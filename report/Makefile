@@ -10,7 +10,7 @@ all:
 	$(LATEX) $(FLAGS) -jobname=$(NOME) $(MAIN).tex
 
 clean:
-	rm -f *.aux *.log *.out *.toc *.lof *.lot *.synctex.gz
+	rm -f *.aux *.log *.out *.toc *.lof *.lot *.synctex.gz *.nlo
 
 distclean: clean
 	rm -f $(NOME).pdf
