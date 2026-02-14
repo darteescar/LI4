@@ -178,64 +178,461 @@
 %==========================================================================
 % BEGIN SUGESTÕES PARA ESCRITA DO RELATÓRIO
 %==========================================================================
-
-\chapter{Sugestões para Escrita do Relatório}
-
-    \section{Sugestões Gerais}
-        <<O presente documento deverá servir de base para a escrita do relatório do trabalho realizado.>>\\
-
-        <<O tipo de letra a utilizar deverá ser Arial.. Porém recomenda-se em situações de escrita de excertos de programas a utilização do tipo de letra Courier New.>>\\
-
-        << Alguns estilos documento: Heading1, Heading2, Heading3, Normal e Footnote Text; foram especialmente modificados para os relatórios da presente disciplina.>>\\
-
-        <<Os formatos e estilos de letra não devem estar constantemente a ser modificados ao longo do relatório. Tal situação dará origem a um relatório com um formato e apresentação muito heterogénea e com um aspecto pouco consistente.>>
-    \section{Termos Estrangeiros}
-        <<Os termos estrangeiros utilizados deverão ser apresentados num formato diferente do resto do texto, por exemplo: Data Warehouse (em itálico) ou "Data Warehouses" (entre aspas), devendo ser evitados sempre que se conheça uma tradução correcta para português. Para validação desses termos existem vários dicionários no mercado que poderão ser úteis.>>
-    \section{Tabelas e Figuras}
-        <<Caso seja necessário introduzir figuras ou tabelas no corpo do documento, estas devem seguir os formatos que se apresentam de seguida. Qualquer figura ou tabela deverá ter uma legenda associada, devendo esta estar correctamente apresentada no índice respectivo no início do relatório.>>
-        
-
-         \begin{figure}[!h]
-            \centering
-            \includegraphics[scale=0.7]{images/example.png}
-            \caption{Ilustração de inserção de uma figura e legenda.}
-         \end{figure}
-        
-        \vspace*{0.2cm}
-        
-        \begin{table}[!h]
-            \centering
-            \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|}
-               \hline
-               \rowcolor{gray!20!white}
-                Coluna1 & Coluna2 & Coluna3 & & ColunaN \\
-                \hline
-                        &         &         & &         \\
-                \hline
-                        &         &         & &         \\
-                \hline
-                        &         &         & &         \\
-                \hline
-                        &         &         & &         \\
-                \hline
-                        &         &         & &         \\
-                \hline
-            \end{tabular}
-            \caption{Ilustração de inserção de uma tabela e sua legenda.}
-        \end{table}
-        
-        
-    \section{Siglas e Acrónimos}
-        <<A utilização de siglas ou acrónimos deverão, tal como os termos estrangeiros, ser feita com base no seguinte formato: Bases de Dados (BD). Todas as siglas e acrónimos deverão ser apresentadas numa secção própria, no início (a seguir aos índices) ou no final (a seguir ao capítulo das conclusões e trabalho futuro) do relatório.
-    \section{Referências Bibliográficas}
-        <<A forma de apresentação das referências bibliográficas deverão estar de acordo com as regras definidas pela IEEE. Consultar www.ieee.org>>
-    \section{Tipo de Ficheiro}
-        <<O relatório poderá ser enviado para o regente da disciplina por correio electrónico num dos seguintes formatos: html, word ou pdf>>
-   
-        
+%
+%\chapter{Sugestões para Escrita do Relatório}
+%
+%    \section{Sugestões Gerais}
+%        <<O presente documento deverá servir de base para a escrita do relatório do trabalho realizado.>>\\
+%
+%        <<O tipo de letra a utilizar deverá ser Arial.. Porém recomenda-se em situações de escrita de excertos de programas a utilização do tipo de letra Courier New.>>\\
+%
+%        << Alguns estilos documento: Heading1, Heading2, Heading3, Normal e Footnote Text; foram especialmente modificados para os relatórios da presente disciplina.>>\\
+%
+%        <<Os formatos e estilos de letra não devem estar constantemente a ser modificados ao longo do relatório. Tal situação dará origem a um relatório com um formato e apresentação muito heterogénea e com um aspecto pouco consistente.>>
+%    \section{Termos Estrangeiros}
+%        <<Os termos estrangeiros utilizados deverão ser apresentados num formato diferente do resto do texto, por exemplo: Data Warehouse (em itálico) ou "Data Warehouses" (entre aspas), devendo ser evitados sempre que se conheça uma tradução correcta para português. Para validação desses termos existem vários dicionários no mercado que poderão ser úteis.>>
+%    \section{Tabelas e Figuras}
+%        <<Caso seja necessário introduzir figuras ou tabelas no corpo do documento, estas devem seguir os formatos que se apresentam de seguida. Qualquer figura ou tabela deverá ter uma legenda associada, devendo esta estar correctamente apresentada no índice respectivo no início do relatório.>>
+%        
+%
+%         \begin{figure}[!h]
+%            \centering
+%            \includegraphics[scale=0.7]{images/example.png}
+%            \caption{Ilustração de inserção de uma figura e legenda.}
+%         \end{figure}
+%        
+%        \vspace*{0.2cm}
+%        
+%        \begin{table}[!h]
+%            \centering
+%            \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|}
+%               \hline
+%               \rowcolor{gray!20!white}
+%                Coluna1 & Coluna2 & Coluna3 & & ColunaN \\
+%                \hline
+%                        &         &         & &         \\
+%                \hline
+%                        &         &         & &         \\
+%               \hline
+%                        &         &         & &         \\
+%                \hline
+%                        &         &         & &         \\
+%                \hline
+%                        &         &         & &         \\
+%                \hline
+%            \end{tabular}
+%            \caption{Ilustração de inserção de uma tabela e sua legenda.}
+%        \end{table}
+%        
+%        
+%    \section{Siglas e Acrónimos}
+%        <<A utilização de siglas ou acrónimos deverão, tal como os termos estrangeiros, ser feita com base no seguinte formato: Bases de Dados (BD). Todas as siglas e acrónimos deverão ser apresentadas numa secção própria, no início (a seguir aos índices) ou no final (a seguir ao capítulo das conclusões e trabalho futuro) do relatório.
+%    \section{Referências Bibliográficas}
+%        <<A forma de apresentação das referências bibliográficas deverão estar de acordo com as regras definidas pela IEEE. Consultar www.ieee.org>>
+%    \section{Tipo de Ficheiro}
+%        <<O relatório poderá ser enviado para o regente da disciplina por correio electrónico num dos seguintes formatos: html, word ou pdf>>
+%   
+%        
 %==========================================================================
 % END SUGESTÕES PARA ESCRITA DO RELATÓRIO
 %==========================================================================
+
+
+%==========================================================================
+% BEGIN DEFINIÇÃO DO DOMÍNIO
+%==========================================================================
+
+\chapter{Definição do Domínio do Sistema}
+
+A modelação do domínio do sistema representa, de forma abstrata, os elementos essenciais envolvidos no funcionamento de uma oficina de reparação de trotinetes. Este domínio engloba os processos de receção e diagnóstico dos equipamentos, execução de intervenções técnicas, utilização e gestão de peças, controlo de stock, faturação, pagamentos e também a produção de relatórios que apoiam a tomada de decisão da gerência.
+
+Segue-se a descrição das entidades principais, incluindo agora também as entidades associadas ao consumo de peças (Peça Utilizada) e à geração de relatórios (técnicos e financeiros).
+
+\section{Cliente}
+
+O \textit{Cliente} é a entidade que representa o proprietário das trotinetes que recorrem aos serviços da oficina. É o ponto de início e fim do ciclo de reparação, pois fornece o equipamento a reparar e realiza o pagamento final.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Registar informação pessoal e fiscal do cliente.
+    \item Permitir associar as trotinetes ao seu proprietário.
+    \item Identificar quem é responsável pelos pagamentos.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idCliente} -- Identificador único do cliente.
+    \item \textbf{nome} -- Nome completo do cliente.
+    \item \textbf{NIF} -- Número de identificação fiscal, usado para faturação.
+    \item \textbf{telefone} -- Contacto telefónico.
+    \item \textbf{email} -- Contacto eletrónico para envio de comunicações e faturas.
+    \item \textbf{morada} -- Endereço físico, útil para faturação e histórico.
+    \item \textbf{dataRegisto} -- Data em que o cliente foi inserido no sistema.
+\end{itemize}
+
+\subsection{Importância no domínio}
+
+O cliente é essencial para a criação das Ordens de Serviço e para todos os documentos financeiros associados.
+
+\section{Trotinete}
+
+A \textit{Trotinete} é o equipamento físico que será diagnosticado e reparado.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Identificar cada equipamento individualmente.
+    \item Registar características técnicas relevantes.
+    \item Criar histórico de reparações.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idTrotinete} -- Identificador único da trotinete.
+    \item \textbf{marca / modelo} -- Identificação comercial do equipamento.
+    \item \textbf{numeroDeSerie} -- Número físico que distingue cada unidade.
+    \item \textbf{estado} -- Ativo, avariado, irrecuperável, sinistrado, etc.
+    \item \textbf{dataRegisto} -- Data de entrada da trotinete no sistema.
+    \item \textbf{tipo} (opcional) -- Pode distinguir trotinetes elétricas, mecânicas, etc.
+\end{itemize}
+
+\subsection{Importância no domínio}
+
+Permite ligar todo o processo de reparação ao equipamento correto.
+
+\section{Ordem de Serviço (OS)}
+
+A \textit{OS} formaliza o pedido de reparação feito pelo cliente.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Registar todos os dados associados ao processo de reparação.
+    \item Servir como documento principal de trabalho dentro da oficina.
+    \item Centralizar diagnósticos, intervenções e faturação.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idOS} -- Identificador da OS.
+    \item \textbf{dataAbertura} -- Momento em que a OS é criada.
+    \item \textbf{dataConclusao} -- Data prevista ou real de conclusão.
+    \item \textbf{estadoOS} -- Aberta, Em Diagnóstico, Em Reparação, Concluída, Faturada.
+    \item \textbf{problemaReportado} -- Descrição fornecida pelo cliente.
+    \item \textbf{custoTotal} -- Soma das intervenções e peças (calculado).
+\end{itemize}
+
+\subsection{Importância no domínio}
+
+É o núcleo do processo de reparação, agregando todas as restantes entidades.
+
+\section{Diagnóstico}
+
+O \textit{Diagnóstico} resulta da análise inicial do técnico.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Determinar a avaria da trotinete.
+    \item Definir o plano de reparação (intervenções necessárias).
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idDiagnostico} -- Identificador único.
+    \item \textbf{descricao} -- Detalhes técnicos da avaria.
+    \item \textbf{recomendacoes} -- Ações sugeridas para reparação.
+    \item \textbf{tecnicoResponsavel} -- Funcionário que realizou o diagnóstico.
+    \item \textbf{dataDiagnostico} -- Momento da avaliação.
+\end{itemize}
+
+\subsection{Importância no domínio}
+
+Baseia as intervenções e permite estimar prazos e custos.
+
+\section{Intervenção}
+
+A \textit{Intervenção} corresponde ao trabalho técnico executado numa OS.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Registar cada ação realizada.
+    \item Permitir calcular custos de mão de obra.
+    \item Ligar peças utilizadas ao trabalho efetivo.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idIntervencao} -- Identificador.
+    \item \textbf{descricao} -- Descrição da tarefa.
+    \item \textbf{dataInicio / dataFim} -- Período da intervenção.
+    \item \textbf{tempoTrabalho} -- Tempo gasto pelo técnico.
+    \item \textbf{custoMaoDeObra} -- Valor associado ao trabalho.
+    \item \textbf{tecnicoResponsavel} -- Técnico que executou.
+\end{itemize}
+
+\subsection{Importância no domínio}
+
+Permite a divisão clara das etapas da reparação.
+
+\section{Peça}
+
+Entidade que representa um componente físico.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Identificar todas as peças usadas na oficina.
+    \item Servir de base para controlo de stock e cálculos financeiros.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idPeca} -- Identificador.
+    \item \textbf{nome / categoria} -- Identificação da peça.
+    \item \textbf{precoUnitario} -- Valor de custo ou venda.
+    \item \textbf{fabricante} -- Marca ou fornecedor.
+    \item \textbf{garantiaMeses} -- Garantia do componente.
+\end{itemize}
+
+\section{Peça Utilizada}
+
+Entidade associativa entre \textit{Intervenção} e \textit{Peça}.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Registar quantas peças foram usadas em cada intervenção.
+    \item Permitir cálculos detalhados do custo total.
+    \item Suportar atualização do stock.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idIntervencao} -- FK.
+    \item \textbf{idPeca} -- FK.
+    \item \textbf{quantidadeUtilizada} -- Quantidade consumida.
+    \item \textbf{custoTotal} -- quantidade $\times$ preço da peça.
+\end{itemize}
+
+\section{Stock}
+
+Controla o inventário de peças.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Garantir disponibilidade de materiais.
+    \item Permitir gerir reposições.
+    \item Detetar níveis mínimos.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idStock} -- Identificador.
+    \item \textbf{idPeca} -- FK para peça associada.
+    \item \textbf{quantidadeAtual} -- Existências atuais.
+    \item \textbf{quantidadeMinima} -- Limiar de alerta.
+    \item \textbf{localizacao} -- Prateleira/armário.
+    \item \textbf{dataUltimaReposicao} -- Histórico de reposições.
+\end{itemize}
+
+\section{Fatura}
+
+Documento financeiro gerado no final da OS.
+
+\subsection{Finalidade da entidade}
+
+\begin{itemize}
+    \item Materializar a cobrança dos serviços prestados.
+    \item Registar valores para relatórios financeiros.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idFatura}
+    \item \textbf{dataEmissao}
+    \item \textbf{valorTotal}
+    \item \textbf{estadoPagamento} (pago, pendente, parcial)
+\end{itemize}
+
+\section{Pagamento}
+
+Regista transações financeiras.
+
+\subsection{Finalidade}
+
+\begin{itemize}
+    \item Permitir diferentes métodos de pagamento.
+    \item Registar histórico financeiro detalhado.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idPagamento}
+    \item \textbf{montante}
+    \item \textbf{dataPagamento}
+    \item \textbf{metodoPagamento}
+\end{itemize}
+
+\section{Funcionário}
+
+Representa trabalhadores da oficina.
+
+\subsection{Finalidade}
+
+\begin{itemize}
+    \item Identificar quem executa diagnósticos, intervenções e tarefas administrativas.
+\end{itemize}
+
+\subsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idFuncionario}
+    \item \textbf{nome}
+    \item \textbf{cargo} (técnico, rececionista, gestor)
+    \item \textbf{contacto}
+\end{itemize}
+
+\section{Entidades Relacionadas com Relatórios}
+
+Para permitir à gerência acompanhar as operações da oficina e fundamentar decisões estratégicas, o domínio é expandido com duas entidades dedicadas à geração e análise de relatórios.
+
+\subsection{Relatório Técnico}
+
+Agrega dados operacionais para análise da oficina.
+
+\subsubsection{Finalidade}
+
+\begin{itemize}
+    \item Mostrar indicadores sobre reparações, tempos, avarias mais comuns, consumo de peças.
+    \item Suportar decisões operacionais e melhorias internas.
+\end{itemize}
+
+\subsubsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idRelatorioTecnico}
+    \item \textbf{dataGeracao}
+    \item \textbf{intervaloDatas}
+    \item \textbf{totalReparacoes}
+    \item \textbf{tempoMedioReparacao}
+    \item \textbf{peçasMaisUtilizadas}
+    \item \textbf{incidenciasMaisComuns}
+\end{itemize}
+
+Serve como apoio à análise operacional, permitindo identificar tendências e gargalos técnicos.
+
+\subsection{Relatório Financeiro}
+
+Agrega dados financeiros da oficina.
+
+\subsubsection{Finalidade}
+
+\begin{itemize}
+    \item Apoiar decisões de investimento e gestão financeira.
+\end{itemize}
+
+\subsubsection{Atributos detalhados}
+
+\begin{itemize}
+    \item \textbf{idRelatorioFinanceiro}
+    \item \textbf{dataGeracao}
+    \item \textbf{intervaloDatas}
+    \item \textbf{totalFaturado}
+    \item \textbf{totalRecebido}
+    \item \textbf{totalEmDivida}
+    \item \textbf{custoTotalPecas}
+    \item \textbf{lucroEstimado}
+\end{itemize}
+
+Estes relatórios apoiam decisões de gestão relacionadas com custos, lucros, rentabilidade e fluxo de caixa.
+
+\section{Relacionamentos Principais do Domínio}
+
+\begin{itemize}
+    \item Um \textbf{Cliente} possui várias \textbf{Trotinetes}.
+    \item Uma \textbf{Trotinete} pode originar várias \textbf{Ordens de Serviço}.
+    \item Cada \textbf{Ordem de Serviço} tem um único \textbf{Diagnóstico}.
+    \item Uma \textbf{Ordem de Serviço} contém uma ou várias \textbf{Intervenções}.
+    \item Uma \textbf{Intervenção} utiliza uma ou várias \textbf{Peças}, representadas pela entidade \textbf{Peça Utilizada}.
+    \item Cada \textbf{Peça} possui um registo de \textbf{Stock}.
+    \item Uma \textbf{Ordem de Serviço} gera uma única \textbf{Fatura}.
+    \item Uma \textbf{Fatura} pode estar associada a vários \textbf{Pagamentos}.
+    \item Os \textbf{Funcionários} realizam diagnósticos, intervenções e operações administrativas.
+    \item \textbf{Relatórios Técnicos} e \textbf{Relatórios Financeiros} são gerados com base nos dados agregados do sistema.
+\end{itemize}
+
+%==========================================================================
+% END DEFINIÇÃO DO DOMÍNIO
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN IDENTIFICAÇÃO DOS STAKEHOLDERS
+%==========================================================================
+
+\chapter{Identificação dos Stakeholders}
+
+Os stakeholders representam todas as partes interessadas que interagem direta ou indiretamente com o sistema.
+
+\section{Cliente}
+
+\begin{itemize}
+    \item Proprietário das trotinetes.
+    \item Solicita reparações e realiza pagamentos.
+    \item Necessita de informação clara sobre o estado da OS, prazos, custos e faturação.
+\end{itemize}
+
+\section{Técnicos / Mecânicos}
+
+\begin{itemize}
+    \item Realizam diagnósticos e intervenções.
+    \item Necessitam de registar trabalho, consultar histórico e aceder aos dados técnicos da trotinete.
+    \item Contribuem para relatórios operacionais.
+\end{itemize}
+
+\section{Rececionista / Funcionário Administrativo}
+
+\begin{itemize}
+    \item Ponto de contacto com o cliente.
+    \item Regista OS, comunica prazos e entrega faturas.
+    \item Gere pagamentos e documentação.
+\end{itemize}
+
+\section{Gestor da Oficina / Gerência}
+
+\begin{itemize}
+    \item Analisa relatórios técnicos e financeiros.
+    \item Supervisiona o desempenho dos técnicos.
+    \item Decide sobre compras, reposições de stock, investimentos e melhorias operacionais.
+    \item Acompanha indicadores como lucros, custos e produtividade.
+\end{itemize}
+
+\section{Fornecedores de peças}
+
+\begin{itemize}
+    \item Entregam peças e componentes necessários.
+    \item Afetam o stock, custos e prazos de reparação.
+    \item Podem futuramente estar integrados em automatismos de reposição.
+\end{itemize}
+
+%==========================================================================
+% END IDENTIFICAÇÃO DOS STAKEHOLDERS
+%==========================================================================
+
 
 %==========================================================================
 % BEGIN CONCLUSÕES DE TRABALHO FUTURO
