@@ -58,6 +58,11 @@
     %% Tikz library to point operations ((x1,y1) + (x2,y2))
     \usetikzlibrary{calc}
 
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{listings}
+\usepackage{listings}
+\usepackage{xcolor}
+
 %% Defining sfdefault font and default font for document
 \renewcommand{\familydefault}{\sfdefault}
 
@@ -236,6 +241,249 @@
 %==========================================================================
 % END SUGESTÕES PARA ESCRITA DO RELATÓRIO
 %==========================================================================
+
+
+\chapter{Conceção e Engenharia de Requisitos Assistida por LLM}
+<<Nesta etapa pretende-se definir claramente o problema e o domínio de aplicação do sistema, introduzir os LLM como agentes de apoio cognitivo ao processo de Engenharia de Requisitos e produzir a documentação formal de requisitos necessária, de forma estruturada e alinhada com as normas reconhecidas, para servir como base as etapas seguintes do projeto.>>
+
+\section{Definição do domínio do sistema}
+
+\subsection{Contextualização}
+
+A empresa EcoRide Solutions é uma oficina de média dimensão situada em Braga, especializada na reparação e manutenção de trotinetes elétricas. Fundada em 2018 por João Martins, antigo técnico de eletrónica, e Ana Ribeiro, gestora com experiência na área da mobilidade urbana, a empresa cresceu rapidamente devido ao aumento da utilização de trotinetes como meio de transporte alternativo. Atualmente, a oficina conta com uma equipa de oito colaboradores, incluindo técnicos especializados, um responsável de armazém e uma assistente administrativa.
+
+Com o aumento do volume de trabalho, a gestão manual dos processos começou a revelar-se insuficiente. A empresa lida diariamente com dezenas de pedidos de diagnóstico, reparações complexas, encomendas de peças e emissão de faturas. A ausência de um sistema integrado tem originado atrasos, falhas de comunicação interna e dificuldades no controlo de custos e de stock. A gerência reconhece que, para manter a competitividade e garantir a qualidade do serviço, é necessário modernizar os processos operacionais.
+
+\subsection{Fundamentação}
+
+A necessidade de implementar um sistema informático surge da crescente complexidade das operações da oficina. Os processos atuais, baseados em folhas de cálculo, documentos dispersos e registos manuais, dificultam a rastreabilidade das intervenções e comprometem a fiabilidade da informação. A inexistência de um mecanismo centralizado para gerir clientes, equipamentos, ordens de serviço e peças conduz a erros frequentes, como discrepâncias no stock, perda de histórico técnico e dificuldades na elaboração de relatórios financeiros.
+
+Além disso, a expansão do mercado de micromobilidade exige que a empresa adote ferramentas que permitam maior eficiência operacional e capacidade de resposta. A automatização dos processos administrativos e técnicos permitirá reduzir tempos de execução, melhorar a comunicação entre técnicos e administração e aumentar a transparência perante o cliente. A implementação de um sistema de gestão integrado constitui, assim, um passo estratégico para a sustentabilidade e crescimento da empresa.
+
+\subsection{Objetivos}
+
+O \textbf{objetivo geral} é desenvolver um sistema de gestão integrado que suporte e otimize os processos operacionais, técnicos e administrativos de uma oficina de reparação de trotinetes.
+
+Os \textbf{objetivos específicos} são:
+\begin{itemize}
+	\item Garantir o registo estruturado de clientes, equipamentos e histórico de intervenções;
+	\item Controlar o ciclo completo das ordens de serviço, desde o diagnóstico até à entrega;
+	\item Registar tempos de reparação, peças utilizadas e custos associados;
+	\item Automatizar a gestão de stock, incluindo entradas, saídas e alertas de reposição;
+	\item Integrar a faturação de serviços e peças, assegurando conformidade legal;
+	\item Disponibilizar relatórios técnicos e financeiros para apoio à decisão;
+	\item Melhorar a comunicação interna e reduzir erros operacionais.
+\end{itemize}
+
+
+\subsection{Viabilidade}
+
+A implementação do sistema apresenta viabilidade económica e operacional. Estima-se que o desenvolvimento e implementação tenham um custo inicial entre \textbf{12 000 € e 18 000 €}, dependendo da complexidade dos módulos e da necessidade de integrações externas. Os custos anuais de manutenção e suporte poderão situar-se entre \textbf{1 000 € e 2 500 €}.
+
+Com base nos dados da empresa, calcula-se que a automatização dos processos permita reduzir o tempo administrativo em cerca de \textbf{30\%}, o que representa uma poupança anual aproximada de \textbf{6 000 €} em horas de trabalho. A melhoria no controlo de stock poderá reduzir perdas e compras desnecessárias, estimando-se um ganho adicional de \textbf{2 000 € a 3 000 €} por ano. A redução de erros de faturação e a melhoria na gestão das ordens de serviço poderão ainda aumentar a receita anual em cerca de \textbf{5\%}, o que, para um volume médio de faturação de \textbf{150 000 €}, representa \textbf{7 500 €}.
+
+Assim, o retorno do investimento poderá ser alcançado entre \textbf{12 e 18 meses}, demonstrando a viabilidade económica do projeto.
+
+\subsection{Delimitação do Domínio}
+
+O domínio do sistema abrange todos os processos relacionados com a gestão operacional de uma oficina de reparação de trotinetes, incluindo:
+\begin{itemize}
+	\item Gestão de entidades (clientes, trotinetes, técnicos);
+	\item Gestão de ordens de serviço e respetivos estados;
+	\item Processos de diagnóstico e reparação;
+	\item Gestão de peças, consumíveis e stock;
+	\item Processos de faturação e emissão de documentos;
+	\item Geração de relatórios operacionais e financeiros;
+\end{itemize}
+
+Não estão incluídos no domínio:
+\begin{itemize}
+	\item Gestão de recursos humanos;
+	\item Integração com plataformas externas de mobilidade (exceto se definido como requisito futuro);
+	\item Funcionalidades de e-commerce ou portal de cliente (fora do escopo inicial).
+\end{itemize}
+
+
+\subsection{Recursos}
+
+\subsection{Equipa de Trabalho}
+
+\subsection{Plano de Execução}
+
+
+\section{Identificação de stakeholders}
+
+\subsection{Stakeholders Internos}
+
+<<Breve descrição do que são "stakeholders internos".>>
+
+\begin{tcolorbox}[
+	title={Gerência: João Martins e Ana Ribeiro},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsáveis pela direção estratégica da EcoRide Solutions. \par
+	\textbf{Interesse:} Obter visibilidade total sobre o desempenho operacional, financeiro e técnico da oficina. \par
+	\textbf{Influência:} Elevada; têm poder de decisão sobre requisitos, prioridades e investimentos. \par
+	\textbf{Necessidades principais:} Relatórios financeiros e técnicos, indicadores de desempenho, controlo de custos, rastreabilidade das operações. \par
+	\textbf{Interação com o sistema:} Consulta de dashboards, relatórios e validação de decisões operacionais.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Assistente Administrativa},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsável pelo atendimento ao cliente, criação de ordens de serviço, faturação e arquivo documental. \par
+	\textbf{Interesse:} Simplificação das tarefas administrativas e redução de erros. \par
+	\textbf{Influência:} Moderada; utiliza o sistema diariamente e fornece feedback operacional. \par
+	\textbf{Necessidades principais:} Registo rápido de clientes e equipamentos, emissão de faturas, gestão de documentos e comunicação com clientes. \par
+	\textbf{Interação com o sistema:} Inserção e atualização de dados, emissão de documentos, consulta de histórico.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Técnicos de Reparação},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Executam diagnósticos, intervenções e reparações nas trotinetes. \par
+	\textbf{Interesse:} Acesso rápido ao histórico técnico e registo eficiente das intervenções. \par
+	\textbf{Influência:} Moderada; impactam diretamente a qualidade dos dados técnicos. \par
+	\textbf{Necessidades principais:} Registo de diagnósticos, tempos de reparação, peças utilizadas e estados das ordens de serviço. \par
+	\textbf{Interação com o sistema:} Atualização de ordens de serviço, consulta de instruções e histórico de reparações.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Responsável de Armazém},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Gere o stock de peças, consumíveis e materiais. \par
+	\textbf{Interesse:} Manter níveis de stock adequados e evitar ruturas ou excesso de inventário. \par
+	\textbf{Influência:} Moderada; contribui para a definição de regras de stock e reposição.\par
+	\textbf{Necessidades principais:} Registo de entradas e saídas, alertas de stock mínimo, integração com ordens de serviço. \par
+	\textbf{Interação com o sistema:} Atualização de inventário, consulta de necessidades de peças, validação de consumos.
+\end{tcolorbox}
+
+
+\subsection{Stakeholders Externos}
+
+<<Breve descrição do que são "stakeholders externos".>>
+
+\begin{tcolorbox}[
+	title={Clientes da Oficina},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Proprietários das trotinetes que recorrem aos serviços da empresa. \par
+	\textbf{Interesse:} Transparência no processo de reparação, prazos cumpridos e custos claros. \par
+	\textbf{Influência:} Baixa; não intervêm no desenvolvimento, mas influenciam requisitos de qualidade. \par
+	\textbf{Necessidades principais:} Informação sobre o estado da reparação, histórico de serviços, faturas e orçamentos. \par
+	\textbf{Interação com o sistema:} Indireta; através de documentos emitidos e comunicação da oficina.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Fornecedores de Peças},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Entidades que fornecem componentes e consumíveis. \par
+	\textbf{Interesse:} Processos de encomenda claros e previsíveis. \par
+	\textbf{Influência:} Baixa; apenas afetam o módulo de stock e compras. \par
+	\textbf{Necessidades principais:} Informação sobre necessidades de reposição e histórico de compras. \par
+	\textbf{Interação com o sistema:} Indireta; através de registos de encomendas e receção de material.
+\end{tcolorbox}
+
+
+\subsection{Stakeholders Técnicos}
+
+<<Breve descrição do que são "stakeholders técnicos".>>
+
+\begin{tcolorbox}[
+	title={Equipa de Desenvolvimento do Sistema},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsáveis pela análise, implementação e manutenção do software. \par
+	\textbf{Interesse:} Requisitos claros, estabilidade do sistema e facilidade de manutenção. \par
+	\textbf{Influência:} Elevada; definem a arquitetura e viabilidade técnica. \par
+	\textbf{Necessidades principais:} Especificações completas, acesso a utilizadores-chave, feedback contínuo. \par
+	\textbf{Interação com o sistema:} Desenvolvimento, testes, manutenção e evolução.
+\end{tcolorbox}
+
+\section{LLM e Avaliação}
+
+\textbf{Objetivo:} Apresentar tema e do sistema a definir
+
+\begin{tcolorbox}[
+	listing only,
+	breakable,
+	enhanced,
+	colback=white,
+	colframe=black,
+	listing options={
+		breaklines=true,
+		basicstyle=\ttfamily\small
+	}
+	]
+	Considera o seguinte tema para a implementação de um sistema informático (Efetua apenas uma análise breve, não inicies nenhum processo criativo): <<Tema 3 no enunciado do trabalho prático>>
+\end{tcolorbox}
+
+\textbf{Análise Crítica:} Avaliar resultados...
+
+\textbf{Objetivo:} Definir o contexto do problema e objetivos a atingir
+\begin{tcolorbox}[
+	listing only,
+	breakable,
+	enhanced,
+	colback=white,
+	colframe=black,
+	listing options={
+		breaklines=true,
+		basicstyle=\ttfamily\small
+	}
+	]
+	Age como um engenheiro de requisitos. Define o dominio do sistema para o tema apresentado. Apresenta os seguintes tópicos: \\
+	- Contextualização (2 a 3 parágrafos): apresenta o contexto e uma história para uma potencial empresa com pessoas reais; \\
+	- Fundamentação (2 a 3 parágrafos): apresenta a causa/s para a implementação do sistema \\
+	- Objetivos a atingir \\
+	- Viabilidade: simula potenciais valores \\
+	Podes apresentar mais tópicos que aches necessários, mas o foco deverão ser os apresentados. Utiliza uma linguagem técnica e formal, adequada para um relatório académico. Evita "bullet points" na contextualização e fundamentação.
+\end{tcolorbox}
+
+\textbf{Análise Crítica:} Avaliar resultados...
+
+\textbf{Objetivo:} Definir os stakeholders de forma estruturada
+\begin{tcolorbox}[
+	listing only,
+	breakable,
+	enhanced,
+	colback=white,
+	colframe=black,
+	listing options={
+		breaklines=true,
+		basicstyle=\ttfamily\small
+	}
+	]
+	A próxima tarefa é identificar os stakeholders, sendo coerente com a definição do sistema gerada. Apresenta o nome de cada stakeholder (nos casos que se aplique), o seu papel, interesse, influência, necessidades principais (nos casos que se aplique) e o tipo de interação com o sistema. Agrupa os stakholders em grupos (e.g: pessoal interno e externo).
+\end{tcolorbox}
+\textbf{Análise Crítica:} Avaliar resultados...
+
+
 
 %==========================================================================
 % BEGIN CONCLUSÕES DE TRABALHO FUTURO
