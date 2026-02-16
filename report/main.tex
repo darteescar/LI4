@@ -248,13 +248,13 @@
 
 \section{Definição do domínio do sistema}
 
-\subsection{Contextualização}
+\subsection{Contexto da Aplicação}
 
-A empresa EcoRide Solutions é uma oficina de média dimensão situada em Braga, especializada na reparação e manutenção de trotinetes elétricas. Fundada em 2018 por João Martins, antigo técnico de eletrónica, e Ana Ribeiro, gestora com experiência na área da mobilidade urbana, a empresa cresceu rapidamente devido ao aumento da utilização de trotinetes como meio de transporte alternativo. Atualmente, a oficina conta com uma equipa de oito colaboradores, incluindo técnicos especializados, um responsável de armazém e uma assistente administrativa.
+A EcoRide Solutions nasceu em 2018 da visão conjunta de João Martins e Ana Ribeiro, amigos de longa data e profissionais com percursos distintos mas complementares. João, técnico de eletrónica com mais de 15 anos de experiência na reparação de equipamentos industriais, começou a interessar-se pela mobilidade elétrica ao reparar a sua própria trotinete, o que despertou a perceção de uma lacuna no mercado local. Ana, por sua vez, trabalhava como gestora de operações numa empresa de transportes urbanos, onde acompanhou de perto o crescimento da micromobilidade e os desafios associados à manutenção de frotas de trotinetes. Ambos decidiram abandonar as suas carreiras estáveis para fundar uma oficina especializada, apostando na crescente procura por soluções de transporte sustentáveis e na escassez de serviços técnicos qualificados nesta área.
 
-Com o aumento do volume de trabalho, a gestão manual dos processos começou a revelar-se insuficiente. A empresa lida diariamente com dezenas de pedidos de diagnóstico, reparações complexas, encomendas de peças e emissão de faturas. A ausência de um sistema integrado tem originado atrasos, falhas de comunicação interna e dificuldades no controlo de custos e de stock. A gerência reconhece que, para manter a competitividade e garantir a qualidade do serviço, é necessário modernizar os processos operacionais.
+Atualmente, a empresa opera a partir de um espaço próprio em Braga e conta com uma equipa de oito colaboradores. Para além dos dois gerentes, a equipa é composta por quatro mecânicos especializados em eletrónica e mecânica de veículos leves, um gestor de armazém responsável pela logística e controlo de peças, e uma assistente administrativa que assegura o atendimento ao cliente, a faturação e a gestão documental. A estrutura organizacional é concisa, mas funcional, permitindo uma comunicação direta entre os diferentes intervenientes e uma resposta ágil às necessidades dos clientes. A cultura da empresa assenta na inovação, na eficiência operacional e na prestação de um serviço técnico de elevada qualidade.
 
-\subsection{Fundamentação}
+\subsection{Motivação e Objetivos do Trabalho}
 
 A necessidade de implementar um sistema informático surge da crescente complexidade das operações da oficina. Os processos atuais, baseados em folhas de cálculo, documentos dispersos e registos manuais, dificultam a rastreabilidade das intervenções e comprometem a fiabilidade da informação. A inexistência de um mecanismo centralizado para gerir clientes, equipamentos, ordens de serviço e peças conduz a erros frequentes, como discrepâncias no stock, perda de histórico técnico e dificuldades na elaboração de relatórios financeiros.
 
@@ -278,9 +278,9 @@ Os \textbf{objetivos específicos} são:
 
 \subsection{Viabilidade}
 
-A implementação do sistema apresenta viabilidade económica e operacional. Estima-se que o desenvolvimento e implementação tenham um custo inicial entre \textbf{12 000 € e 18 000 €}, dependendo da complexidade dos módulos e da necessidade de integrações externas. Os custos anuais de manutenção e suporte poderão situar-se entre \textbf{1 000 € e 2 500 €}.
+A implementação do sistema apresenta uma viabilidade económica favorável, considerando os benefícios operacionais e administrativos que proporciona. O custo estimado para o desenvolvimento e implementação do sistema situa-se nos \textbf{12 000 €}, incluindo análise de requisitos, desenvolvimento, testes, formação e instalação.
 
-Com base nos dados da empresa, calcula-se que a automatização dos processos permita reduzir o tempo administrativo em cerca de \textbf{30\%}, o que representa uma poupança anual aproximada de \textbf{6 000 €} em horas de trabalho. A melhoria no controlo de stock poderá reduzir perdas e compras desnecessárias, estimando-se um ganho adicional de \textbf{2 000 € a 3 000 €} por ano. A redução de erros de faturação e a melhoria na gestão das ordens de serviço poderão ainda aumentar a receita anual em cerca de \textbf{5\%}, o que, para um volume médio de faturação de \textbf{150 000 €}, representa \textbf{7 500 €}.
+Com base na análise dos processos atuais da EcoRide Solutions, estima-se que a automatização dos fluxos de trabalho poderá reduzir em cerca de \textbf{25\% a 30\%} o tempo despendido em tarefas administrativas e operacionais. Esta melhoria traduz-se numa maior eficiência na gestão de ordens de serviço, controlo de stock e emissão de faturas. Adicionalmente, a redução de erros humanos e a melhoria na rastreabilidade das intervenções técnicas poderão contribuir para um aumento de \textbf{5\% a 8\%} na satisfação dos clientes e na retenção de serviços.
 
 Assim, o retorno do investimento poderá ser alcançado entre \textbf{12 e 18 meses}, demonstrando a viabilidade económica do projeto.
 
@@ -425,64 +425,152 @@ Não estão incluídos no domínio:
 	\textbf{Interação com o sistema:} Desenvolvimento, testes, manutenção e evolução.
 \end{tcolorbox}
 
+
 \section{LLM e Avaliação}
 
-\textbf{Objetivo:} Apresentar tema e do sistema a definir
-
 \begin{tcolorbox}[
-	listing only,
-	breakable,
-	enhanced,
+	title={Prompt P1 - Apresentação do tema do sistema},
 	colback=white,
 	colframe=black,
-	listing options={
-		breaklines=true,
-		basicstyle=\ttfamily\small
-	}
+	arc=2mm,
+	boxrule=0.5pt
 	]
-	Considera o seguinte tema para a implementação de um sistema informático (Efetua apenas uma análise breve, não inicies nenhum processo criativo): <<Tema 3 no enunciado do trabalho prático>>
+	\textbf{Objetivo:} Apresentar tema do sistema a definir. \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Considera o seguinte tema para a implementação de um sistema informático (Efetua apenas uma análise breve, não inicies nenhum processo criativo): <<Tema 3 no enunciado do trabalho prático>>
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
 \end{tcolorbox}
 
-\textbf{Análise Crítica:} Avaliar resultados...
 
-\textbf{Objetivo:} Definir o contexto do problema e objetivos a atingir
 \begin{tcolorbox}[
-	listing only,
-	breakable,
-	enhanced,
+	title={Prompt P2 - Definição do domínio do sistema},
 	colback=white,
 	colframe=black,
-	listing options={
-		breaklines=true,
-		basicstyle=\ttfamily\small
-	}
+	arc=2mm,
+	boxrule=0.5pt
 	]
-	Age como um engenheiro de requisitos. Define o dominio do sistema para o tema apresentado. Apresenta os seguintes tópicos: \\
-	- Contextualização (2 a 3 parágrafos): apresenta o contexto e uma história para uma potencial empresa com pessoas reais; \\
-	- Fundamentação (2 a 3 parágrafos): apresenta a causa/s para a implementação do sistema \\
-	- Objetivos a atingir \\
-	- Viabilidade: simula potenciais valores \\
-	Podes apresentar mais tópicos que aches necessários, mas o foco deverão ser os apresentados. Utiliza uma linguagem técnica e formal, adequada para um relatório académico. Evita "bullet points" na contextualização e fundamentação.
+	\textbf{Objetivo:} Definir o contexto e formular o problema a resolver. \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Age como um engenheiro de requisitos. Define o dominio do sistema para o tema apresentado. Apresenta os seguintes tópicos: \\
+		- Contextualização (2 a 3 parágrafos): apresenta o contexto e uma história para uma potencial empresa com pessoas reais; \\
+		- Fundamentação (2 a 3 parágrafos): apresenta a causa/s para a implementação do sistema \\
+		- Objetivos a atingir \\
+		- Viabilidade: simula potenciais valores \\
+		Podes apresentar mais tópicos que aches necessários, mas o foco deverão ser os apresentados. Utiliza uma linguagem técnica e formal, adequada para um relatório académico. Evita "bullet points" na contextualização e fundamentação.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
 \end{tcolorbox}
 
-\textbf{Análise Crítica:} Avaliar resultados...
 
-\textbf{Objetivo:} Definir os stakeholders de forma estruturada
 \begin{tcolorbox}[
-	listing only,
-	breakable,
-	enhanced,
+	title={Prompt P3 - Indentificação de Stakeholders},
 	colback=white,
 	colframe=black,
-	listing options={
-		breaklines=true,
-		basicstyle=\ttfamily\small
-	}
+	arc=2mm,
+	boxrule=0.5pt
 	]
-	A próxima tarefa é identificar os stakeholders, sendo coerente com a definição do sistema gerada. Apresenta o nome de cada stakeholder (nos casos que se aplique), o seu papel, interesse, influência, necessidades principais (nos casos que se aplique) e o tipo de interação com o sistema. Agrupa os stakholders em grupos (e.g: pessoal interno e externo).
+	\textbf{Objetivo:} Identificar stakeholders do sistema a implementar \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		A próxima tarefa é identificar os stakeholders, sendo coerente com a definição do sistema gerada. Apresenta o nome de cada stakeholder (nos casos que se aplique), o seu papel, interesse, influência, necessidades principais (nos casos que se aplique) e o tipo de interação com o sistema. Agrupa os stakholders em grupos (e.g: pessoal interno e externo).
+	\end{tcolorbox}
+	 \par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
 \end{tcolorbox}
-\textbf{Análise Crítica:} Avaliar resultados...
 
+
+\begin{tcolorbox}[
+	title={Prompt P4 - Reformulação da contextualização},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Reformular a contextualização \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		O segundo parágrafo da contextualização está semelhante à fundamentação. Neste tópico deves dar contexto à empresa, aos funcionários.
+		Na contextualização, formula uma história do porquê da empresa ter sido criada que inclua o motivo dos gerentes terem abandonado as suas antigas profissões. Os funcionários da empresa devem ser 4 mecânicos, 1 gestor de armazém, 1 assistente administrativo e os 2 gerentes. Escreve dois parágrafos. Reformula apenas a contextualização, tendo em consideração os restantes tópicos já criados.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Prompt P4 - Reformulação da contextualização},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Reformular a contextualização \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Na análise de viabilidade estás a exagerar nos valores apresentados. Reforma este tópico com menos referências a valores. Apresenta apenas algumas percentagens relativas a ganhos ou perdas e o valor total de custo.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
 
 
 %==========================================================================
