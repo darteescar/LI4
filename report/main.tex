@@ -58,6 +58,11 @@
     %% Tikz library to point operations ((x1,y1) + (x2,y2))
     \usetikzlibrary{calc}
 
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{listings}
+\usepackage{listings}
+\usepackage{xcolor}
+
 %% Defining sfdefault font and default font for document
 \renewcommand{\familydefault}{\sfdefault}
 
@@ -238,401 +243,458 @@
 %==========================================================================
 
 
-%==========================================================================
-% BEGIN DEFINIÇÃO DO DOMÍNIO
-%==========================================================================
+\chapter{Conceção e Engenharia de Requisitos Assistida por LLM}
+<<Nesta etapa pretende-se definir claramente o problema e o domínio de aplicação do sistema, introduzir os LLM como agentes de apoio cognitivo ao processo de Engenharia de Requisitos e produzir a documentação formal de requisitos necessária, de forma estruturada e alinhada com as normas reconhecidas, para servir como base as etapas seguintes do projeto.>>
 
-\chapter{Definição do Domínio do Sistema}
+\section{Definição do domínio do sistema}
 
-A modelação do domínio do sistema representa, de forma abstrata, os elementos essenciais envolvidos no funcionamento de uma oficina de reparação de trotinetes. Este domínio engloba os processos de receção e diagnóstico dos equipamentos, execução de intervenções técnicas, utilização e gestão de peças, controlo de stock, faturação, pagamentos e também a produção de relatórios que apoiam a tomada de decisão da gerência.
+\subsection{Contexto da Aplicação}
 
-Segue-se a descrição das entidades principais, incluindo agora também as entidades associadas ao consumo de peças (Peça Utilizada) e à geração de relatórios (técnicos e financeiros).
+A EcoRide Solutions nasceu em 2018 da visão conjunta de João Martins e Ana Ribeiro, amigos de longa data e profissionais com percursos distintos mas complementares. João, técnico de eletrónica com mais de 15 anos de experiência na reparação de equipamentos industriais, começou a interessar-se pela mobilidade elétrica ao reparar a sua própria trotinete, o que despertou a perceção de uma lacuna no mercado local. Ana, por sua vez, trabalhava como gestora de operações numa empresa de transportes urbanos, onde acompanhou de perto o crescimento da micromobilidade e os desafios associados à manutenção de frotas de trotinetes. Ambos decidiram abandonar as suas carreiras estáveis para fundar uma oficina especializada, apostando na crescente procura por soluções de transporte sustentáveis e na escassez de serviços técnicos qualificados nesta área.
 
-\section{Cliente}
+Atualmente, a empresa opera a partir de um espaço próprio em Braga e conta com uma equipa de oito colaboradores. Para além dos dois gerentes, a equipa é composta por quatro mecânicos especializados em eletrónica e mecânica de veículos leves, um gestor de armazém responsável pela logística e controlo de peças, e uma assistente administrativa que assegura o atendimento ao cliente, a faturação e a gestão documental. A estrutura organizacional é concisa, mas funcional, permitindo uma comunicação direta entre os diferentes intervenientes e uma resposta ágil às necessidades dos clientes. A cultura da empresa assenta na inovação, na eficiência operacional e na prestação de um serviço técnico de elevada qualidade.
 
-O \textit{Cliente} é a entidade que representa o proprietário das trotinetes que recorrem aos serviços da oficina. É o ponto de início e fim do ciclo de reparação, pois fornece o equipamento a reparar e realiza o pagamento final.
+\subsection{Motivação e Objetivos do Trabalho}
 
-\subsection{Finalidade da entidade}
+A necessidade de implementar um sistema informático surge da crescente complexidade das operações da oficina. Os processos atuais, baseados em folhas de cálculo, documentos dispersos e registos manuais, dificultam a rastreabilidade das intervenções e comprometem a fiabilidade da informação. A inexistência de um mecanismo centralizado para gerir clientes, equipamentos, ordens de serviço e peças conduz a erros frequentes, como discrepâncias no stock, perda de histórico técnico e dificuldades na elaboração de relatórios financeiros.
 
+Além disso, a expansão do mercado de micromobilidade exige que a empresa adote ferramentas que permitam maior eficiência operacional e capacidade de resposta. A automatização dos processos administrativos e técnicos permitirá reduzir tempos de execução, melhorar a comunicação entre técnicos e administração e aumentar a transparência perante o cliente. A implementação de um sistema de gestão integrado constitui, assim, um passo estratégico para a sustentabilidade e crescimento da empresa.
+
+\subsection{Objetivos}
+
+O \textbf{objetivo geral} é desenvolver um sistema de gestão integrado que suporte e otimize os processos operacionais, técnicos e administrativos de uma oficina de reparação de trotinetes.
+
+Os \textbf{objetivos específicos} são:
 \begin{itemize}
-    \item Registar informação pessoal e fiscal do cliente.
-    \item Permitir associar as trotinetes ao seu proprietário.
-    \item Identificar quem é responsável pelos pagamentos.
+	\item Garantir o registo estruturado de clientes, equipamentos e histórico de intervenções;
+	\item Controlar o ciclo completo das ordens de serviço, desde o diagnóstico até à entrega;
+	\item Registar tempos de reparação, peças utilizadas e custos associados;
+	\item Automatizar a gestão de stock, incluindo entradas, saídas e alertas de reposição;
+	\item Integrar a faturação de serviços e peças, assegurando conformidade legal;
+	\item Disponibilizar relatórios técnicos e financeiros para apoio à decisão;
+	\item Melhorar a comunicação interna e reduzir erros operacionais.
 \end{itemize}
 
-\subsection{Atributos detalhados}
 
+\subsection{Viabilidade}
+
+A implementação do sistema apresenta uma viabilidade económica favorável, considerando os benefícios operacionais e administrativos que proporciona. O custo estimado para o desenvolvimento e implementação do sistema situa-se nos \textbf{12 000 €}, incluindo análise de requisitos, desenvolvimento, testes, formação e instalação.
+
+Com base na análise dos processos atuais da EcoRide Solutions, estima-se que a automatização dos fluxos de trabalho poderá reduzir em cerca de \textbf{25\% a 30\%} o tempo despendido em tarefas administrativas e operacionais. Esta melhoria traduz-se numa maior eficiência na gestão de ordens de serviço, controlo de stock e emissão de faturas. Adicionalmente, a redução de erros humanos e a melhoria na rastreabilidade das intervenções técnicas poderão contribuir para um aumento de \textbf{5\% a 8\%} na satisfação dos clientes e na retenção de serviços.
+
+Assim, o retorno do investimento poderá ser alcançado entre \textbf{12 e 18 meses}, demonstrando a viabilidade económica do projeto.
+
+\subsection{Delimitação do Domínio}
+
+O domínio do sistema abrange todos os processos relacionados com a gestão operacional de uma oficina de reparação de trotinetes, incluindo:
 \begin{itemize}
-    \item \textbf{idCliente} -- Identificador único do cliente.
-    \item \textbf{nome} -- Nome completo do cliente.
-    \item \textbf{NIF} -- Número de identificação fiscal, usado para faturação.
-    \item \textbf{telefone} -- Contacto telefónico.
-    \item \textbf{email} -- Contacto eletrónico para envio de comunicações e faturas.
-    \item \textbf{morada} -- Endereço físico, útil para faturação e histórico.
-    \item \textbf{dataRegisto} -- Data em que o cliente foi inserido no sistema.
+	\item Gestão de entidades (clientes, trotinetes, técnicos);
+	\item Gestão de ordens de serviço e respetivos estados;
+	\item Processos de diagnóstico e reparação;
+	\item Gestão de peças, consumíveis e stock;
+	\item Processos de faturação e emissão de documentos;
+	\item Geração de relatórios operacionais e financeiros;
 \end{itemize}
 
-\subsection{Importância no domínio}
-
-O cliente é essencial para a criação das Ordens de Serviço e para todos os documentos financeiros associados.
-
-\section{Trotinete}
-
-A \textit{Trotinete} é o equipamento físico que será diagnosticado e reparado.
-
-\subsection{Finalidade da entidade}
-
+Não estão incluídos no domínio:
 \begin{itemize}
-    \item Identificar cada equipamento individualmente.
-    \item Registar características técnicas relevantes.
-    \item Criar histórico de reparações.
+	\item Gestão de recursos humanos;
+	\item Integração com plataformas externas de mobilidade (exceto se definido como requisito futuro);
+	\item Funcionalidades de e-commerce ou portal de cliente (fora do escopo inicial).
 \end{itemize}
 
-\subsection{Atributos detalhados}
 
-\begin{itemize}
-    \item \textbf{idTrotinete} -- Identificador único da trotinete.
-    \item \textbf{marca / modelo} -- Identificação comercial do equipamento.
-    \item \textbf{numeroDeSerie} -- Número físico que distingue cada unidade.
-    \item \textbf{estado} -- Ativo, avariado, irrecuperável, sinistrado, etc.
-    \item \textbf{dataRegisto} -- Data de entrada da trotinete no sistema.
-    \item \textbf{tipo} (opcional) -- Pode distinguir trotinetes elétricas, mecânicas, etc.
-\end{itemize}
-
-\subsection{Importância no domínio}
-
-Permite ligar todo o processo de reparação ao equipamento correto.
-
-\section{Ordem de Serviço (OS)}
-
-A \textit{OS} formaliza o pedido de reparação feito pelo cliente.
-
-\subsection{Finalidade da entidade}
-
-\begin{itemize}
-    \item Registar todos os dados associados ao processo de reparação.
-    \item Servir como documento principal de trabalho dentro da oficina.
-    \item Centralizar diagnósticos, intervenções e faturação.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idOS} -- Identificador da OS.
-    \item \textbf{dataAbertura} -- Momento em que a OS é criada.
-    \item \textbf{dataConclusao} -- Data prevista ou real de conclusão.
-    \item \textbf{estadoOS} -- Aberta, Em Diagnóstico, Em Reparação, Concluída, Faturada.
-    \item \textbf{problemaReportado} -- Descrição fornecida pelo cliente.
-    \item \textbf{custoTotal} -- Soma das intervenções e peças (calculado).
-\end{itemize}
-
-\subsection{Importância no domínio}
-
-É o núcleo do processo de reparação, agregando todas as restantes entidades.
-
-\section{Diagnóstico}
-
-O \textit{Diagnóstico} resulta da análise inicial do técnico.
-
-\subsection{Finalidade da entidade}
-
-\begin{itemize}
-    \item Determinar a avaria da trotinete.
-    \item Definir o plano de reparação (intervenções necessárias).
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idDiagnostico} -- Identificador único.
-    \item \textbf{descricao} -- Detalhes técnicos da avaria.
-    \item \textbf{recomendacoes} -- Ações sugeridas para reparação.
-    \item \textbf{tecnicoResponsavel} -- Funcionário que realizou o diagnóstico.
-    \item \textbf{dataDiagnostico} -- Momento da avaliação.
-\end{itemize}
-
-\subsection{Importância no domínio}
-
-Baseia as intervenções e permite estimar prazos e custos.
-
-\section{Intervenção}
-
-A \textit{Intervenção} corresponde ao trabalho técnico executado numa OS.
-
-\subsection{Finalidade da entidade}
-
-\begin{itemize}
-    \item Registar cada ação realizada.
-    \item Permitir calcular custos de mão de obra.
-    \item Ligar peças utilizadas ao trabalho efetivo.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idIntervencao} -- Identificador.
-    \item \textbf{descricao} -- Descrição da tarefa.
-    \item \textbf{dataInicio / dataFim} -- Período da intervenção.
-    \item \textbf{tempoTrabalho} -- Tempo gasto pelo técnico.
-    \item \textbf{custoMaoDeObra} -- Valor associado ao trabalho.
-    \item \textbf{tecnicoResponsavel} -- Técnico que executou.
-\end{itemize}
-
-\subsection{Importância no domínio}
-
-Permite a divisão clara das etapas da reparação.
-
-\section{Peça}
-
-Entidade que representa um componente físico.
-
-\subsection{Finalidade da entidade}
-
-\begin{itemize}
-    \item Identificar todas as peças usadas na oficina.
-    \item Servir de base para controlo de stock e cálculos financeiros.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idPeca} -- Identificador.
-    \item \textbf{nome / categoria} -- Identificação da peça.
-    \item \textbf{precoUnitario} -- Valor de custo ou venda.
-    \item \textbf{fabricante} -- Marca ou fornecedor.
-    \item \textbf{garantiaMeses} -- Garantia do componente.
-\end{itemize}
-
-\section{Peça Utilizada}
-
-Entidade associativa entre \textit{Intervenção} e \textit{Peça}.
-
-\subsection{Finalidade da entidade}
-
-\begin{itemize}
-    \item Registar quantas peças foram usadas em cada intervenção.
-    \item Permitir cálculos detalhados do custo total.
-    \item Suportar atualização do stock.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idIntervencao} -- FK.
-    \item \textbf{idPeca} -- FK.
-    \item \textbf{quantidadeUtilizada} -- Quantidade consumida.
-    \item \textbf{custoTotal} -- quantidade $\times$ preço da peça.
-\end{itemize}
-
-\section{Stock}
-
-Controla o inventário de peças.
-
-\subsection{Finalidade da entidade}
-
-\begin{itemize}
-    \item Garantir disponibilidade de materiais.
-    \item Permitir gerir reposições.
-    \item Detetar níveis mínimos.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idStock} -- Identificador.
-    \item \textbf{idPeca} -- FK para peça associada.
-    \item \textbf{quantidadeAtual} -- Existências atuais.
-    \item \textbf{quantidadeMinima} -- Limiar de alerta.
-    \item \textbf{localizacao} -- Prateleira/armário.
-    \item \textbf{dataUltimaReposicao} -- Histórico de reposições.
-\end{itemize}
-
-\section{Fatura}
-
-Documento financeiro gerado no final da OS.
-
-\subsection{Finalidade da entidade}
-
-\begin{itemize}
-    \item Materializar a cobrança dos serviços prestados.
-    \item Registar valores para relatórios financeiros.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idFatura}
-    \item \textbf{dataEmissao}
-    \item \textbf{valorTotal}
-    \item \textbf{estadoPagamento} (pago, pendente, parcial)
-\end{itemize}
-
-\section{Pagamento}
-
-Regista transações financeiras.
-
-\subsection{Finalidade}
-
-\begin{itemize}
-    \item Permitir diferentes métodos de pagamento.
-    \item Registar histórico financeiro detalhado.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idPagamento}
-    \item \textbf{montante}
-    \item \textbf{dataPagamento}
-    \item \textbf{metodoPagamento}
-\end{itemize}
-
-\section{Funcionário}
-
-Representa trabalhadores da oficina.
-
-\subsection{Finalidade}
-
-\begin{itemize}
-    \item Identificar quem executa diagnósticos, intervenções e tarefas administrativas.
-\end{itemize}
-
-\subsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idFuncionario}
-    \item \textbf{nome}
-    \item \textbf{cargo} (técnico, rececionista, gestor)
-    \item \textbf{contacto}
-\end{itemize}
-
-\section{Entidades Relacionadas com Relatórios}
-
-Para permitir à gerência acompanhar as operações da oficina e fundamentar decisões estratégicas, o domínio é expandido com duas entidades dedicadas à geração e análise de relatórios.
-
-\subsection{Relatório Técnico}
-
-Agrega dados operacionais para análise da oficina.
-
-\subsubsection{Finalidade}
-
-\begin{itemize}
-    \item Mostrar indicadores sobre reparações, tempos, avarias mais comuns, consumo de peças.
-    \item Suportar decisões operacionais e melhorias internas.
-\end{itemize}
-
-\subsubsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idRelatorioTecnico}
-    \item \textbf{dataGeracao}
-    \item \textbf{intervaloDatas}
-    \item \textbf{totalReparacoes}
-    \item \textbf{tempoMedioReparacao}
-    \item \textbf{peçasMaisUtilizadas}
-    \item \textbf{incidenciasMaisComuns}
-\end{itemize}
-
-Serve como apoio à análise operacional, permitindo identificar tendências e gargalos técnicos.
-
-\subsection{Relatório Financeiro}
-
-Agrega dados financeiros da oficina.
-
-\subsubsection{Finalidade}
-
-\begin{itemize}
-    \item Apoiar decisões de investimento e gestão financeira.
-\end{itemize}
-
-\subsubsection{Atributos detalhados}
-
-\begin{itemize}
-    \item \textbf{idRelatorioFinanceiro}
-    \item \textbf{dataGeracao}
-    \item \textbf{intervaloDatas}
-    \item \textbf{totalFaturado}
-    \item \textbf{totalRecebido}
-    \item \textbf{totalEmDivida}
-    \item \textbf{custoTotalPecas}
-    \item \textbf{lucroEstimado}
-\end{itemize}
-
-Estes relatórios apoiam decisões de gestão relacionadas com custos, lucros, rentabilidade e fluxo de caixa.
-
-\section{Relacionamentos Principais do Domínio}
-
-\begin{itemize}
-    \item Um \textbf{Cliente} possui várias \textbf{Trotinetes}.
-    \item Uma \textbf{Trotinete} pode originar várias \textbf{Ordens de Serviço}.
-    \item Cada \textbf{Ordem de Serviço} tem um único \textbf{Diagnóstico}.
-    \item Uma \textbf{Ordem de Serviço} contém uma ou várias \textbf{Intervenções}.
-    \item Uma \textbf{Intervenção} utiliza uma ou várias \textbf{Peças}, representadas pela entidade \textbf{Peça Utilizada}.
-    \item Cada \textbf{Peça} possui um registo de \textbf{Stock}.
-    \item Uma \textbf{Ordem de Serviço} gera uma única \textbf{Fatura}.
-    \item Uma \textbf{Fatura} pode estar associada a vários \textbf{Pagamentos}.
-    \item Os \textbf{Funcionários} realizam diagnósticos, intervenções e operações administrativas.
-    \item \textbf{Relatórios Técnicos} e \textbf{Relatórios Financeiros} são gerados com base nos dados agregados do sistema.
-\end{itemize}
-
-%==========================================================================
-% END DEFINIÇÃO DO DOMÍNIO
-%==========================================================================
-
-
-%==========================================================================
-% BEGIN IDENTIFICAÇÃO DOS STAKEHOLDERS
-%==========================================================================
-
-\chapter{Identificação dos Stakeholders}
-
-Os stakeholders representam todas as partes interessadas que interagem direta ou indiretamente com o sistema.
-
-\section{Cliente}
-
-\begin{itemize}
-    \item Proprietário das trotinetes.
-    \item Solicita reparações e realiza pagamentos.
-    \item Necessita de informação clara sobre o estado da OS, prazos, custos e faturação.
-\end{itemize}
-
-\section{Técnicos / Mecânicos}
-
-\begin{itemize}
-    \item Realizam diagnósticos e intervenções.
-    \item Necessitam de registar trabalho, consultar histórico e aceder aos dados técnicos da trotinete.
-    \item Contribuem para relatórios operacionais.
-\end{itemize}
-
-\section{Rececionista / Funcionário Administrativo}
-
-\begin{itemize}
-    \item Ponto de contacto com o cliente.
-    \item Regista OS, comunica prazos e entrega faturas.
-    \item Gere pagamentos e documentação.
-\end{itemize}
-
-\section{Gestor da Oficina / Gerência}
-
-\begin{itemize}
-    \item Analisa relatórios técnicos e financeiros.
-    \item Supervisiona o desempenho dos técnicos.
-    \item Decide sobre compras, reposições de stock, investimentos e melhorias operacionais.
-    \item Acompanha indicadores como lucros, custos e produtividade.
-\end{itemize}
-
-\section{Fornecedores de peças}
-
-\begin{itemize}
-    \item Entregam peças e componentes necessários.
-    \item Afetam o stock, custos e prazos de reparação.
-    \item Podem futuramente estar integrados em automatismos de reposição.
-\end{itemize}
-
-%==========================================================================
-% END IDENTIFICAÇÃO DOS STAKEHOLDERS
-%==========================================================================
-
+\subsection{Recursos}
+
+A implementação do sistema de gestão da EcoRide Solutions envolveu um conjunto de recursos humanos e materiais que sustentaram todas as fases do projeto, desde a análise de requisitos até à sua conclusão.
+
+Os recursos humanos englobaram todos os funcionários da empresa, os clientes enquanto utilizadores indiretos do sistema e a equipa de desenvolvimento responsável pela conceção, implementação, testes e manutenção da solução.
+
+No que diz respeito aos recursos materiais, foram utilizados componentes de hardware e software adequados às exigências do projeto. O hardware incluiu um servidor de base de dados para alojamento centralizado da informação e os computadores utilizados pela equipa de desenvolvimento. Em termos de software, foram empregues o sistema de gestão de base de dados MySQL, o MySQL Workbench para administração e modelação da base de dados, o brModelo para a modelação conceptual do modelo de dados e o Visual Paradigm para a modelação de processos e estruturas com base na linguagem UML. Adicionalmente, foram utilizadas diversas ferramentas de desenvolvimento, coordenação e teste de código, com a implementação a ter sido realizada em Java.
+
+\subsection{Equipa de Trabalho}
+A equipa de trabalho envolvida no desenvolvimento do sistema de gestão da EcoRide Solutions foi estruturada em duas categorias principais: pessoal interno e pessoal externo.
+
+O pessoal interno correspondeu a todos os funcionários da empresa, que participaram como utilizadores finais do sistema e contribuíram com conhecimento prático sobre os processos operacionais e administrativos da oficina. Esta colaboração permitiu identificar os requisitos funcionais e validar as funcionalidades implementadas. Cada colaborador desempenhou um papel específico: os gerentes supervisionaram e aprovaram as decisões estratégicas, os mecânicos forneceram informação sobre os procedimentos técnicos, o gestor de armazém detalhou os fluxos de gestão de stock e a assistente administrativa descreveu os processos de atendimento, faturação e gestão documental.
+
+O pessoal externo foi composto pela equipa de desenvolvimento e pelos clientes da empresa. A equipa de desenvolvimento, constituída por Duarte Escairo, Eduardo Fernandes, Inês Ferreira, Luís Soares e Tiago Figueiredo, foi responsável por todo o processo de engenharia de software, incluindo o levantamento e análise de requisitos, modelação conceptual e lógica da base de dados, modelação de processos segundo a linguagem UML, implementação da aplicação em Java, testes e validação da solução. Os clientes participaram em fases específicas do projeto, nomeadamente através da resposta a inquéritos de opinião e da validação dos serviços prestados, contribuindo para aferir a eficácia e adequação do sistema às suas necessidades.
+
+\subsection{Plano de Execução}
+
+
+\section{Identificação de stakeholders}
+
+\subsection{Stakeholders Internos}
+
+<<Breve descrição do que são "stakeholders internos".>>
+
+\begin{tcolorbox}[
+	title={Gerência: João Martins e Ana Ribeiro},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsáveis pela direção estratégica da EcoRide Solutions. \par
+	\textbf{Interesse:} Obter visibilidade total sobre o desempenho operacional, financeiro e técnico da oficina. \par
+	\textbf{Influência:} Elevada; têm poder de decisão sobre requisitos, prioridades e investimentos. \par
+	\textbf{Necessidades principais:} Relatórios financeiros e técnicos, indicadores de desempenho, controlo de custos, rastreabilidade das operações. \par
+	\textbf{Interação com o sistema:} Consulta de dashboards, relatórios e validação de decisões operacionais.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Assistente Administrativa},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsável pelo atendimento ao cliente, criação de ordens de serviço, faturação e arquivo documental. \par
+	\textbf{Interesse:} Simplificação das tarefas administrativas e redução de erros. \par
+	\textbf{Influência:} Moderada; utiliza o sistema diariamente e fornece feedback operacional. \par
+	\textbf{Necessidades principais:} Registo rápido de clientes e equipamentos, emissão de faturas, gestão de documentos e comunicação com clientes. \par
+	\textbf{Interação com o sistema:} Inserção e atualização de dados, emissão de documentos, consulta de histórico.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Técnicos de Reparação},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Executam diagnósticos, intervenções e reparações nas trotinetes. \par
+	\textbf{Interesse:} Acesso rápido ao histórico técnico e registo eficiente das intervenções. \par
+	\textbf{Influência:} Moderada; impactam diretamente a qualidade dos dados técnicos. \par
+	\textbf{Necessidades principais:} Registo de diagnósticos, tempos de reparação, peças utilizadas e estados das ordens de serviço. \par
+	\textbf{Interação com o sistema:} Atualização de ordens de serviço, consulta de instruções e histórico de reparações.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Responsável de Armazém},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Gere o stock de peças, consumíveis e materiais. \par
+	\textbf{Interesse:} Manter níveis de stock adequados e evitar ruturas ou excesso de inventário. \par
+	\textbf{Influência:} Moderada; contribui para a definição de regras de stock e reposição.\par
+	\textbf{Necessidades principais:} Registo de entradas e saídas, alertas de stock mínimo, integração com ordens de serviço. \par
+	\textbf{Interação com o sistema:} Atualização de inventário, consulta de necessidades de peças, validação de consumos.
+\end{tcolorbox}
+
+
+\subsection{Stakeholders Externos}
+
+<<Breve descrição do que são "stakeholders externos".>>
+
+\begin{tcolorbox}[
+	title={Clientes da Oficina},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Proprietários das trotinetes que recorrem aos serviços da empresa. \par
+	\textbf{Interesse:} Transparência no processo de reparação, prazos cumpridos e custos claros. \par
+	\textbf{Influência:} Baixa; não intervêm no desenvolvimento, mas influenciam requisitos de qualidade. \par
+	\textbf{Necessidades principais:} Informação sobre o estado da reparação, histórico de serviços, faturas e orçamentos. \par
+	\textbf{Interação com o sistema:} Indireta; através de documentos emitidos e comunicação da oficina.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Fornecedores de Peças},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Entidades que fornecem componentes e consumíveis. \par
+	\textbf{Interesse:} Processos de encomenda claros e previsíveis. \par
+	\textbf{Influência:} Baixa; apenas afetam o módulo de stock e compras. \par
+	\textbf{Necessidades principais:} Informação sobre necessidades de reposição e histórico de compras. \par
+	\textbf{Interação com o sistema:} Indireta; através de registos de encomendas e receção de material.
+\end{tcolorbox}
+
+
+\subsection{Stakeholders Técnicos}
+
+<<Breve descrição do que são "stakeholders técnicos".>>
+
+\begin{tcolorbox}[
+	title={Equipa de Desenvolvimento do Sistema},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsáveis pela análise, implementação e manutenção do software. \par
+	\textbf{Interesse:} Requisitos claros, estabilidade do sistema e facilidade de manutenção. \par
+	\textbf{Influência:} Elevada; definem a arquitetura e viabilidade técnica. \par
+	\textbf{Necessidades principais:} Especificações completas, acesso a utilizadores-chave, feedback contínuo. \par
+	\textbf{Interação com o sistema:} Desenvolvimento, testes, manutenção e evolução.
+\end{tcolorbox}
+
+
+\section{LLM e Avaliação}
+
+\begin{tcolorbox}[
+	title={Prompt P1 - Apresentação do tema do sistema},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Apresentar tema do sistema a definir. \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Considera o seguinte tema para a implementação de um sistema informático (Efetua apenas uma análise breve, não inicies nenhum processo criativo): <<Tema 3 no enunciado do trabalho prático>>
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[
+	title={Prompt P2 - Definição do domínio do sistema},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Definir o contexto e formular o problema a resolver. \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Age como um engenheiro de requisitos. Define o dominio do sistema para o tema apresentado. Apresenta os seguintes tópicos: \\
+		- Contextualização (2 a 3 parágrafos): apresenta o contexto e uma história para uma potencial empresa com pessoas reais; \\
+		- Fundamentação (2 a 3 parágrafos): apresenta a causa/s para a implementação do sistema \\
+		- Objetivos a atingir \\
+		- Viabilidade: simula potenciais valores \\
+		Podes apresentar mais tópicos que aches necessários, mas o foco deverão ser os apresentados. Utiliza uma linguagem técnica e formal, adequada para um relatório académico. Evita "bullet points" na contextualização e fundamentação.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[
+	title={Prompt P3 - Indentificação de Stakeholders},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Identificar stakeholders do sistema a implementar \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		A próxima tarefa é identificar os stakeholders, sendo coerente com a definição do sistema gerada. Apresenta o nome de cada stakeholder (nos casos que se aplique), o seu papel, interesse, influência, necessidades principais (nos casos que se aplique) e o tipo de interação com o sistema. Agrupa os stakholders em grupos (e.g: pessoal interno e externo).
+	\end{tcolorbox}
+	 \par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[
+	title={Prompt P4 - Reformulação da contextualização},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Reformular a contextualização \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		O segundo parágrafo da contextualização está semelhante à fundamentação. Neste tópico deves dar contexto à empresa, aos funcionários.
+		Na contextualização, formula uma história do porquê da empresa ter sido criada que inclua o motivo dos gerentes terem abandonado as suas antigas profissões. Os funcionários da empresa devem ser 4 mecânicos, 1 gestor de armazém, 1 assistente administrativo e os 2 gerentes. Escreve dois parágrafos. Reformula apenas a contextualização, tendo em consideração os restantes tópicos já criados.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Prompt P4 - Reformulação da contextualização},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Reformular a contextualização \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Na análise de viabilidade estás a exagerar nos valores apresentados. Reforma este tópico com menos referências a valores. Apresenta apenas algumas percentagens relativas a ganhos ou perdas e o valor total de custo.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Prompt P5 - Identificação dos Recursos},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Enumerar recursos usados no desenvolvimento do sistema \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Gera um texto onde eu são enumerados os recursos humanos e materiais. 
+		Tem em conta que os recursos humanos incluem todos os funcionários da empresa, os clientes e a equipa de desenvolvimento. Enquanto que os recursos materiais incluem o hardware (servidor bd e os computadores da equipa de desenvolvimento) e o software (sistema de gestão de bd, neste caso o MySQL, Workbench, o brModelo para modelação conceptual da BD e o Visual Paradigm para modelação seguindo a linguaguem de modelação UML), e todas as ferramentas de desenvolvimento, coordenação e teste de código, que foi feito usando JAVA, usado pela equipa de desenvolvimento (podes mencionar isto sem entrar em muito detalhe sobre quais são). 
+		Evita o uso de bullet points se enumerares algo, mantém o estilo de escrita que um Engenheiro de Software teria ao redigir um relatório que falasse sobre isto.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Prompt P6 - Reformulação dos Recursos},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Reformular conteúdo dos Recursos usados \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Reformula o texto e: não enumeres os funcionários da empresa, não entres em detalhe sobre como é que os clientes foram importantes para o desenvolvimento do sistema e não enumeres quem participou na equipa de desenvolvimento.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Prompt P7 - Enumeração da Equipa de Trabalho},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Enumerar todo o pessoal pertencente à equipa de trabalho (interno e externo) \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Redige um texto sobre a equipa de trabalho e menciona que pôde ser dividida em duas categorias: pessoal interno (todos os funcionários da empresa) e pessoal externo: equipa de desenvolvimento, ou seja, Duarte Escairo, Eduardo Fernandes, Inês Ferreira, Luís Soares e Tiago Figueiredo, e os clientes, usados para levantamento de inquéritos de opinião e validação de serviços prestados pela empresa. Explica a função de cada funcionário da empresa em não mais do que uma linha e explica de uma forma geral e concisa o que a equipa de desenvolvimento fez, ou seja, todo o processo de levantamento de requisitos, modelação do sistema,
+		implementação do sistema, etc.
+		Caso enumeres algo usa bullet points com moderação, mantém o estilo de escrita que um Engenheiro de Software teria ao redigir um relatório que falasse sobre isto.
+
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Prompt P8 - Reformulação do texto da Equipa de Trabalho},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Reformular o texto que expoe a equipa de trabalho (interno e externo) \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Inclui no texto que redigiste os participantes da equipa de desenvolvimento
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
 
 %==========================================================================
 % BEGIN CONCLUSÕES DE TRABALHO FUTURO
