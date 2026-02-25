@@ -1,0 +1,94 @@
+\begin{tcolorbox}[
+	title={Gerência: João Martins e Ana Ribeiro},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsáveis pela direção estratégica da EcoRide Solutions. \par
+	\textbf{Interesse:} Obter visibilidade total sobre o desempenho operacional, financeiro e técnico da oficina. \par
+	\textbf{Necessidades principais:} Relatórios financeiros e técnicos, indicadores de desempenho, controlo de custos, rastreabilidade das operações. \par
+	\textbf{Interação com o sistema:} Consulta de dashboards, relatórios e validação de decisões operacionais.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Assistente Administrativa},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsável pelo atendimento ao cliente, criação de ordens de serviço, faturação e arquivo documental. \par
+	\textbf{Interesse:} Simplificação das tarefas administrativas e redução de erros. \par
+	\textbf{Necessidades principais:} Registo rápido de clientes e equipamentos, emissão de faturas, gestão de documentos e comunicação com clientes. \par
+	\textbf{Interação com o sistema:} Inserção e atualização de dados, emissão de documentos, consulta de histórico.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Técnicos de Reparação},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Executam diagnósticos, intervenções e reparações nas trotinetes. \par
+	\textbf{Interesse:} Acesso rápido ao histórico técnico e registo eficiente das intervenções. \par
+	\textbf{Necessidades principais:} Registo de diagnósticos, tempos de reparação, peças utilizadas e estados das ordens de serviço. \par
+	\textbf{Interação com o sistema:} Atualização de ordens de serviço, consulta de instruções e histórico de reparações.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Responsável de Armazém},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Gere o stock de peças, consumíveis e materiais. \par
+	\textbf{Interesse:} Manter níveis de stock adequados e evitar ruturas ou excesso de inventário. \par
+	\textbf{Necessidades principais:} Registo de entradas e saídas, alertas de stock mínimo, integração com ordens de serviço. \par
+	\textbf{Interação com o sistema:} Atualização de inventário, consulta de necessidades de peças, validação de consumos.
+\end{tcolorbox}
+
+
+
+
+\begin{tcolorbox}[
+	title={Clientes da Oficina},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Proprietários das trotinetes que recorrem aos serviços da empresa. \par
+	\textbf{Interesse:} Transparência no processo de reparação, prazos cumpridos e custos claros. \par
+	\textbf{Necessidades principais:} Informação sobre o estado da reparação, histórico de serviços, faturas e orçamentos. \par
+	\textbf{Interação com o sistema:} Indireta; através de documentos emitidos e comunicação da oficina.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+	title={Fornecedores de Peças},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Entidades que fornecem componentes e consumíveis. \par
+	\textbf{Interesse:} Processos de encomenda claros e previsíveis. \par
+	\textbf{Necessidades principais:} Informação sobre necessidades de reposição e histórico de compras. \par
+	\textbf{Interação com o sistema:} Indireta; através de registos de encomendas e receção de material.
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[
+	title={Equipa de Desenvolvimento do Sistema},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Papel:} Responsáveis pela análise, implementação e manutenção do software. \par
+	\textbf{Interesse:} Requisitos claros, estabilidade do sistema e facilidade de manutenção. \par
+	\textbf{Necessidades principais:} Especificações completas, acesso a utilizadores-chave, feedback contínuo. \par
+	\textbf{Interação com o sistema:} Desenvolvimento, testes, manutenção e evolução.
+\end{tcolorbox}
