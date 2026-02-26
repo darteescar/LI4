@@ -1,0 +1,116 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Pacotes de Idioma e Codificação ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+
+% --- Design e Layout ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{charter} % Fonte profissional e legível
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+% --- Configuração de Cores ---
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+
+% --- Cabeçalho e Rodapé ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \textbf{Registo de Entrevista} | Projeto Interno}
+\fancyhead[R]{\small \thepage\ de \pageref{LastPage}}
+\fancyfoot[L]{\small \textit{Confidencial - Apenas para uso interno}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Ambiente Personalizado para Transcrição ---
+% Facilita a distinção entre Entrevistador (E) e Entrevistado (R)
+\newlist{transcription}{description}{1}
+\setlist[transcription]{
+	labelsep=1em,
+	leftmargin=3.5em,
+	style=nextline,
+	font=\bfseries\color{primaryblue}
+}
+
+\newcommand{\pergunta}[1]{\item[E:] \textit{#1}}
+\newcommand{\resposta}[1]{\item[R:] #1}
+
+% --- Início do Documento ---
+\begin{document}
+	
+	% Título Principal
+	{\noindent\LARGE\bfseries\color{primaryblue} Relatório de Entrevista Individual}
+	\\[0.5cm]
+	
+	% --- Tabela de Metadados ---
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabularx}{\textwidth}{@{}|l|X|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{ID Entrevista} & \#001 & \textbf{Data} & 26 de Fevereiro de 2026 \\ \hline
+		\textbf{Hora Início} & 10:00 & \textbf{Hora Fim} & 11:15 \\ \hline
+		\textbf{Local/Meio} & Sala de Reuniões B (ou Teams) & \textbf{Estado} & Finalizada / Transcrita \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.5cm}
+	
+	% --- Participantes ---
+	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Intervenientes} & \textbf{Cargo / Função} \\ \hline
+		\textbf{Entrevistador(a)} & [O Teu Nome] - Consultor de Processos \\ \hline
+		\textbf{Entrevistado(a)}  & [Nome do Colaborador] - Diretor de Operações \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.8cm}
+	
+	% --- Contexto e Objetivos ---
+	\section*{1. Enquadramento e Objetivos}
+	\begin{itemize}[leftmargin=*, label=\small\color{primaryblue}$\blacksquare$]
+		\item Levantar os principais \textit{bottlenecks} no fluxo de aprovação de faturas.
+		\item Validar a necessidade de integração entre o ERP atual e a nova ferramenta de CRM.
+		\item Recolher feedback sobre a cultura organizacional pós-reestruturação.
+	\end{itemize}
+	
+	\hrule % Linha separadora opcional
+	\vspace{0.5cm}
+	
+	% --- Transcrição ---
+	\section*{2. Transcrição / Notas da Entrevista}
+	
+	\begin{transcription}
+		
+		\pergunta{Pode descrever brevemente a sua função atual e as principais responsabilidades da sua equipa?}
+		\resposta{Atualmente giro a equipa de logística, focando-me na otimização da cadeia de abastecimento. Somos responsáveis por garantir que o inventário está alinhado com as previsões de venda trimestrais.}
+		
+		\pergunta{Como avalia a comunicação entre o departamento de vendas e a logística?}
+		\resposta{A comunicação ainda é muito manual, baseada em folhas de cálculo enviadas por email. Isto causa um atraso de cerca de 24 horas na atualização dos dados, o que é crítico para produtos de alta rotação.}
+		
+		\pergunta{Se pudesse automatizar um único processo amanhã, qual seria?}
+		\resposta{Sem dúvida, a atualização do stock em tempo real no dashboard de vendas.}
+		
+	\end{transcription}
+	
+	\vspace{0.8cm}
+	
+	% --- Observações e Próximos Passos ---
+	\section*{3. Análise e Observações Gerais}
+	\begin{itemize}[leftmargin=*]
+		\item \textbf{Tom de voz:} O entrevistado demonstrou abertura, mas alguma frustração com os sistemas de IT atuais.
+		\item \textbf{Pontos Críticos:} Falta de interoperabilidade entre sistemas.
+	\end{itemize}
+	
+	\section*{4. Próximos Passos}
+	\begin{tabularx}{\textwidth}{@{}|X|l|l|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Ação} & \textbf{Responsável} & \textbf{Prazo} \\ \hline
+		Validar fluxo de dados com equipa de IT & [Teu Nome] & 05/03/2026 \\ \hline
+		Agendar follow-up para demonstração de solução & [Teu Nome] & 12/03/2026 \\ \hline
+	\end{tabularx}
+	
+\end{document}
