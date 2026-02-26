@@ -1,0 +1,162 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Pacotes de Idioma e Codificação ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+
+% --- Design e Layout ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{charter} % Fonte profissional e legível
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+% --- Configuração de Cores ---
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+
+% --- Cabeçalho e Rodapé ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \textbf{Registo de Entrevista} | EcoRide Solutions}
+\fancyhead[R]{\small \thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Ambiente Personalizado para Transcrição ---
+% Facilita a distinção entre Entrevistador (E) e Entrevistado (R)
+\newlist{transcription}{description}{1}
+\setlist[transcription]{
+	labelsep=1em,
+	leftmargin=3.5em,
+	style=nextline,
+	font=\bfseries\color{primaryblue}
+}
+
+\newcommand{\pergunta}[1]{\item[P:] \textit{#1}}
+\newcommand{\resposta}[1]{\item[R:] #1}
+
+% --- Início do Documento ---
+\begin{document}
+	
+	% Título Principal
+	{\noindent\LARGE\bfseries\color{primaryblue} Relatório de Entrevista Individual}
+	\\[0.5cm]
+	
+	% --- Tabela de Metadados ---
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabularx}{\textwidth}{@{}|l|X|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{ID Entrevista} & \#001 & \textbf{Data} & 26 de Fevereiro de 2026 \\ \hline
+		\textbf{Hora Início} & 10:00 & \textbf{Hora Fim} & 11:00 \\ \hline
+		\textbf{Local/Meio} & Sala de Reuniões B & \textbf{Estado} & Finalizada / Transcrita \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.5cm}
+	
+	% --- Participantes ---
+	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Intervenientes} & \textbf{Cargo / Função} \\ \hline
+		\textbf{Entrevistador(a)} & [O Teu Nome] - Consultor de Processos \\ \hline
+		\textbf{Entrevistado(a)}  & João Martins - Dono da oficina \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.8cm}
+	
+	% --- Contexto e Objetivos ---
+	\section*{1. Enquadramento e Objetivos}
+	\begin{itemize}[leftmargin=*, label=\small\color{primaryblue}$\blacksquare$]
+		\item Mapeamento da realidade operacional.
+		\item Definição de responsabilidades e segurança.
+		\item Identificação de valor e decisão estratégica.
+	\end{itemize}
+	
+	\hrule % Linha separadora opcional
+	\vspace{0.5cm}
+	
+	% --- Transcrição ---
+	\section*{2. Transcrição / Notas da Entrevista}
+	
+	\begin{transcription}
+		
+		\pergunta{Para além do nome e contacto, que informação guarda relativamente aos clientes? Queremos distinguir clientes empresariais de clientes particulares?}
+		\resposta{Relativamente aos clientes, para além do nome e contacto, costumo guardar também o número de contribuinte, a morada e, quando possível, o e-mail. Isso ajuda tanto para efeitos de faturação como para manter um registo mais completo do cliente. Sim, faz sentido distinguir entre clientes particulares e empresariais, porque os empresariais normalmente têm mais do que uma trotinete, pedem faturas com dados específicos e, por vezes, têm acordos de manutenção ou condições diferentes.}
+		
+		\pergunta{Além da marca e modelo, que detalhes técnicos são vitais para a descrição de uma trotinete? Podemos ter várias trotinetes associadas ao mesmo cliente?}
+		\resposta{No que toca às trotinetes, além da marca e modelo, é importante saber o número de série ou algum identificador único, o tipo de motor (se é elétrico ou híbrido, por exemplo), a capacidade da bateria e o estado geral do equipamento. Também costumo apontar observações como se já teve quedas ou se foi intervencionada por outras oficinas. E sim, há muitos clientes que têm mais do que uma trotinete, por isso é essencial conseguir associar várias ao mesmo cliente.}
+		
+		\pergunta{Sobre o Funcionário: O que precisamos de saber sobre os mecânicos? Especialidade? , custo por hora para a oficina, ou apenas o nome para saber quem fez o quê?}
+		\resposta{Quanto aos funcionários, o mais importante para mim é saber quem fez o quê. Gosto de ter o nome do mecânico associado a cada intervenção, para poder acompanhar o trabalho de cada um e, se houver algum problema, saber quem esteve envolvido. Não costumo trabalhar com especialidades muito distintas, mas se um dia tiver alguém mais focado em eletrónica ou baterias, por exemplo, talvez fizesse sentido registar isso. Quanto ao custo por hora, não costumo calcular isso ao detalhe, mas tenho uma ideia geral dos tempos médios por tipo de reparação.}
+		
+		\pergunta{Sobre as Peças/Stock: Uma peça tem apenas um preço ou precisamos de saber o preço de compra e o preço de venda? Existe um código de barras ou referência interna?}
+		\resposta{Sobre as peças, preciso de saber o preço a que as compro e o preço a que as vendo, porque há sempre uma margem que tenho de controlar. Algumas peças vêm com código de barras, outras não, mas normalmente uso uma referência interna ou o nome da peça para as identificar. O importante é conseguir saber o que tenho em stock, o que saiu e o que preciso de repor. Também me dá jeito saber em que reparações cada peça foi usada, para ter esse histórico associado à trotinete.}
+		
+		\pergunta{Quando um cliente entra na loja com uma trotinete avariada, o que é que anota primeiro? Faz isso num caderno ou em fichas soltas?}
+		\resposta{Quando um cliente entra na oficina com uma trotinete avariada, a primeira coisa que faço é tentar perceber o que se passou. Pergunto o que aconteceu, se houve alguma queda, se a trotinete deixou de ligar, se há barulhos estranhos, esse tipo de coisas. Enquanto o cliente me vai explicando, costumo apontar tudo num caderno ou numa folha solta, onde escrevo o nome do cliente, o contacto, o modelo da trotinete e uma descrição do problema. Também costumo tirar uma fotografia à trotinete, principalmente se tiver danos visíveis, para ficar registado como ela chegou.}
+
+		\pergunta{Abertura de Ordem de Serviço: Assim que a trotinete entra, ela fica em que estado? (ex: 'Pendente Diagnóstico'). Como é que o mecânico sabe que tem uma trotinete nova à espera?}
+		\resposta{Assim que a trotinete entra, costumo considerar que está “por diagnosticar”. Fica numa zona da oficina onde coloco os equipamentos que ainda não foram vistos. Os mecânicos já sabem que, quando têm tempo, vão lá ver qual é a próxima da fila. Não há um sistema formal para isso, é mais por ordem de chegada e pela urgência que o cliente demonstrou.}
+		
+		\pergunta{No diagnóstico, costumam dar um orçamento fixo ou o valor pode mudar a meio da reparação? Como informam o cliente dessa mudança? Relativamente ao processo de reparação, o mecânico pode começar a reparar sem o cliente aprovar o orçamento? Como é que o sistema deve travar isso?}
+		\resposta{Quanto ao diagnóstico, tento sempre dar um orçamento ao cliente antes de avançar com qualquer reparação. Mas às vezes, quando abrimos a trotinete, percebemos que há mais problemas do que parecia. Nesses casos, ligo ao cliente para explicar a situação e dar um novo valor. Só avançamos com a reparação depois de ele confirmar que está de acordo. Nunca começamos nada sem essa autorização, porque já tive situações em que o cliente não quis pagar por algo que não tinha sido combinado.}
+		
+		\pergunta{No registo de intervenções, o mecânico deve escrever um diário do que fez ou apenas selecionar tarefas pré-definidas (ex: 'Troca de Pneu', 'Afinação de Travões', ...)?}
+		\resposta{Durante a reparação, o mecânico costuma escrever o que fez, mas nem sempre é muito detalhado. Às vezes escreve só “troca de pneu” ou “substituição de travão”, outras vezes escreve mais, se for algo fora do normal. Acho que seria útil ter uma lista de tarefas comuns para facilitar, mas também devia haver espaço para escrever algo mais, quando for preciso.}
+	
+		\pergunta{Quando a reparação acaba, a trotinete vai para uma prateleira de 'Prontas'? O sistema deve disparar um aviso automático ao cliente?}
+		\resposta{Quando a reparação está concluída, a trotinete vai para uma prateleira onde ficam as que estão prontas para entrega. Costumo ligar ao cliente ou mandar uma mensagem a avisar que já pode vir buscar. Se o sistema conseguisse enviar esse aviso automaticamente, poupava-me tempo e evitava esquecimentos, porque às vezes, com o movimento do dia a dia, pode passar.}
+		
+		\pergunta{O mecânico pode alterar o preço de uma peça ou essa é uma função exclusiva do gerente?}
+		\resposta{O mecânico não deve ter liberdade para alterar o preço de uma peça. Isso é algo que fica ao meu critério, porque sou eu que acompanho os preços de compra, as margens e os valores que praticamos ao público. Se cada um pudesse mudar isso, corria o risco de haver erros ou até prejuízo. Por isso, qualquer alteração de preço deve passar por mim.}
+		
+		\pergunta{Quem pode apagar um registo de cliente ou uma ordem de serviço mal feita? Qualquer um ou apenas o administrador?}
+		\resposta{Quanto a apagar registos, também acho que isso deve ser controlado. Já aconteceu alguém enganar-se a criar uma ordem de serviço ou registar um cliente duas vezes, mas prefiro que me avisem para eu tratar disso. Assim evito que se apague algo importante por engano. Portanto, só eu ou alguém com acesso de administrador é que devia conseguir apagar registos.}
+		
+		\pergunta{Pode-se entregar uma trotinete ao cliente sem que a ordem de serviço esteja marcada como 'Paga'?}
+		\resposta{Sobre a entrega da trotinete, para mim é essencial que o cliente pague antes de levar o equipamento. Já tive situações em que entreguei e depois tive dificuldade em receber. Por isso, hoje em dia só entrego quando a ordem está paga. O sistema devia ajudar a garantir isso, talvez com um aviso ou impedindo que se finalize a entrega sem o pagamento registado.}
+		
+		\pergunta{Atualmente, como é que calculam o preço final? É um valor fixo por serviço ou cobram o tempo que o mecânico demorou mais o preço das peças?}
+		\resposta{Atualmente, o preço final que cobramos ao cliente é calculado com base no tempo que o mecânico demorou na reparação e no valor das peças utilizadas. Não temos uma tabela fixa por serviço, porque cada caso é diferente. Por exemplo, trocar um pneu pode demorar 15 minutos ou 1 hora, dependendo do estado da roda ou se há mais danos. Por isso, o tempo é um fator importante. As peças são cobradas com base no preço de venda que definimos, e o tempo é convertido num valor com base numa taxa horária que aplicamos.}
+	
+		\pergunta{Têm muitos problemas com clientes que deixam a trotinete e demoram semanas a vir buscá-la (e a pagar)?}
+		\resposta{Sim, infelizmente acontece com alguma frequência os clientes deixarem a trotinete e demorarem muito tempo a vir buscá-la. Já tive casos de trotinetes que ficaram semanas ou até meses na oficina. Isso ocupa espaço e atrasa o trabalho, porque temos de andar sempre a desviar equipamentos que já estão prontos. Além disso, enquanto não vêm buscar, também não pagam, o que afeta o nosso fluxo de caixa. Era bom ter uma forma de controlar isso melhor, talvez com alertas ou prazos definidos.}
+		
+		\pergunta{Precisam que o sistema emita a fatura oficial logo ali, ou usam outro programa para a parte fiscal/finanças?}
+		\resposta{Quanto à faturação, usamos um programa à parte, certificado pelas finanças, para emitir as faturas oficiais. O ideal seria que o sistema da oficina conseguisse gerar os dados da fatura automaticamente, e depois fosse só exportar ou integrar com o programa fiscal. Isso evitaria erros e poupava tempo, porque agora temos de copiar os dados manualmente.}
+		
+		\pergunta{No final do mês, como é que sabe se a oficina deu lucro ou prejuízo? Que contas costuma fazer?}
+		\resposta{No final do mês, costumo ver quanto dinheiro entrou em pagamentos e comparar com os custos que tive, como peças compradas, salários, renda e outras despesas. Faço isso numa folha de Excel, onde aponto os valores principais. Não é muito detalhado, mas dá para perceber se o mês correu bem ou mal. Se o sistema ajudasse a fazer esse balanço, com gráficos ou totais por categoria, seria uma grande ajuda.}
+		
+		\pergunta{Gostaria de saber qual é o mecânico mais rápido ou qual o tipo de avaria que aparece mais vezes (ex: furos vs. problemas elétricos)?}
+		\resposta{Gostava muito de saber qual é o mecânico mais rápido ou mais produtivo, mas hoje em dia não tenho forma de medir isso com precisão. Também me interessava saber quais são os tipos de avarias mais comuns, como furos, problemas de travões ou falhas elétricas. Isso ajudava-me a decidir que peças devo ter sempre em stock e que tipo de formação posso dar à equipa.}
+		
+		\pergunta{Há alguma informação que hoje não consegue saber facilmente e que o ajudaria a gerir melhor o negócio?}
+		\resposta{Uma coisa que sinto falta é de ter uma visão geral do negócio, por exemplo, quantas ordens de serviço foram abertas num mês, quantas estão pendentes, quantas foram concluídas, e quanto dinheiro entrou por tipo de serviço. Hoje em dia tenho de andar a somar tudo à mão ou a procurar em papéis. Se tivesse essa informação num só sítio, conseguia tomar decisões com mais segurança.}
+		
+		
+	\end{transcription}
+	
+	\vspace{0.8cm}
+	
+	% --- Observações e Próximos Passos ---
+%	\section*{3. Análise e Observações Gerais}
+%	\begin{itemize}[leftmargin=*]
+%		\item \textbf{Tom de voz:} O entrevistado demonstrou abertura, mas alguma frustração com os sistemas de IT atuais.
+%		\item \textbf{Pontos Críticos:} Falta de interoperabilidade entre sistemas.
+%	\end{itemize}
+%	
+%	\section*{4. Próximos Passos}
+%	\begin{tabularx}{\textwidth}{@{}|X|l|l|@{}}
+%		\hline
+%		\rowcolor{gray!10} \textbf{Ação} & \textbf{Responsável} & \textbf{Prazo} \\ \hline
+%		Validar fluxo de dados com equipa de IT & [Teu Nome] & 05/03/2026 \\ \hline
+%		Agendar follow-up para demonstração de solução & [Teu Nome] & 12/03/2026 \\ \hline
+%	\end{tabularx}
+	
+\end{document}
