@@ -1,0 +1,143 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Pacotes de Idioma e Codificação ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+
+% --- Design e Layout ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{charter} % Fonte profissional e legível
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+% --- Configuração de Cores ---
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+
+% --- Cabeçalho e Rodapé ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \textbf{Registo de Entrevista} | EcoRide Solutions}
+\fancyhead[R]{\small \thepage\ de \pageref{LastPage}}
+\fancyfoot[L]{\small \textit{Confidencial - Apenas para uso interno}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Ambiente Personalizado para Transcrição ---
+% Facilita a distinção entre Entrevistador (E) e Entrevistado (R)
+\newlist{transcription}{description}{1}
+\setlist[transcription]{
+	labelsep=1em,
+	leftmargin=3.5em,
+	style=nextline,
+	font=\bfseries\color{primaryblue}
+}
+
+\newcommand{\pergunta}[1]{\item[P:] \textit{#1}}
+\newcommand{\resposta}[1]{\item[R:] #1}
+
+% --- Início do Documento ---
+\begin{document}
+	
+	% Título Principal
+	{\noindent\LARGE\bfseries\color{primaryblue} Relatório de Entrevista Individual}
+	\\[0.5cm]
+	
+	% --- Tabela de Metadados ---
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabularx}{\textwidth}{@{}|l|X|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{ID Entrevista} & \#004 & \textbf{Data} & 26 de Fevereiro de 2026 \\ \hline
+		\textbf{Hora Início} & 15:00 & \textbf{Hora Fim} & 15:40 \\ \hline
+		\textbf{Local/Meio} & Sala de Reuniões B & \textbf{Estado} & Finalizada / Transcrita \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.5cm}
+	
+	% --- Participantes ---
+	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Intervenientes} & \textbf{Cargo / Função} \\ \hline
+		\textbf{Entrevistador(a)} & [O Teu Nome] - Consultor de Processos \\ \hline
+		\textbf{Entrevistado(a)}  & [Nome do Colaborador] - Mecânico \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.8cm}
+	
+	% --- Contexto e Objetivos ---
+	\section*{1. Enquadramento e Objetivos}
+	\begin{itemize}[leftmargin=*, label=\small\color{primaryblue}$\blacksquare$]
+		\item \textbf{Redução da Carga Administrativa}: O objetivo é encontrar a forma mais rápida de o mecânico comunicar o que fez, garantindo que a informação flui para a faturação sem erros.
+		\item \textbf{Organização do Fluxo (Workflow)}: Garantir que o mecânico sabe sempre o que é prioritário, reduzindo o tempo morto entre reparações.
+		\item \textbf{Qualidade e Rastreabilidade}: Criar um histórico técnico rico que ajude em futuras reparações e que proteja a oficina em caso de reclamações sobre a segurança da trotinete.
+	\end{itemize}
+	
+	\hrule % Linha separadora opcional
+	\vspace{0.5cm}
+	
+	% --- Transcrição ---
+	\section*{2. Transcrição / Notas da Entrevista}
+	
+	\begin{transcription}
+		
+		\pergunta{Quando recebe uma trotinete para diagnóstico, como é que regista o que encontrou? Prefere escrever um texto livre ou ter uma lista de problemas comuns para selecionar (ex: 'Controlador queimado', 'Pneu furado')?}
+		\resposta{Quando recebo uma trotinete para diagnóstico, costumo escrever o que encontrei num papel ou numa ficha. Gosto de ter liberdade para descrever o problema com as minhas palavras, mas também seria útil ter uma lista de avarias comuns - como “pneu furado”, “travão desalinhado”, “controlador queimado”, “bateria não carrega” - para preencher mais rápido. O ideal seria poder selecionar da lista e, se for algo diferente, escrever à parte.}
+		
+		\pergunta{Durante o diagnóstico, como é que indica ao sistema que peças vai precisar? Seria útil poder 'reservar' as peças no stock enquanto espera pela aprovação do cliente?}
+		\resposta{Durante o diagnóstico, normalmente anoto as peças que vou precisar e aviso o gestor de stock ou a receção. Mas às vezes, se for algo urgente, já peço logo a peça. Seria ótimo se o sistema me deixasse “reservar” as peças no stock assim que identifico o problema, para garantir que ninguém as usa noutra reparação enquanto espero pela aprovação do cliente.}
+		
+		\pergunta{Se a meio de uma reparação descobrir um problema novo (escondido), como é que prefere avisar a receção para eles falarem com o cliente?}
+		\resposta{Se a meio da reparação descubro um problema novo, costumo ir pessoalmente à receção e explicar o que encontrei. Se estiverem ocupados, às vezes deixo um bilhete ou aviso por mensagem. Mas seria mais prático se o sistema tivesse uma forma de eu registar o novo problema e isso aparecesse logo na ficha da ordem de serviço, com um alerta para a receção contactar o cliente.}
+		
+		\pergunta{Como é que sabe qual é a próxima trotinete em que deve trabalhar? Gostaria de ter uma lista de prioridades (ex: Urgente, Normal, Garantia) no ecrã?}
+		\resposta{Para saber qual é a próxima trotinete a reparar, normalmente pergunto ao gerente ou olho para a fila física das trotinetes. Mas nem sempre é claro qual é mais urgente. Seria muito útil ter uma lista no ecrã com as ordens de serviço organizadas por prioridade — por exemplo: “Urgente”, “Normal”, “Garantia”, “Aguardando Peças”. Isso ajudava a planear melhor o dia.}
+		
+		\pergunta{Como é que regista o tempo que demora em cada serviço? Prefere marcar a hora de início e fim, ou apenas dizer no final: 'Isto demorou 1 hora'?}
+		\resposta{Quanto ao tempo de trabalho, costumo dizer no final quanto tempo demorei — por exemplo, “demorei 45 minutos”. Não costumo apontar a hora de início e fim, mas se o sistema tivesse um botão para “iniciar” e “terminar” o serviço, talvez fosse mais preciso. Desde que não me atrase ou complique, até preferia assim.}
+	
+		\pergunta{É comum trabalhar em duas trotinetes ao mesmo tempo? O sistema deve permitir ter duas Ordens de Serviço 'abertas' em simultâneo no seu perfil?}
+		\resposta{Sim, é comum estar a trabalhar em duas trotinetes ao mesmo tempo — por exemplo, enquanto espero que uma carregue ou que o gestor de stock traga uma peça, vou adiantando outra. Por isso, o sistema devia permitir ter duas ordens de serviço abertas em simultâneo no meu perfil, para eu poder alternar entre elas sem perder o registo do que estou a fazer.}
+		
+		\pergunta{Como é que regista as peças que gasta? Prefere ler um código de barras ou procurar pelo nome da peça no sistema?}
+		\resposta{Para registar as peças que gasto numa reparação, prefiro procurar pelo nome da peça no sistema, porque já conheço os nomes internos e é mais rápido para mim. Mas se houvesse um leitor de código de barras e as peças estivessem bem etiquetadas, também seria prático — especialmente para evitar erros ou confusões entre modelos parecidos.}
+		
+		\pergunta{E as 'pequenas peças' que não têm código (ex: parafusos, abraçadeiras, lubrificante)? Como é que gostaria de registar esse gasto para que não seja esquecido no custo final?}
+		\resposta{As pequenas peças como parafusos, abraçadeiras ou lubrificante são fáceis de esquecer, mas fazem parte do custo da reparação. Hoje em dia, muitas vezes nem as registamos. Seria ótimo se o sistema tivesse uma opção para “consumíveis usados” ou “peças genéricas”, onde eu pudesse clicar em algo como “kit de parafusos” ou “dose de lubrificante” e isso já ficasse associado à ordem de serviço.}
+		
+		\pergunta{Já aconteceu montar uma peça e descobrir que ela estava com defeito de fábrica? Como é que gostaria de reportar isso no sistema para o gestor de stock saber?}
+		\resposta{Sim, já me aconteceu montar uma peça nova — como um controlador ou uma luz — e perceber logo que não funciona. Quando isso acontece, aviso o gestor de stock ou a receção, mas às vezes passa despercebido. Seria muito útil se o sistema tivesse um botão para “reportar defeito” diretamente na peça, e isso gerasse um alerta para o gestor de stock tratar da devolução ou substituição.}
+		
+		\pergunta{Antes de entregar a trotinete, que verificações de segurança faz sempre (ex: testar travões, verificar luzes)? Gostaria de ter uma 'Checklist' digital para assinalar 'OK' antes de conseguir fechar o serviço?}
+		\resposta{Antes de entregar a trotinete, faço sempre algumas verificações básicas: travões, luzes, pneus, aceleração, travagem e se o visor está a funcionar bem. Também costumo dar uma volta curta para testar. Ter uma checklist digital com esses pontos e marcar “OK” antes de fechar a ordem de serviço seria ótimo — ajudava a garantir que nada fica esquecido e servia como prova de que foi tudo verificado.}
+		
+		\pergunta{Seria útil poder tirar uma foto do trabalho finalizado e anexar à Ordem de Serviço para provar que a reparação foi bem feita?}
+		\resposta{Sim, seria muito útil poder tirar uma foto do trabalho finalizado e anexar à ordem de serviço. Isso servia como prova de que a reparação foi bem feita, especialmente em casos de clientes mais exigentes ou quando há dúvidas sobre o estado da trotinete na entrega.}
+		
+		\pergunta{Quando apanha uma trotinete que já cá esteve antes, é importante para si ver o que foi feito na última vez e que peças foram trocadas? Isso ajuda no diagnóstico atual?}
+		\resposta{Quando apanho uma trotinete que já esteve cá antes, é muito importante ver o que foi feito da última vez. Saber que peças foram trocadas ou que problemas já existiam ajuda-me a perceber se é uma avaria nova ou uma repetição. Isso poupa tempo no diagnóstico e evita fazer trabalho desnecessário. Ter esse histórico acessível no sistema, por número de série ou ID da trotinete, seria uma grande mais-valia.}
+		
+	\end{transcription}
+	
+	\vspace{0.8cm}
+	
+	% --- Observações e Próximos Passos ---
+%	\section*{3. Análise e Observações Gerais}
+%	\begin{itemize}[leftmargin=*]
+%		\item \textbf{Tom de voz:} O entrevistado demonstrou abertura, mas alguma frustração com os sistemas de IT atuais.
+%		\item \textbf{Pontos Críticos:} Falta de interoperabilidade entre sistemas.
+%	\end{itemize}
+%	
+%	\section*{4. Próximos Passos}
+%	\begin{tabularx}{\textwidth}{@{}|X|l|l|@{}}
+%		\hline
+%		\rowcolor{gray!10} \textbf{Ação} & \textbf{Responsável} & \textbf{Prazo} \\ \hline
+%		Validar fluxo de dados com equipa de IT & [Teu Nome] & 05/03/2026 \\ \hline
+%		Agendar follow-up para demonstração de solução & [Teu Nome] & 12/03/2026 \\ \hline
+%	\end{tabularx}
+	
+\end{document}
