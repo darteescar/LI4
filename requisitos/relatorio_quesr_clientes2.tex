@@ -1,0 +1,217 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Pacotes de Idioma e Codificação ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+
+% --- Design e Layout ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{charter}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{longtable}
+
+% --- Configuração de Cores ---
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+
+% --- Cabeçalho e Rodapé ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \textbf{Relatório de Análise de Questionário} | EcoRide Solutions}
+\fancyhead[R]{\small \thepage\ de \pageref{LastPage}}
+\fancyfoot[L]{\small \textit{Confidencial - Apenas para uso interno}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Início do Documento ---
+\begin{document}
+	
+% --- Título Principal ---
+{\noindent\LARGE\bfseries\color{primaryblue} Relatório de Análise dos Resultados do Questionário de Clientes}
+\\[0.5cm]
+
+% --- Tabela de Metadados ---
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\textwidth}{@{}|l|X|l|X|@{}}
+	\hline
+	\rowcolor{gray!10} \textbf{ID Relatório} & \#006 & \textbf{Data} & 27 de Fevereiro de 2026 \\ \hline
+	\textbf{Total de Respostas} & 50 & \textbf{Tipo de Estudo} & Análise Exploratória para Engenharia de Requisitos \\ \hline
+	\textbf{Origem dos Dados} & Questionário Clientes & \textbf{Estado} & Concluído \\ \hline
+\end{tabularx}
+
+\vspace{0.8cm}
+
+% --- Enquadramento ---
+\section*{1. Enquadramento e Objetivo}
+
+O presente relatório apresenta a análise detalhada dos dados recolhidos através do Questionário de Clientes aplicado a 50 clientes distintos da EcoRide Solutions. 
+
+O objetivo principal desta análise consiste em:
+
+\begin{itemize}[leftmargin=*, label=\small\color{primaryblue}$\blacksquare$]
+	\item Identificar padrões de satisfação e insatisfação;
+	\item Extrair requisitos implícitos e explícitos relevantes para o sistema de gestão da oficina;
+	\item Apoiar decisões na fase de Engenharia de Requisitos;
+	\item Identificar oportunidades de melhoria operacional.
+\end{itemize}
+
+\hrule
+\vspace{0.6cm}
+
+% --- Análise Quantitativa ---
+\section*{2. Análise Quantitativa dos Resultados}
+
+\subsection*{2.1 Avaliação do Atendimento}
+
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{gray!10}
+\textbf{Avaliação} & \textbf{Frequência} & \textbf{Percentagem} \\
+\midrule
+Muito insatisfatório & 2 & 4\% \\
+Insatisfatório & 6 & 12\% \\
+Satisfatório & 27 & 54\% \\
+Muito satisfatório & 15 & 30\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3cm}
+Índice médio (escala 1–4): 3.10
+
+\vspace{0.6cm}
+
+\subsection*{2.2 Tempo de Reparação}
+
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{gray!10}
+\textbf{Avaliação} & \textbf{Frequência} & \textbf{Percentagem} \\
+\midrule
+Muito demorado & 5 & 10\% \\
+Demorado & 12 & 24\% \\
+Adequado & 25 & 50\% \\
+Rápido & 8 & 16\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3cm}
+Índice médio (escala 1–4): 2.72
+
+\vspace{0.6cm}
+
+\subsection*{2.3 Clareza do Diagnóstico}
+
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{gray!10}
+\textbf{Resposta} & \textbf{Frequência} & \textbf{Percentagem} \\
+\midrule
+Sim & 41 & 82\% \\
+Não & 9 & 18\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.6cm}
+
+\subsection*{2.4 Adequação dos Preços}
+
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{gray!10}
+\textbf{Resposta} & \textbf{Frequência} & \textbf{Percentagem} \\
+\midrule
+Sim & 34 & 68\% \\
+Não & 16 & 32\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.6cm}
+
+\subsection*{2.5 Satisfação Final}
+
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{gray!10}
+\textbf{Resposta} & \textbf{Frequência} & \textbf{Percentagem} \\
+\midrule
+Sim & 40 & 80\% \\
+Não & 10 & 20\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.6cm}
+
+\subsection*{2.6 Probabilidade de Recomendação}
+
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{gray!10}
+\textbf{Resposta} & \textbf{Frequência} & \textbf{Percentagem} \\
+\midrule
+Sim & 36 & 72\% \\
+Talvez & 9 & 18\% \\
+Não & 5 & 10\% \\
+\bottomrule
+\end{tabular}
+\vspace{0.8cm}
+
+% --- Análise e Discussão ---
+\section*{3. Análise e Discussão dos Resultados}
+
+\subsection*{3.1 Tendências Gerais}
+
+Os dados indicam um nível global de satisfação elevado (80\%), com predominância de avaliações positivas no atendimento e na clareza do diagnóstico técnico. 
+
+Contudo, observa-se que 34\% dos clientes consideram o tempo de reparação demorado ou muito demorado, representando um potencial ponto crítico operacional.
+
+\vspace{0.6cm}
+
+\subsection*{3.2 Correlações Observadas}
+
+A análise qualitativa das respostas simuladas permitiu observar:
+
+\begin{itemize}
+	\item Clientes que consideram o tempo de reparação demorado tendem a avaliar negativamente o preço.
+	\item Clientes que receberam informação clara apresentam maior probabilidade de recomendar o serviço.
+	\item A satisfação final está fortemente correlacionada com a perceção de comunicação durante o processo.
+\end{itemize}
+
+\vspace{0.6cm}
+
+\subsection*{3.3 Implicações para Engenharia de Requisitos}
+
+Com base nos resultados, identificam-se os seguintes requisitos potenciais para o sistema de gestão:
+
+\begin{itemize}
+	\item Implementação de notificações automáticas de estado da reparação;
+	\item Disponibilização de relatório técnico digital detalhado;
+	\item Dashboard interno para controlo de tempos médios de reparação;
+	\item Sistema de estimativa prévia de custo com validação do cliente;
+	\item Histórico digital acessível ao cliente.
+\end{itemize}
+
+\vspace{0.8cm}
+
+% --- Conclusões ---
+\section*{4. Conclusão}
+
+Os resultados obtidos evidenciam uma base sólida de satisfação, mas revelam igualmente áreas críticas relacionadas com tempo de resposta e perceção de valor.
+
+Do ponto de vista da Engenharia de Requisitos, os dados recolhidos permitem fundamentar requisitos funcionais e não funcionais orientados para:
+
+\begin{itemize}
+	\item Melhoria da comunicação;
+	\item Redução do tempo de ciclo da reparação;
+	\item Transparência de custos;
+	\item Melhoria da experiência do cliente.
+\end{itemize}
+
+Este relatório deverá servir como base para a definição do backlog inicial do sistema de gestão da oficina.
+
+\end{document}
