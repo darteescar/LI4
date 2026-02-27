@@ -23,9 +23,9 @@
 % --- Cabeçalho e Rodapé ---
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small \textbf{Investigação Operacional} | EcoRide Solutions}
+\fancyhead[L]{\small \textbf{Análise do Processo Operacional} | EcoRide Solutions}
 \fancyhead[R]{\small \thepage\ de \pageref{LastPage}}
-
+\fancyfoot[L]{\small \textit{Confidencial - Apenas para uso interno}}
 \renewcommand{\headrulewidth}{0.4pt}
 
 % --- Ambiente Personalizado para Transcrição ---
@@ -38,23 +38,23 @@
 	font=\bfseries\color{primaryblue}
 }
 
-\newcommand{\pergunta}[1]{\item[P:] \textit{#1}}
+\newcommand{\pergunta}[1]{\item[O:] #1}
 \newcommand{\resposta}[1]{\item[R:] #1}
 
 % --- Início do Documento ---
 \begin{document}
 	
 	% Título Principal
-	{\noindent\LARGE\bfseries\color{primaryblue} Relatório de Investigação Operacional}
+	{\noindent\LARGE\bfseries\color{primaryblue} Análise do Processo Operacional}
 	\\[0.5cm]
 	
 	% --- Tabela de Metadados ---
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabularx}{\textwidth}{@{}|l|X|l|X|@{}}
 		\hline
-		\rowcolor{gray!10} \textbf{ID Relatório} & \#001 & \textbf{Data} & 27 de Fevereiro de 2026 \\ \hline
+		\rowcolor{gray!10} \textbf{ID Relatório} & \#005 & \textbf{Data} & 27 de Fevereiro de 2026 \\ \hline
 		\textbf{Hora Início} & 8:30 & \textbf{Hora Fim} & 18:30 \\ \hline
-		\textbf{Local/Meio} & Oficina da EcoRide Solutions & \textbf{Estado} & Finalizada / Transcrita \\ \hline
+		\textbf{Local} & Oficina da EcoRide Solutions & \textbf{Estado} & Finalizada / Transcrita \\ \hline
 	\end{tabularx}
 	
 	\vspace{0.5cm}
@@ -63,17 +63,18 @@
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
 		\hline
 		\rowcolor{gray!10} \textbf{Intervenientes} & \textbf{Nome} \\ \hline
-		\textbf{Investigador} & Duarte Silva \\ \hline
+		\textbf{Analista} & Eduardo Fernandes \\ \hline
 		\textbf{Gerente} & João Martins \\ \hline
-		\textbf{Secretária Administrativa} & Ana Costa \\ \hline
-		\textbf{Mecânico} & [A inserir] \\ \hline
-		\textbf{Mecânico} & [A inserir] \\ \hline
+		\textbf{Secretária Administrativa} & Silvina Matagal \\ \hline
+		\textbf{Gestor de Armazém} & Dionísio Teixeira \\ \hline
+		\textbf{Mecânico} & Ramiro Ramalho  \\ \hline
+		\textbf{Mecânico} & Belmiro Pais  \\ \hline
 	\end{tabularx}
 	
 	\vspace{0.8cm}
 	
 	\section*{1. Introdução}
-	Para garantir uma identificação completa de todos os requisitos, a equipa de desenvolvimento decidiu acompanhar as operações da oficina da EcoRide Solutions ao longo de um dia de trabalho típico. Esta abordagem surge do reconhecimento de que, por vezes, o levantamento de requisitos é feito sem que os desenvolvedores tenham um contacto direto com os processos que o sistema irá suportar. A observação direta permite, assim, compreender melhor o contexto real de trabalho e reduzir a probabilidade de falhas ou omissões que poderiam ocorrer se o levantamento fosse feito apenas a partir de documentação ou entrevistas e não existisse contacto com o terreno.
+	Para garantir uma identificação completa de todos os requisitos, a equipa de desenvolvimento decidiu acompanhar as operações da oficina da EcoRide Solutions ao longo de um dia de trabalho típico. Esta abordagem surge do reconhecimento de que, por vezes, o levantamento de requisitos é feito sem que a equipa de desenvolvimento tenham um contacto direto com os processos que o sistema irá suportar.A observação direta permite, assim, compreender melhor o contexto real de trabalho e reduzir a probabilidade de falhas ou omissões que poderiam ocorrer se o levantamento fosse feito apenas a partir de documentação ou entrevistas e não existisse contacto com o terreno.
 	
 
 	\vspace{0.5cm}
@@ -89,18 +90,66 @@
 		\item Análise do fluxo de ordens de serviço, desde a chegada da trotinete até à entrega.
 		\item Verificação do controlo de peças e gestão de stock.
 		\item Registo das práticas de comunicação e registos internos.
-		\item Detecção de possíveis pontos críticos ou áreas de melhoria nos processos.
+		\item Deteção de possíveis pontos críticos ou áreas de melhoria nos processos.
 	\end{itemize}
 	
 	\hrule % Linha separadora opcional
 	\vspace{0.5cm}
 	
 	% --- Transcrição ---
-	\section*{3. Observações}
+	\section*{3. Interações}
 	
+	\subsection*{Cliente e a Assistente Administrativa}
+	\begin{itemize}
+		
+		\pergunta Foram entregues várias trotinetes sujas e com riscos por parte dos clientes. Para evitar reclamações ou intrigas entre os clientes e a oficina, a assistente tinha de tirar fotos com vários ângulos e posições às trotinetes para ter um registo do estado da trotinete aquando da sua entrega
+		
+		\resposta O sistema precisa de uma funcionalidade rápida na abertura da OS para "Registo de Danos Prévios", idealmente com a opção de anexar uma ou várias fotos à ficha.
+		
+		\pergunta Um cliente afirmou ter entregue juntamente com a sua trotinete, o carregador e o cadeado para permitir aos mecânicos testá-la livremente. Apesar disto, a secretária assegurou que nenhum destes itens foi entregue.
+		
+		\resposta Deverá ser possível adicionar os itens que foram deixados na hora de entrega da trotinete, como por exemplo, carregador, cadeado e chave.
+		
+		\pergunta A identificação do modelo exato das trotinetes foi, por vezes, difícil. A assistente teve de se baixar várias vezes para procurar a etiqueta do número de série no chassi, que muitas vezes estava ilegível.
+		
+		\resposta Uma base de dados visual com fotos dos modelos mais comuns para ajudar a secretária a identificar o modelo junto com o cliente.
+	\end{itemize}
+
+
+	\subsection*{Mecânicos e o Gestor de Armazém}
+	\begin{itemize}
+		
+		\pergunta Por vezes, o gestor do armazém estava ocupado e não podia registar no seu caderno o levantamento de peças ou materiais por parte dos mecânicos, o que o levava a ter de consultá-los para confirmar o levantamento do material.
+		
+		\resposta O sistema deverá permitir que o mecânico adicione a peça à ordem de serviço diretamente do seu posto de trabalho, sem ter de passar o fluxo pelo gestor de stock para itens de baixo valor pré-aprovados.
+		
+	\end{itemize}
+
+	\subsection*{Gestor de Stock e os Fornecedores}
+	\begin{itemize}
+
+	\pergunta Um fornecedor ligou a avisar que uma entrega ia atrasar dois dias. O gestor do armazém teve de anotar manualmente na ordem de serviço o atraso e a secretária teve de notificar o cliente.
+	
+	\resposta A implementação de uma "Data Prevista de Chegada" (ETA) nas encomendas de peças, que irá refletir automaticamente na ordem de serviço associada o atraso, mudando o estado  "A Aguardar Peças (Atrasado)", para que a receção saiba informar o cliente.
+
+	\end{itemize}
+
+	\subsection*{Mecânicos e a Assistente Administrativa}
+	\begin{itemize}
+	
+	\pergunta Por várias vezes, a assistente teve de atender chamadas de clientes a perguntar se a trotinete já estava pronta. Em todas elas, teve de se levantar, ir à oficina, interromper o mecânico e perguntar pelo ponto de situação.
+	
+	\resposta É crítico ter um "Quadro de Estado em Tempo Real" acessível na receção. O mecânico deverá identificar a ordem de serviço associada e atualizar o seu estado para que a assistente tenha sempre a resposta imediatamente.
+	
+	\pergunta Aprovação de orçamentos extras: O mecânico abriu um motor e descobriu que precisava de mais peças do que o orçamentado inicialmente. Foi avisar a assistente presencialmente, que teve de ligar ao cliente para pedir nova aprovação.
+	
+	\resposta O sistema deverá permitir criar um "Orçamento Suplementar" dentro da ordem de serviço existente. Quando o mecânico o submete, notificação é gerada no ecrã da assistente (e possivelmente um email/SMS automático para o cliente com um link para aprovação digital).
+		
+	\end{itemize}
 	
 	% --- Transcrição ---
 	\section*{4. Conclusões}
+	A observação no terreno pôde demonstrar que, embora nas entrevistas tenham sido identificados bastantes requisitos, apenas com a observação feita por alguém com conhecimento técnico de análise e modelação, foi possível identificar que no ambiente operacional a comunicação assíncrona entre a receção e a oficina é o maior gargalo atual. O sistema terá de reduzir a necessidade dos funcionários saírem dos seus postos para trocar informação e, assim, aumentar a sua produtividade e qualidade do serviço prestado pela oficina da EcoRide Solutions.
 	
 	\vspace{0.8cm}
 	
