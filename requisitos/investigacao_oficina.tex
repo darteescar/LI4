@@ -1,0 +1,122 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Pacotes de Idioma e Codificação ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+
+% --- Design e Layout ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{charter} % Fonte profissional e legível
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+% --- Configuração de Cores ---
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+
+% --- Cabeçalho e Rodapé ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \textbf{Investigação Operacional} | EcoRide Solutions}
+\fancyhead[R]{\small \thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Ambiente Personalizado para Transcrição ---
+% Facilita a distinção entre Entrevistador (E) e Entrevistado (R)
+\newlist{transcription}{description}{1}
+\setlist[transcription]{
+	labelsep=1em,
+	leftmargin=3.5em,
+	style=nextline,
+	font=\bfseries\color{primaryblue}
+}
+
+\newcommand{\pergunta}[1]{\item[P:] \textit{#1}}
+\newcommand{\resposta}[1]{\item[R:] #1}
+
+% --- Início do Documento ---
+\begin{document}
+	
+	% Título Principal
+	{\noindent\LARGE\bfseries\color{primaryblue} Relatório de Investigação Operacional}
+	\\[0.5cm]
+	
+	% --- Tabela de Metadados ---
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabularx}{\textwidth}{@{}|l|X|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{ID Relatório} & \#001 & \textbf{Data} & 27 de Fevereiro de 2026 \\ \hline
+		\textbf{Hora Início} & 8:30 & \textbf{Hora Fim} & 18:30 \\ \hline
+		\textbf{Local/Meio} & Oficina da EcoRide Solutions & \textbf{Estado} & Finalizada / Transcrita \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.5cm}
+	
+	% --- Participantes ---
+	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Intervenientes} & \textbf{Nome} \\ \hline
+		\textbf{Investigador} & Duarte Silva \\ \hline
+		\textbf{Gerente} & João Martins \\ \hline
+		\textbf{Secretária Administrativa} & Ana Costa \\ \hline
+		\textbf{Mecânico} & [A inserir] \\ \hline
+		\textbf{Mecânico} & [A inserir] \\ \hline
+	\end{tabularx}
+	
+	\vspace{0.8cm}
+	
+	\section*{1. Introdução}
+	Para garantir uma identificação completa de todos os requisitos, a equipa de desenvolvimento decidiu acompanhar as operações da oficina da EcoRide Solutions ao longo de um dia de trabalho típico. Esta abordagem surge do reconhecimento de que, por vezes, o levantamento de requisitos é feito sem que os desenvolvedores tenham um contacto direto com os processos que o sistema irá suportar. A observação direta permite, assim, compreender melhor o contexto real de trabalho e reduzir a probabilidade de falhas ou omissões que poderiam ocorrer se o levantamento fosse feito apenas a partir de documentação ou entrevistas e não existisse contacto com o terreno.
+	
+
+	\vspace{0.5cm}
+	\hrule % Linha separadora opcional
+	\vspace{0.5cm}
+	
+	% --- Contexto e Objetivos ---
+	\section*{2. Enquadramento e Objetivos}
+	\begin{itemize}[leftmargin=*, label=\small\color{primaryblue}$\blacksquare$]
+		\item Observação do ambiente operacional.
+		\item Identificação dos processos envolvidos numa reparação.
+		\item Levantamento das interações entre clientes, funcionários e equipamentos.
+		\item Análise do fluxo de ordens de serviço, desde a chegada da trotinete até à entrega.
+		\item Verificação do controlo de peças e gestão de stock.
+		\item Registo das práticas de comunicação e registos internos.
+		\item Detecção de possíveis pontos críticos ou áreas de melhoria nos processos.
+	\end{itemize}
+	
+	\hrule % Linha separadora opcional
+	\vspace{0.5cm}
+	
+	% --- Transcrição ---
+	\section*{3. Observações}
+	
+	
+	% --- Transcrição ---
+	\section*{4. Conclusões}
+	
+	\vspace{0.8cm}
+	
+	% --- Observações e Próximos Passos ---
+	%	\section*{3. Análise e Observações Gerais}
+	%	\begin{itemize}[leftmargin=*]
+		%		\item \textbf{Tom de voz:} O entrevistado demonstrou abertura, mas alguma frustração com os sistemas de IT atuais.
+		%		\item \textbf{Pontos Críticos:} Falta de interoperabilidade entre sistemas.
+		%	\end{itemize}
+	%	
+	%	\section*{4. Próximos Passos}
+	%	\begin{tabularx}{\textwidth}{@{}|X|l|l|@{}}
+		%		\hline
+		%		\rowcolor{gray!10} \textbf{Ação} & \textbf{Responsável} & \textbf{Prazo} \\ \hline
+		%		Validar fluxo de dados com equipa de IT & [Teu Nome] & 05/03/2026 \\ \hline
+		%		Agendar follow-up para demonstração de solução & [Teu Nome] & 12/03/2026 \\ \hline
+		%	\end{tabularx}
+	
+\end{document}

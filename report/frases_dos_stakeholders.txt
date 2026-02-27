@@ -92,3 +92,5 @@
 	\textbf{Necessidades principais:} Especificações completas, acesso a utilizadores-chave, feedback contínuo. \par
 	\textbf{Interação com o sistema:} Desenvolvimento, testes, manutenção e evolução.
 \end{tcolorbox}
+
+Tendo em vista a identificação de todos os requisitos que seriam utilizados durante a fase de implementação do sistema, a equipa de desenvolvimento decidiu utilizar todas as formas de levantamento de requisitos possíveis, para diminuir as possibilidades de numa fase futura existirem falhas 
