@@ -62,6 +62,9 @@
 \tcbuselibrary{listings}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{array}
 
 %% Defining sfdefault font and default font for document
 \renewcommand{\familydefault}{\sfdefault}
@@ -265,7 +268,7 @@ Atualmente, a empresa opera a partir de um espaço próprio em Braga e conta com
 
 A necessidade de implementar um sistema informático surge da crescente complexidade das operações da oficina. Os processos atuais, baseados em folhas de cálculo, documentos dispersos e registos manuais, dificultam a rastreabilidade das intervenções e comprometem a fiabilidade da informação. A inexistência de um mecanismo centralizado para gerir clientes, equipamentos, ordens de serviço e peças conduz a erros frequentes, como discrepâncias no stock, perda de histórico técnico e dificuldades na elaboração de relatórios financeiros.
 
-Além disso, a expansão do mercado de micromobilidade exige que a empresa adote ferramentas que permitam maior eficiência operacional e capacidade de resposta. A automatização dos processos administrativos e técnicos permitirá reduzir tempos de execução, melhorar a comunicação entre técnicos e administração e aumentar a transparência perante o cliente. A implementação de um sistema de gestão integrado constitui, assim, um passo estratégico para a sustentabilidade e crescimento da empresa.
+Além disso, a expansão do mercado de micromobilidade exige que a empresa adote ferramentas que permitam maior eficiência operacional e capacidade de resposta. A automatização dos processos administrativos e técnicos permitirá reduzir tempos de execução, melhorar a comunicação entre os mecânicos e a administração e aumentar a transparência perante o cliente. A implementação de um sistema de gestão integrado constitui, assim, um passo estratégico para a sustentabilidade e crescimento da empresa.
 
 \subsection{Objetivos}
 
@@ -295,7 +298,7 @@ Assim, o retorno do investimento poderá ser alcançado entre \textbf{12 e 18 me
 
 O domínio do sistema abrange todos os processos relacionados com a gestão operacional de uma oficina de reparação de trotinetes, incluindo:
 \begin{itemize}
-	\item Gestão de entidades (clientes, trotinetes, técnicos);
+	\item Gestão de entidades (clientes, trotinetes, funcionários);
 	\item Gestão de ordens de serviço e respetivos estados;
 	\item Processos de diagnóstico e reparação;
 	\item Gestão de peças, consumíveis e stock;
@@ -340,107 +343,146 @@ O pessoal externo foi composto pela equipa de desenvolvimento e pelos clientes d
 
 
 \section{Identificação de stakeholders}
-No contexto do desenvolvimento deste projeto, os stakeholders desempenharam um papel essencial na definição dos objetivos, na validação dos requisitos e na garantia de que o sistema final correspondeu às necessidades reais da organização. Os stakeholders foram classificados em duas categorias principais: internos e externos.
+No contexto do desenvolvimento deste projeto, os stakeholders desempenharam um papel essencial na definição dos objetivos, na validação dos requisitos e na garantia de que o sistema final correspondeu às necessidades reais da organização. Os stakeholders foram classificados em três categorias principais: internos, externos e técnicos.
 
 \subsection{Stakeholders Internos}
 Os stakeholders internos são os elementos da organização que participam diretamente no desenvolvimento e utilização do sistema. No contexto deste projeto, corresponderam aos funcionários da empresa, cuja colaboração foi essencial para a definição dos objetivos, validação dos requisitos e alinhamento da solução com os processos reais da organização. Foram também os principais utilizadores do sistema final.
+	
+\begin{table}[H]
+	\centering
+	\setlength{\arrayrulewidth}{0.6pt}
+	\begin{tabular}{|p{5cm}|p{9cm}|}
+		\hline
+		\rowcolor{gray!20!white}
+		\textbf{Papel} & \textbf{Descrição} \\
+		\hline
+		Gerente & Responsável pela direção estratégica da EcoRide Solutions. \\
+		\hline
+		Assistente Administrativa & Responsável pelo atendimento ao cliente, criação de ordens de serviço, faturação e arquivo documental. \\
+		\hline
+		Gestor de Armazém & Gere o stock de peças, consumíveis e materiais. \\
+		\hline
+		Mecânico & Executa diagnósticos, intervenções e reparações nas trotinetes. \\
+		\hline
+	\end{tabular}
+	\caption{Identificação dos cargos e respetivas funções dos stakeholders internos.}
+\end{table}
 
-\begin{tcolorbox}[
-	title={Gerência: João Martins e Ana Ribeiro},
-	colback=white,
-	colframe=black,
-	arc=2mm,
-	boxrule=0.5pt
-	]
-	\textbf{Papel:} Responsáveis pela direção estratégica da EcoRide Solutions. \par
-	\textbf{Interesse:} Obter visibilidade total sobre o desempenho operacional, financeiro e técnico da oficina. \par
-	\textbf{Necessidades principais:} Relatórios financeiros e técnicos, indicadores de desempenho, controlo de custos, rastreabilidade das operações. \par
-	\textbf{Interação com o sistema:} Consulta de dashboards, relatórios e validação de decisões operacionais.
-\end{tcolorbox}
-
-\begin{tcolorbox}[
-	title={Assistente Administrativa},
-	colback=white,
-	colframe=black,
-	arc=2mm,
-	boxrule=0.5pt
-	]
-	\textbf{Papel:} Responsável pelo atendimento ao cliente, criação de ordens de serviço, faturação e arquivo documental. \par
-	\textbf{Interesse:} Simplificação das tarefas administrativas e redução de erros. \par
-	\textbf{Necessidades principais:} Registo rápido de clientes e equipamentos, emissão de faturas, gestão de documentos e comunicação com clientes. \par
-	\textbf{Interação com o sistema:} Inserção e atualização de dados, emissão de documentos, consulta de histórico.
-\end{tcolorbox}
-
-\begin{tcolorbox}[
-	title={Técnicos de Reparação},
-	colback=white,
-	colframe=black,
-	arc=2mm,
-	boxrule=0.5pt
-	]
-	\textbf{Papel:} Executam diagnósticos, intervenções e reparações nas trotinetes. \par
-	\textbf{Interesse:} Acesso rápido ao histórico técnico e registo eficiente das intervenções. \par
-	\textbf{Necessidades principais:} Registo de diagnósticos, tempos de reparação, peças utilizadas e estados das ordens de serviço. \par
-	\textbf{Interação com o sistema:} Atualização de ordens de serviço, consulta de instruções e histórico de reparações.
-\end{tcolorbox}
-
-\begin{tcolorbox}[
-	title={Responsável de Armazém},
-	colback=white,
-	colframe=black,
-	arc=2mm,
-	boxrule=0.5pt
-	]
-	\textbf{Papel:} Gere o stock de peças, consumíveis e materiais. \par
-	\textbf{Interesse:} Manter níveis de stock adequados e evitar ruturas ou excesso de inventário. \par
-	\textbf{Necessidades principais:} Registo de entradas e saídas, alertas de stock mínimo, integração com ordens de serviço. \par
-	\textbf{Interação com o sistema:} Atualização de inventário, consulta de necessidades de peças, validação de consumos.
-\end{tcolorbox}
-
+\begin{table}[H]
+	\centering
+	\setlength{\arrayrulewidth}{0.6pt}
+	\begin{tabular}{|p{5cm}|p{9cm}|}
+		\hline
+		\rowcolor{gray!20!white}
+		\textbf{Nome} & \textbf{Papel} \\
+		\hline
+		João Martins & Gerente \\
+		\hline
+		Ana Ribeiro & Gerente \\
+		\hline
+		Silvina Matagal & Assistente Administrativa \\
+		\hline
+		Dionísio Teixeira & Gestor de Armazém \\
+		\hline
+		Ramiro Ramalho & Mecânico \\
+		\hline
+		Edgar Novo & Mecânico \\
+		\hline
+		Belmiro Pais & Mecânico \\
+		\hline
+		Raúl Rafeiro & Mecânico \\
+		\hline
+	\end{tabular}
+	\caption{Identificação dos stakeholders internos e respetivos cargos.}
+\end{table}
 
 \subsection{Stakeholders Externos}
-Os stakeholders externos são todos os intervenientes que, não pertencendo à estrutura interna da organização, influenciaram ou foram impactados pelo desenvolvimento do sistema. No contexto deste projeto, incluíram os clientes, os fornecedores e a equipa de desenvolvimento. A sua importância residiu no fornecimento de feedback, validação de serviços e execução técnica do sistema, assegurando que a solução final fosse funcional, adequada às necessidades do negócio e tecnicamente sólida.
+Os stakeholders externos são todos os intervenientes que, não pertencendo à estrutura interna da organização, influenciaram ou foram impactados pelo desenvolvimento do sistema. No contexto deste projeto, incluíram os clientes e os fornecedores. A sua importância residiu no fornecimento de feedback e na validação de serviços, assegurando que a solução final fosse funcional e adequada às necessidades do negócio.
+
+\begin{table}[H]
+	\centering
+	\setlength{\arrayrulewidth}{0.6pt}
+	\begin{tabular}{|p{5cm}|p{9cm}|}
+		\hline
+		\rowcolor{gray!20!white}
+		\textbf{Papel} & \textbf{Descrição} \\
+		\hline
+		Cliente & Proprietário das trotinetes que recorrem aos serviços da empresa.\\
+		\hline
+		Fornecedor & Entidades que fornecem peças e materiais à empresa. \\	
+		\hline
+	\end{tabular}
+	\caption{Identificação dos papéis e respetivas responsabilidades dos stakeholders internos.}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\setlength{\arrayrulewidth}{0.6pt}
+	\begin{tabular}{|p{5cm}|p{9cm}|}
+		\hline
+		\rowcolor{gray!20!white}
+		\textbf{Nome} & \textbf{Papel} \\
+		\hline
+		Correia \& Cardoso & Fornecedor\\
+		\hline
+		MotoFreitas & Fornecedor \\
+		\hline
+		Barcelpeças & Fornecedor \\
+		\hline
+		Centrauto & Fornecedor \\
+		\hline
+	\end{tabular}
+	\caption{Identificação dos papéis e respetivas responsabilidades dos stakeholders externos.}
+\end{table}
+
+\subsection{Stakeholders Técnicos}
+Stakeholders técnicos são os intervenientes diretamente envolvidos na conceção, desenvolvimento e validação técnica de um sistema de software. No contexto deste projeto, os stakeholders técnicos incluiram: o orientador (responsável pela supervisão técnica e metodológica), o coordenador (responsável pela articulação entre os objetivos e prazos do projeto), os programadores (encarregues da implementação do sistema) e os analistas (responsáveis pela recolha e formalização dos requisitos). A sua participação é essencial para garantir que o sistema cumpre os requisitos funcionais e não funcionais identificados, assegurando a viabilidade técnica, a coerência arquitetural e a qualidade do produto final.
 
 
-\begin{tcolorbox}[
-	title={Clientes da Oficina},
-	colback=white,
-	colframe=black,
-	arc=2mm,
-	boxrule=0.5pt
-	]
-	\textbf{Papel:} Proprietários das trotinetes que recorrem aos serviços da empresa. \par
-	\textbf{Interesse:} Transparência no processo de reparação, prazos cumpridos e custos claros. \par
-	\textbf{Necessidades principais:} Informação sobre o estado da reparação, histórico de serviços, faturas e orçamentos. \par
-	\textbf{Interação com o sistema:} Indireta; através de documentos emitidos e comunicação da oficina.
-\end{tcolorbox}
-
-\begin{tcolorbox}[
-	title={Fornecedores de Peças},
-	colback=white,
-	colframe=black,
-	arc=2mm,
-	boxrule=0.5pt
-	]
-	\textbf{Papel:} Entidades que fornecem componentes e consumíveis. \par
-	\textbf{Interesse:} Processos de encomenda claros e previsíveis. \par
-	\textbf{Necessidades principais:} Informação sobre necessidades de reposição e histórico de compras. \par
-	\textbf{Interação com o sistema:} Indireta; através de registos de encomendas e receção de material.
-\end{tcolorbox}
+\begin{table}[H]
+	\centering
+	\setlength{\arrayrulewidth}{0.6pt}
+	\begin{tabular}{|p{5cm}|p{9cm}|}
+		\hline
+		\rowcolor{gray!20!white}
+		\textbf{Papel} & \textbf{Descrição} \\
+		\hline
+		Orientador & Responsável pela validação ocasional do trabalho desenvolvido pela equipa de desenvolvimento. \\
+		\hline
+		Coordenador & Encarregado da gestão da equipa de desenvolvimento e dos recursos disponíveis para a criação do sistema. \\
+		\hline
+		Programador & Responsável pela implementação e manutenção do software. \\
+		\hline
+		Analista & Conduz o levantamento, análise e refinamento de requisitos.\\
+		\hline
+	\end{tabular}
+	\caption{Identificação dos papéis e respetivas responsabilidades dos stakeholders técnicos.}
+\end{table}
 
 
-\begin{tcolorbox}[
-	title={Equipa de Desenvolvimento do Sistema},
-	colback=white,
-	colframe=black,
-	arc=2mm,
-	boxrule=0.5pt
-	]
-	\textbf{Papel:} Responsáveis pela análise, implementação e manutenção do software. \par
-	\textbf{Interesse:} Requisitos claros, estabilidade do sistema e facilidade de manutenção. \par
-	\textbf{Necessidades principais:} Especificações completas, acesso a utilizadores-chave, feedback contínuo. \par
-	\textbf{Interação com o sistema:} Desenvolvimento, testes, manutenção e evolução.
-\end{tcolorbox}
+\begin{table}[H]
+	\centering
+	\setlength{\arrayrulewidth}{0.6pt}
+	\begin{tabular}{|p{5cm}|p{9cm}|}
+		\hline
+		\rowcolor{gray!20!white}
+		\textbf{Papel} & \textbf{Descrição} \\
+		\hline
+		Duarte Escairo & Programador \\
+		\hline
+		Eduardo Fernandes & Analista \\
+		\hline
+		Inês Ferreira & Coordenadora \\
+		\hline
+		Luís Soares & Analista \\
+		\hline
+		Orlando Belo & Orientador \\
+		\hline
+		Tiago Figueiredo & Programador \\
+		\hline
+	\end{tabular}
+	\caption{Identificação dos papéis e respetivas responsabilidades dos stakeholders técnicos.}
+\end{table}
 
 \section{LLM e Avaliação}
 
@@ -781,6 +823,33 @@ Sê breve, isto é, não escrevas mais do que 4 linhas e mantém o estilo de esc
 	\textbf{Modificações:} ... \par
 \end{tcolorbox}
 
+\begin{tcolorbox}[
+	title={Prompt P13 - Escrita do texto introdutório dos stakeholders técnicos},
+	colback=white,
+	colframe=black,
+	arc=2mm,
+	boxrule=0.5pt
+	]
+	\textbf{Objetivo:} Compor o texto que explica o quê e quem são os stakeholders técnicos \par
+	\textbf{Prompt:} 
+	\begin{tcolorbox}[
+		listing only,
+		breakable,
+		enhanced,
+		colback=white,
+		colframe=black,
+		listing options={
+			breaklines=true,
+			basicstyle=\ttfamily\small
+		}
+		]
+		Redige um texto introdutório sobre o que são stakeholders técnicos, quem eles são no contexto deste projeto (neste caso, o orientador, o coordenador, os programadores e os analistas) e qual a sua importância para o desenvolvimento. 
+		Sê breve, isto é, não escrevas mais do que 4 linhas e mantém o estilo de escrita que um Engenheiro de Software teria ao redigir um relatório que falasse sobre isto.
+	\end{tcolorbox}
+	\par
+	\textbf{Avaliação:} ... \par
+	\textbf{Modificações:} ... \par
+\end{tcolorbox}
 
 
 %==========================================================================
