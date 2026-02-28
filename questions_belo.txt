@@ -1,4 +1,0 @@
-
-
-1- Como obtemos a BD, através do ORM ou a partir da Modelação Lógica ?
-
