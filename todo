@@ -1,7 +1,22 @@
-Acabar requisitos RF e RNF
-Acabar Investigação/Observação no terreno
-Fazer forms
-Identificar os stakeholders mais granularmente --------
+Vale a pena existir uma localização associada às peças no stock (prateleira x, armario y)
 
 
-Atas para reuniões
+
+
+
+
+
+
+
+
+
+
+Adicionar ao relatorio de Investigação operacional
+
+E: Existem kits de peças? (ex: ’Kit Revisão’ que inclui pastilhas + limpeza). Gostaria de
+dar saída de um kit e o sistema descontar automaticamente todos os componentes que o
+compõem?
+R: Temos alguns kits, sim. Por exemplo, o “Kit de Revisão” que inclui pastilhas, lubrificante
+e um pano de limpeza. Quando sai um kit, tenho de dar baixa manualmente de cada
+peça que o compõe, o que dá trabalho e pode levar a erros. Era ótimo se o sistema
+permitisse
