@@ -72,45 +72,36 @@
 	\vspace{0.8cm}
 	
 	\section*{1. Introdução}
-	Para garantir uma identificação completa de todos os requisitos, a equipa de desenvolvimento decidiu acompanhar as operações da oficina da EcoRide Solutions ao longo de um dia de trabalho típico. Esta abordagem surge do reconhecimento de que, por vezes, o levantamento de requisitos é feito sem que a equipa de desenvolvimento tenham um contacto direto com os processos que o sistema irá suportar.A observação direta permite, assim, compreender melhor o contexto real de trabalho e reduzir a probabilidade de falhas ou omissões que poderiam ocorrer se o levantamento fosse feito apenas a partir de documentação ou entrevistas e não existisse contacto com o terreno.
+	Para garantir uma identificação completa de todos os requisitos, a equipa de desenvolvimento decidiu acompanhar as operações da oficina da EcoRide Solutions ao longo de um dia de trabalho típico. Esta abordagem surge do reconhecimento de que, por vezes, o levantamento de requisitos é feito sem que a equipa de desenvolvimento tenham um contacto direto com os processos que o sistema irá suportar. A observação direta permite, assim, compreender melhor o contexto real de trabalho e reduzir a probabilidade de falhas ou omissões que poderiam ocorrer se o levantamento fosse feito apenas a partir de documentação ou entrevistas e não existisse contacto com o terreno.
 	
 
 	\vspace{0.5cm}
 	\hrule % Linha separadora opcional
-	\vspace{0.5cm}
-	
-	% --- Contexto e Objetivos ---
-	\section*{2. Enquadramento e Objetivos}
-	\begin{itemize}[leftmargin=*, label=\small\color{primaryblue}$\blacksquare$]
-		\item Observação do ambiente operacional.
-		\item Identificação dos processos envolvidos numa reparação.
-		\item Levantamento das interações entre clientes, funcionários e equipamentos.
-		\item Análise do fluxo de ordens de serviço, desde a chegada da trotinete até à entrega.
-		\item Verificação do controlo de peças e gestão de stock.
-		\item Registo das práticas de comunicação e registos internos.
-		\item Deteção de possíveis pontos críticos ou áreas de melhoria nos processos.
-	\end{itemize}
-	
-	\hrule % Linha separadora opcional
-	\vspace{0.5cm}
+
+
 	
 	% --- Transcrição ---
-	\section*{3. Interações}
+	\section*{2. Observações}
 	
 	\subsection*{Cliente e a Assistente Administrativa}
 	\begin{itemize}
 		
+		\pergunta No escritório de atendimento da oficina existe um ``Kit de Manutenção`` à venda composto por um pano, uma escova, uma garrafa com detergente, um canivete suiço com chaves próprias de trotinetes e um kit de remendo de furos.
+		
+		\resposta O sistema deverá ter a opção de vender conjuntos de itens diretamente ao público, sem haver uma reparação associada.
+		
 		\pergunta Foram entregues várias trotinetes sujas e com riscos por parte dos clientes. Para evitar reclamações ou intrigas entre os clientes e a oficina, a assistente tinha de tirar fotos com vários ângulos e posições às trotinetes para ter um registo do estado da trotinete aquando da sua entrega
 		
-		\resposta O sistema precisa de uma funcionalidade rápida na abertura da OS para "Registo de Danos Prévios", idealmente com a opção de anexar uma ou várias fotos à ficha.
+		\resposta O sistema precisa de uma funcionalidade rápida na abertura da ordem de serviço para "Registo de Danos Prévios", idealmente com a opção de anexar uma ou várias fotos à ficha.
 		
 		\pergunta Um cliente afirmou ter entregue juntamente com a sua trotinete, o carregador e o cadeado para permitir aos mecânicos testá-la livremente. Apesar disto, a secretária assegurou que nenhum destes itens foi entregue.
 		
-		\resposta Deverá ser possível adicionar os itens que foram deixados na hora de entrega da trotinete, como por exemplo, carregador, cadeado e chave.
+		\resposta Deverá ser possível nomear os itens que foram deixados na hora de entrega da trotinete, como por exemplo, carregador, cadeado e chave.
 		
 		\pergunta A identificação do modelo exato das trotinetes foi, por vezes, difícil. A assistente teve de se baixar várias vezes para procurar a etiqueta do número de série no chassi, que muitas vezes estava ilegível.
 		
-		\resposta Uma base de dados visual com fotos dos modelos mais comuns para ajudar a secretária a identificar o modelo junto com o cliente.
+		\resposta Uma base de dados visual com fotos dos modelos mais comuns para ajudar a secretária a identificar o modelo junto com o cliente. 
+		
 	\end{itemize}
 
 
@@ -137,33 +128,28 @@
 	
 	\pergunta Por várias vezes, a assistente teve de atender chamadas de clientes a perguntar se a trotinete já estava pronta. Em todas elas, teve de se levantar, ir à oficina, interromper o mecânico e perguntar pelo ponto de situação.
 	
-	\resposta É crítico ter um "Quadro de Estado em Tempo Real" acessível na receção. O mecânico deverá identificar a ordem de serviço associada e atualizar o seu estado para que a assistente tenha sempre a resposta imediatamente.
-	
-	\pergunta Aprovação de orçamentos extras: O mecânico abriu um motor e descobriu que precisava de mais peças do que o orçamentado inicialmente. Foi avisar a assistente presencialmente, que teve de ligar ao cliente para pedir nova aprovação.
-	
-	\resposta O sistema deverá permitir criar um "Orçamento Suplementar" dentro da ordem de serviço existente. Quando o mecânico o submete, notificação é gerada no ecrã da assistente (e possivelmente um email/SMS automático para o cliente com um link para aprovação digital).
+	\resposta É crítico ter um "Quadro de Estado em Tempo Real" \space acessível na receção. O mecânico deverá identificar a ordem de serviço associada e atualizar o seu estado para que a assistente tenha sempre a resposta imediatamente.
 		
 	\end{itemize}
 	
-	% --- Transcrição ---
-	\section*{4. Conclusão}
-	A observação no terreno pôde demonstrar que, embora nas entrevistas tenham sido identificados bastantes requisitos, apenas com a observação feita por alguém com conhecimento técnico de análise e modelação, foi possível identificar que no ambiente operacional a comunicação assíncrona entre a receção e a oficina é o maior gargalo atual. O sistema terá de reduzir a necessidade dos funcionários saírem dos seus postos para trocar informação e, assim, aumentar a sua produtividade e qualidade do serviço prestado pela oficina da EcoRide Solutions.
 	
 	\vspace{0.8cm}
 	
-	% --- Observações e Próximos Passos ---
-	%	\section*{3. Análise e Observações Gerais}
-	%	\begin{itemize}[leftmargin=*]
-		%		\item \textbf{Tom de voz:} O entrevistado demonstrou abertura, mas alguma frustração com os sistemas de IT atuais.
-		%		\item \textbf{Pontos Críticos:} Falta de interoperabilidade entre sistemas.
-		%	\end{itemize}
-	%	
-	%	\section*{4. Próximos Passos}
-	%	\begin{tabularx}{\textwidth}{@{}|X|l|l|@{}}
-		%		\hline
-		%		\rowcolor{gray!10} \textbf{Ação} & \textbf{Responsável} & \textbf{Prazo} \\ \hline
-		%		Validar fluxo de dados com equipa de IT & [Teu Nome] & 05/03/2026 \\ \hline
-		%		Agendar follow-up para demonstração de solução & [Teu Nome] & 12/03/2026 \\ \hline
-		%	\end{tabularx}
+	\hrule % Linha separadora opcional
+	\vspace{0.2cm}
+	
+	\section*{2. Requisitos obtidos}
+	
+		\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+			\hline
+			\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+			\textbf{1} & O sistema deverá ter a opção de vender conjuntos de itens diretamente ao público, sem haver uma reparação associada. \\ \hline
+			\textbf{2} & O sistema precisa de uma funcionalidade rápida na abertura da ordem de serviço para "Registo de Danos Prévios", com a opção de anexar uma ou várias fotos à ficha.  \\ \hline
+			\textbf{3} & O sistema deverá ser possível nomear os itens que foram deixados na hora de entrega da trotinete, como por exemplo, carregador, cadeado e chave.  \\ \hline
+			\textbf{4} & O sistema deverá ter uma base de dados visual com fotos dos modelos mais comuns para ajudar a secretária a identificar o modelo junto com o cliente. \\ \hline
+			\textbf{5} & O sistema deverá permitir que o mecânico adicione a peça à ordem de serviço diretamente do seu posto de trabalho, sem ter de passar o fluxo pelo gestor de stock para itens de baixo valor pré-aprovados. \\ \hline
+			\textbf{6} & O sistema deverá implementar de uma "Data Prevista de Chegada" (ETA) nas encomendas de peças, que irá refletir automaticamente na ordem de serviço associada o atraso, mudando o estado  "A Aguardar Peças (Atrasado)", para que a receção saiba informar o cliente. \\ \hline
+			\textbf{7} & O sistema deverá ter um "Quadro de Estado em Tempo Real" \space acessível na receção. O mecânico deverá identificar a ordem de serviço associada e atualizar o seu estado para que a assistente tenha sempre a resposta imediatamente. \\ \hline
+		\end{tabularx}
 	
 \end{document}
