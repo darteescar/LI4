@@ -37,6 +37,7 @@
 	% ========== GERENTE ==========
 	\section*{Entrevista ao Gerente}
 	
+	\renewcommand{\arraystretch}{1.5}
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
 		\hline
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
@@ -55,13 +56,15 @@
 		\textbf{13}  & O sistema deve permitir registar entradas de peças com quantidade, fornecedor, preço de compra e venda, data e número de série (que deverá ser obrigatório se o preço de compra for superior a 70€). \\ \hline
 		\textbf{14}  & O sistema deve permitir registar automaticamente a saída de peças quando associadas a uma ordem de serviço. \\ \hline
 		\textbf{15}  & O sistema deve permitir devolver peças não utilizadas ao stock e remover a associação à ordem de serviço. \\ \hline
+		
+	\end{tabularx}
+	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+	\hline
+	\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+		
 		\textbf{16}  & O sistema deve permitir registar referências de fornecedores e associar cada peça ao fornecedor correto. \\ \hline
 		\textbf{17}  & O sistema deve armazenar contactos, emails, preços habituais e prazos de entrega de fornecedores. \\ \hline
 		\textbf{18}  & O sistema deve gerar listas de peças a encomendar com base em níveis mínimos, consumo e stock atual. \\ \hline
-     \end{tabularx}
-     \begin{tabularx}{\textwidth}{@{}|l|X|@{}}
-		\hline
-		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 		\textbf{19}  & O sistema deve permitir registar peças devolvidas ao fornecedor, com data, motivo e estado da devolução. \\ \hline
           \textbf{20}  & O sistema deve permitir que apenas o gerente possa eliminar ordens de serviço, peças ou registos críticos. \\ \hline
 		\textbf{21}  & O sistema deve impedir a entrega da trotinete se existirem pagamentos pendentes desse cliente. \\ \hline
