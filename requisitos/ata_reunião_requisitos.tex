@@ -1,0 +1,119 @@
+\documentclass[12pt]{article}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=2.5cm}
+
+% Cor cinzenta para cabeçalhos de tabela
+\definecolor{tablegray}{gray}{0.9}
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+
+% Cabeçalho e rodapé
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{Registo de Reunião | EcoRide Solutions}
+\fancyhead[R]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+{\noindent\LARGE\bfseries\color{primaryblue} Ata de Reunião | Validação de Requisitos}
+
+\vspace{0.4cm}
+
+\section*{Identificação da Reunião}
+
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\rowcolor{tablegray}
+\textbf{ID Reunião} & \#006 \\ \hline
+\textbf{Tipo de reunião} & Validação e clarificação de requisitos \\ \hline
+\textbf{Data} & 12 de março de 2026 \\ \hline
+\textbf{Hora Início} & 14:00 \\ \hline
+\textbf{Hora Fim} & 16:00 \\ \hline
+\textbf{Local/Meio} & Sala de Reuniões B \\ \hline
+\textbf{Estado} & Finalizada \\ \hline
+\end{tabularx}
+
+\vspace{0.8cm}
+
+\section*{Participantes}
+
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\rowcolor{tablegray}
+\textbf{Nome} & \textbf{Função} & \textbf{Entidade} \\ \hline
+João Martins & Gerente & EcoRide Solutions \\ \hline
+Silvina Matagal & Secretária Administrativa & EcoRide Solutions \\ \hline
+Ramiro Ramalho & Mecânico & EcoRide Solutions \\ \hline
+Luís Soares & Analista & Equipa de Desenvolvimento \\ \hline
+Eduardo Fernandes & Analista & Equipa de Desenvolvimento \\ \hline
+\end{tabularx}
+
+\vspace{0.8cm}
+\hrule % Linha separadora opcional
+\vspace{0.2cm}
+
+\section*{Objetivo da Reunião}
+
+A reunião teve como objetivo validar e clarificar os requisitos previamente identificados para o sistema de gestão da oficina de reparação de trotinetes. Pretendeu-se garantir que os requisitos representam corretamente as necessidades da oficina e que estão definidos com um nível de detalhe adequado para permitir a sua implementação pela equipa de desenvolvimento.
+
+Durante a reunião foram analisadas possíveis ambiguidades, problemas de estrutura e lacunas funcionais na documentação existente.
+
+\vspace{0.5cm}
+
+\section*{Principais Problemas Identificados}
+
+Durante a análise dos requisitos verificou-se que alguns apresentam ambiguidades ou falta de detalhe relativamente ao comportamento esperado do sistema. Foram discutidos exemplos relacionados com o registo de danos prévios nas trotinetes, critérios para utilização de peças de baixo valor, definição de taxas de armazenamento e gestão de permissões de utilizadores.
+
+Foi também observado que alguns requisitos são demasiado genéricos, agregando várias funcionalidades distintas, especialmente no que diz respeito à geração de relatórios e análise financeira. Nestes casos foi sugerida a sua decomposição em requisitos mais específicos.
+
+Adicionalmente, identificaram-se alguns requisitos demasiado fragmentados, particularmente na área de gestão de peças e fornecedores, sendo recomendada a sua reorganização.
+
+Foram ainda identificadas funcionalidades relevantes que não estavam formalmente descritas nos requisitos, como comunicação com clientes, gestão de peças defeituosas, integração com sistemas externos de faturação e geração de relatórios técnicos de reparação.
+
+\vspace{0.5cm}
+
+\section*{Decisões Tomadas}
+
+\begin{itemize}
+\item Reformular os requisitos que apresentam ambiguidades, introduzindo critérios mais concretos.
+\item Dividir requisitos demasiado genéricos em requisitos mais específicos.
+\item Reorganizar ou consolidar requisitos relacionados com áreas semelhantes.
+\item Avaliar a inclusão das novas funcionalidades identificadas durante a análise.
+\item Criar um documento consolidado contendo todos os requisitos revistos do sistema.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\section*{Próximos Passos}
+
+\begin{itemize}
+\item Revisão e reformulação dos requisitos ambíguos identificados.
+\item Reorganização da estrutura geral dos requisitos.
+\item Avaliação e eventual integração dos novos requisitos propostos.
+\item Elaboração de um documento consolidado de requisitos.
+\item Utilização desse documento como base para as fases seguintes do desenvolvimento do sistema.
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule % Linha separadora opcional
+\vspace{0.2cm}
+
+\section*{Encerramento}
+
+Não havendo mais assuntos a tratar, a reunião foi encerrada após a discussão dos pontos referidos, ficando acordado que a equipa de desenvolvimento procederá à revisão da documentação de requisitos com base nas conclusões alcançadas durante a reunião.
+
+\end{document}
