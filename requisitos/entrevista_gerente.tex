@@ -116,6 +116,9 @@
 	
 		\pergunta{Quando um mecânico escolhe a próxima ordem de serviço a servir, o outro mecânico pode tentar servir a mesma? Eu assumo que haja um registo de intervenções quando uma trotinete é reparada. É preciso que o mecânico escreva sempre o que fez ou existem tarefas repetitivas? }
 		\resposta{Durante a reparação, apenas um mecânico pode reparar algo referente a uma ordem de serviço, isso é uma regra da casa já que poderia acontecer de haver falta de coordenação entre eles e depois haver trabalho que faltasse ser feito ou até trabalho feito em dobro. Em relação às tarefas, existe uma tabela de arranjos que são realizados na oficina e, neste momento, eles apenas precisam de escrever qual foram os arranjos realizados para que depois a secretária apenas precise de somar os valores para calcular o valor final do pagamento.}
+		
+		\pergunta{E não informa o cliente sobre quanto tempo a reparação irá demorar?}
+		\resposta{Quando os clientes perguntam, a secretária consulta a pasta de ordens de serviço por reparar e consegue fazer uma estimativa do tempo que irá demorar para terminar a reparação daquela trotinete.}
 	
 		\pergunta{Existe a necessidade de saber qual mecânico executou uma dada reparação?}
 		\resposta{Sim, às vezes é necessário fazer uma retificação final por parte da secretária e já aconteceu de ela não saber quem é que tinha feito a reparação, e, por isso, não sabia quem consultar.}
@@ -205,21 +208,21 @@
 			\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 			\textbf{1} & O sistema deve disponibilizar ao gerente uma interface que permita visualizar o estado de todas as ordens de serviço (por diagnosticar, pendentes, em reparação, concluídas, aguardando aprovação). Deve suportar filtros por estado, data, cliente e mecânico. \\ \hline
 			\textbf{2}  & O sistema deve permitir registar clientes com nome, email, telemóvel, NIF e múltiplas trotinetes associadas. \\ \hline
-			\textbf{3}  & O sistema deve permitir registar marca, modelo, número de série, estado à entrada (notas textuais ou foto), tipo de motor, tipo de bateria e acessórios. \\ \hline
+			\textbf{3}  & O sistema deve permitir registar marca, modelo, número de série, estado à entrada (notas textuais ou foto), tipo de motor, tipo de bateria e acessórios de uma trotinete. \\ \hline
 			\textbf{4}  & O sistema deve permitir registar dados pessoais dos funcionários: nome, morada, telemóvel, email, data de nascimento, NISS, NIF, NUS e IBAN. \\ \hline
 			\textbf{5}  & O sistema deve permitir registar salário base, alterações salariais, horas extraordinárias e calcular automaticamente o valor mensal a pagar de cada um dos funcionários. \\ \hline
-			\textbf{6}  & O sistema deve permitir registar a entrada de uma trotinete com dados do cliente, dados técnicos da trotinete e descrição do problema numa ordem de serviço nova. \\ \hline
+			\textbf{6}  & O sistema deve permitir registar a entrada de uma trotinete com dados do cliente, dados técnicos da trotinete e descrição do problema numa ordem de serviço nova. Deverá também conseguir calcular um tempo estimado para o término da reparação, para informar o cliente. \\ \hline
 			\textbf{7}  & O sistema deverá facilitar a obtenção de novas ordens de serviço para que os mecânicos realizem diagnósticos ou reparações. \\ \hline
+			
+					\end{tabularx}
+		\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+			
 			\textbf{8}  & O sistema deve atribuir automaticamente o estado ``Por diagnosticar`` a novas ordens de serviço. \\ \hline
 			\textbf{9}  & O sistema deve bloquear o início da reparação até existir aprovação formal do orçamento por parte do cliente registada no sistema (feita pela secretária). \\ \hline
 			\textbf{10}  & O sistema deve impedir que duas pessoas iniciem a mesma ordem de serviço simultaneamente, atribuindo-a a um mecânico de cada vez. \\ \hline
-	
 			\textbf{11}  & O sistema deve registar automaticamente qual mecânico executou cada reparação. \\ \hline
-			
-		\end{tabularx}
-		\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
-			\hline
-			\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 			\textbf{12}  & O sistema deverá ter uma lista de possíveis intervenções para uma ordem de serviço com orçamento aprovado, facilitando a explicação das intervenções por parte dos mecânicos. \\ \hline
 			\textbf{13}  & O sistema deve permitir registar entradas de peças com quantidade, fornecedor, preço de compra e venda, data e número de série (que deverá ser obrigatório se o preço de compra for superior a 70€). \\ \hline
 			\textbf{14}  & O sistema deve permitir registar automaticamente a saída de peças quando associadas a uma ordem de serviço. \\ \hline
@@ -234,9 +237,15 @@
 			\textbf{23}  & O sistema deve registar quantos dias passaram desde que o cliente foi notificado e aplicar automaticamente uma taxa diária de 3€ após 7 dias (excluindo o dia de levatamento). \\ \hline
 			\textbf{24}  & O sistema deve gerar relatórios sobre número de reparações, tempos médios, rentabilidade e trotinetes paradas. \\ \hline
 			\textbf{25}  & O sistema deverá calcular o valor de um serviço baseando-se na lista de intervenções anotada pelos mecânicos e somando esses valores com os valores de venda das peças usadas. \\ \hline
+		\end{tabularx}
+	
+	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+		
 			\textbf{26}  & O sistema deve implementar perfis distintos (gerente, secretária, mecânico) com permissões específicas. \\ \hline
 			\textbf{27}  & Todas as ações (entradas/saídas de stock, alterações de preços, aprovações) devem ser registadas com data, hora e utilizador. \\ \hline
 			\textbf{28} & O sistema deverá calcular os valores dos custos e lucros da oficina e mostrar essa informação na interface do gerente. Deverá ser possível acompanhar os salários, compras de peças, rendas e outras despesas e filtrar por intervalos de tempo. \\ \hline
-		\end{tabularx}
+	\end{tabularx}
 
 \end{document}
