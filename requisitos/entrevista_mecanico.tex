@@ -86,8 +86,11 @@
     \pergunta{Como indica ao sistema de que peças vai precisar e como faz o seu levantamento?}
     \resposta{Normalmente anoto as peças que vou precisar e aviso o gerente ou a receção. Mas às vezes, se for algo urgente, já peço logo a peça ou vou eu próprio ao armazém buscá-la. Já conheço bem o espaço e encontro tudo rapidamente. Assim que tiro a peça, escrevo na ficha da ordem de serviço o que usei, para que depois não haja dúvidas na hora de cobrar ao cliente.}
     
-		\pergunta{A associação de uma peça a uma ordem de serviço é feita sempre na hora do levantamento no armazém ou pode ser também feita pela secretária na hora de pagamento?}
-		\resposta{O ideal é que eu registe a peça logo na hora em que a tiro do armazém, porque é quando sei exatamente o que usei. Mas às vezes, quando a ficha não está comigo ou quando há muita confusão, é a secretária que acaba por registar a peça mais tarde, no momento do pagamento. Mesmo assim, prefiro sempre que fique registado logo no momento do levantamento para evitar esquecimentos.}
+    \pergunta{E se precisar de uma peça que não tem disponível no armazém? Informam o cliente desse percalço?}
+    \resposta{Nesse caso, informo o gerente para que ele encomende a peça o mais atempadamente possível. Depois disso, sei que o gerente fala com a secretária para que ela ligue ao cliente a informar do atraso. Como ele sabe o atraso, eu não faço ideia.}
+    
+	\pergunta{A associação de uma peça a uma ordem de serviço é feita sempre na hora do levantamento no armazém ou pode ser também feita pela secretária na hora de pagamento?}
+	\resposta{O ideal é que eu registe a peça logo na hora em que a tiro do armazém, porque é quando sei exatamente o que usei. Mas às vezes, quando a ficha não está comigo ou quando há muita confusão, é a secretária que acaba por registar a peça mais tarde, no momento do pagamento. Mesmo assim, prefiro sempre que fique registado logo no momento do levantamento para evitar esquecimentos.}
 
     \pergunta{Já aconteceu montar uma peça e descobrir que ela estava com defeito de fábrica?}
     \resposta{Sim, já me aconteceu montar uma peça nova, como um controlador ou uma luz, e perceber logo que não funciona. Quando isso acontece, aviso o gerente, mas às vezes passa despercebido.}
@@ -109,6 +112,7 @@
     
     \pergunta{Quando apanha uma trotinete que já cá esteve antes, é importante para si ver o que foi feito na última vez e que peças foram trocadas? Isso ajuda no diagnóstico atual?}
     \resposta{Quando apanho uma trotinete que já esteve cá antes, é muito importante ver o que foi feito da última vez. Saber que peças foram trocadas ou que problemas já existiam ajuda-me a perceber se é uma avaria nova ou uma repetição. Isso poupa tempo no diagnóstico e evita fazer trabalho desnecessário.}
+  
 		
 	\end{transcription}
 	
@@ -131,5 +135,7 @@
       \textbf{8} & O sistema deve incluir uma checklist obrigatória de verificações de segurança (travões, luzes, pneus, aceleração, travagem, visor, teste de condução), que o mecânico deve validar antes de concluir a ordem. \\ \hline
       \textbf{9} & O sistema deve disponibilizar ao mecânico uma lista digital das ordens pendentes, ordenadas por prioridade ou ordem de chegada. \\ \hline
       \textbf{10} & O sistema deve permitir ao mecânico consultar rapidamente o histórico de reparações e peças substituídas de uma trotinete, para apoiar diagnósticos e evitar trabalho dobrado. \\ \hline
+      \textbf{11} & Caso uma peça não esteja disponível para ser usada por um mecânico numa reparação, ele deverá submeter uma requisição de encomenda da peça para que o gerente possa encomendá-la.\\ \hline 
+      \textbf{12} & Quando uma peça que um mecânico pediu for adicionada ao stock, deverá ser automaticamente retirada do stock e adicionada à ordem de serviço que o mecânico estava a tratar. Para além disso, deverá ser obrigatoriamente a próxima ordem de serviço que o mecânico irá reparar.\\ \hline 
 		\end{tabularx}
 \end{document}
