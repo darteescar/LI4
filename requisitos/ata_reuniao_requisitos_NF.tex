@@ -1,0 +1,147 @@
+\documentclass[12pt]{article}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=2.5cm}
+
+% Cor cinzenta para cabeçalhos de tabela
+\definecolor{tablegray}{gray}{0.9}
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+
+% Cabeçalho e rodapé
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{Registo de Reunião | EcoRide Solutions}
+\fancyhead[R]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+{\noindent\LARGE\bfseries\color{primaryblue} Ata de Reunião | Requisitos não-funcionais}
+
+\vspace{0.4cm}
+
+\section*{Identificação da Reunião}
+
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\rowcolor{tablegray}
+\textbf{ID Reunião} & \#007 \\ \hline
+\textbf{Tipo de reunião} & Levantamento de requisitos não-funcionais\\ \hline
+\textbf{Data} & 13 de março de 2026 \\ \hline
+\textbf{Hora Início} & 9:00 \\ \hline
+\textbf{Hora Fim} & 11:00 \\ \hline
+\textbf{Local/Meio} & Chamada de videoconferência \\ \hline
+\textbf{Estado} & Finalizada \\ \hline
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\section*{Participantes}
+
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\rowcolor{tablegray}
+\textbf{Nome} & \textbf{Função} & \textbf{Entidade} \\ \hline
+Duarte Escairo & Programador & Equipa de Desenvolvimento \\ \hline
+Eduardo Fernandes & Analista & Equipa de Desenvolvimento \\ \hline
+Inês Ferreira & Coordenadora & Equipa de Desenvolvimento \\ \hline
+Luís Soares & Analista & Equipa de Desenvolvimento \\ \hline
+Tiago Figueiredo & Programador & Equipa de Desenvolvimento \\ \hline
+\end{tabularx}
+
+\vspace{0.8cm}
+\hrule % Linha separadora opcional
+	\vspace{0.2cm}
+
+\section*{Objetivo da Reunião}
+
+A reunião teve como objetivo identificar, discutir e formalizar os requisitos não‑funcionais do sistema de gestão da EcoRide Solutions. Pretendeu‑se garantir que, para além das funcionalidades já levantadas, o sistema cumpra critérios de desempenho, segurança, usabilidade, fiabilidade, portabilidade e manutenção adequados ao contexto operacional da oficina.
+
+Durante a sessão, foram analisadas práticas de empresas semelhantes, bem como limitações observadas nos processos atuais, de forma a assegurar que o sistema final apresenta níveis de qualidade compatíveis com as necessidades reais dos utilizadores.
+
+\vspace{0.5cm}
+
+\section*{Principais Problemas Identificados}
+
+Durante a reunião, a equipa analisou em detalhe os aspetos não‑funcionais que o sistema deverá cumprir para garantir um funcionamento eficiente, seguro e adequado ao contexto operacional da EcoRide Solutions. Começou‑se por discutir a importância do desempenho, destacando‑se a necessidade de tempos de resposta reduzidos nas operações mais frequentes, como a criação de ordens de serviço, a pesquisa de clientes e a consulta do estado das reparações. Foi igualmente salientado que o sistema deverá suportar vários utilizadores em simultâneo sem degradação perceptível da performance, tendo em conta que secretária, mecânicos e gerente poderão estar a utilizá‑lo ao mesmo tempo.
+
+Abordaram‑se questões de usabilidade e foram discutidas boas práticas de design baseadas nas heurísticas de Nielsen, reconhecendo‑se que o sistema deve ser intuitivo e fácil de aprender, de forma a não comprometer o ritmo de trabalho da oficina.
+
+No que diz respeito à segurança, foi consensual que o sistema deverá implementar perfis de acesso distintos para gerente, secretária e mecânicos, assegurando que cada utilizador apenas acede às funcionalidades que lhe dizem respeito. Foram também discutidas medidas de proteção de dados sensíveis, como encriptação de informação pessoal e registo de todas as ações críticas para efeitos de auditoria.
+
+A equipa discutiu também requisitos relacionados com portabilidade e compatibilidade, sublinhando que o sistema deverá funcionar corretamente nos principais navegadores e em dispositivos de diferentes resoluções, como os tablets utilizados na oficina. Por fim, foram abordados aspetos de manutenibilidade, defendendo‑se uma arquitetura modular que facilite futuras alterações e simplifique a gestão.
+
+\vspace{0.5cm}
+
+\section*{Requisitos obtidos}
+	
+\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+\hline
+\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+
+
+\textbf{1} & O sistema deve ser modular, permitindo a adição, substituição ou atualização de componentes sem impacto nas restantes funcionalidades. \\ \hline
+
+\textbf{2} & O acesso ao sistema deve ser autenticado com credenciais individuais. \\ \hline
+
+\textbf{2} & Devem existir perfis de acesso distintos, com permissões específicas. \\ \hline
+
+\textbf{4} & Dados sensíveis devem ser armazenados de forma encriptada. \\ \hline
+
+\textbf{5} & O sistema deve impedir a entrega de uma trotinete caso existam pagamentos pendentes. \\ \hline
+
+\textbf{6} & A interface deve ser simples e intuitiva para permitir que novos funcionários aprendam a utilizá‑la rapidamente. \\ \hline
+
+\textbf{7} & Os formulários devem validar automaticamente campos obrigatórios e formatos. \\ \hline
+
+\textbf{8} & O sistema deve minimizar o número de cliques necessários para operações frequentes. \\ \hline
+
+\textbf{9} & O sistema deve apresentar listas de opções e/ou autocompletar campos sempre que possível. \\ \hline
+
+\textbf{10} & Todas as ações críticas devem ser registadas com data, hora e utilizador. \\ \hline
+
+\textbf{11} & O sistema deve garantir que duas pessoas não podem editar a mesma ordem de serviço em simultâneo. \\ \hline
+
+\textbf{12} & O sistema deve funcionar em qualquer navegador moderno e ser compatível com diferentes resoluções. \\ \hline
+
+\textbf{13} & O sistema deve permitir criar uma nova ordem de serviço em menos de 5 segundos, mesmo em períodos de maior carga. \\ \hline
+
+\textbf{14} & As pesquisas por cliente, trotinete ou número de ordem devem apresentar resultados em menos de 2 segundos. \\ \hline
+
+\textbf{15} & O sistema deve suportar, sem degradação significativa, todos os funcionários em simultâneo. \\ \hline
+
+\textbf{16} & Atualizações devem ser planeadas fora do horário de funcionamento da oficina. \\ \hline
+
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\section*{Próximos Passos}
+
+\begin{itemize}
+\item Incorporar os requisitos não‑funcionais no documento final de requisitos.
+\item Rever a estrutura geral dos requisitos para garantir consistência entre funcionais e não‑funcionais.
+\item Validar o documento consolidado com todos os stakeholders.
+\item Utilizar estes requisitos como base para a modelação da arquitetura e definição dos testes de qualidade.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\section*{Encerramento}
+
+A reunião foi encerrada após validação dos requisitos não‑funcionais levantados e definição dos próximos passos. A equipa de desenvolvimento comprometeu‑se a integrar estes requisitos na documentação oficial e a garantir que serão considerados nas fases seguintes do projeto.
+
+\end{document}
