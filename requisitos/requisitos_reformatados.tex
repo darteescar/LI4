@@ -1,0 +1,1392 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Pacotes de Idioma e Codificação ---
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+
+% --- Design e Layout ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{charter}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{parskip}
+
+% --- Configuração de Cores ---
+\definecolor{primaryblue}{RGB}{0, 51, 102}
+\definecolor{sectionblue}{RGB}{0, 102, 153}
+
+% --- Cabeçalho e Rodapé ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small \textbf{Requisitos Reformatados} | EcoRide Solutions}
+\fancyhead[R]{\small \thepage\ de \pageref{LastPage}}
+\fancyfoot[L]{\small \textit{Confidencial - Apenas para uso interno}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Estilos Customizados ---
+\newcommand{\reqheader}[1]{{\noindent\large\bfseries\color{sectionblue}#1}\par\vspace{0.3cm}}
+\newcommand{\reqfield}[2]{{\noindent\textbf{#1:} #2}\par\vspace{0.2cm}}
+\newcommand{\reqsystem}[1]{
+	\begin{itemize}[leftmargin=1cm]
+		#1
+	\end{itemize}
+}
+
+% --- Início do Documento ---
+\begin{document}
+	
+	{\noindent\LARGE\bfseries\color{primaryblue} Requisitos do Sistema EcoRide Solutions}
+	
+	{\noindent\large\textit{Formato Estruturado de Requisitos}}\par\vspace{1cm}
+
+% ======================== REQUISITOS GERAIS ========================
+
+\section*{Requisitos Gerais}
+
+% --- Requisito Geral 1 ---
+\reqheader{REQ-GEN-001: Cálculo Automático do Valor Final da Reparação}
+
+\reqfield{Requisito de utilizador}{O sistema é capaz de calcular automaticamente o valor final de uma reparação}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Gestão Financeira}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema deve somar automaticamente o custo de todas as reparações realizadas
+		\item O sistema deve somar automaticamente o custo de todas as peças utilizadas
+		\item O preço unitário de cada reparação é definido previamente pelo gerente
+		\item O preço unitário de cada peça é definido previamente na ficha da peça
+		\item O valor final é apresentado na vista de "Pendente Pagamento" da OS
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{O cálculo automático garante precisão financeira, elimina erros manuais e agiliza o processo de cobrança aos clientes}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 2 ---
+\reqheader{REQ-GEN-002: Taxa de Armazenagem Automática por Atraso}
+
+\reqfield{Requisito de utilizador}{O sistema é capaz de aplicar automaticamente uma taxa de armazenagem quando um cliente não levanta a trotinete dentro do prazo}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Gestão Financeira}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema registar a data de notificação do cliente sobre conclusão da reparação
+		\item A partir do 7º dia após notificação, é aplicada uma taxa diária de 3€
+		\item A taxa é acumulada por cada dia completo decorrido
+		\item O valor máximo de taxa acumulada é 90€ (correspondendo a 30 dias)
+		\item O valor total com taxa é apresentado na OS em estado "Pendente Pagamento"
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Incentiva o cliente a levantar a trotinete rapidamente, evitando custo de armazenagem desnecessário para a oficina}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 3 ---
+\reqheader{REQ-GEN-003: Estimativa de Tempo para Conclusão da Reparação}
+
+\reqfield{Requisito de utilizador}{O sistema é capaz de estimar automaticamente quanto tempo levará a reparação de uma trotinete}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Tabela de Reparações}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema consulta o tempo médio registado na tabela de reparações para cada tipo de reparação
+		\item O sistema contabiliza todas as reparações necessárias da OS atual
+		\item O sistema contabiliza o número total de OS pendentes de diagnóstico e reparação
+		\item A estimativa é calculada como: (tempo total das reparações da OS) + (tempo de espera das OS pendentes)
+		\item A estimativa é apresentada no momento de criação da OS
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Permite ao cliente ter expectativa realista sobre quando sua trotinete estará pronta, melhorando a experiência e comunicação}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 4 ---
+\reqheader{REQ-GEN-004: Rastreabilidade de Associação de Peças}
+
+\reqfield{Requisito de utilizador}{O sistema regista quem associou uma peça a uma OS e quando foi feito}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Auditoria}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando uma peça é associada a uma OS, o sistema registar automaticamente o identificador do utilizador
+		\item O sistema registar automaticamente a data e hora exata da associação
+		\item Este registo é imutável e permanece no histórico da OS
+		\item O histórico de associações é visível na ficha detalhada da OS
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante rastreabilidade completa para auditoria, responsabilização e resolução de disputas sobre quem realizou ação}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 5 ---
+\reqheader{REQ-GEN-005: Ordenação de OS por Estado Respeitando Data de Criação}
+
+\reqfield{Requisito de utilizador}{O sistema organiza as ordens de serviço em listas por estado, mantendo ordem cronológica}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Cada estado da OS tem uma lista própria (Pendente Diagnóstico, Pendente Reparação, etc.)
+		\item Quando uma OS muda de estado, é movida para a lista do novo estado
+		\item Dentro de cada lista, as OS são ordenadas pela data de criação (mais antigas primeiro)
+		\item A ordenação é mantida dinamicamente conforme novos estados são atingidos
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que as reparações mais antigas sejam atendidas primeiro (FIFO), evitando que clientes esperem indefinidamente}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 6 ---
+\reqheader{REQ-GEN-006: Alertas Automáticos para Secretária}
+
+\reqfield{Requisito de utilizador}{O sistema notifica automaticamente a secretária quando uma OS atinge certos estados críticos}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Gestão de Alertas}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando uma OS é colocada no estado "Pendente de aprovação de orçamento", um alerta é gerado para a secretária
+		\item Quando uma OS é colocada no estado "Pendente Pagamento", um alerta é gerado para a secretária
+		\item Quando uma OS é colocada no estado "A aguardar peças", um alerta é gerado para a secretária
+		\item Cada alerta contém a referência única da OS e o estado atual
+		\item Cada alerta tem um campo que indica se foi "tratado" ou não
+		\item Os alertas são armazenados na lista pessoal de alertas da secretária
+		\item A secretária pode marcar manualmente um alerta como tratado
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que ações críticas não sejam esquecidas, reduzindo atrasos e melhorando o fluxo de trabalho}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 7 ---
+\reqheader{REQ-GEN-007: Rastreabilidade de Responsáveis por Passo da Execução}
+
+\reqfield{Requisito de utilizador}{O sistema regista qual mecânico realizou cada fase da reparação}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Auditoria}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando um mecânico completa o diagnóstico, o sistema registar quem realizou
+		\item Quando um mecânico conclui a reparação, o sistema registar quem realizou
+		\item Se múltiplas reparações são realizadas, cada uma registar o mecânico responsável
+		\item Estes registos são permanentes e visíveis no histórico da OS
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Permite responsabilização dos mecânicos e rastreamento de qualidade de trabalho para fins de avaliação e melhoria}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 8 ---
+\reqheader{REQ-GEN-008: Bloqueio de Atribuição Simultânea de OS}
+
+\reqfield{Requisito de utilizador}{O sistema impede que dois mecânicos trabalhem simultaneamente na mesma ordem de serviço}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Controlo de Acesso}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando um mecânico seleciona uma OS para trabalhar, a OS é "bloqueada" para outros mecânicos
+		\item Se outro mecânico tentar selecionar a mesma OS, recebe uma mensagem de erro
+		\item A OS mantém-se bloqueada até o primeiro mecânico a libertar (marcar como concluída ou parada)
+		\item O sistema mostra qual mecânico tem a OS atualmente bloqueada
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Evita conflitos de trabalho duplicado, corrupção de dados e confusão sobre quem está responsável pela reparação}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 9 ---
+\reqheader{REQ-GEN-009: Gestão de Stock Automática por Peças Associadas}
+
+\reqfield{Requisito de utilizador}{O sistema atualiza automaticamente o stock quando peças são associadas ou removidas de uma OS}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock, Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando um mecânico associa uma peça a uma OS em "Pendente Reparação", a quantidade em stock diminui 1
+		\item Quando uma secretária associa uma peça a uma OS em "Pendente Pagamento", a quantidade em stock diminui 1
+		\item Quando um mecânico revoga uma peça da OS, a quantidade em stock aumenta 1
+		\item O stock é atualizado imediatamente, evitando overbooking
+		\item A quantidade em stock nunca pode ficar negativa
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que o stock sempre reflete a realidade, evitando reservas falsas e facilitando encomendas adequadas}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 10 ---
+\reqheader{REQ-GEN-010: Alertas Automáticos para Gestor de Stock}
+
+\reqfield{Requisito de utilizador}{O sistema notifica automaticamente o gestor de stock quando há problemas com peças}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock, Gestão de Alertas}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando uma peça é marcada como "Possível defeito", um alerta é gerado para o gestor de stock
+		\item Quando o stock de uma peça atinge o nível mínimo, um alerta é gerado para o gestor de stock
+		\item Cada alerta contém o motivo (defeito ou stock baixo) e a peça em questão
+		\item Cada alerta tem um campo que indica se foi "tratado" ou não
+		\item Os alertas são armazenados na lista pessoal de alertas do gestor de stock
+		\item O gestor de stock pode marcar manualmente um alerta como tratado
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Reduz tempo de reação a problemas de stock, evitando paragens por falta de peças e detectando peças defeituosas}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 11 ---
+\reqheader{REQ-GEN-011: Auditoria Completa de Movimentos de Stock}
+
+\reqfield{Requisito de utilizador}{O sistema mantém um registro completo de todas as operações de stock}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock, Auditoria}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Cada entrada de peças é registada com data, hora e utilizador responsável
+		\item Cada saída de peças é registada com data, hora e utilizador responsável
+		\item Alterações aos dados de uma peça (preço, fornecedor, etc.) são registadas com data, hora e utilizador
+		\item Alterações aos dados de um fornecedor são registadas com data, hora e utilizador
+		\item Este log de auditoria é imutável e permanente
+		\item O log é acessível apenas ao gestor de stock e gerente
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Fornece rastreabilidade completa para auditoria financeira, conformidade regulatória e investigação de discrepâncias}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 12 ---
+\reqheader{REQ-GEN-012: Interface Personalizada para Mecânico}
+
+\reqfield{Requisito de utilizador}{A interface do mecânico apresenta apenas informação relevante ao seu trabalho}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Interface de Utilizador, Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item A interface mostra a informação pessoal do mecânico (nome, identificador)
+		\item A interface mostra uma lista de OS em "Pendente Diagnóstico" disponíveis
+		\item A interface mostra uma lista de OS em "Pendente Reparação" disponíveis
+		\item Quando um mecânico está a trabalhar em uma OS, mostra os detalhes completos dessa OS
+		\item A interface mostra apenas as ações e opções aplicáveis ao estado atual da OS
+		\item Nenhuma informação de outros utilizadores ou OS é exibida por padrão
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Melhora a usabilidade e foco do mecânico, evitando confusão e reduzindo tempo de procura de informação}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 13 ---
+\reqheader{REQ-GEN-013: Saída de Stock para Peça em Devolução}
+
+\reqfield{Requisito de utilizador}{O stock de peças é atualizado automaticamente quando uma peça é marcada como possível defeito e entra em processo de devolução}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock, Gestão de Peças Defeituosas}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando uma peça "Possível defeito" é colocada em estado "Pendente devolução", a quantidade em stock diminui 1
+		\item A peça deixa de estar disponível para uso em novas OS
+		\item O movimento é registado na auditoria de stock
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Mantém o stock consistente ao remover peças defeituosas de circulação}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 14 ---
+\reqheader{REQ-GEN-014: Entrada de Stock para Peça Devolvida}
+
+\reqfield{Requisito de utilizador}{O stock de peças é aumentado automaticamente quando uma devolução ao fornecedor é concluída com sucesso}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock, Devolução a Fornecedores}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando uma peça em estado "Pendente devolução" é colocada em estado "Devolvida ao fornecedor", a quantidade em stock aumenta 1
+		\item A peça volta a estar disponível para uso (se for recondicionada) ou é completamente removida conforme política
+		\item O movimento é registado na auditoria de stock
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Recupera valor do stock quando fornecedor aceita devolução, compensando custo de peças defeituosas}
+
+\vspace{0.8cm}
+
+% --- Requisito Geral 15 ---
+\reqheader{REQ-GEN-015: Registro de Custo para Peça Inválida para Devolução}
+
+\reqfield{Requisito de utilizador}{O sistema registar automaticamente o custo financeiro quando uma peça defeituosa não pode ser devolvida}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock, Gestão Financeira}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando uma peça em estado "Pendente devolução" é colocada em estado "Inválida para devolução", o custo é registado
+		\item O custo adicionado é o valor de compra original da peça
+		\item Este custo é adicionado ao "Gasto com peças" do mês em questão
+		\item O movimento aparece no relatório financeiro do mês
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que perdas por peças defeituosas não retornáveis sejam refletidas nos gastos mensais para análise financeira}
+
+\vspace{1.5cm}
+
+% ======================== REQUISITOS DO GERENTE ========================
+
+\section*{Requisitos do Gerente}
+
+% --- Requisito Gerente 1 ---
+\reqheader{REQ-GER-001: Acesso Administrativo Total}
+
+\reqfield{Requisito de utilizador}{O gerente tem acesso a todas as funcionalidades do sistema}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Controlo de Acesso}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O gerente pode executar todas as ações disponíveis para a secretária
+		\item O gerente pode executar todas as ações disponíveis para o gestor de stock
+		\item O gerente pode executar todas as ações disponíveis para os mecânicos
+		\item O gerente tem permissões adicionais exclusivas (gestão de funcionários, preços, etc.)
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que o gerente pode intervir em qualquer situação operacional e tem visibilidade total da empresa}
+
+\vspace{0.8cm}
+
+% --- Requisito Gerente 2 ---
+\reqheader{REQ-GER-002: Gestão de Funcionários}
+
+\reqfield{Requisito de utilizador}{O gerente é capaz de adicionar, remover e modificar registos de funcionários}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Recursos Humanos}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O gerente pode criar novo registo de funcionário
+		\item O gerente pode editar dados existentes de um funcionário
+		\item O gerente pode desativar ou remover um funcionário
+		\item O sistema mantém histórico de alterações (quando foi demitido, etc.)
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Centraliza a gestão de recursos humanos no sistema, evitando registos dispersos e facilitando auditoria}
+
+\vspace{0.8cm}
+
+% --- Requisito Gerente 3 ---
+\reqheader{REQ-GER-003: Estrutura Completa de Dados de Funcionário}
+
+\reqfield{Requisito de utilizador}{O sistema armazena toda informação pessoal e profissional de um funcionário}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Recursos Humanos}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Nome completo
+		\item Campo obrigatório: Morada
+		\item Campo obrigatório: Telemóvel
+		\item Campo obrigatório: Email
+		\item Campo obrigatório: Data de nascimento
+		\item Campo obrigatório: NISS (Número de Identificação de Segurança Social)
+		\item Campo obrigatório: NIF (Número de Identificação Fiscal)
+		\item Campo obrigatório: NUS (Número Único de Segurança)
+		\item Campo obrigatório: IBAN (para transferências salariais)
+		\item Campo obrigatório: Salário base mensal
+		\item Campo opcional: Foto de identificação
+		\item Campo opcional: Data de admissão
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que toda informação necessária para folha de pagamento, segurança social e conformidade legal está centralizada}
+
+\vspace{0.8cm}
+
+% --- Requisito Gerente 4 ---
+\reqheader{REQ-GER-004: Registro e Cálculo de Horas Extraordinárias}
+
+\reqfield{Requisito de utilizador}{O sistema permite registar horas extraordinárias e calcula automaticamente o valor a pagar}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Recursos Humanos, Folha de Pagamento}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O gerente pode registar horas extraordinárias por funcionário e por mês
+		\item O sistema calcula automaticamente o custo das horas extraordinárias
+		\item O cálculo é baseado no valor/hora (salário base / 160 horas típicas)
+		\item Suplemento por hora extraordinária é aplicado (ex: 1.25x)
+		\item O valor total a pagar no mês = salário base + custo horas extraordinárias
+		\item Este cálculo é refletido no relatório de folha de pagamento
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Automatiza cálculo trabalhoso, reduz erros e garante cumprimento de obrigações legais de remuneração}
+
+\vspace{0.8cm}
+
+% --- Requisito Gerente 5 ---
+\reqheader{REQ-GER-005: Consulta de Estado Financeiro da Empresa}
+
+\reqfield{Requisito de utilizador}{O gerente é capaz de visualizar todos os movimentos financeiros realizados}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão Financeira}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema apresenta uma página com histórico completo de movimentos
+		\item Os movimentos incluem: pagamentos de encomendas a fornecedores (débito)
+		\item Os movimentos incluem: pagamento de salários (débito)
+		\item Os movimentos incluem: receção de pagamentos de clientes (crédito)
+		\item Cada movimento mostra: data, tipo, descrição, valor e saldo atual
+		\item Os movimentos são ordenados por data (mais recentes primeiro)
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Fornece visibilidade financeira real à gestão, essencial para decisões estratégicas e conformidade}
+
+\vspace{0.8cm}
+
+% --- Requisito Gerente 6 ---
+\reqheader{REQ-GER-006: Filtragem e Análise de Movimentos Financeiros}
+
+\reqfield{Requisito de utilizador}{O gerente pode filtrar movimentos financeiros para análise segmentada}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão Financeira}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema permite filtrar por intervalo de datas (data inicial e final)
+		\item O sistema permite filtrar por tipo: salários, gastos com peças, lucro mão de obra, lucro venda peças
+		\item O sistema calcula e apresenta totalizadores por categoria filtrada
+		\item O sistema permite múltiplos filtros simultâneos
+		\item Os resultados podem ser exportados para análise externa
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Permite análise profunda do negócio, identificar tendências, rentabilidade por área e tomar decisões informadas}
+
+\vspace{0.8cm}
+
+% --- Requisito Gerente 7 ---
+\reqheader{REQ-GER-007: Gestão da Tabela de Reparações}
+
+\reqfield{Requisito de utilizador}{O gerente pode adicionar, editar e remover tipos de reparação e seus preços}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Tabela de Reparações}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O gerente pode criar novo tipo de reparação
+		\item O gerente pode editar dados existentes de uma reparação
+		\item O gerente pode remover ou desativar um tipo de reparação
+		\item O sistema impede remoção se reparação foi usada em OS (apenas desativa)
+		\item Alterações aparecem imediatamente para criação de novas OS
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Mantém a tabela de preços atualizada conforme custos e mercado mudam, refletindo margem de lucro desejada}
+
+\vspace{0.8cm}
+
+% --- Requisito Gerente 8 ---
+\reqheader{REQ-GER-008: Estrutura Completa de Entrada de Reparação}
+
+\reqfield{Requisito de utilizador}{O sistema armazena toda informação necessária sobre um tipo de reparação}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Tabela de Reparações}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Referência única (ex: REP-001)
+		\item Campo obrigatório: Nomenclatura (nome curto da reparação)
+		\item Campo obrigatório: Descrição detalhada (instruções de execução)
+		\item Campo obrigatório: Preço de execução (em euros)
+		\item Campo opcional: Tempo médio estimado
+		\item Campo opcional: Ferramentas necessárias
+		\item Campo opcional: Normas de segurança aplicáveis
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Padroniza a execução de reparações e garante que prços cobrados cobrem tempo e recursos investidos}
+
+\vspace{1.5cm}
+
+% ======================== REQUISITOS DO GESTOR DE STOCK ========================
+
+\section*{Requisitos do Gestor de Stock}
+
+% --- Requisito Stock 1 ---
+\reqheader{REQ-STK-001: Consulta Multi-Estados de Peças}
+
+\reqfield{Requisito de utilizador}{O gestor de stock pode visualizar peças em diferentes estados do ciclo de vida}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema mostra lista de peças que existem no catálogo (nunca compradas)
+		\item O sistema mostra lista de peças em stock (disponíveis)
+		\item O sistema mostra lista de peças com possível defeito
+		\item O sistema mostra lista de peças pendentes de devolução (saídas recentes)
+		\item O sistema mostra lista de peças devolvidas ao fornecedor (devolução concluída)
+		\item Cada lista é visível em separadores ou abas distintas
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Fornece visibilidade do status de cada peça, facilitando gestão de qualidade e fluxo de fornecimento}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 2 ---
+\reqheader{REQ-STK-002: Filtragem Avançada de Peças}
+
+\reqfield{Requisito de utilizador}{O gestor de stock pode filtrar peças por múltiplos critérios}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Filtro por estado (catálogo, stock, defeito, devolução, devolvido)
+		\item Filtro por fornecedor (nome)
+		\item Filtro por referência (número do fornecedor ou interna)
+		\item Filtro por data de receção (peças recebidas entre datas)
+		\item Filtro por tipo/categoria da peça
+		\item Filtro por preço (peças acima/abaixo de valor)
+		\item Combinação de múltiplos filtros
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Agiliza a procura de peças específicas, economizando tempo do gestor de stock}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 3 ---
+\reqheader{REQ-STK-003: Gestão de Quantidade em Stock}
+
+\reqfield{Requisito de utilizador}{O gestor de stock pode adicionar, remover e editar quantidades de peças}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O gestor pode ajustar manualmente a quantidade de uma peça em stock
+		\item O gestor pode fazer contagem de stock e corrigir discrepâncias
+		\item O sistema mantém histórico de ajustes manuais (data, utilizador, motivo)
+		\item Alertas são disparados se quantidade fica abaixo do nível mínimo
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Permite correção de erros de contagem e ajustes de stock por perdas ou danos}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 4 ---
+\reqheader{REQ-STK-004: Gestão de Fornecedores}
+
+\reqfield{Requisito de utilizador}{O gestor de stock pode adicionar, editar e remover fornecedores}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Fornecedores}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O gestor pode criar novo registo de fornecedor
+		\item O gestor pode editar dados de fornecedor existente
+		\item O gestor pode desativar um fornecedor
+		\item O sistema impede remoção de fornecedor se tem peças ativas (apenas desativa)
+		\item Histórico de alterações é mantido
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Centraliza dados de fornecedores para facilitar comunicação, encomendas e rastreamento de cumprimento}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 5 ---
+\reqheader{REQ-STK-005: Estrutura de Dados de Fornecedor}
+
+\reqfield{Requisito de utilizador}{O sistema armazena informação essencial de cada fornecedor}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Fornecedores}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Nome da empresa fornecedora
+		\item Campo obrigatório: Email de contacto
+		\item Campo obrigatório: Número de telefone de contacto
+		\item Campo opcional: Prazo de entrega típico (em dias)
+		\item Campo opcional: Morada
+		\item Campo opcional: NIF/CNPJ
+		\item Campo opcional: Condições de pagamento
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que contactos de fornecedores estão sempre à mão e que prazos de entrega são conhecidos}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 6 ---
+\reqheader{REQ-STK-006: Estrutura de Dados de Peça}
+
+\reqfield{Requisito de utilizador}{O sistema armazena informação completa sobre cada tipo de peça}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Fornecedor (referência a fornecedor)
+		\item Campo obrigatório: Referência do fornecedor (SKU/código externo)
+		\item Campo obrigatório: Preço de compra ao fornecedor (€)
+		\item Campo obrigatório: Preço de venda ao cliente (€ ou incluído em reparação)
+		\item Campo obrigatório: Nível mínimo aceitável em stock (quantidade)
+		\item Campo opcional: Descrição da peça
+		\item Campo opcional: Categoria/tipo
+		\item Campo opcional: Localização física no armazém
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Padroniza a informação de peças e permite margens corretas e encomendas baseadas em níveis mínimos}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 7 ---
+\reqheader{REQ-STK-007: Registro de Entrada de Peças}
+
+\reqfield{Requisito de utilizador}{O gestor de stock registar a receção de peças do fornecedor}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Referência da peça
+		\item Campo obrigatório: Quantidade recebida
+		\item Campo obrigatório: Fornecedor
+		\item Campo obrigatório: Preço de compra unitário
+		\item Campo obrigatório: Preço de venda unitário
+		\item Campo obrigatório: Data de receção
+		\item Campo condicional: Número de série (obrigatório se preço de compra $>$ 70€)
+		\item O sistema registar automaticamente data/hora e utilizador
+		\item O stock é atualizado automaticamente
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que stock é rastreável, com lote identificável para devolução ou garantia}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 8 ---
+\reqheader{REQ-STK-008: Geração de Listas de Encomenda}
+
+\reqfield{Requisito de utilizador}{O sistema gera automaticamente lista de peças a encomendar}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema calcula para cada peça: consumo médio mensal, stock atual e nível mínimo
+		\item Se stock atual $<$ nível mínimo, peça é incluída na lista
+		\item A quantidade a encomendar = (consumo mensal x 2) + nível mínimo - stock atual
+		\item O sistema sugere fornecedor com melhor preço e prazo mais curto
+		\item A lista é exportável para email/print para enviar ao fornecedor
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Automatiza processo de encomenda, evitando stockouts e minimizando stock excessivo}
+
+\vspace{0.8cm}
+
+% --- Requisito Stock 9 ---
+\reqheader{REQ-STK-009: Gestão de Devoluções a Fornecedor}
+
+\reqfield{Requisito de utilizador}{O gestor de stock registar devolução de peças defeituosas ao fornecedor}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Stock, Devolução a Fornecedores}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O gestor pode criar registo de devolução para peças marcadas "Possível defeito"
+		\item Registo inclui: peça, motivo da devolução (defeito, errado, danificado)
+		\item Registo inclui: data de devolução, fornecedor contactado
+		\item O estado da devolução pode ser: "Pendente devolução", "Devolvida ao fornecedor", "Inválida para devolução"
+		\item Transição entre estados é registada com timestamp
+		\item Consoante o estado final, stock é ajustado (aumento se devolvida, custo se inválida)
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Recupera valor de peças defeituosas e reduz perda total do negócio}
+
+\vspace{1.5cm}
+
+% ======================== REQUISITOS DA ASSISTENTE ADMINISTRATIVA ========================
+
+\section*{Requisitos da Assistente Administrativa (Secretária)}
+
+% --- Requisito Sec 1 ---
+\reqheader{REQ-SEC-001: Consulta de Ordens de Serviço por Estado}
+
+\reqfield{Requisito de utilizador}{A secretária pode visualizar todas as OS agrupadas por estado}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O sistema apresenta 6 listas: Pendente Diagnóstico, Pendente Reparação, A aguardar peças, Pendente aprovação, Pendente Pagamento, Paga
+		\item Cada lista mostra todas as OS nesse estado
+		\item A secretária pode filtrar por: estado, data de criação, nome do cliente, mecânico responsável
+		\item Os resultados podem ser ordenados por data, cliente ou valor
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Fornece visibilidade rápida do fluxo de reparações, identificando gargalos ou atrassos}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 2 ---
+\reqheader{REQ-SEC-002: Operações CRUD de Clientes e Trotinetes}
+
+\reqfield{Requisito de utilizador}{A secretária pode criar, editar, visualizar e remover registos de clientes e trotinetes}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Clientes}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item A secretária pode criar novo cliente
+		\item A secretária pode editar dados de cliente existente
+		\item A secretária pode visualizar histórico completo de um cliente
+		\item A secretária pode remover ou desativar um cliente (apenas se sem OS ativas)
+		\item As mesmas operações aplicam-se a trotinetes
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Centraliza dados de clientes no sistema, evitando dispersão e facilitando rastreamento}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 3 ---
+\reqheader{REQ-SEC-003: Estrutura de Dados de Cliente}
+
+\reqfield{Requisito de utilizador}{O sistema armazena informação essencial de cada cliente}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Clientes}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Nome completo
+		\item Campo obrigatório: Email
+		\item Campo obrigatório: Telemóvel
+		\item Campo obrigatório: NIF
+		\item Campo opcional: Morada
+		\item Campo opcional: Foto/avatar
+		\item Cada cliente pode ter uma ou mais trotinetes associadas
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que dados de cliente e contacto estão sempre disponíveis para notificações e cobrança}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 4 ---
+\reqheader{REQ-SEC-004: Estrutura de Dados de Trotinete}
+
+\reqfield{Requisito de utilizador}{O sistema armazena especificações técnicas de cada trotinete}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Trotinetes}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Marca (ex: Xiaomi, Ninebot)
+		\item Campo obrigatório: Modelo (ex: M365, G30)
+		\item Campo obrigatório: Número de série (único)
+		\item Campo obrigatório: Tipo de motor (escova/sem escova, potência)
+		\item Campo obrigatório: Cliente proprietário
+		\item Campo opcional: Ano de fabrico
+		\item Campo opcional: Foto/desenho
+		\item Campo opcional: Histórico de problemas
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Permite diagnóstico rápido baseado no modelo e histórico de problemas conhecidos}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 5 ---
+\reqheader{REQ-SEC-005: Criação de Ordem de Serviço com Documentação Completa}
+
+\reqfield{Requisito de utilizador}{A secretária pode criar uma OS com toda informação inicial necessária}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Campo obrigatório: Cliente (seleção de cliente existente)
+		\item Campo obrigatório: Trotinete (seleção de trotinete do cliente ou criação nova)
+		\item Campo obrigatório: Descrição do problema relatado pelo cliente
+		\item Campo opcional: Acessórios deixados (carregador, cadeado, etc.)
+		\item Campo opcional: Estado ao receber (notas textuais livres)
+		\item Campo opcional: Fotografias de entrada (até 5 fotos)
+		\item O sistema atribui automaticamente estado "Pendente Diagnóstico"
+		\item O sistema gera automaticamente referência única (ex: OS-2024-001)
+		\item O sistema registar data/hora de criação e utilizador
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que diagnóstico tem contexto completo, evitando surpresas sobre estado inicial}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 6 ---
+\reqheader{REQ-SEC-006: Consulta de Histórico de Reparações}
+
+\reqfield{Requisito de utilizador}{A secretária pode ver rapidamente todo histórico de reparações de um cliente ou trotinete}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item A secretária pode pesquisar por nome de cliente e ver todas as suas OS
+		\item A secretária pode pesquisar por número de série da trotinete
+		\item O histórico mostra: data da reparação, problema, reparações feitas, peças usadas
+		\item O histórico está ordenado cronologicamente (mais recentes primeiro)
+		\item O histórico mostra custo e duração de cada reparação
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Identifica padrões de problemas recorrentes e permite diagnosticar de forma mais rápida}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 7 ---
+\reqheader{REQ-SEC-007: Registro de Aprovação de Orçamento pelo Cliente}
+
+\reqfield{Requisito de utilizador}{A secretária pode registar quando um cliente aprova o orçamento proposto}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O registro é possível apenas para OS em estado "Pendente aprovação do orçamento"
+		\item A secretária clica botão "Aprovar orçamento"
+		\item O sistema registar data/hora de aprovação
+		\item O estado da OS muda automaticamente para "Pendente Reparação"
+		\item Uma notificação é enviada ao mecânico responsável
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Debloqueia a reparação e sinaliza ao mecânico que pode prosseguir}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 8 ---
+\reqheader{REQ-SEC-008: Consulta de Estado de OS com Histórico Completo}
+
+\reqfield{Requisito de utilizador}{A secretária pode visualizar estado atual e histórico completo de uma OS}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Busca por nome de cliente mostra todas as OS do cliente (ordenadas por data)
+		\item Busca por referência da OS mostra OS específica
+		\item Busca por número de série da trotinete mostra todas as OS dessa trotinete
+		\item Para cada OS, mostra estado atual
+		\item Para cada OS, mostra histórico completo de mudanças de estado
+		\item Histórico inclui: data/hora de cada transição, quem fez a mudança
+		\item Histórico inclui: reparações realizadas, peças usadas, custos
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Fornece informação completa para responder a questões de clientes e resolver disputas}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 9 ---
+\reqheader{REQ-SEC-009: Registro de Data de Notificação ao Cliente}
+
+\reqfield{Requisito de utilizador}{A secretária registar quando notificou o cliente sobre conclusão}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Quando OS está em estado "Pendente Pagamento", a secretária registar data de notificação
+		\item Esta data é essencial para cálculo de taxa de armazenagem (contagem começa daqui)
+		\item O sistema apresenta um campo para entrada manual ou pode registar automaticamente
+		\item Uma vez registada, a data é imutável (apenas gerente pode alterar se necessário)
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Define o ponto de partida para acréscimo de armazenagem, sendo crítico para justiça na cobrança}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 10 ---
+\reqheader{REQ-SEC-010: Associação de Peças em OS Pendente Pagamento}
+
+\reqfield{Requisito de utilizador}{A secretária pode associar peças a uma OS se o mecânico não o fez}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item A secretária pode adicionar peças apenas a OS em estado "Pendente Pagamento"
+		\item A secretária procura por peça (referência, fornecedor ou descrição)
+		\item Ao adicionar peça, o preço de venda é registado
+		\item O custo da OS é recalculado automaticamente
+		\item A quantidade em stock da peça diminui
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que se mecânico esqueceu, secretária pode registar peças antes do pagamento}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 11 ---
+\reqheader{REQ-SEC-011: Registro de Pagamento da OS}
+
+\reqfield{Requisito de utilizador}{A secretária registar quando cliente pagou e por qual método}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Gestão Financeira}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item O registro é possível apenas para OS em estado "Pendente Pagamento"
+		\item A secretária seleciona método de pagamento: numerário, multibanco, MBWay
+		\item A secretária introduz data e hora do pagamento
+		\item Opcionalmente, pode indicar comprovante/referência
+		\item Após ambos (método selecionado + data preenchida), estado muda para "Paga"
+		\item Movimento financeiro é criado automaticamente
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Fecha o ciclo de OS e gera comprovante de conclusão}
+
+\vspace{0.8cm}
+
+% --- Requisito Sec 12 ---
+\reqheader{REQ-SEC-012: Bloqueio de Pagamento em Cascata}
+
+\reqfield{Requisito de utilizador}{O sistema impede que cliente pague uma OS se tem outra anterior ainda pendente}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Antes de permitir marcação de "Paga", sistema verifica todas as OS do cliente
+		\item Se cliente tem outra OS em "Pendente Pagamento" com data de notificação anterior, bloqueia
+		\item Mensagem de erro indica qual OS anterior não foi paga
+		\item Secretária deve resolver OS anterior antes de permitir pagamento desta
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Evita que cliente "pule" fila de pagamento e garante ordem justa de cobrança}
+
+\vspace{1.5cm}
+
+% ======================== REQUISITOS DO MECÂNICO ========================
+
+\section*{Requisitos do Mecânico}
+
+% --- Requisito Mec 1 ---
+\reqheader{REQ-MEC-001: Seleção de OS para Diagnóstico ou Reparação}
+
+\reqfield{Requisito de utilizador}{O mecânico pode escolher qual OS deseja trabalhar entre diagnósticos ou reparações}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item A interface apresenta dois separadores/abas: "Pendente Diagnóstico" e "Pendente Reparação"
+		\item Cada separador mostra lista de OS disponíveis ordenadas por data (mais antigas primeiro)
+		\item O mecânico clica em uma OS para selecioná-la
+		\item A OS fica bloqueada para outros mecânicos
+		\item O mecânico pode desistir/devolver a OS à fila se necessário
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Permite distribuição natural de trabalho sem necessidade de atribuição manual}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 2 ---
+\reqheader{REQ-MEC-002: Execução de Diagnóstico com Seleção de Reparações}
+
+\reqfield{Requisito de utilizador}{O mecânico realiza diagnóstico selecionando reparações necessárias e peças do stock}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Tabela de Reparações}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Após selecionar OS em "Pendente Diagnóstico", aparece formulário para diagnóstico
+		\item O mecânico pode selecionar múltiplas reparações da tabela de reparações
+		\item A tabela é consultável por referência, fornecedor ou data
+		\item O mecânico pode procurar peças do stock (referência, fornecedor, descrição)
+		\item O mecânico pode associar múltiplas peças à OS
+		\item O mecânico pode visualizar histórico de reparações anteriores dessa trotinete
+		\item O valor total do diagnóstico é calculado em tempo real
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Estrutura o diagnóstico e documenta o que foi avaliado}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 3 ---
+\reqheader{REQ-MEC-003: Validação de Limite de Orçamento (50€)}
+
+\reqfield{Requisito de utilizador}{O sistema impede reparação se orçamento excede 50€ sem aprovação cliente}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Após mecânico definir reparações e peças no diagnóstico, sistema calcula valor total
+		\item Se valor total $>$ 50€, estado automático muda para "Pendente aprovação do orçamento"
+		\item Se valor total $\le$ 50€, estado automático muda para "Pendente Reparação"
+		\item Em caso de bloqueio, o mecânico recebe mensagem clara explicando o motivo
+		\item Mecânico não pode prosseguir até aprovação cliente
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Protege cliente de cobranças inesperadas e garante controlo de custos}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 4 ---
+\reqheader{REQ-MEC-004: Execução de Reparação com Seleção de Serviços Realizados}
+
+\reqfield{Requisito de utilizador}{O mecânico registar quais reparações foram efetivamente executadas}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Após selecionar OS em "Pendente Reparação", aparece formulário de execução
+		\item O mecânico pode selecionar múltiplas reparações da tabela (as que efetivamente fez)
+		\item O mecânico pode procurar e associar peças usadas (referência, fornecedor, descrição)
+		\item O mecânico pode visualizar histórico de reparações anteriores
+		\item O valor final é recalculado baseado nas reparações e peças reais
+		\item Pode haver diferenças entre diagnóstico previsto e execução real
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Registar efetivamente o que foi feito, não apenas o que foi diagnosticado}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 5 ---
+\reqheader{REQ-MEC-005: Requisicao de Pecas em Falta com Estado Aguardando Pecas}
+
+\reqfield{Requisito de utilizador}{O mecânico pode requisitar peças em falta sem suspender a reparação}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Enquanto mecânico está a executar OS "Pendente Reparação", pode adicionar peça em falta
+		\item Sistema detecta que peça não tem stock disponível
+		\item O mecânico pode clicar "Requisitar encomenda" para essa peça
+		\item A OS automaticamente muda para estado "A aguardar peças"
+		\item O gestor de stock recebe alerta com peça requerida
+		\item A reparação pode continuar normalmente com outras peças/serviços
+		\item Quando peça chega e é adicionada ao stock, OS volta a "Pendente Reparação"
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Evita interrupção completa da reparação por falta de uma peça, acelerando conclusão}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 6 ---
+\reqheader{REQ-MEC-006: Identificação de Novos Problemas Durante Reparação}
+
+\reqfield{Requisito de utilizador}{O mecânico pode adicionar novos problemas descobertos após diagnóstico inicial}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Durante execução, o mecânico pode clicar "Adicionar novo problema"
+		\item Seleciona problema/reparação da tabela
+		\item Se custo total exceder 50€, OS muda automaticamente para "Pendente aprovação do orçamento"
+		\item Uma notificação é enviada à secretária com aviso de custo adicional
+		\item Mecânico não pode prosseguir até novo orçamento ser aprovado
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Recompõe orçamento se problemas adicionais aparecem, mantendo cliente informado}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 7 ---
+\reqheader{REQ-MEC-007: Reportar Defeito em Peça Instalada}
+
+\reqfield{Requisito de utilizador}{O mecânico pode reportar que uma peça instalada é defeituosa}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço, Gestão de Stock}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Após adicionar peça à lista, o mecânico pode marcar como "Possível defeito"
+		\item A peça é removida da lista de peças usadas
+		\item O custo da OS diminui (preço da peça é subtraído)
+		\item A peça é marcada para devolução ao fornecedor
+		\item Um alerta é gerado para o gestor de stock
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Evita cobrar cliente por peça defeituosa e dispara investigação de fornecedor}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 8 ---
+\reqheader{REQ-MEC-008: Checklist de Segurança Obrigatória}
+
+\reqfield{Requisito de utilizador}{O mecânico deve completar checklist de segurança antes de concluir reparação}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Antes de marcar OS como concluída, um formulário de checklist aparece
+		\item Checklist inclui: verificação de travões, luzes, pneus, aceleração, travagem, visor
+		\item Checklist inclui: teste prático de condução
+		\item O mecânico marca cada item como OK/falho
+		\item Se algum item falha, reparação não pode ser concluída (precisa de correção)
+		\item Todos os itens devem estar OK para prosseguir
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Garante que trotinete está segura para uso antes de devolver ao cliente, reduzindo acidentes}
+
+\vspace{0.8cm}
+
+% --- Requisito Mec 9 ---
+\reqheader{REQ-MEC-009: Marcação de Conclusão e Transição para Pagamento}
+
+\reqfield{Requisito de utilizador}{O mecânico marca a OS como concluída, iniciando fluxo de pagamento}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Após passar checklist, o mecânico clica "Concluir reparação"
+		\item O estado da OS muda automaticamente para "Pendente Pagamento"
+		\item A OS é desbloqueada (outro mecânico não está mais bloqueado por ela)
+		\item Um alerta é gerado para a secretária comunicar conclusão ao cliente
+		\item O sistema registar data/hora de conclusão
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Marca fim do trabalho operacional, iniciando fase de cobrança}
+
+\vspace{1.5cm}
+
+% ======================== REQUISITOS DE INVESTIGAÇÃO OPERACIONAL ========================
+
+\section*{Requisitos de Investigação Operacional}
+
+% --- Requisito IO 1 ---
+\reqheader{REQ-IO-001: Registro de Danos Prévios com Fotografias}
+
+\reqfield{Requisito de utilizador}{O sistema permite registar rapidamente danos pré-existentes na trotinete ao receber}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Ao criar OS, há secção dedicada "Registo de Danos Prévios"
+		\item Esta secção permite descrição textual de danos visíveis
+		\item Esta secção permite anexação de múltiplas fotografias (até 5)
+		\item As fotos são armazenadas na ficha da OS para referência futura
+		\item Estabelece baseline de condição inicial da trotinete
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Protege a oficina contra reclamações falsas de dano pós-reparação}
+
+\vspace{0.8cm}
+
+% --- Requisito IO 2 ---
+\reqheader{REQ-IO-002: Registro de Acessórios Deixados pelo Cliente}
+
+\reqfield{Requisito de utilizador}{O sistema permite nomear e registar acessórios deixados pelo cliente}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Ao criar OS, há campo para "Itens deixados pelo cliente"
+		\item Exemplos pré-definidos: carregador, cadeado, chave, mochila, outros
+		\item O sistema permite checkboxes para itens comuns
+		\item O sistema permite campo livre para outros itens
+		\item Ao devolver trotinete, sistema verifica que todos os itens foram devolvidos
+		\item Se falta algum item, alertar antes de libertar trotinete
+	\end{enumerate}
+}
+
+\reqfield{Relevância para a aplicação}{Evita disputas sobre itens perdidos e responsabilização incorreta}
+
+\vspace{0.8cm}
+
+% --- Requisito IO 3 ---
+\reqheader{REQ-IO-003: Quadro de Estado em Tempo Real na Receção}
+
+\reqfield{Requisito de utilizador}{Na receção há um quadro visível com estado atual de todas as OS}
+
+\reqfield{Fonte}{Documento de Análise de Requisitos}
+
+\reqfield{Área do sistema}{Interface de Utilizador, Gestão de Ordens de Serviço}
+
+\reqfield{Requisitos de sistema}{
+	\begin{enumerate}
+		\item Na receção há um ecrã ou tablet com interface dedicada
+		\item O mecânico introduz referência da OS ou scans QR/barcode
+		\item Sistema mostra estado atual da OS em grande
+		\item O mecânico pode confirmar "ainda em diagnóstico", "em reparação", "à espera de peças", "pronta para levantar"
+		\item Estado é atualizado imediatamente no sistema
+		\item A secretária vê atualizações em tempo real
+		\item Dispensa necessidade de chamadas/comunicação manual entre oficina e receção
+	\end{enumerate}
+}
+
+\vspace{0.8cm}
+
+\end{document}
