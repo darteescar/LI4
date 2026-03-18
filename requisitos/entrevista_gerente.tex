@@ -109,7 +109,7 @@
 		\resposta{Assim que a trotinete entra, consideramos que está por diagnosticar ou pendente de avaliação. A secretária costuma avisar verbalmente os mecânicos ou deixar a ficha numa	zona onde eles sabem que há novas entradas. Como não há um sistema automático, os mecânicos vão vendo ao longo do dia se há novas trotinetes na zona de entrada ou se há fichas novas na pasta.}
 		
 		\pergunta{No diagnóstico, é costume dar um orçamento fixo ou o valor pode mudar a meio da reparação? Como é que o cliente é informado dessa mudança?}
-		\resposta{No diagnóstico, tentamos sempre dar um orçamento ao cliente antes de avançar. No entanto, nem sempre conseguimos prever tudo à primeira vista. Às vezes, ao desmontar a trotinete, descobrimos outros problemas que não estavam visíveis no início. Nesses casos, a secretária entra em contacto com o cliente, normalmente por telefone ou email, para explicar a situação e confirmar se ele quer avançar com os custos adicionais. Só depois de termos essa confirmação é que continuamos.}
+		\resposta{No diagnóstico, caso o valor do orçamento exceda os 50\texteuro, consultamos o cliente para validarmos se ele pretende seguir com a reparação ou não. Se sim, a secretária informa o mecânico da autorização.}
 		
 		\pergunta{Relativamente ao processo de reparação, o mecânico pode começar a reparar sem o cliente aprovar o orçamento? }
 		\resposta{O mecânico não deve começar a reparação sem o cliente aprovar o orçamento. Como não temos um sistema que bloqueie isso, dependemos da comunicação entre a receção e os mecânicos, mas, já aconteceu de em dias mais atarefados  alguém começar a mexer numa trotinete antes da aprovação estar formalizada, o que não é o ideal. Por isso, seria importante termos uma forma mais segura de garantir que só se avança quando o cliente já aprovou.}
@@ -220,7 +220,7 @@
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 			
 			\textbf{8}  & O sistema deve atribuir automaticamente o estado ``Por diagnosticar`` a novas ordens de serviço. \\ \hline
-			\textbf{9}  & O sistema deve bloquear o início da reparação até existir aprovação formal do orçamento por parte do cliente registada no sistema (feita pela secretária). \\ \hline
+			\textbf{9}  & O sistema deve bloquear o início da reparação caso o orçamento exceda os 50\texteuro \space. \\ \hline
 			\textbf{10}  & O sistema deve impedir que duas pessoas iniciem a mesma ordem de serviço simultaneamente, atribuindo-a a um mecânico de cada vez. \\ \hline
 			\textbf{11}  & O sistema deve registar automaticamente qual mecânico executou cada reparação. \\ \hline
 			\textbf{12}  & O sistema deverá ter uma lista de possíveis intervenções para uma ordem de serviço com orçamento aprovado, facilitando a explicação das intervenções por parte dos mecânicos. \\ \hline

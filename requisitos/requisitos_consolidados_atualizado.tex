@@ -41,18 +41,28 @@
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
 		\hline
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
-		\textbf{1} & O sistema deve calcular automaticamente o valor final da reparação com base nas reparações feitas, peças utilizadas e preços definidos pelo gerente. \\ \hline
-		\textbf{2} & O sistema deve registar quantos dias passaram desde que o cliente foi notificado e aplicar automaticamente uma taxa diária de 3\texteuro\space após 7 dias (excluindo o dia de levantamento). O valor acumulado máximo deverá ser de 90€ (correspondendo a 30 dias). \\ \hline
+		\textbf{1} & O sistema deve calcular automaticamente o valor final da reparação com base na soma da reparações feitas, peças utilizadas e preços definidos pelo gerente. \\ \hline
+		\textbf{2} & O sistema deve registar quantos dias passaram desde que o cliente foi notificado e aplicar automaticamente uma taxa diária de 3\texteuro\space após 7 dias (incluindo o dia de levantamento). O valor acumulado máximo deverá ser de 90€ (correspondendo a 30 dias). \\ \hline
 		\textbf{3} & Sempre que for criada uma nova OS, o sistema deverá conseguir calcular um tempo estimado para o término da reparação, baseado no tempo médio que uma reparação demora e o número de reparações que estão pendentes de diagnóstico e reparação. \\ \hline
 		\textbf{4} & Sempre que uma peça for associada a uma OS, o sistema deverá registar qual foi o utilizador que o fêz e a data de quando o fêz. \\ \hline
 		\textbf{5} & Sempre que uma OS tiver o seu estado alterado, deverá ser adicionada à lista de OS do estado em que foi colocada. A inserção deverá ter sempre em conta a data de criação da OS. \\ \hline
-		\textbf{6} & Sempre que uma OS for colocada nos estados: "Pendente de aprovação de orçamento", "Pendente Pagamento" ou "A aguardar peças", deverá ser gerado automaticamente um alerta para a secretária, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
+		\textbf{6} & Sempre que uma OS for colocada nos estados: "Pendente de aprovação de orçamento", "Pendente Pagamento" ou "A aguardar peças", deverá ser gerado automaticamente um alerta (que contém a referência da OS e o estado) para a secretária, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
 		\textbf{7} & Para cada um dos passos da execução de uma OS, deverá existir um registo de qual mecânico fez. Isto é, deverá haver um registo de qual mecânico realizou o diagnóstico e qual realizou a reparação da OS. \\ \hline
 		\textbf{8} & O sistema deve impedir que dois mecânicos iniciem a mesma OS simultaneamente, atribuindo-a a um mecânico de cada vez. Caso um mecânico selecione uma OS que já está a ser tratada, deverá ser impedido. \\ \hline
-		\textbf{9} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação" e associar uma peça do stock à OS, a quantidade dessa peça no stock deverá diminuir em uma unidade. Da mesma maneira, se ele quiser revogar o uso da peça, a quantidade dessa peça no stock deverá aumentar em uma unidade. \\ \hline
-		\textbf{10} & Sempre que uma peça for colocada no estado "Possível defeito" ou tiver a sua quantidade mínima atingida, deverá ser gerado automaticamente um alerta para o gestor de stock, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
+		\textbf{9} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação" ou a secretária selecionar uma OS no estado "Pendente Pagamento" e associar uma peça do stock à OS, a quantidade dessa peça no stock deverá diminuir em uma unidade. Da mesma maneira, se ele quiser revogar o uso da peça, a quantidade dessa peça no stock deverá aumentar em uma unidade. \\ \hline
+		\textbf{10} & Sempre que uma peça for colocada no estado "Possível defeito" ou tiver a sua quantidade mínima atingida, deverá ser gerado automaticamente um alerta (que contém o motivo do alerta e a peça em questão) para o gestor de stock, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
 		\textbf{11} & Todas as entradas/saídas de stock e alterações a peças ou fornecedores devem ser registadas com data, hora e utilizador. \\ \hline
 		\textbf{12} & A interface dos mecânicos deverá ser individual (para cada um deles). \\ \hline
+	\end{tabularx}
+	
+	\section*{Requisitos Gerais}
+	\renewcommand{\arraystretch}{1.5}
+	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
+		\hline
+		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+	    \textbf{13} & Quando uma peça no estado "possível defeito" for colocada no estado "pendente de devolução", a quantidade em stock dessa peça deverá diminuir em 1 unidade. \\ \hline
+ 	    \textbf{14} & Quando uma peça no estado "pendente de devolução" for colocada no estado "devolvida ao fornecedor", uma unidade dessa peça deverá ser adicionada ao stock. \\ \hline
+  	    \textbf{15} & Quando uma peça no estado "pendente de devolução" for colocada no estado "inválida para devolução", os gastos com peças nesse mês deverá aumentar consoante o valor de compra da peça em questão. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
@@ -81,13 +91,13 @@
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
 		\hline
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
-		\textbf{1} & O gestor de armazém poderá consultar as peças existentes no sistema, as peças em stock, as peças com possível defeito em stock e as peças devolvidas ao fornecedor. Para isto, poderá filtrar por estado (se existe no sistema, stock, com possível defeito ou se foi devolvida), fornecedor, referência, data de receção (para as que estejam em stock), tipo ou preço. \\ \hline
+		\textbf{1} & O gestor de armazém poderá consultar as peças existentes no sistema, as peças em stock, as peças com possível defeito em stock, as peças pendentes de devolução e as peças devolvidas ao fornecedor. Para isto, poderá filtrar por estado (se existe no sistema, stock, com possível defeito, pendente de devolução, devolvida ao fornecedor ou inválida para devolução), fornecedor, referência, data de receção (para as que estejam em stock), tipo ou preço. \\ \hline
 		\textbf{2} & O gestor de armazém poderá adicionar, remover e editar o stock de peças existentes. Para além disso, também poderá adicionar, remover e editar fornecedores. \\ \hline
 		\textbf{3} & O sistema deve permitir registar fornecedores obrigatoriamente com: nome e contacto (email ou número de telefone), e, opcionalmente, com prazos de entrega. \\ \hline
 		\textbf{4} & O sistema deve permitir o registo de peças obrigatoriamente com: fornecedor, referência (do fornecedor), preço de compra, preço de venda e nível mínimo aceitável em stock. \\ \hline
 		\textbf{5} & O sistema deve permitir registar entradas de peças obrigatoriamente com: referência, quantidade, fornecedor, preço de compra e venda, data de receção e número de série (que deverá ser obrigatório se o preço de compra for superior a 70\texteuro). \\ \hline
 		\textbf{6} & O sistema deve gerar listas de peças a encomendar com base em níveis mínimos, consumo e stock atual. \\ \hline
-		\textbf{7} & O sistema deve permitir registar peças devolvidas ao fornecedor, com data, motivo e estado da devolução ("Pendente", "Devolvido" ou "Inválido"). \\ \hline
+		\textbf{7} & O sistema deve permitir registar e editar peças devolvidas ao fornecedor, com data, motivo e estado da devolução ("pendente de devolução", "devolvida ao fornecedor" ou "inválida para devolução"). \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
@@ -122,11 +132,11 @@
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 		\textbf{1} & O mecânico poderá escolher de entre duas listas de OS: "Pendentes de diagnóstico" ou "Pendentes de reparação", a OS que quer tratar asseguir. \\ \hline
 		\textbf{2} & Quando um mecânico selecionar uma OS "Pendente Diagnóstico", deverá ser possível escolher quais as reparações que ele acha necessárias realizar a partir da tabela de reparações que estará disponível, poderá consultar (procurando por referência, fornecedor ou data) e associar peças do stock, e também deverá poder consultar rapidamente o histórico de reparações da trotinete (mostrando toda a informação das OS que já foram levantadas sobre ela). \\ \hline
-		\textbf{3} & Caso, durante a realização de um diagnóstico, o valor do orçamento exceda o valor definido de 50\texteuro, deverá ser atribuído automaticamente o estado de "Pendente de aprovação de orçamento" e o mecânico não poderá proceder com a sua reparação. \\ \hline
-		\textbf{4} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação", deverá poder selecionar quais as reparações que ele executou a partir da tabela de reparações e poderá consultar (procurando por referência, fornecedor ou data) e associar as peças que usou. Também deverá poder consultar rapidamente o histórico de reparações da trotinete (mostrando toda a informação das OS que já foram levantadas sobre ela). \\ \hline
-		\textbf{5} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação" e uma ou mais peças da lista do diagnóstico não estiver disponível no stock, o sistema deverá disponibilizar a opção de requisição de encomenda das peças. A OS deverá ficar em estado de "A aguardar peças", mas a reparação poderá processeguir normalmente. \\ \hline
+		\textbf{3} & Quando um mecânico selecionar uma OS "Pendente Diagnóstico" (e selecionar as várias reparações e peças usadas), caso o valor do orçamento exceda o valor definido de 50\texteuro, deverá ser atribuído automaticamente o estado de "Pendente de aprovação de orçamento" e o mecânico não poderá proceder com a sua reparação. Caso o valor não exceda, deverá ser atribuído o estado "Pendente Reparação".\\ \hline
+		\textbf{4} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação", deverá poder selecionar quais as reparações que ele executou a partir da tabela de reparações e poderá consultar (procurando por referência, fornecedor ou data) e associar as peças que usou. Também deverá poder consultar rapidamente o histórico de reparações da trotinete (mostrando toda a informação das OS que já foram levantadas sobre ela). \\ \hline	
+		\textbf{5} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação" e uma ou mais peças da lista do diagnóstico não estiver disponível no stock, o sistema deverá disponibilizar a opção de requisição de encomenda das peças. A OS deverá ficar em estado de "A aguardar peças", mas a reparação poderá processeguir normalmente. Quando uma das peças estiver disponível no stock, a OS deverá ficar no estado "Pendente reparação". \\ \hline
 		\textbf{6} & O sistema deve permitir ao mecânico adicionar novos problemas identificados durante a reparação, identificando-os com recurso à tabela de reparações. Esta ação deverá colocar o OS num estado de "Pendente aprovação do orçamento". \\ \hline
-		\textbf{7} & Durante a realização de uma reparação, depois de adicionadas peças à lista de peças usadas na OS, o mecânico poderá reportar defeitos nas peças instaladas, atribuindo o estado "Possível defeito" à peça e removendo-a da lista de peças usadas, diminuindo o valor final da reparação. \\ \hline
+		\textbf{7} & Durante a realização de uma reparação, depois de adicionadas peças à lista de peças usadas na OS, o mecânico poderá reportar defeitos nas peças instaladas, atribuindo o estado "Possível defeito"\space à peça e removendo-a da lista de peças usadas, diminuindo o valor final da reparação. \\ \hline
 		\textbf{8} & Quando um mecânico desejar terminar uma reparação, deverá verificar uma checklist obrigatória de segurança (travões, luzes, pneus, aceleração, travagem, visor, teste de condução). \\ \hline
 		\textbf{9} & O sistema deve permitir ao mecânico marcar a OS como concluída, ficando esta no estado "Pendente Pagamento". \\ \hline
 	\end{tabularx}
