@@ -52,17 +52,19 @@
 		\textbf{9} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação" ou a secretária selecionar uma OS no estado "Pendente Pagamento" e associar uma peça do stock à OS, a quantidade dessa peça no stock deverá diminuir em uma unidade. Da mesma maneira, se ele quiser revogar o uso da peça, a quantidade dessa peça no stock deverá aumentar em uma unidade. \\ \hline
 		\textbf{10} & Sempre que uma peça for colocada no estado "Possível defeito" ou tiver a sua quantidade mínima atingida, deverá ser gerado automaticamente um alerta (que contém o motivo do alerta e a peça em questão) para o gestor de stock, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
 		\textbf{11} & Todas as entradas/saídas de stock e alterações a peças ou fornecedores devem ser registadas com data, hora e utilizador. \\ \hline
-		\textbf{12} & A interface dos mecânicos deverá mostrar apenas a sua informação pessoal, as listas de OS nos estados "Pendente Reparação" e "Pendente Diagnóstico" e, no caso do mecânico estar a tratar de alguma OS, a informação relativa a essa OS, bem como todas as opções (consoante o estado em que se encontra).. \\ \hline
+		
 	\end{tabularx}
-	
+
 	\section*{Requisitos Gerais}
 	\renewcommand{\arraystretch}{1.5}
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
-		\hline
-		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+	\hline
+	\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
+		\textbf{12} & A interface dos mecânicos deverá mostrar apenas a sua informação pessoal, as listas de OS nos estados "Pendente Reparação" e "Pendente Diagnóstico" e, no caso do mecânico estar a tratar de alguma OS, a informação relativa a essa OS, bem como todas as opções (consoante o estado em que se encontra).. \\ \hline
 	    \textbf{13} & Quando uma peça no estado "possível defeito" for colocada no estado "pendente de devolução", a quantidade em stock dessa peça deverá diminuir em 1 unidade. \\ \hline
  	    \textbf{14} & Quando uma peça no estado "pendente de devolução" for colocada no estado "devolvida ao fornecedor", uma unidade dessa peça deverá ser adicionada ao stock. \\ \hline
   	    \textbf{15} & Quando uma peça no estado "pendente de devolução" for colocada no estado "inválida para devolução", os gastos com peças nesse mês deverá aumentar consoante o valor de compra da peça em questão. \\ \hline
+  	    \textbf{16} & O sistema deverá separar os utilizadores definindo diferentes perfis, consoante o seu cargo. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
@@ -75,7 +77,7 @@
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 		\textbf{1} & O gerente deverá ter acesso para fazer todas as ações que a secretária, gestor de stock e mecânicos podem realizar. \\ \hline
 		\textbf{2} & O gerente deverá poder adicionar, remover e editar funcionários. \\ \hline
-		\textbf{3} & O registo de funcionários deverá ser composto obrigatoriamente por: nome, morada, telemóvel, email, data de nascimento, NISS, NIF, NUS, IBAN e salário. \\ \hline
+		\textbf{3} & O registo de funcionários deverá ser composto obrigatoriamente por: nome, morada (número de porta, rua, localidade e código-postal), telemóvel, email, data de nascimento, NISS, NIF, NUS, IBAN e salário. \\ \hline
 		\textbf{4} & O sistema deve permitir registar horas extraordinárias e calcular automaticamente o valor mensal a pagar de cada um dos funcionários (somando as horas extraordinárias com o salário base). \\ \hline
 		\textbf{5} & O sistema deverá permitir ao gerente consultar o estado financeiro da empresa, apresentando os movimentos financeiros realizados (pagamentos de encomendas, pagamento de salários e receção de pagamentos). \\ \hline
 		\textbf{6} & O sistema deverá ainda disponibilizar mecanismos de filtragem por intervalo de datas e por tipo de gasto ou receita, permitindo visualizar os valores totais por categoria, como salários, gastos com peças, lucros com mão de obra e lucros provenientes da venda de peças. \\ \hline
