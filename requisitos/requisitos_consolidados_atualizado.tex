@@ -79,7 +79,7 @@
 		\textbf{2} & O gerente deverá poder adicionar, remover e editar funcionários. \\ \hline
 		\textbf{3} & O registo de funcionários deverá ser composto obrigatoriamente por: nome, morada (número de porta, rua, localidade e código-postal), telemóvel, email, data de nascimento, NISS, NIF, NUS, IBAN e salário (valor pago por hora e valor pago ao fim do mês, tanto líquido como bruto). \\ \hline
 		\textbf{4} & O sistema deve permitir registar horas extraordinárias e calcular automaticamente o valor mensal a pagar de cada um dos funcionários (somando as horas extraordinárias com o salário base). \\ \hline
-		\textbf{5} & O sistema deverá permitir ao gerente consultar o estado financeiro da empresa, apresentando os movimentos financeiros realizados (pagamentos de encomendas, pagamento de salários e receção de pagamentos). \\ \hline
+		\textbf{5} & O sistema deverá permitir ao gerente consultar o estado financeiro da empresa, apresentando os movimentos monetários realizados (pagamentos de encomendas, pagamento de salários e receção de pagamentos). \\ \hline
 		\textbf{6} & O sistema deverá ainda disponibilizar mecanismos de filtragem por intervalo de datas e por tipo de gasto ou receita, permitindo visualizar os valores totais por categoria, como salários, gastos com peças, lucros com mão de obra e lucros provenientes da venda de peças. \\ \hline
 		\textbf{7} & O gerente deverá poder alterar a tabela de reparações, podendo adicionar, remover ou editar novas entradas à mesma. \\ \hline
 		\textbf{8} & Cada entrada deverá ser composta por: uma referência única, uma nomenclatura, uma descrição detalhada e um preço de execução. \\ \hline
@@ -117,11 +117,10 @@
 		\textbf{5} & O sistema deverá registar a criação de uma OS obrigatoriamente com: os dados do cliente, os dados técnicos da trotinete, uma descrição do problema e, opcionalmente, por acessórios e estado à entrada (com notas textuais ou até 5  fotos anexadas). Para todas as OS que forem criadas, deverá ser atribuído o estado de "Pendente Diagnóstico" e deverá ser criada uma referência única para a mesma.\\ \hline
 		\textbf{6} & O sistema deve permitir consultar rapidamente o histórico de reparações de um cliente ou de uma trotinete, através da pesquisa com o nome do cliente ou o número de série da trotinete, incluindo serviços anteriores, peças substituídas e problemas identificados anteriormente. \\ \hline
 		\textbf{7} & O sistema deve permitir registar a aprovação do orçamento somente em OS que estejam no estado "Pendente aprovação do orçamento" por parte de um cliente, antes de permitir que o mecânico continue a reparação. Esta aprovação deverá colocar a OS num estado de "Pendente Reparação". \\ \hline
-		\textbf{8} & O sistema deve permitir consultar o estado de uma qualquer OS usando o nome do cliente (para consultar todas as OS desse cliente, ordenadas por data de criação), a referência da OS ou o número de série da trotinete da OS (apresentando ordenadas por data de criação as OS dessa trotinete), apresentando informação atualizada, isto é, toda a informação relativa a cada um dos estados pelos quais a OS já passou, ordenados por ordem cronológica. \\ \hline
-		\textbf{9} & Para uma OS no estado "Pendente Pagamento" deverá ser registado quando um cliente foi notificado sobre o término da reparação da trotinete. \\ \hline
-		\textbf{10} & O sistema deve permitir que a secretária associe peças a uma OS que esteja no estado "Pendente Pagamento" caso o mecânico não o tenha feito durante a reparação. \\ \hline
-		\textbf{11} & O sistema deve permitir registar a efetuação do pagamento e o respetivo método utilizado numa OS no estado "Pendente Pagamento" (numerário, multibanco, MBWay). Caso sejam ambos registados, a OS deverá ficar no estado "Paga". \\ \hline
-		\textbf{12} & O sistema deve impedir a conclusão de uma OS no estado "Pendente Pagamento" caso o cliente referenciado na mesma tenha outras OS no estado "Pendente Pagamento" que tenham tido a confirmação de término de reparação numa data anterior à primeira. \\ \hline
+		\textbf{8} & Para uma OS no estado "Pendente Pagamento" deverá ser registado quando um cliente foi notificado sobre o término da reparação da trotinete. \\ \hline
+		\textbf{9} & O sistema deve permitir que a secretária associe peças a uma OS que esteja no estado "Pendente Pagamento" caso o mecânico não o tenha feito durante a reparação. \\ \hline
+		\textbf{10} & O sistema deve permitir registar a efetuação do pagamento e o respetivo método utilizado numa OS no estado "Pendente Pagamento" (numerário, multibanco, MBWay). Caso sejam ambos registados, a OS deverá ficar no estado "Paga". \\ \hline
+		\textbf{11} & O sistema deve impedir a conclusão de uma OS no estado "Pendente Pagamento" caso o cliente referenciado na mesma tenha outras OS no estado "Pendente Pagamento" que tenham tido a confirmação de término de reparação numa data anterior à primeira. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
