@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{article}
+	\documentclass[11pt,a4paper]{article}
 
 % --- Pacotes de Idioma e Codificação ---
 \usepackage[utf8]{inputenc}
@@ -41,14 +41,14 @@
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
 		\hline
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
-		\textbf{1} & O sistema deve disponibilizar ao gerente uma interface que permita visualizar o estado de todas as ordens de serviço (por diagnosticar, pendentes, em reparação, concluídas, aguardando aprovação e aguardando peças). Deve suportar filtros por estado, data, cliente e mecânico. \\ \hline
+		\textbf{1} & O sistema deve disponibilizar ao gerente uma interface que permita visualizar o estado de todas as ordens de serviço (pendente diagnóstico, pendentes, em reparação, concluídas, aguardando aprovação e aguardando peças). Deve suportar filtros por estado, data, cliente e mecânico. \\ \hline
 		\textbf{2}  & O sistema deve permitir registar clientes com nome, email, telemóvel, NIF e múltiplas trotinetes associadas. \\ \hline
-		\textbf{3}  & O sistema deve permitir registar marca, modelo, número de série, estado à entrada (notas textuais ou foto), tipo de motor, tipo de bateria e acessórios de uma trotinete. \\ \hline
+		\textbf{3}  & O sistema deve permitir registar marca, modelo, número de série, estado à entrada (notas textuais ou foto), tipo de motor e acessórios de uma trotinete. \\ \hline
 		\textbf{4}  & O sistema deve permitir registar dados pessoais dos funcionários: nome, morada (número de porta, rua, localidade e código-postal), telemóvel, email, data de nascimento, NISS, NIF, NUS e IBAN. \\ \hline
 		\textbf{5}  & O sistema deve permitir registar salário base (valor pago por hora e valor pago ao fim do mês, tanto líquido como bruto), alterações salariais, horas extraordinárias e calcular automaticamente o valor mensal a pagar de cada um dos funcionários. \\ \hline
 		\textbf{6}  & O sistema deve permitir registar a entrada de uma trotinete com dados do cliente, dados técnicos da trotinete e descrição do problema numa ordem de serviço nova. Deverá também conseguir calcular um tempo estimado para o término da reparação, para informar o cliente. \\ \hline
 		\textbf{7}  & O sistema deverá facilitar a obtenção de novas ordens de serviço para que os mecânicos realizem diagnósticos ou reparações. \\ \hline
-		\textbf{8}  & O sistema deve atribuir automaticamente o estado ``Por diagnosticar`` a novas ordens de serviço. \\ \hline
+		\textbf{8}  & O sistema deve atribuir automaticamente o estado 'Pendente Diagnóstico' a novas ordens de serviço. \\ \hline
 		\textbf{9}  & O sistema deve bloquear o início da reparação caso o orçamento exceda os 50\texteuro. \\ \hline
 		\textbf{10}  & O sistema deve impedir que duas pessoas iniciem a mesma ordem de serviço simultaneamente, atribuindo-a a um mecânico de cada vez. \\ \hline
 		\textbf{11}  & O sistema deve registar automaticamente qual mecânico executou cada reparação. \\ \hline
@@ -62,18 +62,17 @@
 	\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 		
 		\textbf{16}  & O sistema deve permitir registar referências de fornecedores e associar cada peça ao fornecedor correto. \\ \hline
-		\textbf{17}  & O sistema deve armazenar contactos, emails, preços habituais e prazos de entrega de fornecedores. \\ \hline
+		\textbf{17}  & O sistema deve armazenar contactos, emails, preços habituais. \\ \hline
 		\textbf{18}  & O sistema deve gerar listas de peças a encomendar com base em níveis mínimos, consumo e stock atual. \\ \hline
 		\textbf{19}  & O sistema deve permitir registar peças devolvidas ao fornecedor, com data, motivo e estado da devolução. \\ \hline
-          \textbf{20}  & O sistema deve permitir que apenas o gerente possa eliminar ou alterar registos críticos. O gestor de stock poderá alterar ou eliminar peças do stock e a secretária ordens de serviço. \\ \hline
-		\textbf{21}  & O sistema deve impedir a entrega da trotinete se existirem pagamentos pendentes desse cliente. \\ \hline
-		\textbf{22}  & O sistema deverá registar quando um cliente foi notificado sobre o término da reparação da sua trotinete. \\ \hline
-		\textbf{23}  & O sistema deve registar quantos dias passaram desde que o cliente foi notificado e aplicar automaticamente uma taxa diária de 3\texteuro\space após 7 dias (excluindo o dia de levatamento). \\ \hline
-		\textbf{24}  & O sistema deve gerar relatórios sobre número de reparações, tempos médios, rentabilidade e trotinetes paradas. \\ \hline
-		\textbf{25}  & O sistema deverá calcular o valor de um serviço baseando-se na lista de intervenções anotada pelos mecânicos e somando esses valores com os valores de venda das peças usadas. \\ \hline
-		\textbf{26}  & O sistema deve implementar perfis distintos (gerente, secretária, mecânico) com permissões específicas. \\ \hline
-		\textbf{27}  & Todas as ações (entradas/saídas de stock, alterações de preços, aprovações) devem ser registadas com data, hora e utilizador. \\ \hline
-		\textbf{28} & O sistema deverá calcular os valores dos custos e lucros da oficina e mostrar essa informação na interface do gerente. Deverá ser possível acompanhar os salários, compras de peças, rendas e outras despesas e filtrar por intervalos de tempo. \\ \hline
+		\textbf{20}  & O sistema deve impedir a entrega da trotinete se existirem pagamentos pendentes desse cliente. \\ \hline
+		\textbf{21}  & O sistema deverá registar quando um cliente foi notificado sobre o término da reparação da sua trotinete. \\ \hline
+		\textbf{22}  & O sistema deve registar quantos dias passaram desde que o cliente foi notificado e aplicar automaticamente uma taxa diária de 3\texteuro\space após 7 dias (excluindo o dia de levantamento). \\ \hline
+		\textbf{23}  & O sistema deve gerar relatórios sobre número de reparações, tempos médios, rentabilidade e trotinetes paradas. \\ \hline
+		\textbf{24}  & O sistema deverá calcular o valor de um serviço baseando-se na lista de intervenções anotada pelos mecânicos e somando esses valores com os valores de venda das peças usadas. \\ \hline
+		\textbf{25}  & O sistema deve implementar perfis distintos (gerente, secretária, mecânico) com permissões específicas. \\ \hline
+		\textbf{26}  & Todas as ações (entradas/saídas de stock, alterações de preços, aprovações) devem ser registadas com data, hora e utilizador. \\ \hline
+		\textbf{27} & O sistema deverá calcular os valores dos custos e lucros da oficina e mostrar essa informação na interface do gerente. Deverá ser possível acompanhar os salários, compras de peças, rendas e outras despesas e filtrar por intervalos de tempo. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}

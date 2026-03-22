@@ -87,7 +87,7 @@
 
 		\pergunta{Além da marca e modelo, que detalhes técnicos são vitais para a descrição de uma trotinete?}	
 		
-		\resposta{No que toca às trotinetes, além da marca e modelo, é essencial termos o número de série, porque é isso que nos permite identificar exatamente cada unidade. Também é importante sabermos o estado geral da trotinete à entrada (às vezes com recurso a uma nota, e, outras vezes, com recurso a uma foto), o tipo de motor, o tipo de bateria, e se tem algum acessório específico, como por exemplo, uma luz ou assento.}
+		\resposta{No que toca às trotinetes, além da marca e modelo, é essencial termos o número de série, porque é isso que nos permite identificar exatamente cada unidade. Também é importante sabermos o estado geral da trotinete à entrada (às vezes com recurso a uma nota, e, outras vezes, com recurso a uma foto), o tipo de motor, e se tem algum acessório específico, como por exemplo, uma luz ou assento.}
 		
 		\pergunta{Quando contrata alguém para trabalhar na empresa, que dados pede-lhe? Como é que calcula o valor do salário para lhe pagar ao fim do mês?}
 		
@@ -178,7 +178,7 @@
 		Às vezes perco o papel e esqueço-me de algumas das peças devolvidas, principalmente se o fornecedor demorar a responder, o que gera alguma confusão quando sou contactado por ele.}
 	
 		\pergunta{Em relação às capacidades que os funcionários têm, quem pode apagar informação que tenha guardada? Só o senhor ou os funcionários também podem ter esse poder?}
-		\resposta{Já aconteceu de criar-se uma ordem de serviço errada ou pedir todos os dados a um cliente duas vezes, mas prefiro que me avisem para eu tratar disso. Portanto, só eu e a secretária é que deveríamos conseguir apagar registos, assim evito que alguém que não eu apague algo importante por engano.}
+		\resposta{Já aconteceu de criar-se uma ordem de serviço errada ou pedir todos os dados a um cliente duas vezes, mas prefiro que me avisem para eu tratar disso. Portanto, só eu e a secretária é que deveríamos conseguir apagar registos de ordens de serviço, assim evito que alguém que não eu apague algo importante por engano. Para além disto, só eu e o gestor de stock é que deveríamos poder alterar e apagar registos de entradas de peças e fornecedores.}
 		
 		\pergunta{Pode-se entregar uma trotinete ao cliente sem que ele tenha pago?}
 		\resposta{Para mim é essencial que o cliente pague antes de levar qualquer equipamento que lhe pertença e que esteja aqui na oficina. Já tive situações em que entreguei e depois tive dificuldade em receber. Por isso, hoje em dia só entrego quando a ordem está paga.}
@@ -208,7 +208,7 @@
 			\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 			\textbf{1} & O sistema deve disponibilizar ao gerente uma interface que permita visualizar o estado de todas as ordens de serviço (por diagnosticar, pendentes, em reparação, concluídas, aguardando aprovação e aguardando peças). Deve suportar filtros por estado, data, cliente e mecânico. \\ \hline
 			\textbf{2}  & O sistema deve permitir registar clientes com nome, email, telemóvel, NIF e múltiplas trotinetes associadas. \\ \hline
-			\textbf{3}  & O sistema deve permitir registar marca, modelo, número de série, estado à entrada (notas textuais ou foto), tipo de motor, tipo de bateria e acessórios de uma trotinete. \\ \hline
+			\textbf{3}  & O sistema deve permitir registar marca, modelo, número de série, estado à entrada (notas textuais ou foto), tipo de motor e acessórios de uma trotinete. \\ \hline
 			\textbf{4}  & O sistema deve permitir registar dados pessoais dos funcionários: nome, morada (número de porta, rua, localidade e código-postal), telemóvel, email, data de nascimento, NISS, NIF, NUS e IBAN. \\ \hline
 			\textbf{5}  & O sistema deve permitir registar salário base (valor pago por hora e valor pago ao fim do mês, tanto líquido como bruto), alterações salariais, horas extraordinárias e calcular automaticamente o valor mensal a pagar de cada um dos funcionários. \\ \hline
 			\textbf{6}  & O sistema deve permitir registar a entrada de uma trotinete com dados do cliente, dados técnicos da trotinete e descrição do problema numa ordem de serviço nova. Deverá também conseguir calcular um tempo estimado para o término da reparação, para informar o cliente. \\ \hline
@@ -231,20 +231,19 @@
 			\textbf{17}  & O sistema deve armazenar contactos, emails, preços habituais. \\ \hline
 			\textbf{18}  & O sistema deve gerar listas de peças a encomendar com base em níveis mínimos, consumo e stock atual. \\ \hline
 			\textbf{19}  & O sistema deve permitir registar peças devolvidas ao fornecedor, com data, motivo e estado da devolução. \\ \hline
-			\textbf{20}  & O sistema deve permitir que apenas o gerente possa eliminar ou alterar registos críticos. O gestor de stock poderá alterar ou eliminar peças do stock e a secretária ordens de serviço. \\ \hline
-			\textbf{21}  & O sistema deve impedir a entrega da trotinete se existirem pagamentos pendentes desse cliente. \\ \hline
-			\textbf{22}  & O sistema deverá registar quando um cliente foi notificado sobre o término da reparação da sua trotinete \\ \hline
-			\textbf{23}  & O sistema deve registar quantos dias passaram desde que o cliente foi notificado e aplicar automaticamente uma taxa diária de 3\texteuro \space após 7 dias (excluindo o dia de levatamento). \\ \hline
-			\textbf{24}  & O sistema deverá calcular o valor de um serviço baseando-se na lista de intervenções anotada pelos mecânicos e somando esses valores com os valores de venda das peças usadas. \\ \hline
+			\textbf{20}  & O sistema deve impedir a entrega da trotinete se existirem pagamentos pendentes desse cliente. \\ \hline
+			\textbf{21}  & O sistema deverá registar quando um cliente foi notificado sobre o término da reparação da sua trotinete \\ \hline
+			\textbf{22}  & O sistema deve registar quantos dias passaram desde que o cliente foi notificado e aplicar automaticamente uma taxa diária de 3\texteuro \space após 7 dias (excluindo o dia de levantamento). \\ \hline
+			\textbf{23}  & O sistema deverá calcular o valor de um serviço baseando-se na lista de intervenções anotada pelos mecânicos e somando esses valores com os valores de venda das peças usadas. \\ \hline
 		\end{tabularx}
 	
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
 		\hline
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 		
-			\textbf{25}  & O sistema deve implementar perfis distintos (gerente, secretária, mecânico) com permissões específicas. \\ \hline
-			\textbf{26}  & Todas as ações (entradas/saídas de stock, alterações de preços, aprovações) devem ser registadas com data, hora e utilizador. \\ \hline
-			\textbf{27} & O sistema deverá calcular os valores dos custos e lucros da oficina e mostrar essa informação na interface do gerente. Deverá ser possível acompanhar os salários, compras de peças, rendas e outras despesas e filtrar por intervalos de tempo. \\ \hline
+			\textbf{24}  & O sistema deve implementar perfis distintos (gerente, secretária, mecânico) com permissões específicas. \\ \hline
+			\textbf{25}  & Todas as ações (entradas/saídas de stock, alterações de preços, aprovações) devem ser registadas com data, hora e utilizador. \\ \hline
+			\textbf{26} & O sistema deverá calcular os valores dos custos e lucros da oficina e mostrar essa informação na interface do gerente. Deverá ser possível acompanhar os salários, compras de peças, rendas e outras despesas e filtrar por intervalos de tempo. \\ \hline
 	\end{tabularx}
 
 \end{document}
