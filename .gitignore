@@ -8,3 +8,6 @@
 *.out
 *.toc
 *.synctex.gz
+
+# VPP
+*.bak*
