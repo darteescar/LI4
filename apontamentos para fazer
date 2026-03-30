@@ -1,19 +1,4 @@
-Dizer nos de eliminação que eles continuam no sistema
+
 Granularizar os requisitos
-Continuar a retirar dos use cases as páginas
-Rever use Cases finais
 
-
-Ter atenção ao use case de adição ao stock de peças que se a peça já n existe no sistema, n pode ser adicionada
-
-Dizer que é eliminado nos use cases ou tirar isso e meter no relatório a justificação ?
-
-
-
-
-
-
-
-Feito:
-Retirar Consultar dos requisitos
-Dizer que identificador é numero e mudar de ordem alfabetica para numerica
+Adicionar requisito de consulta de historico de cenas
