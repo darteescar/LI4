@@ -1,0 +1,2081 @@
+
+#uc_spec(
+    id: "01",
+    nome: "Fazer Autenticação",
+    atores: "Funcionário (Gerente, Secretária, Mecânico ou Gestor de Stock)",
+    pre_condicoes: "O utilizador não está autenticado e possui credenciais válidas registadas no sistema.",
+    pos_condicoes: "O utilizador é autenticado e é-lhe concedido acesso às suas funcionalidades, consoante o seu cargo.",
+    fluxo_normal: (
+      [O utilizador introduz o seu identificador único e a sua palavra‑passe.],
+      [O sistema valida as credenciais introduzidas.],
+      [O sistema identifica o cargo do utilizador autenticado.],
+      [O sistema concede ao utilizador acesso às funcionalidades correspondentes ao seu papel.],
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Credenciais inválidas",
+        passo: "2",
+        fluxo: (
+          [2.1 - O sistema indica que as credenciais são inválidas.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "02",
+    nome: "Registar Funcionário",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado.",
+    pos_condicoes: "Um novo funcionário é registado no sistema e um identificador único é atribuído.",
+    fluxo_normal: (
+      [O gerente seleciona a opção de criar novo funcionário.],
+      [O gerente preenche todos os dados obrigatórios: nome, morada completa (número de porta, rua, localidade e código-postal), telemóvel, email, data de nascimento, NISS, NIF, NUS, IBAN, salário (valor por hora, valor mensal bruto e valor mensal líquido) e palavra-passe.],
+      [O gerente confirma o registo.],
+      [O sistema valida que o nome é um campo textual não vazio.],
+      [O sistema valida que o número de porta é um número inteiro com no máximo 4 dígitos, podendo ser seguido por uma letra.],
+      [O sistema valida que a rua é um campo textual não vazio.],
+      [O sistema valida que a localidade é um campo textual não vazio.],
+      [O sistema valida que o código-postal segue o formato de 4 dígitos, um hífen e 3 dígitos.],
+      [O sistema valida que o telemóvel é composto por 9 dígitos.],
+      [O sistema valida que o email segue o formato válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322].],
+      [O sistema valida que a data de nascimento é uma data válida.],
+      [O sistema valida que o NISS é composto por 11 dígitos.],
+      [O sistema valida que o NIF é composto por 9 dígitos.],
+      [O sistema valida que o NUS é composto por 9 dígitos.],
+      [O sistema valida que o IBAN é composto por 2 caracteres alfabéticos seguidos de 23 dígitos.],
+      [O sistema valida que o valor por hora é um número real positivo com 2 casas decimais.],
+      [O sistema valida que o valor mensal bruto é um número real positivo com 2 casas decimais.],
+      [O sistema valida que o valor mensal líquido é um número real positivo com 2 casas decimais.],
+      [O sistema valida que a palavra-passe é um campo textual não vazio.],
+      [O sistema cria o funcionário e atribui um identificador único],
+      [O sistema confirma o registo apresentando os dados do funcionário criado.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Gerente cancela o registo",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nome inválido",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema informa o gerente que o nome deve ser um campo textual não vazio e impede o registo.],
+        ),
+      ),
+      (
+        condicao: "Número de porta inválido",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema informa o gerente que o número de porta deve ser um número inteiro com no máximo 4 dígitos, podendo ser seguido por uma letra, e impede o registo.],
+        ),
+      ),
+      (
+        condicao: "Rua inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o gerente que a rua deve ser um campo textual não vazio e impede o registo.],
+        ),
+      ),
+      (
+        condicao: "Localidade inválida",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o gerente que a localidade deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Código-postal inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o gerente que o código-postal deve seguir o formato XXXX-XXX (4 dígitos, hífen, 3 dígitos) e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Telemóvel inválido",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o gerente que o telemóvel deve ser composto por 9 dígitos e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Email inválido",
+        passo: "10",
+        fluxo: (
+          [10.1 - O sistema informa o gerente que o email deve seguir o formato de endereço de correio electrónico válido (nome#"@"dominio.com) e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Data de nascimento inválida",
+        passo: "11",
+        fluxo: (
+          [11.1 - O sistema informa o gerente que a data de nascimento deve ser uma data válida e impede o registo.],
+        )
+      ),
+      (
+        condicao: "NISS inválido",
+        passo: "12",
+        fluxo: (
+          [12.1 - O sistema informa o gerente que o NISS deve ser composto por 11 dígitos e impede o registo.],
+        )
+      ),
+      (
+        condicao: "NIF inválido",
+        passo: "13",
+        fluxo: (
+          [13.1 - O sistema informa o gerente que o NIF deve ser composto por 9 dígitos e impede o registo.],
+        )
+      ),
+      (
+        condicao: "NUS inválido",
+        passo: "14",
+        fluxo: (
+          [14.1 - O sistema informa o gerente que o NUS deve ser composto por 9 dígitos e impede o registo.],
+        )
+      ),
+      (
+        condicao: "IBAN inválido",
+        passo: "15",
+        fluxo: (
+          [15.1 - O sistema informa o gerente que o IBAN deve ser composto por 2 caracteres alfabéticos seguidos de 23 dígitos e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Valor por hora inválido",
+        passo: "16",
+        fluxo: (
+          [16.1 - O sistema informa o gerente que o valor por hora deve ser um número real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Valor mensal bruto inválido",
+        passo: "17",
+        fluxo: (
+          [17.1 - O sistema informa o gerente que o valor mensal bruto deve ser um número real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Valor mensal líquido inválido",
+        passo: "18",
+        fluxo: (
+          [18.1 - O sistema informa o gerente que o valor mensal líquido deve ser um número real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Palavra-passe inválida",
+        passo: "19",
+        fluxo: (
+          [19.1 - O sistema informa o gerente que a palavra-passe deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+    )
+)
+
+
+#uc_spec(
+    id: "03",
+    nome: "Editar Funcionário",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado e existe pelo menos um funcionário registado no sistema.",
+    pos_condicoes: "Os dados do funcionário são atualizados no sistema com os novos valores fornecidos.",
+    fluxo_normal: (
+      [O gerente seleciona o funcionário que pretende editar.],
+      [O sistema apresenta os dados atuais do funcionário.],
+      [O gerente seleciona a opção de editar o funcionário.],
+      [O gerente seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O gerente confirma as alterações.],
+      [O sistema valida que o nome é um campo textual não vazio.],
+      [O sistema valida que o número de porta é um número inteiro com no máximo 4 dígitos, podendo ser seguido por uma letra.],
+      [O sistema valida que a rua é um campo textual não vazio.],
+      [O sistema valida que a localidade é um campo textual não vazio.],
+      [O sistema valida que o código-postal segue o formato de 4 dígitos, um hífen e 3 dígitos.],
+      [O sistema valida que o telemóvel é composto por 9 dígitos.],
+      [O sistema valida que o email segue o formato válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322].],
+      [O sistema valida que a data de nascimento é uma data válida.],
+      [O sistema valida que o NISS é composto por 11 dígitos.],
+      [O sistema valida que o NIF é composto por 9 dígitos.],
+      [O sistema valida que o NUS é composto por 9 dígitos.],
+      [O sistema valida que o IBAN é composto por 2 caracteres alfabéticos seguidos de 23 dígitos.],
+      [O sistema valida que o valor por hora é um número real positivo com 2 casas decimais.],
+      [O sistema valida que o valor mensal bruto é um número real positivo com 2 casas decimais.],
+      [O sistema valida que o valor mensal líquido é um número real positivo com 2 casas decimais.],
+      [O sistema valida que a palavra-passe é um campo textual não vazio.],
+      [O sistema atualiza os dados do funcionário e apresenta os dados atualizados.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Gerente cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nome inválido",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o gerente que o nome deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Número de porta inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o gerente que o número de porta deve ser um número inteiro com no máximo 4 dígitos, podendo ser seguido por uma letra, e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Rua inválida",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o gerente que a rua deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Localidade inválida",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o gerente que a localidade deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Código-postal inválido",
+        passo: "10",
+        fluxo: (
+          [10.1 - O sistema informa o gerente que o código-postal deve seguir o formato XXXX-XXX (4 dígitos, hífen, 3 dígitos) e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Telemóvel inválido",
+        passo: "11",
+        fluxo: (
+          [11.1 - O sistema informa o gerente que o telemóvel deve ser composto por 9 dígitos e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Email inválido",
+        passo: "12",
+        fluxo: (
+          [12.1 - O sistema informa o gerente que o email deve seguir o formato de endereço de correio electrónico válido (nome#"@"dominio.com) e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Data de nascimento inválida",
+        passo: "13",
+        fluxo: (
+          [13.1 - O sistema informa o gerente que a data de nascimento deve ser uma data válida e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "NISS inválido",
+        passo: "14",
+        fluxo: (
+          [14.1 - O sistema informa o gerente que o NISS deve ser composto por 11 dígitos e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "NIF inválido",
+        passo: "15",
+        fluxo: (
+          [15.1 - O sistema informa o gerente que o NIF deve ser composto por 9 dígitos e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "NUS inválido",
+        passo: "16",
+        fluxo: (
+          [16.1 - O sistema informa o gerente que o NUS deve ser composto por 9 dígitos e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "IBAN inválido",
+        passo: "17",
+        fluxo: (
+          [17.1 - O sistema informa o gerente que o IBAN deve ser composto por 2 caracteres alfabéticos seguidos de 23 dígitos e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Valor por hora inválido",
+        passo: "18",
+        fluxo: (
+          [18.1 - O sistema informa o gerente que o valor por hora deve ser um número real positivo com 2 casas decimais e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Valor mensal bruto inválido",
+        passo: "19",
+        fluxo: (
+          [19.1 - O sistema informa o gerente que o valor mensal bruto deve ser um número real positivo com 2 casas decimais e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Valor mensal líquido inválido",
+        passo: "20",
+        fluxo: (
+          [20.1 - O sistema informa o gerente que o valor mensal líquido deve ser um número real positivo com 2 casas decimais e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Palavra-passe inválida",
+        passo: "21",
+        fluxo: (
+          [21.1 - O sistema informa o gerente que a palavra-passe deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "04",
+    nome: "Remover Funcionário",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado e existe pelo menos um funcionário registado no sistema.",
+    pos_condicoes: "O funcionário é removido do sistema e deixa de conseguir autenticar-se.",
+    fluxo_normal: (
+      [O gerente seleciona o funcionário.],
+      [O sistema apresenta os dados do funcionário selecionado.],
+      [O gerente seleciona a opção de eliminar o funcionário.],
+      [O gerente confirma a eliminação.],
+      [O sistema remove o funcionário e bloqueia o seu acesso ao sistema.],
+      [O sistema confirma ao gerente que a eliminação foi bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Gerente cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo.],
+        )
+      ),
+    )
+)
+
+
+
+#uc_spec(
+    id: "05",
+    nome: "Registar Horas Extraordinárias",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado e existe pelo menos um funcionário registado no sistema.",
+    pos_condicoes: "As horas extraordinárias são registadas e o valor total a pagar ao funcionário no mês corrente é atualizado.",
+    fluxo_normal: (
+      [O gerente seleciona o funcionário.],
+      [O sistema apresenta os dados atuais do funcionário.],
+      [O gerente seleciona a opção de registar horas extraordinárias.],
+      [O gerente introduz o número de horas extraordinárias.],
+      [O sistema valida que o valor introduzido é um número inteiro.],
+      [O gerente confirma o registo.],
+      [O sistema regista as horas extraordinárias e recalcula automaticamente o valor total a pagar ao funcionário no mês corrente.],
+      [O sistema apresenta uma confirmação do registo com o valor total atualizado.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Valor introduzido não é um número inteiro",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema informa o gerente que o valor introduzido é inválido e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Gerente cancela o registo",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema cancela o processo.],
+        )
+      )
+    )
+)
+
+
+#uc_spec(
+    id: "06",
+    nome: "Consultar Estado Financeiro",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado.",
+    pos_condicoes: "Os movimentos que o gerente deseja consultar, são-lhe apresentados.",
+    fluxo_normal: (
+      [O gerente inicia a consulta do estado financeiro.],
+      [O gerente seleciona um ou vários filtros, nomeadamente: por intervalo de datas, por tipo de gasto ou receita (salários, gastos com peças, lucros com mão de obra, lucros provenientes da venda de peças).],
+      [O gerente confirma o conjunto de filtros que pretende usar.],
+      [O sistema procura por movimentos que correspondam aos filtros usados e apresenta-os ao gerente.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Gerente não confirma os filtros",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema cancela o processo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "07",
+    nome: "Registar Serviço de Reparação",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado.",
+    pos_condicoes: "Uma nova entrada é adicionada ao catálogo de reparações e um identificador único é atribuído.",
+    fluxo_normal: (
+      [O gerente seleciona a opção de criar uma nova entrada.],
+      [O gerente preenche todos os dados obrigatórios: nomenclatura, descrição detalhada e preço de execução.],
+      [O gerente confirma o registo.],
+      [O sistema valida que a nomenclatura é um campo textual não vazio.],
+      [O sistema valida que a descrição é um campo textual não vazio.],
+      [O sistema valida que o preço de execução é um valor real positivo com 2 casas decimais.],
+      [O sistema cria a entrada, atribui um identificador único e apresenta os dados da nova entrada registada.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Gerente cancela o registo",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nomenclatura inválida",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema informa o gerente que a nomenclatura deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Descrição inválida",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema informa o gerente que a descrição deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Preço de execução inválido",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o gerente que o preço de execução deve ser um valor real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "08",
+    nome: "Editar Serviço de Reparação",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado e existe pelo menos uma entrada no catálogo de reparações.",
+    pos_condicoes: "Os dados da entrada são atualizados no sistema com os novos valores fornecidos.",
+    fluxo_normal: (
+      [O gerente seleciona a entrada que pretende editar.],
+      [O sistema apresenta os dados atuais da entrada.],
+      [O gerente seleciona a opção de editar a entrada.],
+      [O gerente seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O gerente confirma as alterações.],
+      [O sistema valida que a nomenclatura é um campo textual não vazio.],
+      [O sistema valida que a descrição é um campo textual não vazio.],
+      [O sistema valida que o preço de execução é um valor real positivo com 2 casas decimais.],
+      [O sistema atualiza os dados da entrada e apresenta os dados atualizados.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Gerente cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nomenclatura inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o gerente que a nomenclatura deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Descrição inválida",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o gerente que a descrição deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Preço de execução inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o gerente que o preço de execução deve ser um valor real positivo com 2 casas decimais e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "09",
+    nome: "Remover Serviço de Reparação",
+    atores: "Gerente",
+    pre_condicoes: "O gerente está autenticado e existe pelo menos uma entrada no catálogo de reparações.",
+    pos_condicoes: "Deixa de ser possível associar a entrada a novas ordens de serviço.",
+    fluxo_normal: (
+      [O gerente seleciona a reparação que pretende eliminar.],
+      [O sistema apresenta ao gerente os dados da reparação selecionada.],
+      [O gerente seleciona a opção de eliminar a reparação.],
+      [O gerente confirma a eliminação.],
+      [O sistema apresenta uma mensagem de confirmação da eliminação bem-sucedida.],
+      [O sistema impossibilita o uso da entrada em novas ordens de serviço.],
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Gerente cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo.],
+        )
+      ),
+    )
+)
+
+
+#uc_spec(
+    id: "10",
+    nome: "Registar Peça",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos um fornecedor registado.",
+    pos_condicoes: "Uma nova peça é registada no sistema e um identificador único é atribuído.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de criar uma nova peça.],
+      [O funcionário introduz o identificador do fornecedor.],
+      [O sistema valida a existência do fornecedor.],
+      [O funcionário preenche todos os restantes dados obrigatórios: referência do fornecedor e nível mínimo aceitável em stock.],
+      [O funcionário confirma o registo.],
+      [O sistema valida que a referência do fornecedor é um campo textual não vazio.],
+      [O sistema valida que o nível mínimo aceitável em stock é um número inteiro não negativo.],
+      [O sistema cria a peça e atribui-lhe um identificador único.],
+      [O sistema apresenta os dados da nova peça registada.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela o registo",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Fornecedor inexistente",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que não existe nenhum fornecedor com o identificador fornecido.],
+        )
+      ),
+      (
+        condicao: "Referência do fornecedor inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a referência do fornecedor deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Nível mínimo aceitável em stock inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o nível mínimo aceitável em stock deve ser um número inteiro não negativo e impede o registo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "11",
+    nome: "Editar Peça",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O utilizador está autenticado e existe pelo menos uma peça registada.",
+    pos_condicoes: "Os dados da peça são atualizados no sistema com os novos valores fornecidos.",
+    fluxo_normal: (
+      [O funcionário seleciona a peça que pretende editar.],
+      [O sistema apresenta os dados atuais da peça.],
+      [O funcionário seleciona a opção de editar a peça.],
+      [O funcionário seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que a referência do fornecedor é um campo textual não vazio.],
+      [O sistema valida que o nível mínimo aceitável em stock é um número inteiro positivo.],
+      [O sistema atualiza os dados da peça e apresenta os dados atualizados.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Referência do fornecedor inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a referência do fornecedor deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Nível mínimo aceitável em stock inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o nível mínimo aceitável em stock deve ser um número inteiro positivo e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "12",
+    nome: "Remover Peça",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma peça registada.",
+    pos_condicoes: "A peça é removida do sistema e deixa de ser possível adicionar stock da peça removida.",
+    fluxo_normal: (
+      [O funcionário seleciona a peça que pretende eliminar.],
+      [O sistema apresenta os dados da peça.],
+      [O funcionário seleciona a opção de eliminar a peça.],
+      [O funcionário confirma a eliminação.],
+      [O sistema impossibilita a adição de novas entradas em stock da peça removida a partir deste momento e apresenta uma mensagem de confirmação de eliminação bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "13",
+    nome: "Registar Entrada de Peças em Stock",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existem peças registadas no sistema.",
+    pos_condicoes: "Uma nova entrada de peça em stock é registada com identificador único numérico, quantidade aumenta e é registada com data, hora e utilizador.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de adicionar uma nova entrada.],
+      [O funcionário introduz o valor da referência do fornecedor ou o identificador único da peça.],
+      [O sistema valida a existência da peça.],
+      [O funcionário preenche todos os dados obrigatórios: quantidade, preço de compra, preço de venda e data de receção.],
+      [O funcionário confirma o registo.],
+      [O sistema valida que a quantidade é um número inteiro positivo.],
+      [O sistema valida que o preço de compra é um valor real positivo com 2 casas decimais.],
+      [O sistema valida que o preço de venda é um valor real positivo com 2 casas decimais.],
+      [O sistema valida que a data de receção é uma data válida no formato AAAA-MM-DD.],
+      [O sistema verifica que o preço de compra é inferior a 70€.],
+      [O sistema cria a entrada, atribui um identificador único numérico, adiciona a quantidade em stock e apresenta os dados da nova entrada registada.]
+    ),
+    fluxos_alternativos: (
+      (
+        condicao: "O preço de compra é superior a 70€",
+        passo: "10",
+        fluxo: (
+          [10.1 - O funcionário introduz o número de série para cada unidade da quantidade fornecida.],
+          [10.2 - O funcionário introduz o tempo de garantia.],
+          [10.3 - O sistema valida que o número de série é um campo textual não vazio.],
+          [10.4 - O sistema valida que o tempo de garantia é um número inteiro positivo.],
+          [10.5 - Retorna ao passo 11 do fluxo normal.]
+        )
+      ),
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Peça inexistente",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que não existe nenhuma peça com os dados fornecidos.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela o registo",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Quantidade inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a quantidade deve ser um número inteiro positivo e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Preço de compra inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o preço de compra deve ser um valor real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Preço de venda inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o funcionário que o preço de venda deve ser um valor real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Data de receção inválida",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o funcionário que a data de receção deve ser uma data válida no formato AAAA-MM-DD e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Número de série inválido",
+        passo: "10.3",
+        fluxo: (
+          [10.3.1 - O sistema informa o funcionário que o número de série deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Tempo de garantia inválido",
+        passo: "10.4",
+        fluxo: (
+          [10.4.1 - O sistema informa o funcionário que o tempo de garantia deve ser um número inteiro positivo (em meses) e impede o registo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "14",
+    nome: "Editar Entrada de Stock de Peças",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma entrada de peça em stock registada.",
+    pos_condicoes: "Os dados da entrada de stock são atualizados no sistema com os novos valores fornecidos e é registada com data, hora e utilizador.",
+    fluxo_normal: (
+      [O funcionário seleciona a entrada de peça que pretende editar.],
+      [O sistema apresenta os dados atuais da entrada.],
+      [O funcionário seleciona a opção de editar a entrada.],
+      [O funcionário seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que a quantidade é um número inteiro não negativo.],
+      [O sistema valida que o preço de compra é um valor real positivo com 2 casas decimais.],
+      [O sistema valida que o preço de venda é um valor real positivo com 2 casas decimais.],
+      [O sistema valida que a data de receção é uma data válida no formato AAAA-MM-DD.],
+      [O sistema atualiza os dados da entrada de stock, regista a data, hora e utilizador da edição, e apresenta os dados atualizados.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Quantidade inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a quantidade deve ser um número inteiro não negativo e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Preço de compra inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o preço de compra deve ser um valor real positivo com 2 casas decimais e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Preço de venda inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o funcionário que o preço de venda deve ser um valor real positivo com 2 casas decimais e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Data de receção inválida",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o funcionário que a data de receção deve ser uma data válida no formato AAAA-MM-DD e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "15",
+    nome: "Registar Devolução de Peça ao Fornecedor",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existem peças registadas no sistema.",
+    pos_condicoes: "Uma nova devolução é registada no sistema com estado 'Pendente de Devolução', identificador único é atribuído e data, hora e utilizador são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de criar uma nova devolução.],
+      [O funcionário introduz o identificador único da peça no sistema.],
+      [O sistema valida a existência da peça.],
+      [O funcionário preenche todos os dados obrigatórios: quantidade, data da devolução e motivo da devolução.],
+      [O funcionário confirma o registo.],
+      [O sistema valida que a quantidade é um número inteiro positivo e não excede a quantidade de peças marcadas como 'Possível Defeito' em stock da peça em questão.],
+      [O sistema valida que a data da devolução é uma data válida no formato AAAA-MM-DD.],
+      [O sistema valida que o motivo da devolução é um campo textual não vazio.],
+      [O sistema cria a devolução com estado automaticamente definido como 'Pendente de Devolução' e atribui um identificador único numérico.],
+      [O sistema diminui a quantidade em stock da peça consoante a quantidade especificada na devolução.],
+      [O sistema regista a data, hora e utilizador da devolução, e apresenta os dados da nova devolução.],
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Peça inexistente",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que não existe nenhuma peça com o identificador fornecido.],
+        )
+      ),
+            (
+        condicao: "Funcionário cancela o registo",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Quantidade inválida",
+        passo: "6",
+        fluxo: (
+          [6.1.1 - O sistema informa o funcionário que a quantidade deve ser um número inteiro positivo e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Quantidade superior à quantidade em 'Possível Defeito'",
+        passo: "6",
+        fluxo: (
+          [6.1.2 - O sistema informa o funcionário que a quantidade não deve exceder a quantidade marcada como 'Possível Defeito' em stock, e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Data da devolução inválida",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que a data da devolução deve ser uma data válida no formato AAAA-MM-DD e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Motivo da devolução inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o funcionário que o motivo da devolução deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "16",
+    nome: "Editar Devolução de Peça ao Fornecedor",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma devolução registada.",
+    pos_condicoes: "Os dados da devolução são atualizados no sistema com os novos valores fornecidos, as transições de estado causam os efeitos correspondentes no stock e na gestão financeira, e data, hora e utilizador da edição são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona a devolução que pretende editar.],
+      [O sistema apresenta os dados atuais da devolução.],
+      [O funcionário seleciona a opção de editar a devolução.],
+      [O funcionário seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que a quantidade é um número inteiro positivo e a diferença entre a quantidade anteriormente registada e a inserida não excede a quantidade marcada como 'Possível Defeito' em stock.],
+      [O sistema valida que a data da devolução é uma data válida no formato AAAA-MM-DD.],
+      [O sistema valida que o motivo da devolução é um campo textual não vazio.],
+      [O sistema valida que nenhuma mudança no estado foi feita.],
+      [O sistema atualiza os dados da devolução, regista a data, hora e utilizador da edição, e apresenta os dados atualizados.]
+    ),
+    fluxos_alternativos: (
+        (
+        condicao: "O sistema verifica que a transição de estado é de 'Pendente de Devolução' para 'Devolvida ao Fornecedor'",
+        passo: "9",
+        fluxo: (
+          [9.1.1 - O sistema verifica que a transição de estado é de 'Pendente de Devolução' para 'Devolvida ao Fornecedor'.],
+          [9.1.2 - O sistema adiciona a quantidade especificada na devolução ao stock da peça, sem custos adicionais.],
+          [9.1.3 - Retorna ao passo 10 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O sistema verifica que a transição de estado é de 'Pendente de Devolução' para 'Inválida para Devolução'",
+        passo: "9",
+        fluxo: (
+          [9.2.1 - O sistema aumenta os gastos em peças do mês atual no valor de compra da peça em questão.],
+          [9.2.2 - Retorna ao passo 10 do fluxo normal.]
+        )
+      ),
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Quantidade inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a quantidade deve ser um número inteiro positivo e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Quantidade superior à quantidade em 'Possível Defeito'",
+        passo: "6",
+        fluxo: (
+          [6.2 - O sistema informa o funcionário que a quantidade não deve exceder a soma da quantidade registada anteriormente com a quantidade marcada como 'Possível Defeito' em stock, e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Data da devolução inválida",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que a data da devolução deve ser uma data válida no formato AAAA-MM-DD e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Motivo da devolução inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o funcionário que o motivo da devolução deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Transição de estado inválida",
+        passo: "10",
+        fluxo: (
+          [10.1 - O sistema informa o funcionário que a transição de estado solicitada não é permitida e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "17",
+    nome: "Remover Devolução de Peça ao Fornecedor",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma devolução no estado 'Pendente de Devolução' registada no sistema.",
+    pos_condicoes: "A devolução é removida do sistema, os gastos em peças são aumentados consoante o valor da peça e quantidade, e data, hora e utilizador da eliminação são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona a devolução que pretende eliminar.],
+      [O sistema apresenta os dados atuais da devolução.],
+      [O funcionário seleciona a opção de eliminar a devolução.],
+      [O sistema verifica que o estado da devolução é 'Pendente de Devolução'.],
+      [O funcionário confirma a eliminação.],
+      [O sistema remove a devolução do sistema.],
+      [O sistema aumenta os gastos em peças do mês atual no valor de compra da peça multiplicado pela quantidade especificada na devolução.],
+      [O sistema regista a data, hora e utilizador da eliminação e apresenta uma mensagem de confirmação de eliminação bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Devolução não está no estado 'Pendente de Devolução'",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema informa o funcionário que apenas devoluções no estado 'Pendente de Devolução' podem ser eliminadas e impede a eliminação.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela a eliminação",
+        passo: "6",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      )
+    )
+)
+
+
+#uc_spec(
+    id: "18",
+    nome: "Registar Fornecedor",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado.",
+    pos_condicoes: "Um novo fornecedor é registado no sistema com identificador único e data, hora e utilizador são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de criar um novo fornecedor.],
+      [O funcionário preenche todos os dados obrigatórios: nome e contacto (email e/ou número de telefone).],
+      [O funcionário confirma o registo.],      
+      [O sistema valida que o nome é um campo textual não vazio.],
+      [O sistema valida que o contacto é um email válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322] e/ou um número de telefone composto por 9 dígitos.],
+      [O sistema cria o fornecedor, atribui um identificador único numérico, regista a data, hora e utilizador da criação, e apresenta os dados do novo fornecedor.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela o registo",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nome inválido",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema informa o funcionário que o nome deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Contacto inválido",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema informa o funcionário que o contacto deve ser um email válido (de acordo com a conveção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322]) e/ou um número de telefone composto por 9 dígitos, e impede o registo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "19",
+    nome: "Editar Fornecedor",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos um fornecedor registado no sistema.",
+    pos_condicoes: "Os dados do fornecedor são atualizados no sistema com os novos valores fornecidos e data, hora e utilizador da edição são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona o fornecedor que pretende editar.],
+      [O sistema apresenta os dados atuais do fornecedor.],
+      [O funcionário seleciona a opção de editar o fornecedor.],
+      [O funcionário seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que o nome é um campo textual não vazio.],
+      [O sistema valida que o contacto, é um email válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322] e/ou um número de telefone composto por 9 dígitos.],
+      [O sistema atualiza os dados do fornecedor, regista a data, hora e utilizador da edição, e apresenta os dados atualizados.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nome inválido",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que o nome deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Contacto inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o contacto deve ser um email válido (de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322]) e/ou um número de telefone composto por 9 dígitos, e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "20",
+    nome: "Remover Fornecedor",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos um fornecedor registado no sistema.",
+    pos_condicoes: "O fornecedor é removido do sistema, deixa de ser possível associar peças a este fornecedor e data, hora e utilizador da eliminação são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona o fornecedor que pretende eliminar.],
+      [O sistema apresenta os dados do fornecedor.],
+      [O funcionário seleciona a opção de eliminar o fornecedor.],
+      [O funcionário confirma a eliminação.],
+      [O sistema regista a data, hora e utilizador da eliminação, impossibilita a associação de peças a este fornecedor, e apresenta uma mensagem de confirmação de eliminação bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "21",
+    nome: "Gerar Lista de Encomendas",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existem peças com quantidade em stock inferior ao nível mínimo aceitável.",
+    pos_condicoes: "Uma nova lista de encomendas é criada no sistema no estado 'Rascunho'.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de gerar uma nova lista.],
+      [O sistema analisa automaticamente o stock de todas as peças.],
+      [O sistema identifica as peças cuja quantidade em stock é inferior ao nível mínimo aceitável.],
+      [O sistema calcula a quantidade a encomendar para cada peça.],
+      [O sistema apresenta as peças identificadas, agrupadas por fornecedor.],
+      [O funcionário seleciona quais as peças que deseja incluir na lista de encomenda.],
+      [O funcionário confirma as peças que deseja incluir na lista.],
+      [O funcionário insere o preço de compra e o preço de venda para cada uma das peças.],
+      [O funcionário confirma a criação da lista.],
+      [O sistema valida que os preços de compra são valores reais positivos com 2 casas decimais.],
+      [O sistema valida que os preços de venda são valores reais positivos com 2 casas decimais.],
+      [O sistema cria a lista, atribui-lhe um identificador único, define o estado como 'Rascunho' e apresenta os dados da nova lista, incluindo dados das peças, quantidades, preços de compra e venda e fornecedores.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Nenhuma peça com stock inferior ao nível mínimo",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que não existem peças que necessitem de encomenda no momento.],
+        )
+      ),
+      (
+        condicao: "Funcionário não seleciona nenhuma peça",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que nenhuma peça foi selecionada e impede a criação da lista.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela a criação",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Preço de compra inválido",
+        passo: "10",
+        fluxo: (
+          [10.1 - O sistema informa o funcionário que o preço de compra deve ser um valor real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Preço de venda inválido",
+        passo: "11",
+        fluxo: (
+          [11.1 - O sistema informa o funcionário que o preço de venda deve ser um valor real positivo com 2 casas decimais e impede o registo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "22",
+    nome: "Editar Lista de Encomendas",
+    atores: "Gestor de Stock",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma lista de encomendas registada no sistema.",
+    pos_condicoes: "Os dados da lista são atualizados com as peças adicionadas ou removidas, ou o estado da lista é alterado para o novo estado selecionado.",
+    fluxo_normal: (
+      [O funcionário seleciona a lista que pretende editar.],
+      [O sistema apresenta os dados atuais da lista.],
+      [O funcionário seleciona a opção de editar a lista.],
+      [O sistema valida que a lista se encontra no estado 'Rascunho'.],
+      [O funcionário adiciona ou remove peças da lista.],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que nenhuma mudança no estado foi feita.],
+      [O sistema atualiza os dados da lista e apresenta os dados atualizados.]
+    ),
+    fluxos_alternativos: (
+      (
+        condicao: "O funcionário alterou o estado da lista de 'Rascunho' para 'Enviada'",
+        passo: "7",
+        fluxo: (
+          [7.1.1 - Retorna ao passo 8 do fluxo normal.],
+        )
+      ),
+      (
+        condicao: "O funcionário alterou o estado da lista de 'Enviada' para 'Recebida'",
+        passo: "7",
+        fluxo: (
+          [7.2.1 - O sistema valida que nenhuma das peças na lista tem um preço de compra superior a 70€.],
+          [7.2.2 - O sistema adiciona automaticamente ao stock as peças registadas na lista.],
+          [7.2.3 - Retorna ao passo 8 do fluxo normal.],
+        )
+      ),
+      (
+        condicao: "O preço de compra é superior a 70€",
+        passo: "7.2.1",
+        fluxo: (
+          [7.2.1.1 - O funcionário introduz o número de série para cada unidade da quantidade fornecida.],
+          [7.2.1.2 - O funcionário introduz o tempo de garantia.],
+          [7.2.1.3 - O sistema valida que o número de série é um campo textual não vazio.],
+          [7.2.1.4 - O sistema valida que o tempo de garantia é um número inteiro positivo.],
+          [7.2.1.5 - Retorna ao passo 8 do fluxo normal.]
+        )
+      ),
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Lista não se encontra no estado 'Rascunho' para edição de peças",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que apenas listas no estado 'Rascunho' podem ter as suas peças editadas.],
+        )
+      ),
+      (
+        condicao: "Transição de estado inválida",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que a transição de estado solicitada não é permitida e impede a alteração.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema cancela o processo.],
+        )
+      ),
+            (
+        condicao: "Número de série inválido",
+        passo: "7.2.1.3",
+        fluxo: (
+          [7.2.1.3.1 - O sistema informa o funcionário que o número de série deve ser um campo textual não vazio e impede a alteração.],
+        )
+      ),
+      (
+        condicao: "Tempo de garantia inválido",
+        passo: "7.2.1.4",
+        fluxo: (
+          [7.2.1.4.1 - O sistema informa o funcionário que o tempo de garantia deve ser um número inteiro positivo (em meses) e impede a alteração.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "23",
+    nome: "Eliminar Lista de Encomendas",
+    atores: "Gestor de Stock e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma lista em estado 'Rascunho'.",
+    pos_condicoes: "A lista de encomendas é removida do sistema.",
+    fluxo_normal: (
+      [O funcionário seleciona a lista que pretende eliminar.],
+      [O sistema apresenta os dados da lista.],
+      [O funcionário seleciona a opção de eliminar a lista.],
+      [O funcionário confirma a eliminação.],
+      [O sistema remove a lista e apresenta uma mensagem de confirmação de eliminação bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Lista não se encontra no estado 'Rascunho'",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que apenas listas em estado 'Rascunho' podem ser eliminadas.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo.],
+        )
+      )
+    )
+)
+
+#uc_spec(
+    id: "24",
+    nome: "Registar Cliente",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado.",
+    pos_condicoes: "Um novo cliente é registado no sistema com identificador único numérico.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de criar um novo cliente.],
+      [O funcionário preenche todos os dados obrigatórios: nome, email, telemóvel e NIF.],
+      [O funcionário confirma o registo.],
+      [O sistema valida que o nome é um campo textual não vazio.],
+      [O sistema valida que o email segue o formato válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322].],
+      [O sistema valida que o telemóvel é um número composto por 9 dígitos.],
+      [O sistema valida que o NIF é um número composto por 9 dígitos.],
+      [O sistema cria o cliente, atribui um identificador único e apresenta os dados do novo cliente.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela o registo",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nome inválido",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema informa o funcionário que o nome deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Email inválido",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema informa o funcionário que o email deve seguir o formato de endereço de correio electrónico válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322] (nome#"@"dominio.com) e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Telemóvel inválido",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que o telemóvel deve ser um número composto por 9 dígitos e impede o registo.],
+        )
+      ),
+      (
+        condicao: "NIF inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o NIF deve ser um número composto por 9 dígitos e impede o registo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "25",
+    nome: "Editar Cliente",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos um cliente registado no sistema.",
+    pos_condicoes: "Os dados do cliente são atualizados no sistema com os novos valores fornecidos.",
+    fluxo_normal: (
+      [O funcionário seleciona o cliente que pretende editar.],
+      [O sistema apresenta os dados atuais do cliente, incluindo as trotinetes a ele associadas e todas as ordens de serviço associadas a cada uma delas.],
+      [O funcionário seleciona a opção de editar o cliente.],
+      [O funcionário seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que o nome é um campo textual não vazio.],
+      [O sistema valida que o email segue o formato válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322].],
+      [O sistema valida que o telemóvel é um número composto por 9 dígitos.],
+      [O sistema valida que o NIF é um número composto por 9 dígitos.],
+      [O sistema atualiza os dados do cliente e apresenta os dados atualizados.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Nome inválido",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que o nome deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Email inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o email deve seguir o formato de endereço de correio electrónico válido de acordo com a convenção #link("https://www.rfc-editor.org/rfc/rfc5322.html")[RFC 5322] (nome#"@"dominio.com) e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Telemóvel inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o funcionário que o telemóvel deve ser um número composto por 9 dígitos e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "NIF inválido",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o funcionário que o NIF deve ser um número composto por 9 dígitos e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "26",
+    nome: "Remover Cliente",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos um cliente registado no sistema.",
+    pos_condicoes: "O cliente é removido do sistema, bem como todas as suas trotinetes associadas.",
+    fluxo_normal: (
+      [O funcionário seleciona o cliente que pretende eliminar.],
+      [O sistema apresenta os dados do cliente, incluindo as trotinetes a ele associadas e todas as ordens de serviço associadas a cada uma delas.],
+      [O funcionário seleciona a opção de eliminar o cliente.],
+      [O funcionário confirma a eliminação.],
+      [A partir deste momento, o sistema impossibilita a associação de novas OS e trotinetes a este cliente, e apresenta uma mensagem de confirmação de eliminação bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "27",
+    nome: "Registar Trotinete",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos um cliente registado no sistema.",
+    pos_condicoes: "Uma nova trotinete é registada no sistema com identificador único numérico.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de criar uma nova trotinete.],
+      [O funcionário introduz o identificador único, o nome ou o NIF do cliente.],
+      [O sistema valida a existência do cliente.],
+      [O funcionário seleciona o cliente.],
+      [O funcionário preenche todos os dados obrigatórios: marca, modelo, número de série e tipo de motor.],
+      [O funcionário confirma o registo.],
+      [O sistema valida que a marca é um campo textual não vazio.],
+      [O sistema valida que o modelo é um campo textual não vazio.],
+      [O sistema valida que o número de série é um campo textual não vazio.],
+      [O sistema valida que o tipo de motor é um tipo de motor válido.],
+      [O sistema cria a trotinete, atribui um identificador único e apresenta os dados da nova trotinete.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Cliente inexistente",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que não existe nenhum cliente com os dados fornecidos.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela o registo",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Marca inválida",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que a marca deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Modelo inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o funcionário que o modelo deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Número de série inválido",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o funcionário que o número de série deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Tipo de motor inválido",
+        passo: "10",
+        fluxo: (
+          [10.1 - O sistema informa o funcionário que o tipo de motor deve ser um tipo de motor válido.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "28",
+    nome: "Editar Trotinete",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma trotinete registada no sistema.",
+    pos_condicoes: "Os dados da trotinete são atualizados no sistema com os novos valores fornecidos.",
+    fluxo_normal: (
+      [O funcionário seleciona a trotinete que pretende editar.],
+      [O sistema apresenta os dados atuais da trotinete, bem como todas as ordens de serviço associadas a ela.],
+      [O funcionário seleciona a opção de editar a trotinete.],
+      [O funcionário seleciona o ou os campos que pretende alterar e introduz os novos valores (com a exceção do cliente).],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que a marca é um campo textual não vazio.],
+      [O sistema valida que o modelo é um campo textual não vazio.],
+      [O sistema valida que o número de série é um campo textual não vazio.],
+      [O sistema valida que o tipo de motor é um tipo de motor válido.],
+      [O sistema atualiza os dados da trotinete e apresenta os dados atualizados.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Marca inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a marca deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Modelo inválido",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que o modelo deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Número de série inválido",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema informa o funcionário que o número de série deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Tipo de motor inválido",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o funcionário que o tipo de motor deve ser um tipo de motor válido.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "29",
+    nome: "Remover Trotinete",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma trotinete registada no sistema.",
+    pos_condicoes: "A trotinete é removida do sistema e não é possível associar novas ordens de serviço a esta trotinete.",
+    fluxo_normal: (
+      [O funcionário seleciona a trotinete que pretende eliminar.],
+      [O sistema apresenta os dados da trotinete, bem como todas as ordens de serviço associadas a ela.],
+      [O funcionário seleciona a opção de eliminar a trotinete.],
+      [O funcionário confirma a eliminação.],
+      [O sistema remove a trotinete, impossibilita a associação de novas ordens de serviço a esta trotinete, e apresenta uma mensagem de confirmação de eliminação bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "30",
+    nome: "Registar Ordem de Serviço",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos um cliente registado no sistema.",
+    pos_condicoes: "Uma nova ordem de serviço é registada no sistema com identificador único numérico, estado 'Pendente Diagnóstico' e data, hora e utilizador são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona a opção de criar uma nova ordem de serviço.],
+      [O funcionário introduz o identificador único, nome ou NIF do cliente.],
+      [O sistema valida a existência do cliente.],
+      [O funcionário seleciona o cliente.],
+      [O funcionário seleciona a trotinete associada ao cliente.],
+      [O funcionário preenche a descrição do problema.],
+      [O funcionário não regista acessórios.],
+      [O funcionário não adiciona fotografias.],
+      [O funcionário confirma o registo.],
+      [O sistema valida que a descrição do problema é um campo textual não vazio.],
+      [O sistema cria a ordem de serviço, atribui um identificador único numérico, define o estado como 'Pendente Diagnóstico', regista a data, hora e utilizador da criação, calcula o tempo estimado para a conclusão da reparação e apresenta os dados da nova ordem de serviço e o tempo estimado.]
+    ),
+    fluxos_alternativos: (
+      (
+        condicao: "O cliente não tem trotinetes registadas",
+        passo: "5",
+        fluxo: (
+          [5.1 - O funcionário seleciona a opção de registar uma nova trotinete e conclui o seu registo.],
+          [5.2 - Retorna ao passo 6 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O funcionário pretende registar acessórios",
+        passo: "7",
+        fluxo: (
+          [7.1 - O funcionário regista um ou mais acessórios como campos textuais não vazios.],
+          [7.2 - O sistema valida que todos os acessórios são campos textuais não vazios],
+          [7.3 - Retorna ao passo 9 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O funcionário pretende registar o estado à entrada da trotinete",
+        passo: "8",
+        fluxo: (
+          [8.1.1 - O funcionário anexa até 5 fotografias nos formatos PNG ou JPEG, cada uma com no máximo 5MB.],
+          [8.1.2 - O sistema valida o formato e tamanho de cada fotografia.],
+          [8.1.3 - Retorna ao passo 9 do fluxo normal.]
+        )
+      )
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Cliente inexistente",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que não existe nenhum cliente com os dados fornecidos.],
+        )
+      ),
+      (
+        condicao: "Descrição do problema inválida",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a descrição do problema deve ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Acessório inválido",
+        passo: "7.2",
+        fluxo: (
+          [7.2.1 - O sistema informa o funcionário que os acessórios devem ser um campo textual não vazio e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Formato ou tamanho de fotografia inválido",
+        passo: "8.1.2",
+        fluxo: (
+          [8.1.2.1 - O sistema informa o funcionário que uma ou mais fotografias não cumprem os requisitos (formato PNG ou JPEG com, no máximo, 5MB) e impede o registo.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela o registo",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema cancela o processo.],
+        )
+      )
+    )
+)
+
+#uc_spec(
+    id: "31",
+    nome: "Editar Ordem de Serviço",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma ordem de serviço registada no sistema.",
+    pos_condicoes: "Os dados da ordem de serviço são atualizados no sistema com os novos valores fornecidos, e data, hora, utilizador e estado são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona a ordem de serviço que pretende editar.],
+      [O sistema apresenta os dados atuais da ordem de serviço.],
+      [O funcionário seleciona a opção de editar a ordem de serviço.],
+      [O sistema verifica que o estado da OS não requer um fluxo de edição especial.],
+      [O funcionário seleciona o ou os campos que pretende alterar e introduz os novos valores.],
+      [O funcionário não altera acessórios.],
+      [O funcionário não altera fotografias.],
+      [O funcionário confirma as alterações.],
+      [O sistema valida que a descrição do problema é um campo textual não vazio.],
+      [O sistema atualiza os dados da ordem de serviço, regista a data, hora, utilizador e o estado em que ficou, e apresenta os dados atualizados.]
+    ),
+    fluxos_alternativos: (
+      (
+        condicao: "O funcionário pretende adicionar ou editar acessórios",
+        passo: "6",
+        fluxo: (
+          [6.1 - O funcionário adiciona ou edita um ou mais acessórios como campos textuais não vazios.],
+          [6.2 - O sistema valida que todos os acessórios são campos textuais não vazios.],
+          [6.3 - Retorna ao passo 7 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O funcionário pretende adicionar ou editar fotos do estado à entrada",
+        passo: "7",
+        fluxo: (
+          [7.1 - O funcionário anexa ou substitui fotografias nos formatos PNG ou JPEG, no máximo 5, cada uma com até 5MB.],
+          [7.2 - O sistema valida o formato e tamanho de cada fotografia.],
+          [7.3 - Retorna ao passo 8 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "OS no estado 'Pendente aprovação do orçamento'",
+        passo: "4",
+        fluxo: (
+          [4.1 - O funcionário não regista a aprovação do orçamento.],
+          [4.2 - Retorna ao passo 8 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O funcionário regista a aprovação do orçamento",
+        passo: "4.1",
+        fluxo: (
+          [4.1.1 - O funcionário regista a aprovação do orçamento.],
+          [4.1.2 - O funcionário confirma a aprovação do orçamento.],
+          [4.1.3 - O sistema altera o estado da OS para "Pendente Reparação".],
+          [4.1.4 - Retorna ao passo 10 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "OS no estado 'Pendente Pagamento'",
+        passo: "4",
+        fluxo: (
+          [4.2.1 - O funcionário não regista a notificação de término.],
+          [4.2.2 - O funcionário não associa peças à OS.],
+          [4.2.3 - O funcionário não regista o pagamento.],
+          [4.2.4 - Retorna ao passo 8 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O funcionário regista a notificação de término",
+        passo: "4.2.1",
+        fluxo: (
+          [4.2.1.1 - O funcionário regista a notificação de término.],
+          [4.2.1.2 - O funcionário confirma a notificação de término.],
+          [4.2.1.3 - Retorna ao passo 4.2.2 dos fluxos alternativos.]
+        )
+      ),
+      (
+        condicao: "O funcionário associa ou remove peças da OS",
+        passo: "4.2.2",
+        fluxo: (
+          [4.2.2.1 - O funcionário introduz o identificador único ou a referência do fornecedor da peça que pretende associar.],
+          [4.2.2.2 - O sistema valida a existência da peça em stock.],
+          [4.2.2.3 - O funcionário seleciona a peça e especifica a quantidade utilizada.],
+          [4.2.2.4 - O funcionário confirma a associação.],
+          [4.2.2.5 - O sistema valida que a quantidade é um número inteiro positivo.],
+          [4.2.2.6 - O sistema associa as peças à OS, regista a data, hora e utilizador que associou as peças e atualiza o valor total da OS.],
+          [4.2.2.7 - Retorna ao passo 4.2.3 dos fluxos alternativos.]
+        )
+      ),
+      (
+        condicao: "O funcionário regista o pagamento",
+        passo: "4.2.3",
+        fluxo: (
+          [4.2.3.1 - O sistema valida que o cliente foi previamente notificado sobre o término da reparação.],
+          [4.2.3.2 - O sistema valida que não existem outras OS do mesmo cliente no estado "Pendente Pagamento" com data de notificação anterior à da OS atual.],
+          [4.2.3.3 - O funcionário seleciona o método de pagamento: "Numerário", "Multibanco" ou "MBWay".],
+          [4.2.3.4 - O funcionário confirma o registo do pagamento.],
+          [4.2.3.5 - O sistema regista o pagamento e altera o estado da OS para "Paga".],
+          [4.2.3.6 - Retorna ao passo 10 do fluxo normal.]
+        )
+      )
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "O funcionário não confirma a aprovação do orçamento",
+        passo: "4.1.2",
+        fluxo: (
+          [4.1.2.1 - O sistema altera o estado da ordem de serviço para 'Orçamento não aprovado', regista a data, hora e utilizador e impossibilita o uso dos dados da OS para estatísticas da empresa.],
+          [4.1.2.2 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "O funcionário não confirma a notificação de término",
+        passo: "4.2.1.2",
+        fluxo: (
+          [4.2.1.2.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Peça inexistente em stock",
+        passo: "4.2.2.2",
+        fluxo: (
+          [4.2.2.2.1 - O sistema informa que não existe nenhuma peça com os dados fornecidos e cancela o processo.],
+        )
+      ),
+      (
+        condicao: "O funcionário não confirma a associação",
+        passo: "4.2.2.4",
+        fluxo: (
+          [4.2.2.4.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Quantidade de peça inválida",
+        passo: "4.2.2.5",
+        fluxo: (
+          [4.2.2.5.1 - O sistema informa o funcionário que a quantidade deve ser um número inteiro positivo e impede a associação.],
+        )
+      ),
+      (
+        condicao: "Notificação de término não registada",
+        passo: "4.2.3.1",
+        fluxo: (
+          [4.2.3.1.1 - O sistema informa que é necessário registar a notificação de término antes de processar o pagamento.],
+        )
+      ),
+      (
+        condicao: "Existem OS anteriores pendentes do mesmo cliente",
+        passo: "4.2.3.2",
+        fluxo: (
+          [4.2.3.2.1 - O sistema informa que existem OS do mesmo cliente com data de notificação anterior que devem ser pagas primeiro e apresenta a lista das respetivas referências.],
+        )
+      ),
+      (
+        condicao: "Método de pagamento não selecionado",
+        passo: "4.2.3.3",
+        fluxo: (
+          [4.2.3.3.1 - O sistema informa que é necessário selecionar um método de pagamento e impede o registo.],
+        )
+      ),
+      (
+        condicao: "O funcionário não confirma o registo do pagamento",
+        passo: "4.2.3.4",
+        fluxo: (
+          [4.2.3.4.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Acessório inválido",
+        passo: "6.2",
+        fluxo: (
+          [6.2.1 - O sistema informa o funcionário que os acessórios devem ser campos textuais não vazios e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Formato ou tamanho de fotografia inválido",
+        passo: "7.2",
+        fluxo: (
+          [7.2.1 - O sistema informa o funcionário que uma ou mais fotografias não cumprem os requisitos (formato PNG ou JPEG com no máximo 5MB) e impede a atualização.],
+        )
+      ),
+      (
+        condicao: "Funcionário cancela a edição",
+        passo: "8",
+        fluxo: (
+          [8.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Descrição do problema inválida",
+        passo: "9",
+        fluxo: (
+          [9.1 - O sistema informa o funcionário que a descrição do problema deve ser um campo textual não vazio e impede a atualização.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "32",
+    nome: "Remover Ordem de Serviço",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma ordem de serviço registada no sistema.",
+    pos_condicoes: "A ordem de serviço muda para estado 'Eliminada' e não é possível usar os seus dados para estatísticas da empresa. Data, hora e utilizador da eliminação são registados.",
+    fluxo_normal: (
+      [O funcionário seleciona a ordem de serviço que pretende eliminar.],
+      [O sistema apresenta os dados da ordem de serviço.],
+      [O funcionário seleciona a opção de eliminar a ordem de serviço.],
+      [O funcionário confirma a eliminação.],
+      [O sistema altera o estado da ordem de serviço para 'Eliminada', regista a data, hora e utilizador que realizou a eliminação, impossibilita o uso dos dados da OS para estatísticas da empresa, e apresenta uma mensagem de confirmação de eliminação bem-sucedida.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a eliminação",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema cancela o processo.],
+        )
+      ),
+    )
+)
+
+#uc_spec(
+    id: "33",
+    nome: "Consultar Ordem de Serviço",
+    atores: "Secretária e Gerente",
+    pre_condicoes: "O funcionário está autenticado e existe pelo menos uma ordem de serviço registada no sistema.",
+    pos_condicoes: "Uma lista de ordens de serviço filtradas é apresentada ao funcionário.",
+    fluxo_normal: (
+      [O funcionário seleciona um ou vários filtros: estado, intervalo de datas, cliente e/ou funcionário.],
+      [O funcionário confirma o conjunto de filtros que pretende usar.],
+      [O sistema valida que o estado selecionado é um dos estados válidos: 'Pendente Diagnóstico', 'Pendente Reparação', 'A aguardar peças', 'Pendente aprovação do orçamento', 'Pendente Pagamento', 'Paga' ou 'Eliminada'.],
+      [O sistema valida que o intervalo de datas segue o formato #link("https://www.iso.org/iso-8601-date-and-time-format.html")[ISO 8601] (AAAA-MM-DD).],
+      [O sistema valida que o cliente existe no sistema.],
+      [O sistema valida que o funcionário existe no sistema.],
+      [O sistema procura por ordens de serviço que correspondam aos filtros usados.],
+      [O sistema apresenta todas as ordens de serviço filtradas, incluindo: identificador, cliente, trotinete, estado, data de criação, funcionário responsável, valor total do orçamento e se aplicável, data da última alteração.]
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "Funcionário cancela a pesquisa",
+        passo: "2",
+        fluxo: (
+          [2.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Estado inválido",
+        passo: "3",
+        fluxo: (
+          [3.1 - O sistema informa o funcionário que o estado selecionado é inválido e impede a pesquisa.],
+        )
+      ),
+      (
+        condicao: "Intervalo de datas inválido",
+        passo: "4",
+        fluxo: (
+          [4.1 - O sistema informa o funcionário que o intervalo de datas deve seguir o formato #link("https://www.iso.org/iso-8601-date-and-time-format.html")[ISO 8601] (AAAA-MM-DD) e impede a pesquisa.],
+        )
+      ),
+      (
+        condicao: "Cliente inexistente",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema informa o funcionário que não existe nenhum cliente com os dados fornecidos e impede a pesquisa.],
+        )
+      ),
+      (
+        condicao: "Mecânico inexistente",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que não existe nenhum funcionário com os dados fornecidos e impede a pesquisa.],
+        )
+      ),
+      (
+        condicao: "Nenhuma ordem de serviço corresponde aos filtros",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema informa o funcionário que não existem ordens de serviço que correspondam aos filtros selecionados.],
+        )
+      ),
+    )
+)
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  MECÂNICO
+// ─────────────────────────────────────────────────────────────────────────────
+
+#uc_spec(
+    id: "34",
+    nome: "Executar Diagnóstico de Ordem de Serviço",
+    atores: "Mecânico e Gerente",
+    pre_condicoes: "O funcionário selecionou uma OS no estado 'Pendente Diagnóstico' através do UC-37.",
+    pos_condicoes: "O diagnóstico é registado com a data, hora e funcionário que o realizou. A OS transita para o estado 'Pendente Reparação' ou 'Pendente aprovação do orçamento' consoante o valor total do orçamento.",
+    fluxo_normal: (
+      [O funcionário seleciona uma das OS que estão no estado "Pendente Diagnóstico".],
+      [O funcionário consulta os dados completos da OS, incluindo os dados da trotinete, do cliente e o histórico de reparações anteriores da trotinete.],
+      [O funcionário adiciona e remove as reparações necessárias da tabela de reparações, pesquisando por identificador ou nomenclatura.],
+      [O funcionário pesquisa, adiciona e remove peças por referência do fornecedor ou identificador único, especificando as quantidades.],
+      [O funcionário confirma o diagnóstico.],
+      [O sistema valida que as quantidades são números inteiros positivos e não excedem o stock disponível.],
+      [O sistema calcula o valor do orçamento e valida que é inferior a 50€.],
+      [O sistema altera o estado da OS para "Pendente Reparação".],
+      [O sistema regista a data, hora e funcionário que realizou o diagnóstico.],
+    ),
+    fluxos_alternativos: (
+      (
+        condicao: "O valor do orçamento é superior a 50€",
+        passo: "7",
+        fluxo: (
+          [7.1 - O sistema altera o estado da OS para "Pendente aprovação do orçamento" e gera um alerta com o identificador da OS e o seu estado para a secretária],
+          [7.2 - Retorna para o passo 9 do fluxo normal.]
+        )
+      ),
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "O funcionário cancela o diagnóstico",
+        passo: "5",
+        fluxo: (
+          [5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Quantidade inválida ou superior ao stock disponível",
+        passo: "6",
+        fluxo: (
+          [6.1 - O sistema informa o funcionário que a quantidade da peça deve ser um valor inteiro positivo ou excede o stock disponível e impede a adição.],
+        )
+      ),
+    ),
+)
+
+#uc_spec(
+    id: "35",
+    nome: "Executar Reparação de Ordem de Serviço",
+    atores: "Mecânico e Gerente",
+    pre_condicoes: "O funcionário selecionou uma OS no estado 'Pendente Reparação' através do UC-37.",
+    pos_condicoes: "As reparações executadas e peças utilizadas são registadas, as quantidades de peças são descontadas do stock com registo de data, hora e utilizador, o custo final é calculado e a OS transita para o estado 'Pendente Pagamento' com alerta gerado para a lista de alertas da secretária.",
+    fluxo_normal: (
+      [O funcionário seleciona uma das OS que estão no estado "Pendente Reparação".],
+      [O sistema valida que todas as peças prescritas no diagnóstico estão disponíveis em stock.],
+      [O funcionário consulta os dados completos da OS, incluindo o histórico de reparações anteriores da trotinete e as reparações e peças prescritas no diagnóstico.],
+      [O funcionário marca as reparações prescritas que executou como concluídas e as peças prescritas (e disponíveis em stock) que precisou como utilizadas.],
+      [O sistema desconta do stock as quantidades das peças marcadas como utilizadas e regista a data, hora e utilizador.],
+      [O funcionário não pretende adicionar reparações adicionais.],
+      [O funcionário não pretende adicionar peças adicionais.],
+      [O funcionário não reporta defeitos em peças instaladas.],
+      [O funcionário seleciona a opção de concluir a reparação.],
+      [O funcionário verifica todos os itens obrigatórios da checklist de segurança: Travões, Luzes, Pneus, Aceleração, Travagem, Visor e Teste de Condução.],
+      [O funcionário confirma a conclusão da checklist.],
+      [O funcionário confirma a conclusão da reparação.],
+      [O sistema valida que todos os itens da checklist estão marcados como verificados.],
+      [O sistema calcula o custo final da reparação, altera o estado da OS para "Pendente Pagamento", gera um alerta com o identificador da OS e o seu estado para a secretária, regista a data, hora e funcionário que realizou a reparação e apresenta um resumo final da OS.]
+    ),
+    fluxos_alternativos: (
+      (
+        condicao: "Uma peça prescrita no diagnóstico não está disponível em stock",
+        passo: "2",
+        fluxo: (
+          [2.1.1 - O sistema informa o funcionário que a quantidade solicitada da peça prescrita não está disponível em stock.],
+          [2.1.2 - O funcionário seleciona a opção de requisitar encomenda da peça indisponível.],
+          [2.1.3 - O funcionário confirma a requisição.],
+          [2.1.4 - O sistema gera um alerta com o identificador e referência da peça para o do gestor de stock, gera um alerta com o identificador da OS e o seu estado para a secretária e altera o estado da OS para "A aguardar peças".],
+          [2.1.5 - Retorna ao passo 3 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O funcionário pretende adicionar peças adicionais",
+        passo: "7",
+        fluxo: (
+          [7.1 - O funcionário pesquisa, adiciona e remove peças por referência do fornecedor ou identificador único, especificando as quantidades.],
+          [7.2 - O funcionário confirma as peças adicionais.],
+          [7.3 - O sistema valida que as quantidades são números inteiros positivos e não excedem o stock disponível.],
+          [7.5 - Retorna ao passo 8 do fluxo normal.]
+        )
+      ),
+      (
+        condicao: "O funcionário pretende reportar um defeito numa peça instalada",
+        passo: "8",
+        fluxo: (
+          [8.1 - O funcionário seleciona a peça defeituosa da lista de peças utilizadas.],
+          [8.2 - O funcionário indica que deseja reportar um defeito na peça],
+          [8.3 - O funcionário fornece uma descrição do defeito encontrado.],
+          [8.4 - O funcionário confirma o reporte do defeito.],
+          [8.5 - O sistema valida que existem peças iguais na mesma quantidade disponíveis em stock e adiciona-as à lista de peças usadas e remove as peças defeituosas da lista de peças utilizadas.],
+          [8.6 - O sistema cria um registo de devolução marcando as peças defeituosas como "Possível defeito", restitui ao stock a quantidade correspondente e gera um alerta com o identificador, referência e descrição do defeito das peças para o gestor de stock.],
+          [8.7 - Retorna ao passo 9 do fluxo normal.]
+        )
+      ),
+    ),
+    fluxos_excecao: (
+      (
+        condicao: "O funcionário cancela a requisição da peça",
+        passo: "2.1.3",
+        fluxo: (
+          [2.1.3.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "O funcionário pretende adicionar reparações adicionais",
+        passo: "6",
+        fluxo: (
+          [6.1.1 - O funcionário adiciona e remove reparações adicionais da tabela de reparações, pesquisando por identificador ou nomenclatura.],
+          [6.1.2 - O funcionário confirma as reparações adicionais.],
+          [6.1.3 - O sistema coloca a OS no estado \"Pendente de aprovação do orçamento\" e gera um alerta novo para a secretária que contém o identificador da OS e o estado em que ela se encontra.],
+        )
+      ),
+      (
+        condicao: "O funcionário cancela a adição das novas peças",
+        passo: "7.2",
+        fluxo: (
+          [7.2.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Quantidade inválida ou superior ao stock disponível",
+        passo: "7.3",
+        fluxo: (
+          [7.3.1 - O sistema informa o funcionário que a quantidade é inválida ou excede o stock disponível e impede a adição.],
+        )
+      ),
+      (
+        condicao: "O funcionário cancela o reporte do defeito",
+        passo: "8.4",
+        fluxo: (
+          [8.4.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Não existem peças disponíveis em stock",
+        passo: "8.5",
+        fluxo: (
+          [8.5.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "O funcionário cancela a conclusão da reparação",
+        passo: "12",
+        fluxo: (
+          [12.1 - O sistema cancela o processo.],
+        )
+      ),
+      (
+        condicao: "Existem itens da checklist por verificar",
+        passo: "13",
+        fluxo: (
+          [13.1 - O sistema informa o funcionário que existem itens da checklist por verificar.],
+        )
+      ),
+    )
+)

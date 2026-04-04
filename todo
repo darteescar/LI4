@@ -1,31 +1,5 @@
-REPARAÇÃO INVIÁVEL NA USER STORIE 2 
+Mudar requisitos sobre as peças e o stock (preço de venda)
 
-APAGAR REGISTOS NOS REQUISITOS ESTRUTURADOS
+Granularizar os requisitos
 
-ALTERAÇÃO DO ORÇAMENTO NÃO PRECISA DE SABER O HISTÓRICO.
-
-Nos diagramas:
-
-1-
-. falta o gestor de stock
-. Gerente nao modifica relatorios mas sim movimentos financeiros (nao temos a parte de criar relatorios)
-. Gerente - acesso a tudo
-. Secretária - acesso a clientes, trotinetes, OS e pode retirar quantidades de peças do stock
-. Mecânico - acesso a OS no estado "Pendente Diagnóstico", "Pendente Reparação" e "A aguardar peças"
-. Gestor de Stock - acesso a fornecedores, peças, stock de peças e devoluções de peças
-
-3 - Criar Ordem de serviço
-. na criação da OS, falta dizer que o cliente e a trotinete podem não existir (apenas na trotinete existe a possiblidade de criá-la no momento da criação da OS)
-. no caso da secretária adicionar fotos e notas, não devia haver uma seta para ela terminar o fluxo ?
-
-4 - Iniciar Diagnóstico
-. tem 'Verifica que a OS já está atribuída a outro mecânico' repetido
-. a seta de 'Seleciona outra Ordem de Serviço disponível' não podia ir para 'Seleciona uma Ordem de Serviço para iniciar diagnóstico' ????
-
-5 - Registar Fotos de Danos prévios
-. na 'Apresenta uma mensagem indicando que o limite máximo foi atingido' não se devia poder ir para 'Escolhe guardar as fotografias' ?????
-. a parte de 'Garante que as fotografias ficam visíveis apenas para funcionários.' devia ficar se viermos a vendar peças ou assim, como para já não temos a cena dos clientes poderem interagir com o sistema, não é necessário.
-
-6 - Registar funcionário
-. o NIF, NIS e NUS não deviam estar em 'caixas únicas' (porque a validação deles é diferente)
-
+Adicionar requisito de consulta de historico de cenas
