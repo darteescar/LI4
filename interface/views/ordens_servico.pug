@@ -1,0 +1,41 @@
+extends layout
+
+block content
+  div.d-flex.justify-content-between.align-items-center.mb-3
+    h1= title
+    a.btn.btn-primary(href="#") 
+      i.bi.bi-receipt 
+      |  Abrir Nova OS
+
+  table.table.table-hover.table-bordered
+    thead.table-dark
+      tr
+        th ID OS
+        th Data
+        th Cliente
+        th Trotinete (S/N)
+        th Estado
+        th Mecânico
+        th Ações
+    tbody
+      tr
+        td OS-10023
+        td 17/04/2026
+        td João Silva
+        td SN12345
+        td
+          span.badge.bg-warning.text-dark Pendente Reparação
+        td Carlos Santos
+        td
+          a.btn.btn-sm.btn-info.me-1(href="#") Detalhes
+          a.btn.btn-sm.btn-success(href="#") Executar Check-list
+      tr
+        td OS-10024
+        td 18/04/2026
+        td Maria Gomes
+        td SN98765
+        td
+          span.badge.bg-secondary Pendente Diagnóstico
+        td (Não Atribuído)
+        td
+          a.btn.btn-sm.btn-primary(href="#") Iniciar Diagnóstico

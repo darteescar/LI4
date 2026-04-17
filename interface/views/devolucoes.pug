@@ -1,0 +1,44 @@
+extends layout
+
+block content
+  div.d-flex.justify-content-between.align-items-center.mb-3
+    h1= title
+    a.btn.btn-primary(href="#") 
+      i.bi.bi-arrow-return-left 
+      |  Registar Nova Devolução
+
+  table.table.table-hover.table-bordered
+    thead.table-dark
+      tr
+        th ID
+        th Data
+        th Peça (Ref)
+        th Quantidade
+        th Fornecedor
+        th Motivo
+        th Estado
+        th Ações
+    tbody
+      tr
+        td DEV-100
+        td 16/04/2026
+        td Pneu Xiaomi Sólido
+        td 2
+        td Fornecedor X
+        td Furo na borracha de fábrica.
+        td
+          span.badge.bg-warning.text-dark Pendente Devolução
+        td
+          a.btn.btn-sm.btn-success.me-1(href="#") Confirmar Envio
+          a.btn.btn-sm.btn-danger(href="#") Inválida
+      tr
+        td DEV-101
+        td 10/04/2026
+        td Placa Mãe Bateria Segway
+        td 1
+        td Fornecedor Y
+        td Curto-circuito ao ligar (Visto pelo Mecânico).
+        td
+          span.badge.bg-success Devolvida
+        td
+          a.btn.btn-sm.btn-info.me-1(href="#") Ver Detalhes

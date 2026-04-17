@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  div.d-flex.justify-content-between.align-items-center.mb-3
+    h1= title
+    div
+      button.btn.btn-outline-primary.dropdown-toggle(type='button', data-bs-toggle='dropdown', aria-expanded='false') 
+        |  Adicionar/Operar
+      ul.dropdown-menu
+        li: a.dropdown-item(href="#") Nova Peça no Sistema
+        li: a.dropdown-item(href="#") Registar Entrada (Compra)
+
+  table.table.table-hover.table-bordered
+    thead.table-dark
+      tr
+        th Referência
+        th Descrição da Peça
+        th Fornecedor
+        th Stock Atual
+        th Mínimo Aceitável
+        th Preços (C/V)
+        th Ações
+    tbody
+      tr
+        td REF-001
+        td Pneu Xiaomi M365 (Sólido)
+        td Fornecedor X
+        td 
+          span.text-success 45
+        td 10
+        td 15.00 € / 25.00 €
+        td
+          a.btn.btn-sm.btn-warning(href="#") Encomendar
+      tr
+        td REF-002
+        td Placa Mãe Bateria Segway Max
+        td Fornecedor Y
+        td 
+          span.text-danger 2
+        td 5
+        td 45.50 € / 80.00 €
+        td
+          a.btn.btn-sm.btn-warning(href="#") Encomendar
