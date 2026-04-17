@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  div.d-flex.justify-content-between.align-items-center.mb-3
+    h1= title
+    a.btn.btn-primary(href="#") 
+      i.bi.bi-person-plus 
+      |  Adicionar Fornecedor
+
+  table.table.table-hover.table-bordered
+    thead.table-dark
+      tr
+        th ID
+        th Nome
+        th Contacto
+        th Ações
+    tbody
+      tr
+        td FORN-01
+        td Xiaomi Peças Oficiais Lda
+        td 912345678 (geral@xiaomipecas.pt)
+        td
+          a.btn.btn-sm.btn-info.me-1(href="#") Ver
+          a.btn.btn-sm.btn-warning(href="#") Editar
+      tr
+        td FORN-02
+        td ElectroScooter Parts
+        td adm@electroscooter.com
+        td
+          a.btn.btn-sm.btn-info.me-1(href="#") Ver
+          a.btn.btn-sm.btn-warning(href="#") Editar
