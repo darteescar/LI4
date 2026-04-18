@@ -8,10 +8,6 @@ Adicionar requisito de consulta de historico de cenas
 
 ////////////////////////////////////////////////////////////////////////////
 
-Diagramas de atividade que falta fazer: UC34
-
-
-
 Responsabilidades e Diagramas de sequencia:
 
 - apaguei o metodo IniciarSessao, não fazia muito sentido como estava feito, deixei apenas o autenticar, 
