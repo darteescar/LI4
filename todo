@@ -4,18 +4,18 @@ Granularizar os requisitos
 
 Adicionar requisito de consulta de historico de cenas
 
-Pensar nas politicas de deleção para entradas de stock no estado "Devolvida ao Fornecedor", "Inválida para devolução"
+
+
+
+
+
+Pensar nas politicas de deleção para entradas de stock no estado "Devolvida ao Fornecedor", "Inválida para devolução" e também que foram usadas numa reparação
+Pensar se os metodos de validacao estao bem assim ou é melhor fazer mais geral
 
 
 ////////////////////////////////////////////////////////////////////////////
 
 Responsabilidades e Diagramas de sequencia:
 
-- apaguei o metodo IniciarSessao, não fazia muito sentido como estava feito, deixei apenas o autenticar, 
-que permite saber o cargo e papel do funcionario atraves do valor de retorno
-
-- Ver como tratar horas extras
-
+- ver como vao funcionar os altertas e notificações
 - Ver como vai funcionae o método Criar Snapshot
-
-- Passar os métodos de validação para o vpp
