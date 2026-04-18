@@ -11,3 +11,14 @@ Adicionar requisito de consulta de historico de cenas
 Diagramas de atividade que falta fazer: UC31, UC33, UC34, UC35
 
 
+
+Responsabilidades e Diagramas de sequencia:
+
+- apaguei o metodo IniciarSessao, não fazia muito sentido como estava feito, deixei apenas o autenticar, 
+que permite saber o cargo e papel do funcionario atraves do valor de retorno
+
+- Ver como tratar horas extras
+
+- Ver como vai funcionae o método Criar Snapshot
+
+- Passar os métodos de validação para o vpp

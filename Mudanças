@@ -1,0 +1,12 @@
+Adicionei uma lista de trotinetes ao cliente:
+- Para facilitar a consulta das trotinetes e ordens de serviço de um cliente especifico
+- Sem esta lista seria necessário consultar todas as trotinetes e filtar por cliente
+- Mudei tanto no sem DAO como no com DAO
+
+Adicionei o estado "PendenteDevolucao" para os estados do stock:
+- Para destinguor se uma enrada no stock ja foi realmente devolvida ou se a devolução ainda não foi feita
+- Como estava antes não existia um estado certo para a situação em que a devolução ainda não tinha sido feita, o que podia levar a confusões
+- Mudei tanto no sem DAO como no com DAO
+
+Mudei os estados do Stock para nomes mais adequados:
+- Por exemplo, "Inválida para Devolução" para "Invalida_para_Devolucao"
