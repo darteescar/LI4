@@ -11,3 +11,6 @@
 
 # VPP
 *.bak*
+
+.~lock.responsabilidades.xlsx#
+.LI4.vpp.lck
