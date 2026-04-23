@@ -1,22 +1,4 @@
-Mudar requisitos sobre as peças e o stock (preço de venda)
-
-Granularizar os requisitos
-
-Adicionar requisito de consulta de historico de cenas
-
-
-
-Atenção que na interface, apenas o mecânico que diagnostica, é que repara
-Aprovar orçamento SEMPRE
 
 
 Pensar nas politicas de deleção para entradas de stock no estado "Devolvida ao Fornecedor", "Inválida para devolução" e também que foram usadas numa reparação
 Pensar se os metodos de validacao estao bem assim ou é melhor fazer mais geral
-
-
-////////////////////////////////////////////////////////////////////////////
-
-Responsabilidades e Diagramas de sequencia:
-
-- Rever os Historicos 
-- Ver como vai funcionae o método Criar Snapshot
