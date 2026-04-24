@@ -42,14 +42,14 @@
 		\hline
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
 		\textbf{1} & O sistema deve calcular automaticamente o valor final da reparação com base na soma da reparações feitas, peças utilizadas e preços das reparações definidos pelo gerente. \\ \hline
-		\textbf{3} & Sempre que uma OS for colocada nos estados: "Pendente de aprovação de orçamento", "Pendente Pagamento" ou "A aguardar peças", deverá ser gerado automaticamente um alerta (que contém a referência da OS e o estado) para a secretária, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
-		\textbf{4} & Deverá haver um registo de qual mecânico realizou o diagnóstico e qual realizou a reparação da OS. \\ \hline
-		\textbf{5} & O sistema deve impedir que dois mecânicos iniciem a mesma OS simultaneamente, atribuindo-a a um mecânico de cada vez. Caso um mecânico selecione uma OS que já está a ser tratada, deverá ser impedido. \\ \hline
-		\textbf{6} & Sempre que uma peça for colocada no estado "Possível defeito" ou tiver a sua quantidade mínima atingida, deverá ser gerado automaticamente um alerta (que contém o motivo do alerta e a peça em questão) para o gestor de stock, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
-	    \textbf{7} & Quando uma peça no estado "Possível Defeito" for colocada no estado "Pendente de Devolução", a quantidade em stock dessa peça deverá diminuir em 1 unidade. \\ \hline
- 	    \textbf{8} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Devolvida ao fornecedor", uma unidade dessa peça deverá ser adicionada ao stock sem qualquer custo adicional. \\ \hline
-  	    \textbf{9} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Inválida para Devolução", não deverá existir qualquer consequência no stock ou nos movimentos. \\ \hline
-  	    \textbf{10} & O sistema deverá separar os utilizadores definindo diferentes perfis, consoante o seu cargo, disponibilizando as respetivas capacidades. \\ \hline
+		\textbf{2} & Sempre que uma OS for colocada nos estados: "Pendente de aprovação de orçamento", "Pendente Pagamento" ou "A aguardar peças", deverá ser gerado automaticamente um alerta (que contém a referência da OS e o estado) para a secretária, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
+		\textbf{3} & Deverá haver um registo de qual mecânico realizou o diagnóstico e qual realizou a reparação da OS. \\ \hline
+		\textbf{4} & O sistema deve impedir que dois mecânicos iniciem a mesma OS simultaneamente, atribuindo-a a um mecânico de cada vez. Caso um mecânico selecione uma OS que já está a ser tratada, deverá ser impedido. \\ \hline
+		\textbf{5} & Sempre que uma peça for colocada no estado "Possível defeito" ou tiver a sua quantidade mínima atingida, deverá ser gerado automaticamente um alerta (que contém o motivo do alerta e a peça em questão) para o gestor de stock, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
+	    \textbf{6} & Quando uma peça no estado "Possível Defeito" for colocada no estado "Pendente de Devolução", a quantidade em stock dessa peça deverá diminuir em 1 unidade. \\ \hline
+ 	    \textbf{7} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Devolvida ao fornecedor", uma unidade dessa peça deverá ser adicionada ao stock sem qualquer custo adicional. \\ \hline
+  	    \textbf{8} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Inválida para Devolução", não deverá existir qualquer consequência no stock ou nos movimentos. \\ \hline
+  	    \textbf{9} & O sistema deverá separar os utilizadores definindo diferentes perfis, consoante o seu cargo, disponibilizando as respetivas capacidades. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
@@ -103,8 +103,8 @@
 		\textbf{6} & O sistema deve permitir consultar rapidamente o histórico de reparações de um cliente ou de uma trotinete, através da pesquisa com o nome do cliente ou o número de série da trotinete, incluindo serviços anteriores, peças substituídas e problemas identificados anteriormente. \\ \hline
 		\textbf{7} & O sistema deve permitir registar a aprovação do orçamento por parte de um cliente somente em OS que estejam no estado "Pendente aprovação do orçamento", antes de permitir que o mecânico continue a reparação. Esta aprovação deverá colocar a OS num estado de "Pendente Reparação". \\ \hline
 		\textbf{8} & Para uma OS no estado "Pendente Pagamento" \space deverá ser registado quando um cliente foi notificado sobre o término da reparação da trotinete. \\ \hline
-		\textbf{10} & O sistema deve permitir registar a efetuação do pagamento e o respetivo método utilizado numa OS no estado "Pendente Pagamento" (numerário, multibanco, MBWay). Caso sejam ambos registados, a OS deverá ficar no estado "Paga". \\ \hline
-		\textbf{11} & O sistema deve impedir a conclusão de uma OS no estado "Pendente Pagamento"\space caso o cliente referenciado na mesma tenha outras OS no estado "Pendente Pagamento" que tenham tido a confirmação de término de reparação numa data anterior à primeira. \\ \hline
+		\textbf{0} & O sistema deve permitir registar a efetuação do pagamento e o respetivo método utilizado numa OS no estado "Pendente Pagamento" (numerário, multibanco, MBWay). Caso sejam ambos registados, a OS deverá ficar no estado "Paga". \\ \hline
+		\textbf{10} & O sistema deve impedir a conclusão de uma OS no estado "Pendente Pagamento"\space caso o cliente referenciado na mesma tenha outras OS no estado "Pendente Pagamento" que tenham tido a confirmação de término de reparação numa data anterior à primeira. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
