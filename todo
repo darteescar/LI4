@@ -2,3 +2,50 @@
 
 Pensar nas politicas de deleção para entradas de stock no estado "Devolvida ao Fornecedor", "Inválida para devolução" e também que foram usadas numa reparação
 Pensar se os metodos de validacao estao bem assim ou é melhor fazer mais geral
+
+
+SAutenticacao
+Redundância crítica — Utilizador vs Funcionario: A decisão anterior foi fundir a autenticação nos Funcionários. No entanto, existe agora uma classe Utilizador separada com -id, -password e -idFuncionario. Isto significa que há dois sítios onde a palavra-passe pode viver — no Utilizador e presumivelmente no Funcionario. Tens de decidir: ou o Funcionario guarda a password (e o UtilizadorDAO é desnecessário), ou existe uma tabela separada de credenciais. Tal como está, está duplicado.
+Dependência cruzada problemática: O UtilizadorDAO aponta diretamente para SFuncionarios::FuncionarioDAO. Isto cria um acoplamento direto entre dois subsistemas ao nível dos DAOs, o que é difícil de manter. O correto seria a SAutenticacaoFacade chamar a interface ISFuncionarios, não o DAO interno.
+Naming inconsistente no enum Cargo: Tens Gestor_stock com underscore mas Gerente, Secretaria, Mecanico sem. Uniformiza o estilo.
+
+SClientes
+ordensServicoDAO na entidade errada: A referência ao EcoRideCD::OrdemServicoDAO parece estar a ser navegada a partir da Trotinete diretamente. Uma entidade não deve conhecer o DAO de outro subsistema — isso é responsabilidade da facade.
+SClientesFacade vazia: Não tem métodos visíveis, o que dificulta perceber como é exposta a interface ao exterior.
+
+SFinanceiro
+Quem cria os MovimentoFinanceiro? Este é o problema mais sério deste subsistema. O SFinanceiroFacade só lê movimentos, mas eles têm de ser criados quando ocorrem pagamentos (SOrdens), compras de peças (SStock) ou salários (SFuncionarios). Não existe nenhum mecanismo modelado para isso. Precisas de decidir se cada subsistema escreve diretamente na tabela de movimentos financeiros, ou se chama a interface ISFinanceiro para registar um movimento.
+Falta de referência à entidade de origem: O MovimentoFinanceiro tem apenas -descricao: string para identificar a origem. Para filtragem por tipo (salários, peças, etc.) o TipoMovimento resolve, mas para rastrear qual OS ou qual funcionário gerou o movimento, seria útil um campo como -codEntidade: int.
+
+SFuncionarios
+horas_extra: int sem contexto mensal: O campo horas_extra é reset mensal (como indica a nota). Mas se é apenas um inteiro, não existe histórico — no momento em que é resetado, a informação perde-se. Se precisares de consultar horas extraordinárias de meses anteriores no estado financeiro, este design não suporta isso. Considera uma entidade HorasExtraordinarias com mês/ano associado.
+palavra_passe não visível: O ecrã está truncado e não se consegue confirmar se o campo existe. Precisa de ser verificado.
+Morada foi absorvida no Funcionario: Isso é uma decisão válida, mas garante que o FuncionarioDAO trata a persistência de todos os campos de morada corretamente.
+
+SNotificacoes
+Falta de estrutura no conteúdo do alerta: O campo -descricao: string é demasiado genérico. Os UCs especificam alertas com "identificador da OS e o seu estado" ou "identificador e referência da peça". Uma string livre não permite filtrar ou processar alertas programaticamente. Considera adicionar campos como -codEntidade: int e -tipoAlerta (enum).
+Ausência de enum para tipo de alerta: Sem distinguir o tipo de alerta (OS mudou de estado, peça com defeito, stock mínimo atingido), a secretária e o gestor de stock não conseguem filtrar os seus alertas de forma estruturada.
+
+SOrdensServico
+ultima_alteracao: DateTime na OrdemServico: Segundo as alterações feitas aos UCs, timestamps de edição de OS foram removidos dos requisitos. Este campo contradiz essa decisão.
+codResponsavel: int ambíguo: Não fica claro o que este campo representa — é a secretária que criou a OS, ou o mecânico responsável? O mecânico já está registado em Diagnostico.codMecanico e Conserto.codMecanico. Se é a secretária criadora, o campo deveria chamar-se codCriador ou similar.
+Conserto.preco_total sem tipo: Falta a anotação de tipo (devia ser float).
+CheckList existe desde a criação da OS: A composição 1-para-1 entre OrdemServico e CheckList significa que toda a OS tem uma checklist, mesmo quando está em estado PendenteDiagnostico. Faz mais sentido a checklist só existir quando a reparação é concluída (passo final do UC-35). Considera criar a CheckList apenas nesse momento.
+EcoRideCD::FuncionariosDAO aparece duas vezes: Há duas associações separadas ao mesmo DAO. Deveria ser uma única referência reutilizada.
+SStock::QuantidadePeca sem referência à peça: A classe QuantidadePeca tem apenas -quantidade: int. Quando usada em Conserto ou Diagnostico, como se sabe a que peça pertence? A chave do Map (qualified association) deve ser o codPeca — isso precisa de estar explicitamente documentado no diagrama.
+Nota em aberto "como fazemos isto?" junto à Fotografia — a resposta já foi discutida: guardar conteudo: byte[]. Pode ser removida a nota.
+
+SReparacoes
+Falta flag de "removida": O UC-09 diz que após eliminar uma entrada do catálogo, ela deixa de poder ser associada a novas OS mas mantém-se no sistema. Não existe nenhum campo ativa: bool ou similar na classe Reparacao para suportar este comportamento.
+
+SStock
+Devolucao sem campo quantidade: O UC-15 exige que a devolução tenha uma quantidade. O campo -codStock: int identifica a entrada de stock, mas não quantas unidades estão a ser devolvidas. Falta -quantidade: int.
+Peca sem flag de "removida": Tal como Reparacao, uma Peca pode ser removida (UC-12) mas deve manter-se no sistema. Falta um campo ativa: bool.
+nr_serie e garantia obrigatoriamente não-nulos: Em Stock, esses campos são só necessários quando preco_compra > 70€. Como tipos primitivos, não suportam valor nulo. Considera usar tipos wrapper (Integer, String) ou uma subclasse StockComGarantia.
+EstadoEncomenda com naming inconsistente: Tens PedidoEnviado no enum mas os UCs e a linguagem do projeto usam "Enviada". Uniformiza para Enviada.
+EstadoDevolucao vs EstadoStock nomes inconsistentes entre si: EstadoDevolucao tem Devolvida e Invalida, mas EstadoStock tem Devolvida_ao_Fornecedor e Invalida_para_Devolucao. Se representam o mesmo conceito em dois contextos diferentes, os nomes deviam ser paralelos e coerentes.
+
+Problemas transversais
+Todas as facades sem métodos: Nenhuma facade tem métodos visíveis nos diagramas. Para que o diagrama sirva de contrato para a implementação, os métodos principais devem estar definidos — pelo menos os que correspondem aos UCs.
+Criação de MovimentoFinanceiro não está modelada: Como referido no SFinanceiro, este fluxo de dados transversal não está resolvido no modelo.
+Dependências ao nível dos DAOs entre subsistemas: Em vários sítios (SAutenticacao, SClientes, SOrdensServico) os DAOs de outros subsistemas são referenciados diretamente. O princípio correto é os subsistemas comunicarem apenas pelas interfaces públicas (ISFuncionarios, ISClientes, etc.), nunca pelos DAOs internos.
