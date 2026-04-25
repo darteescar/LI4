@@ -8,3 +8,6 @@ O ficheiro das responsabilidades esta desatualizado/Corrigi-lo com os use cases 
 
 
 
+Fazer:
+
+Falta de referência à entidade de origem: O MovimentoFinanceiro tem apenas -descricao: string para identificar a origem. Para filtragem por tipo (salários, peças, etc.) o TipoMovimento resolve, mas para rastrear qual OS ou qual funcionário gerou o movimento, seria útil um campo como -codEntidade: int.
