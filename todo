@@ -3,18 +3,4 @@
 Pensar nas politicas de deleção para entradas de stock no estado "Devolvida ao Fornecedor", "Inválida para devolução" e também que foram usadas numa reparação
 Pensar se os metodos de validacao estao bem assim ou é melhor fazer mais geral
 
-
-
-
-
-
-
-
-
-Fazer diagramas de sequencia:
-
-- removerPeca
-- removerReparacao
-- registarEntradaStock (versao normal < 70$)
-
 O ficheiro das responsabilidades esta desatualizado/Corrigi-lo com os use cases atuais
