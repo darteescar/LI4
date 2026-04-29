@@ -1,0 +1,10 @@
+package app.ecoRideLN.sStock;
+
+public enum EstadoStock {
+    EM_STOCK,
+    POSSIVEL_DEFEITO,
+    DEVOLVIDA_AO_FORNECEDOR,
+    INVALIDA_PARA_DEVOLUCAO,
+    PENDENTE_DEVOLUCAO,
+    USADA_EM_CONSERTO
+}
