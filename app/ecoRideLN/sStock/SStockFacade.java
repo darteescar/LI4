@@ -2,14 +2,16 @@ package app.ecoRideLN.sStock;
 
 import app.common.EcoRideException;
 import app.common.Validacoes;
+import app.ecoRideCD.DAOconfig;
 import app.ecoRideCD.sStock.DevolucaoDAO;
 import app.ecoRideCD.sStock.EncomendaDAO;
 import app.ecoRideCD.sStock.FornecedorDAO;
 import app.ecoRideCD.sStock.PecaDAO;
 import app.ecoRideCD.sStock.StockDAO;
 import app.ecoRideLN.sFinanceiro.ISFinanceiro;
-import app.ecoRideLN.sFinanceiro.TipoMovimento;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,17 +21,11 @@ public class SStockFacade implements ISStock {
 
     private static final float LIMIAR_PRECO_GARANTIA = 70.0f;
 
-    private final FornecedorDAO fornecedoresDAO = new FornecedorDAO();
-    private final PecaDAO pecasDAO = new PecaDAO();
-    private final StockDAO stockDAO = new StockDAO();
-    private final EncomendaDAO encomendasDAO = new EncomendaDAO();
-    private final DevolucaoDAO devolucoesDAO = new DevolucaoDAO();
-
-    private int idFornecedor = 1;
-    private int idPeca = 1;
-    private int idStock = 1;
-    private int idEncomenda = 1;
-    private int idDevolucao = 1;
+    private final FornecedorDAO fornecedoresDAO = FornecedorDAO.getInstance();
+    private final PecaDAO pecasDAO = PecaDAO.getInstance();
+    private final StockDAO stockDAO = StockDAO.getInstance();
+    private final EncomendaDAO encomendasDAO = EncomendaDAO.getInstance();
+    private final DevolucaoDAO devolucoesDAO = DevolucaoDAO.getInstance();
 
     private final ISFinanceiro sFinanceiro;
 
@@ -45,20 +41,14 @@ public class SStockFacade implements ISStock {
         Validacoes.emailValido(email);
         Validacoes.telemovel(telemovel);
 
-        Fornecedor f = new Fornecedor(idFornecedor++, nome, email, telemovel);
+        int id = fornecedoresDAO.generateNewId();
+        Fornecedor f = new Fornecedor(id, nome, email, telemovel);
         fornecedoresDAO.put(f.getId(), f);
         return f;
     }
 
-    @Override
-    public Optional<Fornecedor> obterDadosFornecedor(int id) {
-        return fornecedoresDAO.obterPorId(id);
-    }
-
-    @Override
-    public boolean existeFornecedor(int id) {
-        return fornecedoresDAO.containsKey(id);
-    }
+    @Override public Optional<Fornecedor> obterDadosFornecedor(int id) { return fornecedoresDAO.obterPorId(id); }
+    @Override public boolean existeFornecedor(int id) { return fornecedoresDAO.containsKey(id); }
 
     @Override
     public void removerFornecedor(int id) {
@@ -103,32 +93,20 @@ public class SStockFacade implements ISStock {
         Validacoes.naoVazio(referencia, "Referência");
         Validacoes.inteiroNaoNegativo(stock_minimo, "Stock mínimo");
         Validacoes.valorMonetario(preco_venda, "Preço de venda");
-
         if (!existeFornecedor(idFornecedor))
             throw new EcoRideException("Fornecedor não encontrado.");
-
         if (pecasDAO.obterPorReferencia(referencia).isPresent())
             throw new EcoRideException("Já existe peça com esta referência.");
 
-        Peca p = new Peca(idPeca++, referencia, stock_minimo, preco_venda, idFornecedor);
+        int id = pecasDAO.generateNewId();
+        Peca p = new Peca(id, referencia, stock_minimo, preco_venda, idFornecedor);
         pecasDAO.put(p.getId(), p);
         return p;
     }
 
-    @Override
-    public Optional<Peca> obterDadosPeca(int id) {
-        return pecasDAO.obterPorId(id);
-    }
-
-    @Override
-    public boolean existePecaPorId(int id) {
-        return pecasDAO.containsKey(id);
-    }
-
-    @Override
-    public Optional<Peca> existePecaPorReferencia(String referencia) {
-        return pecasDAO.obterPorReferencia(referencia);
-    }
+    @Override public Optional<Peca> obterDadosPeca(int id) { return pecasDAO.obterPorId(id); }
+    @Override public boolean existePecaPorId(int id) { return pecasDAO.containsKey(id); }
+    @Override public Optional<Peca> existePecaPorReferencia(String referencia) { return pecasDAO.obterPorReferencia(referencia); }
 
     @Override
     public void removerPeca(int id) {
@@ -185,6 +163,50 @@ public class SStockFacade implements ISStock {
         pecasDAO.put(p.getId(), p);
     }
 
+    @Override
+    public void aumentarQuantidadePeca(int idPeca, int n) {
+        Validacoes.inteiroPositivo(n, "Quantidade");
+        try (Connection conn = DAOconfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                Peca p = pecasDAO.getWithConnection(conn, idPeca);
+                if (p == null) throw new EcoRideException("Peça não encontrada.");
+                p.aumentarQuantidade(n);
+                pecasDAO.putWithConnection(conn, p);
+                conn.commit();
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            throw new EcoRideException("Erro a aumentar quantidade da peça: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public void diminuirQuantidadePeca(int idPeca, int n) {
+        Validacoes.inteiroPositivo(n, "Quantidade");
+        try (Connection conn = DAOconfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                Peca p = pecasDAO.getWithConnection(conn, idPeca);
+                if (p == null) throw new EcoRideException("Peça não encontrada.");
+                p.diminuirQuantidade(n);
+                pecasDAO.putWithConnection(conn, p);
+                conn.commit();
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            throw new EcoRideException("Erro a diminuir quantidade da peça: " + ex.getMessage(), ex);
+        }
+    }
+
     // -------- Stock --------
 
     @Override
@@ -196,14 +218,12 @@ public class SStockFacade implements ISStock {
         if (preco_compra > LIMIAR_PRECO_GARANTIA)
             throw new EcoRideException("Stock com preço de compra superior a 70€ requer nº de série e garantia.");
 
-        Stock s = new Stock(idStock++, preco_compra, idPeca, data, null, null);
-        stockDAO.put(s.getId(), s);
-        return s;
+        return adicionarStockAtomico(idPeca, preco_compra, data, null, null);
     }
 
     @Override
-    public Stock registarStockPecaSuperior70(int idPeca, float preco_compra, LocalDateTime data,
-                                              String nr_serie, int garantia) {
+    public StockComGarantia registarStockPecaSuperior70(int idPeca, float preco_compra, LocalDateTime data,
+                                                         String nr_serie, int garantia) {
         Validacoes.valorMonetario(preco_compra, "Preço de compra");
         Validacoes.naoNulo(data, "Data de chegada");
         Validacoes.naoVazio(nr_serie, "Número de série");
@@ -213,26 +233,63 @@ public class SStockFacade implements ISStock {
         if (preco_compra <= LIMIAR_PRECO_GARANTIA)
             throw new EcoRideException("Use o registo normal para preços inferiores ou iguais a 70€.");
 
-        Stock s = new Stock(idStock++, preco_compra, idPeca, data, nr_serie, garantia);
-        stockDAO.put(s.getId(), s);
-        return s;
+        return (StockComGarantia) adicionarStockAtomico(idPeca, preco_compra, data, nr_serie, garantia);
     }
 
-    @Override
-    public Optional<Stock> obterDadosStock(int id) {
-        return stockDAO.obterPorId(id);
+    private Stock adicionarStockAtomico(int idPeca, float preco_compra, LocalDateTime data,
+                                        String nr_serie, Integer garantia) {
+        try (Connection conn = DAOconfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                int idStock = stockDAO.generateNewId();
+                Stock s = (nr_serie == null || garantia == null)
+                        ? new Stock(idStock, preco_compra, idPeca, data)
+                        : new StockComGarantia(idStock, preco_compra, idPeca, data, nr_serie, garantia);
+                stockDAO.putWithConnection(conn, s);
+
+                Peca p = pecasDAO.getWithConnection(conn, idPeca);
+                p.aumentarQuantidade();
+                pecasDAO.putWithConnection(conn, p);
+
+                conn.commit();
+                return s;
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            throw new EcoRideException("Erro ao adicionar stock: " + ex.getMessage(), ex);
+        }
     }
 
-    @Override
-    public boolean existeStock(int id) {
-        return stockDAO.containsKey(id);
-    }
+    @Override public Optional<Stock> obterDadosStock(int id) { return stockDAO.obterPorId(id); }
+    @Override public boolean existeStock(int id) { return stockDAO.containsKey(id); }
 
     @Override
     public void removerStock(int id) {
-        if (!existeStock(id))
-            throw new EcoRideException("Entrada de stock não encontrada.");
-        stockDAO.remove(id);
+        Stock s = stockDAO.obterPorId(id)
+                .orElseThrow(() -> new EcoRideException("Entrada de stock não encontrada."));
+        try (Connection conn = DAOconfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                Peca p = pecasDAO.getWithConnection(conn, s.getCodPeca());
+                if (p != null && p.getQuantidade() > 0) {
+                    p.diminuirQuantidade();
+                    pecasDAO.putWithConnection(conn, p);
+                }
+                stockDAO.remove(id);
+                conn.commit();
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            throw new EcoRideException("Erro ao remover stock: " + ex.getMessage(), ex);
+        }
     }
 
     private Stock obterStockOuFalhar(int id) {
@@ -292,7 +349,9 @@ public class SStockFacade implements ISStock {
     public void atualizarGarantiaStock(int id, int garantia) {
         Validacoes.inteiroPositivo(garantia, "Garantia");
         Stock s = obterStockOuFalhar(id);
-        s.setGarantia(garantia);
+        if (!(s instanceof StockComGarantia))
+            throw new EcoRideException("Esta entrada de stock não tem garantia.");
+        ((StockComGarantia) s).setGarantia(garantia);
         stockDAO.put(s.getId(), s);
     }
 
@@ -300,7 +359,9 @@ public class SStockFacade implements ISStock {
     public void atualizarNrSerieStock(int id, String nr_serie) {
         Validacoes.naoVazio(nr_serie, "Número de série");
         Stock s = obterStockOuFalhar(id);
-        s.setNr_serie(nr_serie);
+        if (!(s instanceof StockComGarantia))
+            throw new EcoRideException("Esta entrada de stock não tem nº de série.");
+        ((StockComGarantia) s).setNr_serie(nr_serie);
         stockDAO.put(s.getId(), s);
     }
 
@@ -313,7 +374,8 @@ public class SStockFacade implements ISStock {
         if (s.getEstado() != EstadoStock.POSSIVEL_DEFEITO)
             throw new EcoRideException("Apenas stock em POSSIVEL_DEFEITO pode ser devolvido.");
 
-        Devolucao d = new Devolucao(idDevolucao++, LocalDateTime.now(), motivo, idStock);
+        int id = devolucoesDAO.generateNewId();
+        Devolucao d = new Devolucao(id, LocalDateTime.now(), motivo, idStock);
         devolucoesDAO.put(d.getId(), d);
         s.setEstado(EstadoStock.PENDENTE_DEVOLUCAO);
         stockDAO.put(s.getId(), s);
@@ -340,15 +402,8 @@ public class SStockFacade implements ISStock {
         stockDAO.put(s.getId(), s);
     }
 
-    @Override
-    public Optional<Devolucao> obterDadosDevolucao(int id) {
-        return devolucoesDAO.obterPorId(id);
-    }
-
-    @Override
-    public boolean existeDevolucao(int id) {
-        return devolucoesDAO.containsKey(id);
-    }
+    @Override public Optional<Devolucao> obterDadosDevolucao(int id) { return devolucoesDAO.obterPorId(id); }
+    @Override public boolean existeDevolucao(int id) { return devolucoesDAO.containsKey(id); }
 
     @Override
     public void removerDevolucao(int id) {
@@ -360,7 +415,7 @@ public class SStockFacade implements ISStock {
             Peca p = obterPecaOuFalhar(s.getCodPeca());
             sFinanceiro.aumentarGastoPecasDoMes(LocalDateTime.now(), p.getPreco_venda(),
                     "Reposição de gasto com peça pela remoção de devolução pendente",
-                    s.getId(), "Stock");
+                    s.getId());
             s.setEstado(EstadoStock.INVALIDA_PARA_DEVOLUCAO);
             stockDAO.put(s.getId(), s);
         }
@@ -431,18 +486,16 @@ public class SStockFacade implements ISStock {
     public Encomenda criarEncomenda(int idFornecedor) {
         if (!existeFornecedor(idFornecedor))
             throw new EcoRideException("Fornecedor não encontrado.");
-        Encomenda e = new Encomenda(idEncomenda++, idFornecedor);
+        int id = encomendasDAO.generateNewId();
+        Encomenda e = new Encomenda(id, idFornecedor);
         encomendasDAO.put(e.getId(), e);
         return e;
     }
 
-    @Override
-    public Optional<Encomenda> obterDadosEncomenda(int id) {
-        return encomendasDAO.obterPorId(id);
-    }
+    @Override public Optional<Encomenda> obterDadosEncomenda(int id) { return encomendasDAO.obterPorId(id); }
 
     @Override
-    public void adicionarPecasEncomendaStock(int idEncomenda, List<QuantidadePeca> pecas, float preco_compra) {
+    public void adicionarPecasEncomendaStock(int idEncomenda, List<PecasDoOrcamento> pecas, float preco_compra) {
         Encomenda e = encomendasDAO.obterPorId(idEncomenda)
                 .orElseThrow(() -> new EcoRideException("Encomenda não encontrada."));
         if (e.getEstado() != EstadoEncomenda.RECEBIDA)
@@ -450,20 +503,33 @@ public class SStockFacade implements ISStock {
 
         Validacoes.valorMonetario(preco_compra, "Preço de compra");
         Validacoes.naoNulo(pecas, "Lista de peças");
-        for (QuantidadePeca qp : pecas) {
-            Peca p = obterPecaOuFalhar(qp.getCodPeca());
-            for (int i = 0; i < qp.getQuantidade(); i++) {
-                Stock s;
-                if (preco_compra > LIMIAR_PRECO_GARANTIA) {
-                    s = new Stock(idStock++, preco_compra, p.getId(), LocalDateTime.now(), null, null);
-                } else {
-                    s = new Stock(idStock++, preco_compra, p.getId(), LocalDateTime.now(), null, null);
+
+        try (Connection conn = DAOconfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                for (PecasDoOrcamento qp : pecas) {
+                    Peca p = pecasDAO.getWithConnection(conn, qp.getCodPeca());
+                    if (p == null) throw new EcoRideException("Peça " + qp.getCodPeca() + " não encontrada.");
+                    for (int i = 0; i < qp.getQuantidade(); i++) {
+                        int idStock = stockDAO.generateNewId();
+                        Stock s = new Stock(idStock, preco_compra, p.getId(), LocalDateTime.now());
+                        stockDAO.putWithConnection(conn, s);
+                        e.getCodEntradasStock().add(s.getId());
+                        p.aumentarQuantidade();
+                    }
+                    pecasDAO.putWithConnection(conn, p);
                 }
-                stockDAO.put(s.getId(), s);
-                e.getCodEntradasStock().add(s.getId());
+                encomendasDAO.put(e.getId(), e);
+                conn.commit();
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
             }
+        } catch (SQLException ex) {
+            throw new EcoRideException("Erro ao adicionar peças da encomenda ao stock: " + ex.getMessage(), ex);
         }
-        encomendasDAO.put(e.getId(), e);
     }
 
     @Override
@@ -521,8 +587,26 @@ public class SStockFacade implements ISStock {
         Stock s = obterStockOuFalhar(idStock);
         if (s.getEstado() != EstadoStock.EM_STOCK)
             throw new EcoRideException("Stock não está disponível para conserto.");
-        s.setEstado(EstadoStock.USADA_EM_CONSERTO);
-        stockDAO.put(s.getId(), s);
+        try (Connection conn = DAOconfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                s.setEstado(EstadoStock.USADA_EM_CONSERTO);
+                stockDAO.putWithConnection(conn, s);
+                Peca p = pecasDAO.getWithConnection(conn, s.getCodPeca());
+                if (p != null && p.getQuantidade() > 0) {
+                    p.diminuirQuantidade();
+                    pecasDAO.putWithConnection(conn, p);
+                }
+                conn.commit();
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            throw new EcoRideException("Erro ao marcar stock como usado: " + ex.getMessage(), ex);
+        }
     }
 
     public Optional<Peca> obterPecaInterna(int idPeca) {

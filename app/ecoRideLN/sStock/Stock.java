@@ -9,18 +9,13 @@ public class Stock {
     private int codPeca;
     private LocalDateTime data_chegada;
     private EstadoStock estado;
-    private String nr_serie;
-    private Integer garantia;
 
-    public Stock(int id, float preco_compra, int codPeca, LocalDateTime data_chegada,
-                 String nr_serie, Integer garantia) {
+    public Stock(int id, float preco_compra, int codPeca, LocalDateTime data_chegada) {
         this.id = id;
         this.preco_compra = preco_compra;
         this.codPeca = codPeca;
         this.data_chegada = data_chegada;
         this.estado = EstadoStock.EM_STOCK;
-        this.nr_serie = nr_serie;
-        this.garantia = garantia;
     }
 
     public int getId() {
@@ -61,25 +56,5 @@ public class Stock {
 
     public void setEstado(EstadoStock estado) {
         this.estado = estado;
-    }
-
-    public String getNr_serie() {
-        return nr_serie;
-    }
-
-    public void setNr_serie(String nr_serie) {
-        this.nr_serie = nr_serie;
-    }
-
-    public Integer getGarantia() {
-        return garantia;
-    }
-
-    public void setGarantia(Integer garantia) {
-        this.garantia = garantia;
-    }
-
-    public boolean temGarantia() {
-        return nr_serie != null && garantia != null;
     }
 }

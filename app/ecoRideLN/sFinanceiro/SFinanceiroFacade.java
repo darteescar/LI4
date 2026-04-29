@@ -1,6 +1,5 @@
 package app.ecoRideLN.sFinanceiro;
 
-import app.common.EcoRideException;
 import app.common.Validacoes;
 import app.ecoRideCD.sFinanceiro.MovimentoFinanceiroDAO;
 
@@ -11,21 +10,18 @@ import java.util.stream.Collectors;
 
 public class SFinanceiroFacade implements ISFinanceiro {
 
-    private final MovimentoFinanceiroDAO movimentos_financeirosDAO = new MovimentoFinanceiroDAO();
-    private int proximoId = 1;
+    private final MovimentoFinanceiroDAO movimentos_financeirosDAO = MovimentoFinanceiroDAO.getInstance();
 
     @Override
     public MovimentoFinanceiro criarMovimentoFinanceiro(float valor, LocalDateTime data, String descricao,
-                                                         TipoMovimento tipo, int codEntidade,
-                                                         String tipoEntidade) {
+                                                         TipoMovimento tipo, int codEntidade) {
         Validacoes.naoNulo(data, "Data");
         Validacoes.naoVazio(descricao, "Descrição");
         Validacoes.naoNulo(tipo, "Tipo de movimento");
-        Validacoes.naoVazio(tipoEntidade, "Tipo de entidade");
         Validacoes.inteiroPositivo(codEntidade, "Código da entidade");
 
-        MovimentoFinanceiro m = new MovimentoFinanceiro(proximoId++, valor, data, descricao,
-                tipo, codEntidade, tipoEntidade);
+        int id = movimentos_financeirosDAO.generateNewId();
+        MovimentoFinanceiro m = new MovimentoFinanceiro(id, valor, data, descricao, tipo, codEntidade);
         movimentos_financeirosDAO.put(m.getId(), m);
         return m;
     }
@@ -51,7 +47,7 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
     @Override
     public void aumentarGastoPecasDoMes(LocalDateTime referencia, float valor, String descricao,
-                                         int codEntidade, String tipoEntidade) {
+                                         int codEntidade) {
         Validacoes.naoNulo(referencia, "Referência");
         Validacoes.valorMonetario(valor, "Valor");
 
@@ -59,8 +55,7 @@ public class SFinanceiroFacade implements ISFinanceiro {
                 .filter(m -> m.getTipo() == TipoMovimento.GASTO_PECAS)
                 .filter(m -> m.getData().getYear() == referencia.getYear() &&
                              m.getData().getMonth() == referencia.getMonth())
-                .filter(m -> m.getCodEntidade() == codEntidade &&
-                             m.getTipoEntidade().equals(tipoEntidade))
+                .filter(m -> m.getCodEntidade() == codEntidade)
                 .findFirst();
 
         if (existente.isPresent()) {
@@ -68,8 +63,7 @@ public class SFinanceiroFacade implements ISFinanceiro {
             m.setValor(m.getValor() + valor);
             movimentos_financeirosDAO.put(m.getId(), m);
         } else {
-            criarMovimentoFinanceiro(valor, referencia, descricao,
-                    TipoMovimento.GASTO_PECAS, codEntidade, tipoEntidade);
+            criarMovimentoFinanceiro(valor, referencia, descricao, TipoMovimento.GASTO_PECAS, codEntidade);
         }
     }
 }

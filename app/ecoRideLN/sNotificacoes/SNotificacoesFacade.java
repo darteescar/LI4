@@ -11,8 +11,7 @@ import java.util.stream.Collectors;
 
 public class SNotificacoesFacade implements ISNotificacoes {
 
-    private final NotificacaoDAO notificacoesDAO = new NotificacaoDAO();
-    private int proximoId = 1;
+    private final NotificacaoDAO notificacoesDAO = NotificacaoDAO.getInstance();
 
     @Override
     public Notificacao criarNotificacao(int idRemetente, int idDestinatario, String descricao) {
@@ -20,7 +19,8 @@ public class SNotificacoesFacade implements ISNotificacoes {
         Validacoes.inteiroPositivo(idRemetente, "Id do remetente");
         Validacoes.inteiroPositivo(idDestinatario, "Id do destinatário");
 
-        Notificacao n = new Notificacao(proximoId++, descricao, LocalDateTime.now(), idRemetente, idDestinatario);
+        int id = notificacoesDAO.generateNewId();
+        Notificacao n = new Notificacao(id, descricao, LocalDateTime.now(), idRemetente, idDestinatario);
         notificacoesDAO.put(n.getId(), n);
         return n;
     }
@@ -109,8 +109,8 @@ public class SNotificacoesFacade implements ISNotificacoes {
 
     @Override
     public List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int idFuncionario,
-                                                                        LocalDateTime dataInicio,
-                                                                        LocalDateTime dataFim) {
+                                                                       LocalDateTime dataInicio,
+                                                                       LocalDateTime dataFim) {
         return obterNotificacoesPorIntervalo(dataInicio, dataFim).stream()
                 .filter(n -> n.getId_destinatario() == idFuncionario || n.getId_remetente() == idFuncionario)
                 .collect(Collectors.toList());

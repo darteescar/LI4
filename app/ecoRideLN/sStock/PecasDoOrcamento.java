@@ -1,11 +1,11 @@
 package app.ecoRideLN.sStock;
 
-public class QuantidadePeca {
+public class PecasDoOrcamento {
 
     private int codPeca;
     private int quantidade;
 
-    public QuantidadePeca(int codPeca, int quantidade) {
+    public PecasDoOrcamento(int codPeca, int quantidade) {
         this.codPeca = codPeca;
         this.quantidade = quantidade;
     }

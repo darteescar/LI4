@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface ISFinanceiro {
 
     MovimentoFinanceiro criarMovimentoFinanceiro(float valor, LocalDateTime data, String descricao,
-                                                  TipoMovimento tipo, int codEntidade, String tipoEntidade);
+                                                  TipoMovimento tipo, int codEntidade);
 
     Optional<MovimentoFinanceiro> obterDadosMovimentoFinanceiro(int id);
 
@@ -16,5 +16,5 @@ public interface ISFinanceiro {
     List<MovimentoFinanceiro> obterMovimentos(LocalDateTime desde, LocalDateTime ate, TipoMovimento tipo);
 
     void aumentarGastoPecasDoMes(LocalDateTime referencia, float valor, String descricao,
-                                  int codEntidade, String tipoEntidade);
+                                  int codEntidade);
 }

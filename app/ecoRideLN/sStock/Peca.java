@@ -1,5 +1,7 @@
 package app.ecoRideLN.sStock;
 
+import app.common.EcoRideException;
+
 public class Peca {
 
     private int id;
@@ -9,6 +11,7 @@ public class Peca {
     private int codFornecedor;
     private boolean disponivel;
     private boolean ativa;
+    private int quantidade;
 
     public Peca(int id, String referencia, int stock_minimo, float preco_venda, int codFornecedor) {
         this.id = id;
@@ -18,6 +21,7 @@ public class Peca {
         this.codFornecedor = codFornecedor;
         this.disponivel = true;
         this.ativa = true;
+        this.quantidade = 0;
     }
 
     public int getId() {
@@ -74,5 +78,37 @@ public class Peca {
 
     public void setAtiva(boolean ativa) {
         this.ativa = ativa;
+    }
+
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    public void aumentarQuantidade() {
+        this.quantidade++;
+    }
+
+    public void aumentarQuantidade(int n) {
+        if (n < 0)
+            throw new EcoRideException("Não é possível aumentar quantidade por valor negativo.");
+        this.quantidade += n;
+    }
+
+    public void diminuirQuantidade() {
+        if (this.quantidade <= 0)
+            throw new EcoRideException("Quantidade da peça já é zero.");
+        this.quantidade--;
+    }
+
+    public void diminuirQuantidade(int n) {
+        if (n < 0)
+            throw new EcoRideException("Não é possível diminuir quantidade por valor negativo.");
+        if (this.quantidade - n < 0)
+            throw new EcoRideException("Quantidade da peça insuficiente.");
+        this.quantidade -= n;
     }
 }

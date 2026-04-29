@@ -4,13 +4,14 @@ import app.common.EcoRideException;
 import app.common.Validacoes;
 import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
 import app.ecoRideLN.sNotificacoes.ISNotificacoes;
+
 import java.util.Optional;
 
 public class SFuncionariosFacade implements ISFuncionarios {
 
-    private final FuncionarioDAO funcionariosDAO = new FuncionarioDAO();
-    private int proximoId = 1;
+    private final FuncionarioDAO funcionariosDAO = FuncionarioDAO.getInstance();
 
+    @SuppressWarnings("unused")
     private final ISNotificacoes sNotificacoes;
 
     public SFuncionariosFacade(ISNotificacoes sNotificacoes) {
@@ -19,10 +20,10 @@ public class SFuncionariosFacade implements ISFuncionarios {
 
     @Override
     public Funcionario registarFuncionario(String nome, String numero_porta, String rua, String localidade,
-            String codigo_postal, String telemovel, String email,
-            String data_nascimento, String niss, String nif, String nus,
-            String iban, float salario_hora, float salario_bruto,
-            float salario_liquido) {
+                                           String codigo_postal, String telemovel, String email,
+                                           String data_nascimento, String niss, String nif, String nus,
+                                           String iban, float salario_hora, float salario_bruto,
+                                           float salario_liquido) {
         Validacoes.naoVazio(nome, "Nome");
         Validacoes.naoVazio(numero_porta, "Número de porta");
         Validacoes.naoVazio(rua, "Rua");
@@ -39,13 +40,13 @@ public class SFuncionariosFacade implements ISFuncionarios {
         Validacoes.valorMonetario(salario_bruto, "Salário bruto");
         Validacoes.valorMonetario(salario_liquido, "Salário líquido");
 
-        if (funcionariosDAO.obterPorNif(nif).isPresent()) {
+        if (funcionariosDAO.obterPorNif(nif).isPresent())
             throw new EcoRideException("Já existe um funcionário com este NIF.");
-        }
 
-        Morada morada = new Morada(numero_porta, rua, localidade, codigo_postal);
-        Funcionario f = new Funcionario(proximoId++, nome, telemovel, email, data_nascimento,
-                niss, nif, nus, iban, salario_hora, salario_bruto, salario_liquido, morada);
+        int id = funcionariosDAO.generateNewId();
+        Funcionario f = new Funcionario(id, nome, telemovel, email, data_nascimento,
+                niss, nif, nus, iban, salario_hora, salario_bruto, salario_liquido,
+                numero_porta, rua, localidade, codigo_postal);
         funcionariosDAO.put(f.getId(), f);
         return f;
     }
@@ -57,9 +58,8 @@ public class SFuncionariosFacade implements ISFuncionarios {
 
     @Override
     public void removerFuncionario(int id) {
-        if (!existeFuncionario(id)) {
+        if (!existeFuncionario(id))
             throw new EcoRideException("Funcionário não encontrado.");
-        }
         funcionariosDAO.remove(id);
     }
 
@@ -93,7 +93,7 @@ public class SFuncionariosFacade implements ISFuncionarios {
     public void atualizarNumeroPortaFuncionario(int id, String numero_porta) {
         Validacoes.naoVazio(numero_porta, "Número de porta");
         Funcionario f = obterOuFalhar(id);
-        f.getMorada().setNumero_porta(numero_porta);
+        f.setNumero_porta(numero_porta);
         funcionariosDAO.put(f.getId(), f);
     }
 
@@ -101,7 +101,7 @@ public class SFuncionariosFacade implements ISFuncionarios {
     public void atualizarRuaFuncionario(int id, String rua) {
         Validacoes.naoVazio(rua, "Rua");
         Funcionario f = obterOuFalhar(id);
-        f.getMorada().setRua(rua);
+        f.setRua(rua);
         funcionariosDAO.put(f.getId(), f);
     }
 
@@ -109,7 +109,7 @@ public class SFuncionariosFacade implements ISFuncionarios {
     public void atualizarLocalidadeFuncionario(int id, String localidade) {
         Validacoes.naoVazio(localidade, "Localidade");
         Funcionario f = obterOuFalhar(id);
-        f.getMorada().setLocalidade(localidade);
+        f.setLocalidade(localidade);
         funcionariosDAO.put(f.getId(), f);
     }
 
@@ -117,7 +117,7 @@ public class SFuncionariosFacade implements ISFuncionarios {
     public void atualizarCodigoPostalFuncionario(int id, String codigo_postal) {
         Validacoes.codigoPostal(codigo_postal);
         Funcionario f = obterOuFalhar(id);
-        f.getMorada().setCodigo_postal(codigo_postal);
+        f.setCodigo_postal(codigo_postal);
         funcionariosDAO.put(f.getId(), f);
     }
 
@@ -149,9 +149,8 @@ public class SFuncionariosFacade implements ISFuncionarios {
     public void atualizarNIFFuncionario(int id, String nif) {
         Validacoes.nif(nif);
         Funcionario f = obterOuFalhar(id);
-        if (funcionariosDAO.obterPorNif(nif).filter(o -> o.getId() != id).isPresent()) {
+        if (funcionariosDAO.obterPorNif(nif).filter(o -> o.getId() != id).isPresent())
             throw new EcoRideException("Já existe um funcionário com este NIF.");
-        }
         f.setNIF(nif);
         funcionariosDAO.put(f.getId(), f);
     }

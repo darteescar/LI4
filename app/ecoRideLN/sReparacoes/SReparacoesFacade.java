@@ -3,12 +3,12 @@ package app.ecoRideLN.sReparacoes;
 import app.common.EcoRideException;
 import app.common.Validacoes;
 import app.ecoRideCD.sReparacoes.ReparacaoDAO;
+
 import java.util.Optional;
 
 public class SReparacoesFacade implements ISReparacoes {
 
-    private final ReparacaoDAO reparacoesDAO = new ReparacaoDAO();
-    private int proximoId = 1;
+    private final ReparacaoDAO reparacoesDAO = ReparacaoDAO.getInstance();
 
     @Override
     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco) {
@@ -20,7 +20,8 @@ public class SReparacoesFacade implements ISReparacoes {
             throw new EcoRideException("Já existe uma reparação com esta nomenclatura.");
         }
 
-        Reparacao r = new Reparacao(proximoId++, nomenclatura, descricao, preco);
+        int id = reparacoesDAO.generateNewId();
+        Reparacao r = new Reparacao(id, nomenclatura, descricao, preco);
         reparacoesDAO.put(r.getId(), r);
         return r;
     }

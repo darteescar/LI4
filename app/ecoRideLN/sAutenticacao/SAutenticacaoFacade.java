@@ -9,9 +9,7 @@ import java.util.Optional;
 
 public class SAutenticacaoFacade implements ISAutenticacao {
 
-    private final UtilizadorDAO utilizadoresDAO = new UtilizadorDAO();
-    private int idUtilizador = 1;
-
+    private final UtilizadorDAO utilizadoresDAO = UtilizadorDAO.getInstance();
     private final ISFuncionarios sFuncionarios;
 
     public SAutenticacaoFacade(ISFuncionarios sFuncionarios) {
@@ -30,7 +28,8 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         if (utilizadoresDAO.obterPorIdFuncionario(idFuncionario).isPresent())
             throw new EcoRideException("Já existe utilizador para este funcionário.");
 
-        Utilizador u = new Utilizador(idUtilizador++, palavra_passe, idFuncionario, cargo);
+        int id = utilizadoresDAO.generateNewId();
+        Utilizador u = new Utilizador(id, palavra_passe, idFuncionario, cargo);
         utilizadoresDAO.put(u.getId(), u);
         return u;
     }

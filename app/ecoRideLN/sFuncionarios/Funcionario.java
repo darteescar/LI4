@@ -15,11 +15,15 @@ public class Funcionario {
     private float salario_liquido;
     private float salario_bruto;
     private int horas_extra;
-    private Morada morada;
+    private String numero_porta;
+    private String rua;
+    private String localidade;
+    private String codigo_postal;
 
     public Funcionario(int id, String nome, String telemovel, String email,
-            String data_nascimento, String NISS, String NIF, String NUS, String IBAN,
-            float salario_hora, float salario_bruto, float salario_liquido, Morada morada) {
+                       String data_nascimento, String NISS, String NIF, String NUS, String IBAN,
+                       float salario_hora, float salario_bruto, float salario_liquido,
+                       String numero_porta, String rua, String localidade, String codigo_postal) {
         this.id = id;
         this.nome = nome;
         this.telemovel = telemovel;
@@ -33,7 +37,10 @@ public class Funcionario {
         this.salario_bruto = salario_bruto;
         this.salario_liquido = salario_liquido;
         this.horas_extra = 0;
-        this.morada = morada;
+        this.numero_porta = numero_porta;
+        this.rua = rua;
+        this.localidade = localidade;
+        this.codigo_postal = codigo_postal;
     }
 
     public int getId() {
@@ -140,11 +147,35 @@ public class Funcionario {
         this.horas_extra = horas_extra;
     }
 
-    public Morada getMorada() {
-        return morada;
+    public String getNumero_porta() {
+        return numero_porta;
     }
 
-    public void setMorada(Morada morada) {
-        this.morada = morada;
+    public void setNumero_porta(String numero_porta) {
+        this.numero_porta = numero_porta;
+    }
+
+    public String getRua() {
+        return rua;
+    }
+
+    public void setRua(String rua) {
+        this.rua = rua;
+    }
+
+    public String getLocalidade() {
+        return localidade;
+    }
+
+    public void setLocalidade(String localidade) {
+        this.localidade = localidade;
+    }
+
+    public String getCodigo_postal() {
+        return codigo_postal;
+    }
+
+    public void setCodigo_postal(String codigo_postal) {
+        this.codigo_postal = codigo_postal;
     }
 }

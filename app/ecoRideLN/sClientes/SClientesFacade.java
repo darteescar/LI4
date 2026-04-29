@@ -10,11 +10,8 @@ import java.util.Optional;
 
 public class SClientesFacade implements ISClientes {
 
-    private final ClienteDAO clientesDAO = new ClienteDAO();
-    private final TrotineteDAO trotinetesDAO = new TrotineteDAO();
-
-    private int idCliente = 1;
-    private int idTrotinete = 1;
+    private final ClienteDAO clientesDAO = ClienteDAO.getInstance();
+    private final TrotineteDAO trotinetesDAO = TrotineteDAO.getInstance();
 
     @Override
     public Cliente registarCliente(String nome, String email, String telemovel, String nif) {
@@ -26,7 +23,8 @@ public class SClientesFacade implements ISClientes {
         if (clientesDAO.obterPorNif(nif).isPresent())
             throw new EcoRideException("Já existe um cliente com este NIF.");
 
-        Cliente c = new Cliente(idCliente++, nome, email, telemovel, nif);
+        int id = clientesDAO.generateNewId();
+        Cliente c = new Cliente(id, nome, email, telemovel, nif);
         clientesDAO.put(c.getId(), c);
         return c;
     }
@@ -45,7 +43,6 @@ public class SClientesFacade implements ISClientes {
     public void removerCliente(int id) {
         if (!existeCliente(id))
             throw new EcoRideException("Cliente não encontrado.");
-        // Remove trotinetes associadas
         for (Trotinete t : trotinetesDAO.obterPorCliente(id))
             trotinetesDAO.remove(t.getId());
         clientesDAO.remove(id);
@@ -106,9 +103,9 @@ public class SClientesFacade implements ISClientes {
         if (!existeCliente(idCliente))
             throw new EcoRideException("Cliente não encontrado.");
 
-        Trotinete t = new Trotinete(idTrotinete++, modelo, marca, numero_serie, tipo_motor, idCliente);
+        int id = trotinetesDAO.generateNewId();
+        Trotinete t = new Trotinete(id, modelo, marca, numero_serie, tipo_motor, idCliente);
         trotinetesDAO.put(t.getId(), t);
-        clientesDAO.obterPorId(idCliente).ifPresent(c -> c.getCodsTrotinetes().add(t.getId()));
         return t;
     }
 
@@ -124,10 +121,8 @@ public class SClientesFacade implements ISClientes {
 
     @Override
     public void removerTrotinete(int id) {
-        Trotinete t = trotinetesDAO.obterPorId(id)
-                .orElseThrow(() -> new EcoRideException("Trotinete não encontrada."));
-        clientesDAO.obterPorId(t.getCodCliente())
-                .ifPresent(c -> c.getCodsTrotinetes().remove(Integer.valueOf(id)));
+        if (!trotinetesDAO.containsKey(id))
+            throw new EcoRideException("Trotinete não encontrada.");
         trotinetesDAO.remove(id);
     }
 
