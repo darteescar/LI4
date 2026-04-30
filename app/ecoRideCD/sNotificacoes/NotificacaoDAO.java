@@ -35,11 +35,12 @@ public class NotificacaoDAO implements Map<Integer, Notificacao> {
         return Optional.ofNullable(this.get(id));
     }
 
-    public List<Notificacao> obterPorDestinatario(int idDestinatario) {
+    public List<Notificacao> obterPorDestinatario(int idUtilizadorDestinatario) {
         List<Notificacao> res = new ArrayList<>();
         try (Connection conn = DAOconfig.getConnection();
-             PreparedStatement pstm = conn.prepareStatement("SELECT * FROM Notificacao WHERE id_destinatario=?")) {
-            pstm.setInt(1, idDestinatario);
+             PreparedStatement pstm = conn.prepareStatement(
+                     "SELECT * FROM Notificacao WHERE idUtilizadorDestinatario_FK=?")) {
+            pstm.setInt(1, idUtilizadorDestinatario);
             try (ResultSet rs = pstm.executeQuery()) {
                 while (rs.next()) res.add(fromRS(rs));
             }
@@ -54,7 +55,7 @@ public class NotificacaoDAO implements Map<Integer, Notificacao> {
     private Notificacao fromRS(ResultSet rs) throws SQLException {
         Notificacao n = new Notificacao(rs.getInt("id"), rs.getString("descricao"),
                 toLDT(rs.getTimestamp("data_emissao")),
-                rs.getInt("id_remetente"), rs.getInt("id_destinatario"));
+                rs.getInt("idUtilizadorRemetente_FK"), rs.getInt("idUtilizadorDestinatario_FK"));
         n.setNotificacao_tratada(rs.getBoolean("tratada"));
         n.setData_horaTratada(toLDT(rs.getTimestamp("data_horaTratada")));
         return n;
@@ -115,12 +116,12 @@ public class NotificacaoDAO implements Map<Integer, Notificacao> {
         try (Connection conn = DAOconfig.getConnection()) {
             if (prev != null) {
                 try (PreparedStatement pstm = conn.prepareStatement(
-                        "UPDATE Notificacao SET descricao=?, data_emissao=?, id_remetente=?, id_destinatario=?, "
-                                + "tratada=?, data_horaTratada=? WHERE id=?")) {
+                        "UPDATE Notificacao SET descricao=?, data_emissao=?, idUtilizadorRemetente_FK=?, "
+                                + "idUtilizadorDestinatario_FK=?, tratada=?, data_horaTratada=? WHERE id=?")) {
                     pstm.setString(1, value.getDescricao());
                     pstm.setTimestamp(2, toTS(value.getData_emissao()));
-                    pstm.setInt(3, value.getId_remetente());
-                    pstm.setInt(4, value.getId_destinatario());
+                    pstm.setInt(3, value.getIdUtilizadorRemetente());
+                    pstm.setInt(4, value.getIdUtilizadorDestinatario());
                     pstm.setBoolean(5, value.isNotificacao_tratada());
                     pstm.setTimestamp(6, toTS(value.getData_horaTratada()));
                     pstm.setInt(7, value.getId());
@@ -128,13 +129,13 @@ public class NotificacaoDAO implements Map<Integer, Notificacao> {
                 }
             } else {
                 try (PreparedStatement pstm = conn.prepareStatement(
-                        "INSERT INTO Notificacao (id, descricao, data_emissao, id_remetente, id_destinatario, "
-                                + "tratada, data_horaTratada) VALUES (?,?,?,?,?,?,?)")) {
+                        "INSERT INTO Notificacao (id, descricao, data_emissao, idUtilizadorRemetente_FK, "
+                                + "idUtilizadorDestinatario_FK, tratada, data_horaTratada) VALUES (?,?,?,?,?,?,?)")) {
                     pstm.setInt(1, value.getId());
                     pstm.setString(2, value.getDescricao());
                     pstm.setTimestamp(3, toTS(value.getData_emissao()));
-                    pstm.setInt(4, value.getId_remetente());
-                    pstm.setInt(5, value.getId_destinatario());
+                    pstm.setInt(4, value.getIdUtilizadorRemetente());
+                    pstm.setInt(5, value.getIdUtilizadorDestinatario());
                     pstm.setBoolean(6, value.isNotificacao_tratada());
                     pstm.setTimestamp(7, toTS(value.getData_horaTratada()));
                     pstm.executeUpdate();

@@ -1,5 +1,6 @@
 package app.ecoRideLN.sStock;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public interface ISStock {
     // ---- Stock ----
     Stock registarStockPecaNormal(int idPeca, float preco_compra, LocalDateTime data);
     StockComGarantia registarStockPecaSuperior70(int idPeca, float preco_compra, LocalDateTime data,
-                                                  String nr_serie, int garantia);
+                                                  String nr_serie, LocalDate garantia);
 
     Optional<Stock> obterDadosStock(int id);
     boolean existeStock(int id);
@@ -49,7 +50,7 @@ public interface ISStock {
 
     void atualizarPrecoCompraStock(int id, float preco_compra);
     void atualizarDataRececaoStock(int id, LocalDateTime data_chegada);
-    void atualizarGarantiaStock(int id, int garantia);
+    void atualizarGarantiaStock(int id, LocalDate garantia);
     void atualizarNrSerieStock(int id, String nr_serie);
 
     // ---- Devolucao ----

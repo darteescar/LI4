@@ -12,6 +12,7 @@ import app.ecoRideLN.sFinanceiro.ISFinanceiro;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -223,11 +224,13 @@ public class SStockFacade implements ISStock {
 
     @Override
     public StockComGarantia registarStockPecaSuperior70(int idPeca, float preco_compra, LocalDateTime data,
-                                                         String nr_serie, int garantia) {
+                                                         String nr_serie, LocalDate garantia) {
         Validacoes.valorMonetario(preco_compra, "Preço de compra");
         Validacoes.naoNulo(data, "Data de chegada");
         Validacoes.naoVazio(nr_serie, "Número de série");
-        Validacoes.inteiroPositivo(garantia, "Garantia");
+        Validacoes.naoNulo(garantia, "Garantia");
+        if (garantia.isBefore(data.toLocalDate()))
+            throw new EcoRideException("Garantia não pode ser anterior à data de chegada.");
         if (!existePecaPorId(idPeca))
             throw new EcoRideException("Peça não encontrada.");
         if (preco_compra <= LIMIAR_PRECO_GARANTIA)
@@ -237,7 +240,7 @@ public class SStockFacade implements ISStock {
     }
 
     private Stock adicionarStockAtomico(int idPeca, float preco_compra, LocalDateTime data,
-                                        String nr_serie, Integer garantia) {
+                                        String nr_serie, LocalDate garantia) {
         try (Connection conn = DAOconfig.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -346,11 +349,13 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
-    public void atualizarGarantiaStock(int id, int garantia) {
-        Validacoes.inteiroPositivo(garantia, "Garantia");
+    public void atualizarGarantiaStock(int id, LocalDate garantia) {
+        Validacoes.naoNulo(garantia, "Garantia");
         Stock s = obterStockOuFalhar(id);
         if (!(s instanceof StockComGarantia))
             throw new EcoRideException("Esta entrada de stock não tem garantia.");
+        if (s.getData_chegada() != null && garantia.isBefore(s.getData_chegada().toLocalDate()))
+            throw new EcoRideException("Garantia não pode ser anterior à data de chegada.");
         ((StockComGarantia) s).setGarantia(garantia);
         stockDAO.put(s.getId(), s);
     }

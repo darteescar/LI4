@@ -14,13 +14,14 @@ public class SNotificacoesFacade implements ISNotificacoes {
     private final NotificacaoDAO notificacoesDAO = NotificacaoDAO.getInstance();
 
     @Override
-    public Notificacao criarNotificacao(int idRemetente, int idDestinatario, String descricao) {
+    public Notificacao criarNotificacao(int idUtilizadorRemetente, int idUtilizadorDestinatario, String descricao) {
         Validacoes.naoVazio(descricao, "Descrição da notificação");
-        Validacoes.inteiroPositivo(idRemetente, "Id do remetente");
-        Validacoes.inteiroPositivo(idDestinatario, "Id do destinatário");
+        Validacoes.inteiroPositivo(idUtilizadorRemetente, "Id do utilizador remetente");
+        Validacoes.inteiroPositivo(idUtilizadorDestinatario, "Id do utilizador destinatário");
 
         int id = notificacoesDAO.generateNewId();
-        Notificacao n = new Notificacao(id, descricao, LocalDateTime.now(), idRemetente, idDestinatario);
+        Notificacao n = new Notificacao(id, descricao, LocalDateTime.now(),
+                idUtilizadorRemetente, idUtilizadorDestinatario);
         notificacoesDAO.put(n.getId(), n);
         return n;
     }
@@ -64,18 +65,18 @@ public class SNotificacoesFacade implements ISNotificacoes {
     }
 
     @Override
-    public void atualizarIdRemetenteNotificacao(int idNotificacao, int idRemetente) {
-        Validacoes.inteiroPositivo(idRemetente, "Id do remetente");
+    public void atualizarIdUtilizadorRemetenteNotificacao(int idNotificacao, int idUtilizadorRemetente) {
+        Validacoes.inteiroPositivo(idUtilizadorRemetente, "Id do utilizador remetente");
         Notificacao n = obterOuFalhar(idNotificacao);
-        n.setId_remetente(idRemetente);
+        n.setIdUtilizadorRemetente(idUtilizadorRemetente);
         notificacoesDAO.put(n.getId(), n);
     }
 
     @Override
-    public void atualizarIdDestinatarioNotificacao(int idNotificacao, int idDestinatario) {
-        Validacoes.inteiroPositivo(idDestinatario, "Id do destinatário");
+    public void atualizarIdUtilizadorDestinatarioNotificacao(int idNotificacao, int idUtilizadorDestinatario) {
+        Validacoes.inteiroPositivo(idUtilizadorDestinatario, "Id do utilizador destinatário");
         Notificacao n = obterOuFalhar(idNotificacao);
-        n.setId_destinatario(idDestinatario);
+        n.setIdUtilizadorDestinatario(idUtilizadorDestinatario);
         notificacoesDAO.put(n.getId(), n);
     }
 
@@ -108,11 +109,12 @@ public class SNotificacoesFacade implements ISNotificacoes {
     }
 
     @Override
-    public List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int idFuncionario,
-                                                                       LocalDateTime dataInicio,
-                                                                       LocalDateTime dataFim) {
+    public List<Notificacao> obterNotificacoesPorUtilizadorEIntervalo(int idUtilizador,
+                                                                      LocalDateTime dataInicio,
+                                                                      LocalDateTime dataFim) {
         return obterNotificacoesPorIntervalo(dataInicio, dataFim).stream()
-                .filter(n -> n.getId_destinatario() == idFuncionario || n.getId_remetente() == idFuncionario)
+                .filter(n -> n.getIdUtilizadorDestinatario() == idUtilizador
+                        || n.getIdUtilizadorRemetente() == idUtilizador)
                 .collect(Collectors.toList());
     }
 }

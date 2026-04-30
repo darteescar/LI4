@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface ISNotificacoes {
 
-    Notificacao criarNotificacao(int idRemetente, int idDestinatario, String descricao);
+    Notificacao criarNotificacao(int idUtilizadorRemetente, int idUtilizadorDestinatario, String descricao);
 
     Optional<Notificacao> obterDadosNotificacao(int idNotificacao);
 
@@ -18,9 +18,9 @@ public interface ISNotificacoes {
 
     void atualizarDataEmissaoNotificacao(int idNotificacao, LocalDateTime dataEmissao);
 
-    void atualizarIdRemetenteNotificacao(int idNotificacao, int idRemetente);
+    void atualizarIdUtilizadorRemetenteNotificacao(int idNotificacao, int idUtilizadorRemetente);
 
-    void atualizarIdDestinatarioNotificacao(int idNotificacao, int idDestinatario);
+    void atualizarIdUtilizadorDestinatarioNotificacao(int idNotificacao, int idUtilizadorDestinatario);
 
     void sinalizarNotificacaoComoTratada(int idNotificacao);
 
@@ -28,7 +28,7 @@ public interface ISNotificacoes {
 
     List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime dataInicio, LocalDateTime dataFim);
 
-    List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int idFuncionario,
-            LocalDateTime dataInicio,
-            LocalDateTime dataFim);
+    List<Notificacao> obterNotificacoesPorUtilizadorEIntervalo(int idUtilizador,
+                                                                LocalDateTime dataInicio,
+                                                                LocalDateTime dataFim);
 }

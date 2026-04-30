@@ -51,10 +51,12 @@ public class DAOconfig {
                 + "id INT AUTO_INCREMENT PRIMARY KEY,"
                 + "descricao TEXT,"
                 + "data_emissao DATETIME,"
-                + "id_remetente INT,"
-                + "id_destinatario INT,"
+                + "idUtilizadorRemetente_FK INT,"
+                + "idUtilizadorDestinatario_FK INT,"
                 + "tratada BOOLEAN DEFAULT FALSE,"
-                + "data_horaTratada DATETIME"
+                + "data_horaTratada DATETIME,"
+                + "FOREIGN KEY (idUtilizadorRemetente_FK) REFERENCES Utilizador(id),"
+                + "FOREIGN KEY (idUtilizadorDestinatario_FK) REFERENCES Utilizador(id)"
                 + ")",
 
             "CREATE TABLE IF NOT EXISTS Cliente ("
@@ -114,7 +116,7 @@ public class DAOconfig {
             "CREATE TABLE IF NOT EXISTS StockComGarantia ("
                 + "idStock_FK INT PRIMARY KEY,"
                 + "nr_serie VARCHAR(100),"
-                + "garantia INT,"
+                + "garantia DATE,"
                 + "FOREIGN KEY (idStock_FK) REFERENCES Stock(id)"
                 + ")",
 
@@ -190,7 +192,7 @@ public class DAOconfig {
                 + "FOREIGN KEY (idReparacao_FK) REFERENCES Reparacao(id)"
                 + ")",
 
-            "CREATE TABLE IF NOT EXISTS DiagnosticoPeca ("
+            "CREATE TABLE IF NOT EXISTS PecasDoOrcamento ("
                 + "idOS_FK INT,"
                 + "idPeca_FK INT,"
                 + "quantidade INT,"
@@ -224,7 +226,7 @@ public class DAOconfig {
                 + ")",
 
             "CREATE TABLE IF NOT EXISTS Checklist ("
-                + "idOS_FK INT PRIMARY KEY,"
+                + "idConserto_FK INT PRIMARY KEY,"
                 + "travoes BOOLEAN,"
                 + "luzes BOOLEAN,"
                 + "pneus BOOLEAN,"
@@ -232,7 +234,7 @@ public class DAOconfig {
                 + "travagem BOOLEAN,"
                 + "visor BOOLEAN,"
                 + "teste_pratico BOOLEAN,"
-                + "FOREIGN KEY (idOS_FK) REFERENCES OrdemServico(id)"
+                + "FOREIGN KEY (idConserto_FK) REFERENCES Conserto(idOS_FK)"
                 + ")",
 
             "CREATE TABLE IF NOT EXISTS Fotografia ("

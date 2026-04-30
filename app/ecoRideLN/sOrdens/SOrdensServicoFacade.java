@@ -4,6 +4,8 @@ import app.common.EcoRideException;
 import app.common.Validacoes;
 import app.ecoRideCD.sOrdens.FotografiaDAO;
 import app.ecoRideCD.sOrdens.OrdemServicoDAO;
+import app.ecoRideLN.sAutenticacao.ISAutenticacao;
+import app.ecoRideLN.sAutenticacao.Utilizador;
 import app.ecoRideLN.sClientes.ISClientes;
 import app.ecoRideLN.sFinanceiro.ISFinanceiro;
 import app.ecoRideLN.sFinanceiro.TipoMovimento;
@@ -14,11 +16,10 @@ import app.ecoRideLN.sReparacoes.ISReparacoes;
 import app.ecoRideLN.sReparacoes.Reparacao;
 import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.ISStock;
-import app.ecoRideLN.sStock.PecasDoOrcamento;
 import app.ecoRideLN.sStock.Peca;
+import app.ecoRideLN.sStock.PecasDoOrcamento;
 import app.ecoRideLN.sStock.SStockFacade;
 import app.ecoRideLN.sStock.Stock;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,16 +41,26 @@ public class SOrdensServicoFacade implements ISOrdens {
     private final ISStock sStock;
     private final ISFinanceiro sFinanceiro;
     private final ISNotificacoes sNotificacoes;
+    private final ISAutenticacao sAutenticacao;
 
     public SOrdensServicoFacade(ISClientes sClientes, ISFuncionarios sFuncionarios,
                                 ISReparacoes sReparacoes, ISStock sStock,
-                                ISFinanceiro sFinanceiro, ISNotificacoes sNotificacoes) {
+                                ISFinanceiro sFinanceiro, ISNotificacoes sNotificacoes,
+                                ISAutenticacao sAutenticacao) {
         this.sClientes = sClientes;
         this.sFuncionarios = sFuncionarios;
         this.sReparacoes = sReparacoes;
         this.sStock = sStock;
         this.sFinanceiro = sFinanceiro;
         this.sNotificacoes = sNotificacoes;
+        this.sAutenticacao = sAutenticacao;
+    }
+
+    private int idUtilizadorPorFuncionario(int idFuncionario) {
+        Utilizador u = sAutenticacao.obterUtilizadorPorIdFuncionario(idFuncionario)
+                .orElseThrow(() -> new EcoRideException(
+                        "Funcionário " + idFuncionario + " não tem utilizador associado."));
+        return u.getId();
     }
 
     // ---- State machine ----
@@ -182,7 +193,12 @@ public class SOrdensServicoFacade implements ISOrdens {
         ordensServicoDAO.put(os.getId(), os);
 
         if (novoEstado == EstadoOS.PENDENTE_PAGAMENTO) {
-            sNotificacoes.criarNotificacao(os.getCodResponsavel(), os.getCodCliente(),
+            // Notificação interna: mecânico do conserto → secretária responsável da OS
+            int remetente = os.getConserto() != null
+                    ? idUtilizadorPorFuncionario(os.getConserto().getCodMecanico())
+                    : idUtilizadorPorFuncionario(os.getCodResponsavel());
+            int destinatario = idUtilizadorPorFuncionario(os.getCodResponsavel());
+            sNotificacoes.criarNotificacao(remetente, destinatario,
                     "OS #" + os.getId() + " concluída e pendente de pagamento.");
         }
     }
@@ -256,7 +272,10 @@ public class SOrdensServicoFacade implements ISOrdens {
         os.setEstado(EstadoOS.PENDENTE_APROVACAO_ORCAMENTO);
         ordensServicoDAO.put(os.getId(), os);
 
-        sNotificacoes.criarNotificacao(idMecanico, os.getCodCliente(),
+        // Notificação interna: mecânico → secretária responsável da OS
+        int remetente = idUtilizadorPorFuncionario(idMecanico);
+        int destinatario = idUtilizadorPorFuncionario(os.getCodResponsavel());
+        sNotificacoes.criarNotificacao(remetente, destinatario,
                 "Orçamento da OS #" + os.getId() + " disponível: " + orcamento + "€.");
     }
 
@@ -380,6 +399,7 @@ public class SOrdensServicoFacade implements ISOrdens {
         Peca p = sStock.obterDadosPeca(s.getCodPeca())
                 .orElseThrow(() -> new EcoRideException("Peça não encontrada."));
         sStock.atualizaEstadoStock(idStock, EstadoStock.EM_STOCK);
+        
         os.getConserto().setPreco_total(os.getConserto().getPreco_total() - p.getPreco_venda());
         ordensServicoDAO.put(os.getId(), os);
     }
@@ -427,13 +447,13 @@ public class SOrdensServicoFacade implements ISOrdens {
         if (!clienteNaoTemPagamentosPendentes(os.getCodCliente(), idOS))
             throw new EcoRideException("Cliente tem pagamentos anteriores pendentes.");
 
-        // Garante que existe notificação de término
+        // Garante que existe notificação de término da OS (entre utilizadores internos)
         boolean temNotificacaoTermino = sNotificacoes
                 .obterNotificacoesPorIntervalo(os.getData_criacao(), LocalDateTime.now())
                 .stream()
-                .anyMatch((Notificacao n) -> n.getId_destinatario() == os.getCodCliente()
-                        && n.getDescricao() != null
-                        && n.getDescricao().contains("OS #" + os.getId()));
+                .anyMatch((Notificacao n) -> n.getDescricao() != null
+                        && n.getDescricao().contains("OS #" + os.getId())
+                        && n.getDescricao().toLowerCase().contains("conclu"));
         if (!temNotificacaoTermino)
             throw new EcoRideException("Notificação de término da OS não existe.");
 

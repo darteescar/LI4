@@ -95,7 +95,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                             while (rrs.next()) d.getCod_reparacoes().add(rrs.getInt("idReparacao_FK"));
                         }
                     }
-                    try (PreparedStatement p = conn.prepareStatement("SELECT idPeca_FK, quantidade FROM DiagnosticoPeca WHERE idOS_FK=?")) {
+                    try (PreparedStatement p = conn.prepareStatement("SELECT idPeca_FK, quantidade FROM PecasDoOrcamento WHERE idOS_FK=?")) {
                         p.setInt(1, os.getId());
                         try (ResultSet prs = p.executeQuery()) {
                             while (prs.next())
@@ -127,7 +127,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                         }
                     }
                     try (PreparedStatement r = conn.prepareStatement(
-                            "SELECT travoes, luzes, pneus, aceleracao, travagem, visor, teste_pratico FROM Checklist WHERE idOS_FK=?")) {
+                            "SELECT travoes, luzes, pneus, aceleracao, travagem, visor, teste_pratico FROM Checklist WHERE idConserto_FK=?")) {
                         r.setInt(1, os.getId());
                         try (ResultSet rrs = r.executeQuery()) {
                             if (rrs.next()) {
@@ -208,11 +208,11 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                     try (Statement stm = conn.createStatement()) {
                         stm.executeUpdate("DELETE FROM AcessorioOS WHERE idOS_FK=" + value.getId());
                         stm.executeUpdate("DELETE FROM DiagnosticoReparacao WHERE idOS_FK=" + value.getId());
-                        stm.executeUpdate("DELETE FROM DiagnosticoPeca WHERE idOS_FK=" + value.getId());
+                        stm.executeUpdate("DELETE FROM PecasDoOrcamento WHERE idOS_FK=" + value.getId());
                         stm.executeUpdate("DELETE FROM Diagnostico WHERE idOS_FK=" + value.getId());
                         stm.executeUpdate("DELETE FROM ConsertoReparacao WHERE idOS_FK=" + value.getId());
                         stm.executeUpdate("DELETE FROM ConsertoStock WHERE idOS_FK=" + value.getId());
-                        stm.executeUpdate("DELETE FROM Checklist WHERE idOS_FK=" + value.getId());
+                        stm.executeUpdate("DELETE FROM Checklist WHERE idConserto_FK=" + value.getId());
                         stm.executeUpdate("DELETE FROM Conserto WHERE idOS_FK=" + value.getId());
                     }
                 } else {
@@ -257,7 +257,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                         }
                     }
                     try (PreparedStatement pstm = conn.prepareStatement(
-                            "INSERT INTO DiagnosticoPeca (idOS_FK, idPeca_FK, quantidade) VALUES (?,?,?)")) {
+                            "INSERT INTO PecasDoOrcamento (idOS_FK, idPeca_FK, quantidade) VALUES (?,?,?)")) {
                         for (PecasDoOrcamento qp : d.getListaPecas()) {
                             pstm.setInt(1, value.getId());
                             pstm.setInt(2, qp.getCodPeca());
@@ -293,7 +293,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                     if (c.getCheckList() != null) {
                         Checklist cl = c.getCheckList();
                         try (PreparedStatement pstm = conn.prepareStatement(
-                                "INSERT INTO Checklist (idOS_FK, travoes, luzes, pneus, aceleracao, travagem, visor, teste_pratico) "
+                                "INSERT INTO Checklist (idConserto_FK, travoes, luzes, pneus, aceleracao, travagem, visor, teste_pratico) "
                                         + "VALUES (?,?,?,?,?,?,?,?)")) {
                             pstm.setInt(1, value.getId());
                             pstm.setBoolean(2, cl.isTravoes());
@@ -325,11 +325,11 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
             int id = (Integer) key;
             stm.executeUpdate("DELETE FROM AcessorioOS WHERE idOS_FK=" + id);
             stm.executeUpdate("DELETE FROM DiagnosticoReparacao WHERE idOS_FK=" + id);
-            stm.executeUpdate("DELETE FROM DiagnosticoPeca WHERE idOS_FK=" + id);
+            stm.executeUpdate("DELETE FROM PecasDoOrcamento WHERE idOS_FK=" + id);
             stm.executeUpdate("DELETE FROM Diagnostico WHERE idOS_FK=" + id);
             stm.executeUpdate("DELETE FROM ConsertoReparacao WHERE idOS_FK=" + id);
             stm.executeUpdate("DELETE FROM ConsertoStock WHERE idOS_FK=" + id);
-            stm.executeUpdate("DELETE FROM Checklist WHERE idOS_FK=" + id);
+            stm.executeUpdate("DELETE FROM Checklist WHERE idConserto_FK=" + id);
             stm.executeUpdate("DELETE FROM Conserto WHERE idOS_FK=" + id);
             stm.executeUpdate("DELETE FROM Fotografia WHERE idOS_FK=" + id);
             stm.executeUpdate("DELETE FROM OrdemServico WHERE id=" + id);
@@ -345,7 +345,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         try (Connection conn = DAOconfig.getConnection(); Statement stm = conn.createStatement()) {
             stm.executeUpdate("DELETE FROM AcessorioOS");
             stm.executeUpdate("DELETE FROM DiagnosticoReparacao");
-            stm.executeUpdate("DELETE FROM DiagnosticoPeca");
+            stm.executeUpdate("DELETE FROM PecasDoOrcamento");
             stm.executeUpdate("DELETE FROM Diagnostico");
             stm.executeUpdate("DELETE FROM ConsertoReparacao");
             stm.executeUpdate("DELETE FROM ConsertoStock");

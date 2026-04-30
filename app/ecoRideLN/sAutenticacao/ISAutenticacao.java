@@ -8,6 +8,8 @@ public interface ISAutenticacao {
 
     Optional<Utilizador> obterDadosUtilizador(int id);
 
+    Optional<Utilizador> obterUtilizadorPorIdFuncionario(int idFuncionario);
+
     void removerUtilizador(int id);
 
     boolean existeUtilizador(int id);

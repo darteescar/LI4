@@ -40,6 +40,11 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
+    public Optional<Utilizador> obterUtilizadorPorIdFuncionario(int idFuncionario) {
+        return utilizadoresDAO.obterPorIdFuncionario(idFuncionario);
+    }
+
+    @Override
     public void removerUtilizador(int id) {
         if (!existeUtilizador(id))
             throw new EcoRideException("Utilizador não encontrado.");

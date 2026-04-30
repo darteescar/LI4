@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.AbstractMap;
@@ -85,9 +86,10 @@ public class StockDAO implements Map<Integer, Stock> {
             pstm.setInt(1, id);
             try (ResultSet rs2 = pstm.executeQuery()) {
                 if (rs2.next()) {
+                    Date g = rs2.getDate("garantia");
                     StockComGarantia s = new StockComGarantia(id, preco, codPeca,
                             dc == null ? null : dc.toLocalDateTime(),
-                            rs2.getString("nr_serie"), rs2.getInt("garantia"));
+                            rs2.getString("nr_serie"), g == null ? null : g.toLocalDate());
                     s.setEstado(estado);
                     return s;
                 }
@@ -178,11 +180,12 @@ public class StockDAO implements Map<Integer, Stock> {
                     "SELECT idStock_FK FROM StockComGarantia WHERE idStock_FK=?")) {
                 check.setInt(1, scg.getId());
                 try (ResultSet rs = check.executeQuery()) {
+                    Date gDate = scg.getGarantia() == null ? null : Date.valueOf(scg.getGarantia());
                     if (rs.next()) {
                         try (PreparedStatement pstm = conn.prepareStatement(
                                 "UPDATE StockComGarantia SET nr_serie=?, garantia=? WHERE idStock_FK=?")) {
                             pstm.setString(1, scg.getNr_serie());
-                            pstm.setInt(2, scg.getGarantia());
+                            pstm.setDate(2, gDate);
                             pstm.setInt(3, scg.getId());
                             pstm.executeUpdate();
                         }
@@ -191,7 +194,7 @@ public class StockDAO implements Map<Integer, Stock> {
                                 "INSERT INTO StockComGarantia (idStock_FK, nr_serie, garantia) VALUES (?,?,?)")) {
                             pstm.setInt(1, scg.getId());
                             pstm.setString(2, scg.getNr_serie());
-                            pstm.setInt(3, scg.getGarantia());
+                            pstm.setDate(3, gDate);
                             pstm.executeUpdate();
                         }
                     }
