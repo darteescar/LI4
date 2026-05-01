@@ -1,14 +1,14 @@
 package app.ecoRideCD.sAutenticacao;
 
-import app.common.EcoRideException;
-import app.ecoRideCD.DAOconfig.ConnectionFactory;
-import app.ecoRideLN.sAutenticacao.Cargo;
-import app.ecoRideLN.sAutenticacao.Utilizador;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import app.common.EcoRideException;
+import app.ecoRideCD.DAOconfig.ConnectionFactory;
+import app.ecoRideLN.sAutenticacao.Cargo;
+import app.ecoRideLN.sAutenticacao.Utilizador;
 
 public class UtilizadorDAO {
     private static UtilizadorDAO instance;
@@ -52,7 +52,7 @@ public class UtilizadorDAO {
         }
     }
 
-    public void save(Utilizador u) {
+    public void add(Utilizador u) {
         String sql = """
                 INSERT INTO Utilizador (id, password, idFuncionario, cargo)
                 VALUES (?, ?, ?, ?)
@@ -70,6 +70,18 @@ public class UtilizadorDAO {
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar utilizador " + u.getId(), e);
+        }
+    }
+
+    public int generateNewId() {
+        String sql = "SELECT MAX(id) FROM Utilizador";
+        try (Connection conn = ConnectionFactory.get();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1) + 1;
+            else return 1;
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a gerar novo ID para utilizador", e);
         }
     }
 }
