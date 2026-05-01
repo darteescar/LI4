@@ -15,5 +15,8 @@
 # Claude
 /.claude
 
+# Fotos
+/sistema
+
 .~lock.responsabilidades.xlsx#
 .LI4.vpp.lck
