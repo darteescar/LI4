@@ -20,3 +20,6 @@
 
 .~lock.responsabilidades.xlsx#
 .LI4.vpp.lck
+
+# Maven
+/app/target
