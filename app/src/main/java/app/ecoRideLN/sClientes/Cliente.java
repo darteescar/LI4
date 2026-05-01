@@ -10,7 +10,7 @@ public class Cliente {
      private String telemovel;
      private String NIF;
      private List<Integer> codsTrotinetes;
-     private TrotineteDAO trotineteDAO;
+     private static final TrotineteDAO trotineteDAO = TrotineteDAO.getInstance();
 
 
      public Cliente(int id, String nome, String email, String telemovel, String NIF, List<Integer> codsTrotinetes) {
@@ -20,7 +20,6 @@ public class Cliente {
           this.telemovel = telemovel;
           this.NIF = NIF;
           this.codsTrotinetes = new ArrayList<>(codsTrotinetes);
-          this.trotineteDAO = TrotineteDAO.getInstance();
      }
 
      public int getId() {
