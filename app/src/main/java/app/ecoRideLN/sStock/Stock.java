@@ -10,6 +10,7 @@ public class Stock {
      private int codPeca;
      private LocalDateTime data_chegada;
      private int quantidade;
+     private EstadoStock estado;
      private static final PecaDAO pecaDAO = PecaDAO.getInstance();
 
 
@@ -19,6 +20,7 @@ public class Stock {
           this.codPeca = codPeca;
           this.data_chegada = data_chegada;
           this.quantidade = quantidade;
+          this.estado = EstadoStock.EmStock;
      }
 
      public int getId() {
@@ -59,6 +61,14 @@ public class Stock {
 
      public void setQuantidade(int quantidade) {
           this.quantidade = quantidade;
+     }
+
+     public EstadoStock getEstado() {
+          return estado;
+     }
+
+     public void setEstado(EstadoStock estado) {
+          this.estado = estado;
      }
 
      // Métodos a mais

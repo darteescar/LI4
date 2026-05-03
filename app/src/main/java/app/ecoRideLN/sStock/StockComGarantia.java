@@ -8,7 +8,7 @@ public class StockComGarantia extends Stock {
      private LocalDate garantia;
      private final int quantidade = 1;
 
-     public StockComGarantia(int id, float preco_compra, int codPeca, LocalDateTime data_chegada, int codProduto, String nr_serie, LocalDate garantia) {
+     public StockComGarantia(int id, float preco_compra, int codPeca, LocalDateTime data_chegada, String nr_serie, LocalDate garantia) {
           super(id, preco_compra, codPeca, data_chegada, 1);
           this.nr_serie = nr_serie;
           this.garantia = garantia;

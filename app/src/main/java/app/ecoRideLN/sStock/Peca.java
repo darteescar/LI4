@@ -6,12 +6,12 @@ public class Peca {
      private int id;
      private String referencia;
      private int stock_minimo;
-     private int preco_venda;
+     private float preco_venda;
      private int codFornecedor;
      private boolean ativa;
      private static final FornecedorDAO fornecedorDAO = FornecedorDAO.getInstance();
 
-     public Peca(int id, String referencia, int stock_minimo, int preco_venda, int codFornecedor, boolean ativa) {
+     public Peca(int id, String referencia, int stock_minimo, float preco_venda, int codFornecedor, boolean ativa) {
           this.id = id;
           this.referencia = referencia;
           this.stock_minimo = stock_minimo;
@@ -44,11 +44,11 @@ public class Peca {
           this.stock_minimo = stock_minimo;
      }
 
-     public int getPreco_venda() {
+     public float getPreco_venda() {
           return preco_venda;
      }
 
-     public void setPreco_venda(int preco_venda) {
+     public void setPreco_venda(float preco_venda) {
           this.preco_venda = preco_venda;
      }
 
