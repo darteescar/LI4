@@ -13,7 +13,7 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public void atualizarPalavraPasseUtilizador(int id, String novaPassword){
-        if (!utilizadoresDAO.exists(id)) {
+        if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
         utilizadoresDAO.updatePassword(id, novaPassword);
@@ -21,7 +21,7 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public Utilizador criarUtilizador(String password, int idFuncionario, Cargo cargo) {
-        if (utilizadoresDAO.exists(idFuncionario)) {
+        if (utilizadoresDAO.containsKey(idFuncionario)) {
             throw new EcoRideException("Utilizador com ID " + idFuncionario + " já existe.");
         }
         Utilizador utilizador = new Utilizador(utilizadoresDAO.generateNewId(), password, idFuncionario, cargo);
@@ -31,15 +31,15 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public Utilizador obterDadosUtilizador(int id) {
-        if (!utilizadoresDAO.exists(id)) {
+        if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
-        return utilizadoresDAO.findById(id);
+        return utilizadoresDAO.get(id);
     }
 
     @Override
     public boolean removerUtilizador(int id) {
-        if (!utilizadoresDAO.exists(id)) {
+        if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
         utilizadoresDAO.remove(id);
@@ -48,12 +48,12 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public boolean existeUtilizador(int id) {
-        return utilizadoresDAO.exists(id);
+        return utilizadoresDAO.containsKey(id);
     }
 
     @Override
     public boolean autenticar(int id, String password) {
-        if (!utilizadoresDAO.exists(id)) {
+        if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
         return utilizadoresDAO.authenticate(id, password);
@@ -61,9 +61,9 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public Cargo obterCargoUtilizador(int id) {
-        if (!utilizadoresDAO.exists(id)) {
+        if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
-        return utilizadoresDAO.findById(id).getCargo();
+        return utilizadoresDAO.get(id).getCargo();
     }
 }

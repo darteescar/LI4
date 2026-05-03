@@ -11,6 +11,15 @@ public class CheckList {
      public CheckList() {
      }
 
+     public CheckList(CheckList checkList) {
+          this.luzes = checkList.luzes;
+          this.pneus = checkList.pneus;
+          this.aceleracao = checkList.aceleracao;
+          this.travagem = checkList.travagem;
+          this.visor = checkList.visor;
+          this.teste_pratico = checkList.teste_pratico;
+     }
+
      public boolean getLuzes() {
           return luzes;
      }

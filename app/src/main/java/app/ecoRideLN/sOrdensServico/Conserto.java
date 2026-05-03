@@ -3,6 +3,10 @@ package app.ecoRideLN.sOrdensServico;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
+import app.ecoRideCD.sReparacoes.ReparacaoDAO;
+
+
 public class Conserto {
      private float preco_total;
      private int codMecanico;
@@ -10,7 +14,7 @@ public class Conserto {
      private List<Integer> cod_reparacoes;
      private CheckList checkList;
 
-     private final static FuncionariosDAO funcionariosDAO = FuncionariosDAO.getInstance();
+     private final static FuncionarioDAO funcionarioDAO = FuncionarioDAO.getInstance();
      private final static ReparacaoDAO reparacoesDAO = ReparacaoDAO.getInstance();
 
      public Conserto(float preco_total, int codMecanico, List<PecasUsadas> listaPecas, List<Integer> cod_reparacoes, CheckList checkList) {
@@ -19,6 +23,14 @@ public class Conserto {
           this.listaPecas = listaPecas;
           this.cod_reparacoes = cod_reparacoes;
           this.checkList = checkList;
+     }
+
+     public Conserto(Conserto conserto){
+          this.preco_total = conserto.preco_total;
+          this.codMecanico = conserto.codMecanico;
+          this.listaPecas = new ArrayList<>(conserto.listaPecas);
+          this.cod_reparacoes = new ArrayList<>(conserto.cod_reparacoes);
+          this.checkList = new CheckList(this.checkList);
      }
 
      public float getPreco_total() {

@@ -1,46 +1,48 @@
 package app.ecoRideLN.sFuncionarios;
 
+import java.time.LocalDate;
+
 public interface ISFuncionarios {
 
-     Funcionario obterDadosFuncionario(int id);
+     public Funcionario obterDadosFuncionario(int id);
 
-     boolean removerFuncionario(int id);
+     public boolean removerFuncionario(int id);
 
-     boolean existeFuncionario(int id);
+     public boolean existeFuncionario(int id);
 
-     Funcionario registarFuncionario(String nome, String telemovel, String email, String data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
+     public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
 
-     float adicionarHorasExtra(int id, int horas_extra);
+     public float adicionarHorasExtra(int id, int horas_extra);
 
-     void atualizarNomeFuncionario(int id, String nome);
+     public void atualizarNomeFuncionario(int id, String nome);
 
-     void atualizarNumeroPortaFuncionario(int id, String numero_porta);
+     public void atualizarNumeroPortaFuncionario(int id, String numero_porta);
 
-     void atualizarRuaFuncionario(int id, String rua);
+     public void atualizarRuaFuncionario(int id, String rua);
 
-     void atualizarLocalidadeFuncionario(int id, String localidade);
+     public void atualizarLocalidadeFuncionario(int id, String localidade);
 
-     void atualizarCodigoPostalFuncionario(int id, String codigo_postal);
+     public void atualizarCodigoPostalFuncionario(int id, String codigo_postal);
 
-     void atualizarTelemovelFuncionario(int id, String telemovel);
+     public void atualizarTelemovelFuncionario(int id, String telemovel);
 
-     void atualizarEmailFuncionario(int id, String email);
+     public void atualizarEmailFuncionario(int id, String email);
 
-     void atualizarDataNascimentoFuncionario(int id, String data_nascimento);
+     public void atualizarDataNascimentoFuncionario(int id, LocalDate data_nascimento);
 
-     void atualizarNIFFuncionario(int id, String NIF);
+     public void atualizarNIFFuncionario(int id, String NIF);
 
-     void atualizarNUSFuncionario(int id, String NUS);
+     public void atualizarNUSFuncionario(int id, String NUS);
 
-     void atualizarIBANFuncionario(int id, String IBAN);
+     public void atualizarIBANFuncionario(int id, String IBAN);
 
-     void atualizarSalarioHoraFuncionario(int id, float salario_hora);
+     public void atualizarSalarioHoraFuncionario(int id, float salario_hora);
 
-     void atualizarSalarioBrutoFuncionario(int id, float salario_bruto);
+     public void atualizarSalarioBrutoFuncionario(int id, float salario_bruto);
 
-     void atualizarSalarioLiquidoFuncionario(int id, float salario_liquido);
+     public void atualizarSalarioLiquidoFuncionario(int id, float salario_liquido);
 
-     void registarPagamentoFuncionario(int id);
+     public void registarPagamentoFuncionario(int id);
 
-     void atualizarNISSFuncionario(int id, String NISS);
+     public void atualizarNISSFuncionario(int id, String NISS);
 }

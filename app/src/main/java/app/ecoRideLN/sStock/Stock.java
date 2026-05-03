@@ -1,5 +1,7 @@
 package app.ecoRideLN.sStock;
 
+import app.ecoRideCD.sStock.PecaDAO;
+
 import java.time.LocalDateTime;
 
 public class Stock {

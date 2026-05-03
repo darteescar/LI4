@@ -1,23 +1,24 @@
 package app.ecoRideLN.sFinanceiro;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ISFinanceiro {
-     MovimentoFinanceiro obterDadosMovimentoFinanceiro(int id);
+     public MovimentoFinanceiro obterDadosMovimentoFinanceiro(int id);
 
-     boolean removerMovimentoFinanceiro(int id);
+     public boolean removerMovimentoFinanceiro(int id);
 
-     boolean existeMovimentoFinanceiro(int id);
+     public boolean existeMovimentoFinanceiro(int id);
 
-     List<MovimentoFinanceiro> obterMovimentos();
+     public List<MovimentoFinanceiro> obterMovimentos();
 
-     MovimentoFinanceiro criarMovimentoFinanceiro(TipoMovimento tipo, float valor, String descricao);
+     public MovimentoFinanceiro criarMovimentoFinanceiro(TipoMovimento tipo, float valor, String descricao);
 
-     void atualizarValorCompraMovimentoFinanceiro(int id, float valor);
+     public void atualizarValorCompraMovimentoFinanceiro(int id, float valor);
 
-     void atualizarDescricaoMovimentoFinanceiro(int id, String descricao);
+     public void atualizarDescricaoMovimentoFinanceiro(int id, String descricao);
 
-     void atualizarDataMovimentoFinanceiro(int id, String data);
+     public void atualizarDataMovimentoFinanceiro(int id, LocalDateTime data);
 
-     void atualizarTipoMovimentoFinanceiro(int id, TipoMovimento tipo);
+     public void atualizarTipoMovimentoFinanceiro(int id, TipoMovimento tipo);
 }

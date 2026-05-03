@@ -1,5 +1,7 @@
 package app.ecoRideLN.sStock;
 
+import app.ecoRideCD.sStock.StockDAO;
+
 import java.time.LocalDateTime;
 
 public class Devolucao {

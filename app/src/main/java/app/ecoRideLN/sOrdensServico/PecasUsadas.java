@@ -1,5 +1,6 @@
 package app.ecoRideLN.sOrdensServico;
 
+import app.ecoRideCD.sStock.StockDAO;
 import app.ecoRideLN.sStock.Stock;
 
 public class PecasUsadas {
@@ -32,7 +33,7 @@ public class PecasUsadas {
      // Métodos a mais
 
      public Stock getStock() {
-          return stockDAO.getStockById(codStock);
+          return stockDAO.get(codStock);
      }
 
 }

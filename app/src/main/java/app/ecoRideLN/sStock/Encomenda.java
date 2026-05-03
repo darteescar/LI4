@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.ecoRideCD.sStock.FornecedorDAO;
+import app.ecoRideCD.sStock.StockDAO;
+
 public class Encomenda {
      private int id;
      private int codFornecedor;
@@ -77,7 +80,7 @@ public class Encomenda {
      public List<Stock> getEntradasStock() {
           List<Stock> entradas = new ArrayList<>();
           for (Integer codEntrada : codEntradasStock) {
-               Stock stock = stockDAO.getStockById(codEntrada);
+               Stock stock = stockDAO.get(codEntrada);
                if (stock != null) {
                     entradas.add(stock);
                }

@@ -2,6 +2,9 @@ package app.ecoRideLN.sClientes;
 
 import java.util.List;
 
+import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.OrdemServico;
+
 public interface ISClientes {
      Cliente registarCliente(String nome, String email, String telemovel, String nif);
 

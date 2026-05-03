@@ -1,5 +1,6 @@
 package app.ecoRideLN.sOrdensServico;
 
+import app.ecoRideCD.sStock.PecaDAO;
 import app.ecoRideLN.sStock.Peca;
 
 public class PecasOrcamento {
@@ -30,7 +31,7 @@ public class PecasOrcamento {
      }
 
      public double calcularValor() {
-          Peca peca = pecaDAO.getPecaById(codPeca);
+          Peca peca = pecaDAO.get(codPeca);
           if (peca != null) {
                return quantidade * peca.getPreco_venda();
           }

@@ -3,6 +3,8 @@ package app.ecoRideLN.sClientes;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.ecoRideCD.sClientes.TrotineteDAO;
+
 public class Cliente {
      private int id;
      private String nome;
@@ -12,6 +14,15 @@ public class Cliente {
      private List<Integer> codsTrotinetes;
      private static final TrotineteDAO trotineteDAO = TrotineteDAO.getInstance();
 
+
+     public Cliente(int id, String nome, String email, String telemovel, String NIF) {
+          this.id = id;
+          this.nome = nome;
+          this.email = email;
+          this.telemovel = telemovel;
+          this.NIF = NIF;
+          this.codsTrotinetes = new ArrayList<>();
+     }
 
      public Cliente(int id, String nome, String email, String telemovel, String NIF, List<Integer> codsTrotinetes) {
           this.id = id;
@@ -73,7 +84,7 @@ public class Cliente {
      public List<Trotinete> getTrotinetes() {
           List<Trotinete> trotinetes = new ArrayList<>();
           for (Integer cod : codsTrotinetes) {
-               Trotinete trotinete = trotineteDAO.getTrotineteById(cod);
+               Trotinete trotinete = trotineteDAO.get(cod);
                if (trotinete != null) {
                     trotinetes.add(trotinete);
                }

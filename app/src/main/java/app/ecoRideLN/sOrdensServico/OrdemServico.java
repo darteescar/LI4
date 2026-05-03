@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.ecoRideCD.sClientes.ClienteDAO;
+import app.ecoRideCD.sClientes.TrotineteDAO;
+import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
+import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.Trotinete;
 import app.ecoRideLN.sFuncionarios.Funcionario;
 
@@ -17,6 +21,8 @@ public class OrdemServico {
      private List<Fotografia> fotografias;
      private EstadoOS estado;
      private List<String> acessorios;
+     private Conserto conserto;
+     private Diagnostico diagnostico;
      
      private static final TrotineteDAO trotDAO = TrotineteDAO.getInstance();
      private static final ClienteDAO clienteDAO = ClienteDAO.getInstance();
@@ -32,6 +38,8 @@ public class OrdemServico {
           this.fotografias = new ArrayList<>(fotografias);
           this.estado = estado;
           this.acessorios = new ArrayList<>(acessorios);
+          this.conserto = null;
+          this.diagnostico = null;
      }
 
      public int getId() {
@@ -106,22 +114,36 @@ public class OrdemServico {
           this.acessorios = new ArrayList<>(acessorios);
      }
 
+     public Conserto getConserto() {
+          Conserto novo = new Conserto(this.conserto);
+          return novo;
+     }
+
+     public void setConserto(Conserto conserto) {
+          this.conserto = conserto;
+     }
+
+     public Diagnostico getDiagnostico() {
+          Diagnostico novo = new Diagnostico(this.diagnostico);
+          return novo;
+     }
+
+     public void setDiagnostico(Diagnostico diagnostico) {
+          this.diagnostico = diagnostico;
+     }
+
      // Métodos a mais
 
      public Trotinete getTrotinete() {
-          return trotDAO.getTrotineteById(codTrotinete);
+          return trotDAO.get(codTrotinete);
      }
 
      public Cliente getCliente() {
-          return clienteDAO.getClienteById(codCliente);
+          return clienteDAO.get(codCliente);
      }
 
      public Funcionario getResponsavel() {
           return funcionarioDAO.getFuncionarioById(codResponsavel);
      }
-
-
-
-
 
 }

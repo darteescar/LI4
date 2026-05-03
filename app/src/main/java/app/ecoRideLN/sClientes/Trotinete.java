@@ -1,5 +1,10 @@
 package app.ecoRideLN.sClientes;
 
+import app.ecoRideCD.sClientes.ClienteDAO;
+import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
+import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.OrdemServico;
+
 import java.util.ArrayList;
 import java.util.List;
 

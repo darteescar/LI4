@@ -3,35 +3,35 @@ package app.ecoRideLN.sReparacoes;
 import java.util.List;
 
 import app.common.EcoRideException;
+import app.ecoRideCD.sReparacoes.ReparacaoDAO;
 
 public class sReparacoesFacade implements ISReparacoes {
-     private ReparacaoDAO reparacaoDAO;
-
-     public sReparacoesFacade() {
-          this.reparacaoDAO = ReparacaoDAO.getInstance();
-     }
+     private final ReparacaoDAO reparacaoDAO = ReparacaoDAO.getInstance();
 
      @Override
      public Reparacao registarReparacao(String nomenclatura, String descricao, float preco){
-          return reparacaoDAO.add(nomenclatura, descricao, preco);
+          int id = reparacaoDAO.generateNewId();
+          Reparacao reparacao = new Reparacao(id, nomenclatura, descricao, preco, true);
+          reparacaoDAO.put(id, reparacao);
+          return reparacao;
      }
 
      @Override
      public Reparacao obterDadosReparacao(int id){
-          return reparacaoDAO.getById(id);
+          return reparacaoDAO.get(id);
      }
 
      @Override
      public boolean removerReparacao(int id){
-          return reparacaoDAO.remove(id);
+          return reparacaoDAO.remove(id) != null;
      }
 
      @Override
      public void atualizarDescricaoReparacao(int id, String novaDescricao){
-          Reparacao reparacao = reparacaoDAO.getById(id);
+          Reparacao reparacao = reparacaoDAO.get(id);
           if (reparacao != null) {
                reparacao.setDescricao(novaDescricao);
-               reparacaoDAO.update(reparacao);
+               reparacaoDAO.put(id, reparacao);
           } else {
                throw new EcoRideException("Reparação não encontrada para atualizar descrição.");
           }
@@ -39,10 +39,10 @@ public class sReparacoesFacade implements ISReparacoes {
 
      @Override
      public void atualizarPrecoReparacao(int id, float novoPreco){
-          Reparacao reparacao = reparacaoDAO.getById(id);
+          Reparacao reparacao = reparacaoDAO.get(id);
           if (reparacao != null) {
                reparacao.setPreco(novoPreco);
-               reparacaoDAO.update(reparacao);
+               reparacaoDAO.put(id, reparacao);
           } else {
                throw new EcoRideException("Reparação não encontrada para atualizar preço.");
           }
@@ -50,10 +50,10 @@ public class sReparacoesFacade implements ISReparacoes {
 
      @Override
      public void atualizarFlagDisponibilidadeReparacao(int id, boolean novaDisponibilidade){
-          Reparacao reparacao = reparacaoDAO.getById(id);
+          Reparacao reparacao = reparacaoDAO.get(id);
           if (reparacao != null) {
                reparacao.setDisponivel(novaDisponibilidade);
-               reparacaoDAO.update(reparacao);
+               reparacaoDAO.put(id, reparacao);
           } else {
                throw new EcoRideException("Reparação não encontrada para atualizar disponibilidade.");
           }
@@ -61,6 +61,6 @@ public class sReparacoesFacade implements ISReparacoes {
 
      @Override
      public List<Reparacao> obterReparacoesDisponiveis(){
-          return reparacaoDAO.getAll();
+          return reparacaoDAO.values().stream().filter(Reparacao::isDisponivel).toList();
      }
 }

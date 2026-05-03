@@ -1,9 +1,10 @@
 package app.ecoRideLN.sOrdensServico;
 
-import app.ecoRideLN.sFuncionarios.FuncionariosDAO;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
+import app.ecoRideCD.sReparacoes.ReparacaoDAO;
 
 public class Diagnostico {
      private String descricao;
@@ -13,8 +14,8 @@ public class Diagnostico {
      private List<Integer> cod_pecas;
      private List<PecasOrcamento> pecasOrcamento;
 
-     private static final FuncionariosDAO funcionariosDAO = FuncionariosDAO.getInstance();
-     private static final ReparacoesDAO reparacoesDAO = ReparacoesDAO.getInstance();
+     private static final FuncionarioDAO funcionariosDAO = FuncionarioDAO.getInstance();
+     private static final ReparacaoDAO reparacoesDAO = ReparacaoDAO.getInstance();
      
 
      public Diagnostico(String descricao, float orcamento, int codMecanico) {
@@ -33,6 +34,15 @@ public class Diagnostico {
           this.cod_reparacoes = new ArrayList<>(cod_reparacoes);
           this.cod_pecas = new ArrayList<>(cod_pecas);
           this.pecasOrcamento = new ArrayList<>(pecasOrcamento);
+     }
+
+     public Diagnostico(Diagnostico diagnostico) {
+          this.descricao = diagnostico.descricao;
+          this.orcamento = diagnostico.orcamento;
+          this.codMecanico = diagnostico.codMecanico;
+          this.cod_reparacoes = new ArrayList<>(diagnostico.cod_reparacoes);
+          this.cod_pecas = new ArrayList<>(diagnostico.cod_pecas);
+          this.pecasOrcamento = new ArrayList<>(diagnostico.pecasOrcamento);
      }
 
      public String getDescricao() {

@@ -1,5 +1,7 @@
 package app.ecoRideLN.sStock;
 
+import app.ecoRideCD.sStock.FornecedorDAO;
+
 public class Peca {
      private int id;
      private String referencia;

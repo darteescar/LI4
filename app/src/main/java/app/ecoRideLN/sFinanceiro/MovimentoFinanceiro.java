@@ -1,13 +1,15 @@
 package app.ecoRideLN.sFinanceiro;
 
+import java.time.LocalDateTime;
+
 public class MovimentoFinanceiro {
      private int id;
      private float valor;
-     private String data;
+     private LocalDateTime data;
      private String descricao;
      private TipoMovimento tipo;
 
-     public MovimentoFinanceiro(int id, String descricao, float valor, String data, TipoMovimento tipo) {
+     public MovimentoFinanceiro(int id, String descricao, float valor, LocalDateTime data, TipoMovimento tipo) {
           this.id = id;
           this.descricao = descricao;
           this.valor = valor;
@@ -31,11 +33,11 @@ public class MovimentoFinanceiro {
           this.valor = valor;
      }
 
-     public String getData() {
+     public LocalDateTime getData() {
           return data;
      }
 
-     public void setData(String data) {
+     public void setData(LocalDateTime data) {
           this.data = data;
      }
 
