@@ -81,4 +81,5 @@ public class CheckList {
           this.travagem = true;
           this.visor = true;
           this.teste_pratico = true;
+     }
 }
