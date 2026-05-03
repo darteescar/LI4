@@ -5,6 +5,7 @@ import java.util.List;
 
 import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
 import app.ecoRideCD.sReparacoes.ReparacaoDAO;
+import app.ecoRideLN.sStock.Stock;
 
 
 public class Conserto {
@@ -17,12 +18,18 @@ public class Conserto {
      private final static FuncionarioDAO funcionarioDAO = FuncionarioDAO.getInstance();
      private final static ReparacaoDAO reparacoesDAO = ReparacaoDAO.getInstance();
 
-     public Conserto(float preco_total, int codMecanico, List<PecasUsadas> listaPecas, List<Integer> cod_reparacoes, CheckList checkList) {
-          this.preco_total = preco_total;
+     public Conserto(int codMecanico, List<PecasUsadas> listaPecas, List<Integer> cod_reparacoes) {
+          this.preco_total = 0;
+          for (PecasUsadas p : listaPecas) {
+               this.preco_total += p.calcularValor();
+          }
+          for (Integer cod : cod_reparacoes) {
+               this.preco_total += reparacoesDAO.get(cod).getPreco();
+          }
           this.codMecanico = codMecanico;
           this.listaPecas = listaPecas;
           this.cod_reparacoes = cod_reparacoes;
-          this.checkList = checkList;
+          this.checkList = new CheckList();
      }
 
      public Conserto(Conserto conserto){
@@ -73,7 +80,17 @@ public class Conserto {
           this.checkList = checkList;
      }
 
+     // Métodos a mais
 
+     public void adicionarPecas(List<Stock> pecas) {
+          for (Stock stock : pecas) {
+               this.listaPecas.add(new PecasUsadas(stock.getQuantidade(), stock.getId()));
+          }
+     }
+
+     public void validarChecklist() {
+          this.checkList.validarChecklist();
+     }
 
 
 

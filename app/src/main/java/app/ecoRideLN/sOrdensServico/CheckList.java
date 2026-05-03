@@ -73,4 +73,12 @@ public class CheckList {
      public boolean isCheckListComplete() {
           return luzes && pneus && aceleracao && travagem && visor && teste_pratico;
      }
+
+     public void validarChecklist() {
+          this.luzes = true;
+          this.pneus = true;
+          this.aceleracao = true;
+          this.travagem = true;
+          this.visor = true;
+          this.teste_pratico = true;
 }

@@ -30,12 +30,12 @@ public class PecasOrcamento {
           this.codPeca = codPeca;
      }
 
-     public double calcularValor() {
+     public float calcularValor() {
           Peca peca = pecaDAO.get(codPeca);
           if (peca != null) {
                return quantidade * peca.getPreco_venda();
           }
-          return 0.0;
+          return 0.0f;
      }
 
 }

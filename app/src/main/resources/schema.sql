@@ -183,3 +183,38 @@ CREATE TABLE IF NOT EXISTS MovimentoPeca (
     FOREIGN KEY (id)      REFERENCES MovimentoFinanceiro(id) ON DELETE CASCADE,
     FOREIGN KEY (codPeca) REFERENCES Peca(id)
 );
+
+-- =========================================================
+-- SOrdensServico
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS OrdemServico (
+    id           INT          NOT NULL,
+    descricao    TEXT,
+    data_emissao DATETIME     NOT NULL,
+    data_prevista DATetime    NOT NULL,
+    codCliente   INT          NOT NULL,
+    codTrotinete INT          NOT NULL,
+    estado       ENUM('Pendente', 'EmProgresso', 'Concluida') NOT NULL DEFAULT 'Pendente',
+    PRIMARY KEY (id),
+    FOREIGN KEY (codCliente) REFERENCES Cliente(id),
+    FOREIGN KEY (codTrotinete) REFERENCES Trotinete(id)
+);
+
+
+CREATE TABLE IF NOT EXISTS OrdemServico_Acessorios (
+    idOrdemServico INT NOT NULL,
+    acessorio     VARCHAR(255) NOT NULL,
+    PRIMARY KEY (idOrdemServico, acessorio),
+    FOREIGN KEY (idOrdemServico) REFERENCES OrdemServico(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Fotografia(
+    idOrdemServico  INT NOT NULL,
+    conteudo        MEDIUMBLOB NOT NULL,
+    formato         VARCHAR(50) NOT NULL,
+    tamanho         LONG NOT NULL,
+    PRIMARY KEY (idOrdemServico),
+    FOREIGN KEY (idOrdemServico) REFERENCES OrdemServico(id) ON DELETE CASCADE
+)
+

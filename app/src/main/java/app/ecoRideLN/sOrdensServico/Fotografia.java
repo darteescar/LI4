@@ -35,4 +35,17 @@ public class Fotografia {
           this.tamanho = tamanho;
      }
 
+     public boolean isValid() {
+          // Simple validation: check if the format is supported and size is within limits
+          String[] formatosSuportados = {"jpg", "jpeg", "png"};
+          boolean formatoValido = false;
+          for (String f : formatosSuportados) {
+               if (formato.equalsIgnoreCase(f)) {
+                    formatoValido = true;
+                    break;
+               }
+          }
+          return formatoValido && tamanho > 0 && tamanho < 5 * 1024 * 1024; // Max 5MB
+     }
+
 }

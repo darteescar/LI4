@@ -58,7 +58,7 @@ public interface ISOrdensServico {
 
      public List<OrdemServico> filtrarOSsPorClienteEFuncionario(int id_cliente, int id_funcionario);
 
-     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int idMecanico);
+     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, String descricao, int idMecanico);
 
      public List<Reparacao> obterReparacoesDiagnosticoOS(int idOS);
 

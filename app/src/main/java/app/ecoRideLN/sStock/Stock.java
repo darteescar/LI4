@@ -1,8 +1,8 @@
 package app.ecoRideLN.sStock;
 
-import app.ecoRideCD.sStock.PecaDAO;
-
 import java.time.LocalDateTime;
+
+import app.ecoRideCD.sStock.PecaDAO;
 
 public class Stock {
      private int id;
@@ -59,6 +59,12 @@ public class Stock {
 
      public void setQuantidade(int quantidade) {
           this.quantidade = quantidade;
+     }
+
+     // Métodos a mais
+
+     public float getPrecoPeca() {
+          return pecaDAO.get(this.codPeca).getPreco_venda();
      }
 
 }

@@ -10,6 +10,7 @@ import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
 import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.Trotinete;
 import app.ecoRideLN.sFuncionarios.Funcionario;
+import app.ecoRideLN.sStock.Stock;
 
 public class OrdemServico {
      private int id;
@@ -28,7 +29,21 @@ public class OrdemServico {
      private static final ClienteDAO clienteDAO = ClienteDAO.getInstance();
      private static final FuncionarioDAO funcionarioDAO = FuncionarioDAO.getInstance();
 
-     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codResponsavel, List<Fotografia> fotografias, EstadoOS estado, List<String> acessorios) {
+     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codResponsavel) {
+          this.id = id;
+          this.descricao = descricao;
+          this.data_criacao = data_criacao;
+          this.codTrotinete = codTrotinete;
+          this.codCliente = codCliente;
+          this.codResponsavel = codResponsavel;
+          this.fotografias = new ArrayList<>();
+          this.estado = EstadoOS.PendenteDiagnostico;
+          this.acessorios = new ArrayList<>();
+          this.conserto = null;
+          this.diagnostico = null;
+     }
+
+     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codResponsavel, List<Fotografia> fotografias, List<String> acessorios) {
           this.id = id;
           this.descricao = descricao;
           this.data_criacao = data_criacao;
@@ -36,7 +51,7 @@ public class OrdemServico {
           this.codCliente = codCliente;
           this.codResponsavel = codResponsavel;
           this.fotografias = new ArrayList<>(fotografias);
-          this.estado = estado;
+          this.estado = EstadoOS.PendenteDiagnostico;
           this.acessorios = new ArrayList<>(acessorios);
           this.conserto = null;
           this.diagnostico = null;
@@ -133,6 +148,10 @@ public class OrdemServico {
      }
 
      // Métodos a mais
+
+     public void adicionarPecasConserto(List<Stock> pecas) {
+          this.conserto.adicionarPecas(pecas);
+     }
 
      public Trotinete getTrotinete() {
           return trotDAO.get(codTrotinete);

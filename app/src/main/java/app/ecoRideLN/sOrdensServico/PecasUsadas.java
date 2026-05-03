@@ -36,4 +36,10 @@ public class PecasUsadas {
           return stockDAO.get(codStock);
      }
 
+     public float calcularValor() {
+          Stock stock = getStock();
+          float preco = stock.getPrecoPeca();
+          return quantidade * preco;
+     }
+
 }

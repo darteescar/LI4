@@ -101,7 +101,7 @@ public class Trotinete {
      public List<OrdemServico> getOSs() {
           List<OrdemServico> ordensServico = new ArrayList<>();
           for (Integer codOS : codsOrdensServico) {
-               OrdemServico os = ordemServicoDAO.getById(codOS);
+               OrdemServico os = ordemServicoDAO.get(codOS);
                if (os != null) {
                     ordensServico.add(os);
                }
@@ -114,7 +114,7 @@ public class Trotinete {
      public List<Conserto> getConsertos(){
           List<Conserto> consertos = new ArrayList<>();
           for (Integer codOS : codsOrdensServico) {
-               OrdemServico os = ordemServicoDAO.getById(codOS);
+               OrdemServico os = ordemServicoDAO.get(codOS);
                if (os != null) {
                     Conserto conserto = os.getConserto();
                     if (conserto != null) {
