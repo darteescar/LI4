@@ -12,9 +12,7 @@ public interface ISStock {
     public Fornecedor obterDadosFornecedor(int id);
     public boolean    existeFornecedor(int id);
     public boolean    removerFornecedor(int id);
-    public void       atualizarNomeFornecedor(int id, String nome);
-    public void       atualizarTelemovelFornecedor(int id, String telemovel);
-    public void       atualizarEmailFornecedor(int id, String email);
+    public void atualizarFornecedor(int id, String nome, String telemovel, String email);
 
     // ------------------- Peca -------------------
 
@@ -23,11 +21,7 @@ public interface ISStock {
     public boolean existePeca_id(int id);
     public boolean existePeca_ref(String ref);
     public boolean removerPeca(int id);
-    public void    atualizarReferenciaPeca(int id, String referencia);
-    public void    atualizarStockMinimoPeca(int id, int stock_minimo);
-    public void    atualizarPrecoVendaPeca(int id, float preco_venda);
-    public void    atualizarIdFornecedorPeca(int id, int id_fornecedor);
-    public void    atualizarFlagDisponibilidadePeca(int id, boolean novaFlag);
+    public void atualizarPeca(int id, String referencia, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
     public int     obter_quantidade_Stock_Peca_id(int id);
     public int     obter_quantidade_Stock_Peca_ref(String referencia);
     public List<Integer> obter_Pecas_baixo_Stock_minimo();
@@ -43,11 +37,8 @@ public interface ISStock {
     public void    atualizaEstadoStock(int id, EstadoStock estado);
     public int     pecasDefeituosas_Stock(int id_peca);
     public void    registar_Defeito_entradaStock(int id_Stock);
-    public void    atualizarIdPecaStock(int id_stock, int id_peca);
-    public void    atualizarPrecoCompraStock(int id_stock, float preco_compra);
-    public void    atualizarDataRececaoStock(int id_stock, LocalDateTime data_rececao);
-    public void    atualizarGarantiaStock(int id_stock, LocalDate garantia);
-    public void    atualizarNrSerieStock(int id_stock, String nr_serie);
+    public void atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
+    public void    atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie);
 
     // ------------------- Devolucao -------------------
 

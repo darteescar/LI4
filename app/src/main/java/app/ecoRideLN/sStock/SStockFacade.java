@@ -40,28 +40,18 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarNomeFornecedor(int id, String nome){
+     public void atualizarFornecedor(int id, String nome, String telemovel, String email){
           Fornecedor fornecedor = fornecedorDAO.get(id);
           if (fornecedor != null) {
-               fornecedor.setNome(nome);
-               fornecedorDAO.put(id, fornecedor);
-          }
-     }
-
-     @Override
-     public void atualizarTelemovelFornecedor(int id, String telemovel){
-          Fornecedor fornecedor = fornecedorDAO.get(id);
-          if (fornecedor != null) {
-               fornecedor.setTelemovel(telemovel);
-               fornecedorDAO.put(id, fornecedor);
-          }
-     }
-
-     @Override
-     public void atualizarEmailFornecedor(int id, String email){
-          Fornecedor fornecedor = fornecedorDAO.get(id);
-          if (fornecedor != null) {
-               fornecedor.setEmail(email);
+               if (nome != null && !nome.isEmpty()) {
+                    fornecedor.setNome(nome);
+               }
+               if (telemovel != null && !telemovel.isEmpty()) {
+                    fornecedor.setTelemovel(telemovel);
+               }
+               if (email != null && !email.isEmpty()) {
+                    fornecedor.setEmail(email);
+               }
                fornecedorDAO.put(id, fornecedor);
           }
      }
@@ -93,46 +83,22 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarReferenciaPeca(int id, String referencia){
+     public void atualizarPeca(int id, String referencia, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa){
           Peca peca = pecaDAO.get(id);
           if (peca != null) {
-               peca.setReferencia(referencia);
-               pecaDAO.put(id, peca);
-          }
-     }
-
-     @Override
-     public void atualizarStockMinimoPeca(int id, int stock_minimo){
-          Peca peca = pecaDAO.get(id);
-          if (peca != null) {
-               peca.setStock_minimo(stock_minimo);
-               pecaDAO.put(id, peca);
-          }
-     }
-
-     @Override
-     public void atualizarPrecoVendaPeca(int id, float preco_venda){
-          Peca peca = pecaDAO.get(id);
-          if (peca != null) {
-               peca.setPreco_venda(preco_venda);
-               pecaDAO.put(id, peca);
-          }
-     }
-
-     @Override
-     public void atualizarIdFornecedorPeca(int id, int id_fornecedor){
-          Peca peca = pecaDAO.get(id);
-          if (peca != null) {
-               peca.setCodFornecedor(id_fornecedor);
-               pecaDAO.put(id, peca);
-          }
-     }
-
-     @Override
-     public void atualizarFlagDisponibilidadePeca(int id, boolean novaFlag){
-          Peca peca = pecaDAO.get(id);
-          if (peca != null) {
-               peca.setAtiva(novaFlag);
+               if (referencia != null && !referencia.isEmpty()) {
+                    peca.setReferencia(referencia);
+               }
+               if (stock_minimo >= 0) {
+                    peca.setStock_minimo(stock_minimo);
+               }
+               if (preco_venda >= 0) {
+                    peca.setPreco_venda(preco_venda);
+               }
+               if (id_fornecedor >= 0) {
+                    peca.setCodFornecedor(id_fornecedor);
+               }
+               peca.setAtiva(ativa);
                pecaDAO.put(id, peca);
           }
      }
@@ -225,47 +191,55 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarIdPecaStock(int id_stock, int id_peca){
+     public void atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado){
           Stock stock = stockDAO.get(id_stock);
           if (stock != null) {
-               stock.setCodPeca(id_peca);
+               if (preco_compra >= 0) {
+                    stock.setPreco_compra(preco_compra);
+               }
+               if (cod_Peca >= 0) {
+                    stock.setCodPeca(cod_Peca);
+               }
+               if (data_rececao != null) {
+                    stock.setData_chegada(data_rececao);
+               }
+               if (quantidade >= 0) {
+                    stock.setQuantidade(quantidade);
+               }
+               if (estado != null) {
+                    stock.setEstado(estado);
+               }
                stockDAO.put(id_stock, stock);
           }
      }
 
      @Override
-     public void atualizarPrecoCompraStock(int id_stock, float preco_compra){
-          Stock stock = stockDAO.get(id_stock);
-          if (stock != null) {
-               stock.setPreco_compra(preco_compra);
-               stockDAO.put(id_stock, stock);
-          }
-     }
-
-     @Override
-     public void atualizarDataRececaoStock(int id_stock, LocalDateTime data_rececao){
-          Stock stock = stockDAO.get(id_stock);
-          if (stock != null) {
-               stock.setData_chegada(data_rececao);
-               stockDAO.put(id_stock, stock);
-          }
-     }
-
-     @Override
-     public void atualizarGarantiaStock(int id_stock, LocalDate garantia){
+     public void atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie){
           Stock stock = stockDAO.get(id_stock);
           if (stock != null && stock instanceof StockComGarantia) {
-               ((StockComGarantia) stock).setGarantia(garantia);
-               stockDAO.put(id_stock, stock);
-          }
-     }
-
-     @Override
-     public void atualizarNrSerieStock(int id_stock, String nr_serie){
-          Stock stock = stockDAO.get(id_stock);
-          if (stock != null && stock instanceof StockComGarantia) {
-               ((StockComGarantia) stock).setNr_serie(nr_serie);
-               stockDAO.put(id_stock, stock);
+               StockComGarantia stockGarantia = (StockComGarantia) stock;
+               if (preco_compra >= 0) {
+                    stockGarantia.setPreco_compra(preco_compra);
+               }
+               if (cod_Peca >= 0) {
+                    stockGarantia.setCodPeca(cod_Peca);
+               }
+               if (data_rececao != null) {
+                    stockGarantia.setData_chegada(data_rececao);
+               }
+               if (quantidade >= 0) {
+                    stockGarantia.setQuantidade(quantidade);
+               }
+               if (estado != null) {
+                    stockGarantia.setEstado(estado);
+               }
+               if (garantia != null) {
+                    stockGarantia.setGarantia(garantia);
+               }
+               if (nr_serie != null && !nr_serie.isEmpty()) {
+                    stockGarantia.setNr_serie(nr_serie);
+               }
+               stockDAO.put(id_stock, stockGarantia);
           }
      }
 

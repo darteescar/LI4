@@ -9,6 +9,7 @@ public class Peca {
      private float preco_venda;
      private int codFornecedor;
      private boolean ativa;
+     
      private static final FornecedorDAO fornecedorDAO = FornecedorDAO.getInstance();
 
      public Peca(int id, String referencia, int stock_minimo, float preco_venda, int codFornecedor, boolean ativa) {
