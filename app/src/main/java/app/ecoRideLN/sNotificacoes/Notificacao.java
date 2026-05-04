@@ -2,6 +2,8 @@ package app.ecoRideLN.sNotificacoes;
 
 import java.time.LocalDateTime;
 
+import app.ecoRideCD.sAutenticacao.UtilizadorDAO;
+
 public class Notificacao {
      private int id;
      private String descricao;
@@ -10,6 +12,8 @@ public class Notificacao {
      private int id_destinatario;
      private boolean notificacao_tratada;
      private LocalDateTime data_horaTratada;
+
+     private static final UtilizadorDAO utilizadorDAO = UtilizadorDAO.getInstance();
 
      public Notificacao(int id, String descricao, int id_remetente, int id_destinatario) {
           this.id = id;

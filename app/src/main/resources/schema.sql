@@ -88,7 +88,9 @@ CREATE TABLE IF NOT EXISTS Notificacao (
     id_destinatario     INT      NOT NULL,
     notificacao_tratada BOOLEAN  NOT NULL DEFAULT FALSE,
     data_horaTratada    DATETIME NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (id_remetente)    REFERENCES Utilizador(id),
+    FOREIGN KEY (id_destinatario) REFERENCES Utilizador(id)
 );
 
 -- =========================================================
