@@ -41,37 +41,20 @@ public class SFinanceiroFacade implements ISFinanceiro {
         }
 
         @Override
-        public void atualizarValorCompraMovimentoFinanceiro(int id, float valor) {
+        public void atualizarMovimentoFinanceiro(int id, TipoMovimento tipo, float valor, String descricao, LocalDateTime data) {
             MovimentoFinanceiro movimento = movimentoFinanceiroDAO.get(id);
             if (movimento != null) {
-                movimento.setValor(valor);
-                movimentoFinanceiroDAO.put(id, movimento);
-            }
-        }
-
-        @Override
-        public void atualizarDescricaoMovimentoFinanceiro(int id, String descricao) {
-            MovimentoFinanceiro movimento = movimentoFinanceiroDAO.get(id);
-            if (movimento != null) {
-                movimento.setDescricao(descricao);
-                movimentoFinanceiroDAO.put(id, movimento);
-            }
-        }
-
-        @Override
-        public void atualizarDataMovimentoFinanceiro(int id, LocalDateTime data) {
-            MovimentoFinanceiro movimento = movimentoFinanceiroDAO.get(id);
-            if (movimento != null) {
-                movimento.setData(data);
-                movimentoFinanceiroDAO.put(id, movimento);
-            }
-        }
-
-        @Override
-        public void atualizarTipoMovimentoFinanceiro(int id, TipoMovimento tipo) {
-            MovimentoFinanceiro movimento = movimentoFinanceiroDAO.get(id);
-            if (movimento != null) {
-                movimento.setTipo(tipo);
+                if (tipo != null)
+                    movimento.setTipo(tipo);
+                if (valor >= 0){
+                    movimento.setValor(valor);
+                }
+                if (descricao != null){
+                    movimento.setDescricao(descricao);
+                }
+                if (data != null){
+                    movimento.setData(data);
+                }
                 movimentoFinanceiroDAO.put(id, movimento);
             }
         }

@@ -14,11 +14,5 @@ public interface ISFinanceiro {
 
      public MovimentoFinanceiro criarMovimentoFinanceiro(TipoMovimento tipo, float valor, String descricao);
 
-     public void atualizarValorCompraMovimentoFinanceiro(int id, float valor);
-
-     public void atualizarDescricaoMovimentoFinanceiro(int id, String descricao);
-
-     public void atualizarDataMovimentoFinanceiro(int id, LocalDateTime data);
-
-     public void atualizarTipoMovimentoFinanceiro(int id, TipoMovimento tipo);
+     public void atualizarMovimentoFinanceiro(int id, TipoMovimento tipo, float valor, String descricao, LocalDateTime data);
 }
