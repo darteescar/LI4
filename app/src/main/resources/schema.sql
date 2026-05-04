@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS Funcionario (
     nome                VARCHAR(100)  NOT NULL,
     telemovel           VARCHAR(20)   NOT NULL,
     email               VARCHAR(150)  NOT NULL,
-    data_nascimento     VARCHAR(30)   NOT NULL,
+    data_nascimento     DATE          NULL,
     NISS                VARCHAR(20)   NOT NULL,
     NIF                 VARCHAR(20)   NOT NULL,
     NUS                 VARCHAR(20)   NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS Peca (
     id            INT          NOT NULL,
     referencia    VARCHAR(100) NOT NULL,
     stock_minimo  INT          NOT NULL DEFAULT 0,
-    preco_venda   INT          NOT NULL,
+    preco_venda   FLOAT        NOT NULL,
     codFornecedor INT          NOT NULL,
     ativa         BOOLEAN      NOT NULL DEFAULT TRUE,
     PRIMARY KEY (id),
@@ -124,6 +124,7 @@ CREATE TABLE IF NOT EXISTS Stock (
     quantidade   INT          NOT NULL,
     nr_serie     VARCHAR(100) NULL,
     garantia     DATE         NULL,
+    estado       ENUM('EmStock','PossivelDefeito','Devolvida','Invalida','PendenteDevolucao','UsadaEmConserto') NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codPeca) REFERENCES Peca(id)
 );

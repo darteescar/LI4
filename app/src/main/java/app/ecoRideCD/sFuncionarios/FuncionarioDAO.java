@@ -1,6 +1,7 @@
 package app.ecoRideCD.sFuncionarios;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,14 +28,15 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
      }
 
      private Funcionario buildFromRow(ResultSet rs) throws SQLException {
+          Date dn = rs.getDate("data_nascimento");
           return new Funcionario(
                     rs.getInt("id"),
                     rs.getString("nome"),
                     rs.getString("telemovel"),
                     rs.getString("email"),
-                    rs.getString("data_nascimento").isBlank() ? null : rs.getDate("data_nascimento").toLocalDate(),
-                    rs.getString("NIF"),
+                    dn == null ? null : dn.toLocalDate(),
                     rs.getString("NISS"),
+                    rs.getString("NIF"),
                     rs.getString("NUS"),
                     rs.getString("IBAN"),
                     rs.getFloat("salario_hora"),
@@ -122,9 +124,9 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
                PreparedStatement ps = c.prepareStatement(sql)) {
                ps.setInt(1, key);
                ps.setString(2, value.getNome());
-               ps.setString(3, value.getEmail());
-               ps.setString(4, value.getTelemovel());
-               ps.setString(5, value.getData_nascimento().toString());
+               ps.setString(3, value.getTelemovel());
+               ps.setString(4, value.getEmail());
+               ps.setDate(5, value.getData_nascimento() == null ? null : Date.valueOf(value.getData_nascimento()));
                ps.setString(6, value.getNISS());
                ps.setString(7, value.getNIF());
                ps.setString(8, value.getNUS());
