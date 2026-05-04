@@ -12,8 +12,8 @@ public class Cliente {
      private String telemovel;
      private String NIF;
      private List<Integer> codsTrotinetes;
+     
      private static final TrotineteDAO trotineteDAO = TrotineteDAO.getInstance();
-
 
      public Cliente(int id, String nome, String email, String telemovel, String NIF) {
           this.id = id;

@@ -209,7 +209,6 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
 
      // --------- Aliases / domínio ---------
 
-     public Funcionario getFuncionarioById(int id) { return get(id); }
      public void add(Funcionario func)          { put(func.getId(), func); }
 
      public int generateNewId() {
@@ -220,8 +219,5 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
           } catch (SQLException e) {
                throw new EcoRideException("Erro a gerar novo ID para funcionario", e);
           }
-     }
-
-
-     
+     }     
 }

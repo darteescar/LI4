@@ -112,99 +112,26 @@ public class SClientesFacade implements ISClientes {
           }
      }
 
-     @Override
-     public void atualizarNomeCliente(int id_cliente, String novo_nome) {
+     @Override 
+     public void atualizarDadosCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif) {
           Cliente cliente = clientesDAO.get(id_cliente);
           if (cliente != null) {
-               cliente.setNome(novo_nome);
+               if (novo_nome != null){
+                    cliente.setNome(novo_nome);
+               }
+               if (novo_email != null){
+                    cliente.setEmail(novo_email);
+               }
+               if (novo_telemovel != null){
+                    cliente.setTelemovel(novo_telemovel);
+               }
+               if (novo_nif != null){
+                    cliente.setNIF(novo_nif);
+               } 
                clientesDAO.put(id_cliente, cliente);
           }
           else {
                throw new EcoRideException("Cliente com ID " + id_cliente + " não encontrado.");
-          }
-     }
-
-     @Override
-     public void atualizarEmailCliente(int id_cliente, String novo_email) {
-          Cliente cliente = clientesDAO.get(id_cliente);
-          if (cliente != null) {
-               cliente.setEmail(novo_email);
-               clientesDAO.put(id_cliente, cliente);
-          }
-          else {
-               throw new EcoRideException("Cliente com ID " + id_cliente + " não encontrado.");
-          }
-     }
-
-     @Override
-     public void atualizarTelemovelCliente(int id_cliente, String novo_telemovel) {
-          Cliente cliente = clientesDAO.get(id_cliente);
-          if (cliente != null) {
-               cliente.setTelemovel(novo_telemovel);
-               clientesDAO.put(id_cliente, cliente);
-          }
-          else {
-               throw new EcoRideException("Cliente com ID " + id_cliente + " não encontrado.");
-          }
-     }
-
-     @Override
-     public void atualizarNIFCliente(int id_cliente, String novo_nif) {
-          Cliente cliente = clientesDAO.get(id_cliente);
-          if (cliente != null) {
-               cliente.setNIF(novo_nif);
-               clientesDAO.put(id_cliente, cliente);
-          }
-          else {
-               throw new EcoRideException("Cliente com ID " + id_cliente + " não encontrado.");
-          }
-     }
-
-     @Override
-     public void atualizarModeloTrotinete(int id_trotinete, String novo_modelo){
-          Trotinete trotinete = trotinetesDAO.get(id_trotinete);
-          if (trotinete != null) {
-               trotinete.setModelo(novo_modelo);
-               trotinetesDAO.put(id_trotinete, trotinete);
-          }
-          else {
-               throw new EcoRideException("Trotinete com ID " + id_trotinete + " não encontrada.");
-          }
-     }
-
-     @Override
-     public void atualizarMarcaTrotinete(int id_trotinete, String nova_marca){
-          Trotinete trotinete = trotinetesDAO.get(id_trotinete);
-          if (trotinete != null) {
-               trotinete.setMarca(nova_marca);
-               trotinetesDAO.put(id_trotinete, trotinete);
-          }
-          else {
-               throw new EcoRideException("Trotinete com ID " + id_trotinete + " não encontrada.");
-          }
-     }
-
-     @Override
-     public void atualizarNumeroSerieTrotinete(int id_trotinete, int novo_num_serie){
-          Trotinete trotinete = trotinetesDAO.get(id_trotinete);
-          if (trotinete != null) {
-               trotinete.setNum_serie(novo_num_serie);
-               trotinetesDAO.put(id_trotinete, trotinete);
-          }
-          else {
-               throw new EcoRideException("Trotinete com ID " + id_trotinete + " não encontrada.");
-          }
-     }
-
-     @Override
-     public void atualizarTipoMotorTrotinete(int id_trotinete, String novo_tipo_motor){
-          Trotinete trotinete = trotinetesDAO.get(id_trotinete);
-          if (trotinete != null) {
-               trotinete.setTipo_motor(novo_tipo_motor);
-               trotinetesDAO.put(id_trotinete, trotinete);
-          }
-          else {
-               throw new EcoRideException("Trotinete com ID " + id_trotinete + " não encontrada.");
           }
      }
 

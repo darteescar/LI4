@@ -162,7 +162,7 @@ public class OrdemServico {
      }
 
      public Funcionario getResponsavel() {
-          return funcionarioDAO.getFuncionarioById(codResponsavel);
+          return funcionarioDAO.get(codResponsavel);
      }
 
 }
