@@ -62,14 +62,11 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     private List<Fotografia> loadFotografias(Connection c, int idOS) throws SQLException {
         List<Fotografia> out = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT conteudo, formato, tamanho FROM Fotografia WHERE idOS = ? ORDER BY id")) {
+                "SELECT caminho FROM Fotografia WHERE idOS = ? ORDER BY id")) {
             ps.setInt(1, idOS);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    out.add(new Fotografia(
-                            rs.getBytes("conteudo"),
-                            rs.getString("formato"),
-                            rs.getLong("tamanho")));
+                    out.add(new Fotografia(rs.getString("caminho")));
                 }
             }
         }
@@ -237,12 +234,10 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     private void insertFotografias(Connection c, int idOS, List<Fotografia> fotos) throws SQLException {
         if (fotos == null || fotos.isEmpty()) return;
         try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO Fotografia (idOS, conteudo, formato, tamanho) VALUES (?, ?, ?, ?)")) {
+                "INSERT INTO Fotografia (idOS, caminho) VALUES (?, ?)")) {
             for (Fotografia f : fotos) {
                 ps.setInt(1, idOS);
-                ps.setBytes(2, f.getConteudo());
-                ps.setString(3, f.getFormato());
-                ps.setLong(4, f.getTamanho());
+                ps.setString(2, f.getCaminho());
                 ps.addBatch();
             }
             ps.executeBatch();

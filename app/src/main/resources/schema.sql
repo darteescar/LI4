@@ -246,11 +246,9 @@ CREATE TABLE IF NOT EXISTS OrdemServico_Acessorio (
 );
 
 CREATE TABLE IF NOT EXISTS Fotografia (
-    id       INT          NOT NULL AUTO_INCREMENT,
-    idOS     INT          NOT NULL,
-    conteudo MEDIUMBLOB,
-    formato  VARCHAR(20),
-    tamanho  BIGINT,
+    id      INT          NOT NULL AUTO_INCREMENT,
+    idOS    INT          NOT NULL,
+    caminho VARCHAR(500) NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
 );
