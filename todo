@@ -3,8 +3,6 @@ Pensar se os metodos de validacao estao bem assim ou é melhor fazer mais geral
 
 O ficheiro das responsabilidades esta desatualizado/Corrigi-lo com os use cases atuais
 
-No vpp nos metodos das interfaces mudar "string" para "String" e "bool" para "boolean"
-
 
 alterar nos use cases que geração das Notificações tbm vao para o gerente
 alterar estados da Interface na OS ?
