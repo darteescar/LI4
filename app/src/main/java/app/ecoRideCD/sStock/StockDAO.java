@@ -19,6 +19,7 @@ import java.util.Set;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
+import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.Stock;
 import app.ecoRideLN.sStock.StockComGarantia;
 
@@ -45,11 +46,12 @@ public class StockDAO implements Map<Integer, Stock> {
         int qtd = rs.getInt("quantidade");
         String nrSerie = rs.getString("nr_serie");
         Date garantia = rs.getDate("garantia");
+        EstadoStock estado = rs.getString("estado") != null ? EstadoStock.valueOf(rs.getString("estado")) : null;
 
         if (nrSerie != null) {
             return new StockComGarantia(id, preco, codPeca, dataChegada, nrSerie, garantia == null ? null : garantia.toLocalDate());
         }
-        return new Stock(id, preco, codPeca, dataChegada, qtd);
+        return new Stock(id, preco, codPeca, dataChegada, qtd, estado);
     }
 
     @Override
@@ -96,8 +98,7 @@ public class StockDAO implements Map<Integer, Stock> {
             return null;
         }
         String sql = """
-                SELECT id, preco_compra, codPeca, data_chegada, quantidade, nr_serie, garantia
-                FROM Stock WHERE id = ?
+                SELECT * FROM Stock WHERE id = ?
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -113,12 +114,12 @@ public class StockDAO implements Map<Integer, Stock> {
     public Stock put(Integer key, Stock value) {
         Stock prev = get(key);
         String sql = """
-                INSERT INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, nr_serie, garantia)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, nr_serie, garantia, estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     preco_compra = VALUES(preco_compra), codPeca = VALUES(codPeca),
                     data_chegada = VALUES(data_chegada), quantidade = VALUES(quantidade),
-                    nr_serie = VALUES(nr_serie), garantia = VALUES(garantia)
+                    nr_serie = VALUES(nr_serie), garantia = VALUES(garantia), estado = VALUES(estado)
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
@@ -136,6 +137,7 @@ public class StockDAO implements Map<Integer, Stock> {
             } else {
                 ps.setNull(6, Types.VARCHAR);
                 ps.setNull(7, Types.DATE);
+                ps.setNull(8, Types.VARCHAR);
             }
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -193,7 +195,7 @@ public class StockDAO implements Map<Integer, Stock> {
     public Collection<Stock> values() {
         Set<Stock> out = new LinkedHashSet<>();
         String sql = """
-                SELECT id, preco_compra, codPeca, data_chegada, quantidade, nr_serie, garantia FROM Stock
+                SELECT * FROM Stock
                 """;
         try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
             while (rs.next()) {
@@ -215,9 +217,6 @@ public class StockDAO implements Map<Integer, Stock> {
     }
 
     // --------- Aliases / domínio ---------
-    public void add(Stock st) {
-        put(st.getId(), st);
-    }
 
     public int generateNewId() {
         try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Stock")) {
@@ -230,8 +229,7 @@ public class StockDAO implements Map<Integer, Stock> {
     public List<Stock> getByPecaId(int id_peca) {
         List<Stock> out = new ArrayList<>();
         String sql = """
-                SELECT id, preco_compra, codPeca, data_chegada, quantidade, nr_serie, garantia
-                FROM Stock WHERE codPeca = ?
+                SELECT * FROM Stock WHERE codPeca = ?
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id_peca);

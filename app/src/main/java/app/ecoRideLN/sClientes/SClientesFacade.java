@@ -71,17 +71,13 @@ public class SClientesFacade implements ISClientes {
           Cliente cliente = clientesDAO.get(id_cliente);
           if (cliente != null) {
                int id = trotinetesDAO.generateNewId();
-               Trotinete trotinete = new Trotinete(id, modelo, marca, num_serie, tipo_motor);
-               if (cliente.addTrotinete(trotinete.getId())) {
-                    clientesDAO.put(id_cliente,cliente);
-                    trotinetesDAO.put(id, trotinete);
-                    return trotinete;
-               }
+               Trotinete trotinete = new Trotinete(id, modelo, marca, num_serie, tipo_motor, id_cliente);
+               trotinetesDAO.put(id, trotinete);
+               return trotinete;
           }
           else {
                throw new EcoRideException("Cliente com ID " + id_cliente + " não encontrado.");
           }
-          return null;
      }
 
      @Override
@@ -104,12 +100,6 @@ public class SClientesFacade implements ISClientes {
      public boolean removerTrotinete(int id) {
           Trotinete trotinete = trotinetesDAO.get(id);
           if (trotinete != null) {
-               Cliente cliente = clientesDAO.get(trotinete.getCod_cliente());
-               if (cliente != null) {
-                    if (cliente.removeTrotinete(id)) {
-                         clientesDAO.put(id, cliente);
-                    }
-               }
                return (trotinetesDAO.remove(id, trotinete));
           }
           return false;

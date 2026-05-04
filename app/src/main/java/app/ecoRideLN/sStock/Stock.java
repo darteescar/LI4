@@ -23,6 +23,15 @@ public class Stock {
           this.estado = EstadoStock.EmStock;
      }
 
+     public Stock(int id, float preco_compra, int codPeca, LocalDateTime data_chegada, int quantidade, EstadoStock estado) {
+          this.id = id;
+          this.preco_compra = preco_compra;
+          this.codPeca = codPeca;
+          this.data_chegada = data_chegada;
+          this.quantidade = quantidade;
+          this.estado = estado;
+     }
+
      public int getId() {
           return id;
      }

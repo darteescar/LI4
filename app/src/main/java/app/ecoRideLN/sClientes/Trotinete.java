@@ -1,12 +1,12 @@
 package app.ecoRideLN.sClientes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.ecoRideCD.sClientes.ClienteDAO;
 import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
 import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Trotinete {
      private int id;
@@ -16,18 +16,17 @@ public class Trotinete {
      private String tipo_motor;
      private int cod_cliente;
      private List<Integer> codsOrdensServico;
-     private ClienteDAO clienteDAO;
-     private OrdemServicoDAO ordemServicoDAO;
+     private static final ClienteDAO clienteDAO = ClienteDAO.getInstance();
+     private static final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
 
-     public Trotinete(int id, String modelo, String marca, int num_serie, String tipo_motor) {
+     public Trotinete(int id, String modelo, String marca, int num_serie, String tipo_motor, int cod_cliente) {
           this.id = id;
           this.modelo = modelo;
           this.marca = marca;
           this.num_serie = num_serie;
           this.tipo_motor = tipo_motor;
+          this.cod_cliente = cod_cliente;
           this.codsOrdensServico = new ArrayList<>();
-          this.clienteDAO = ClienteDAO.getInstance();
-          this.ordemServicoDAO = OrdemServicoDAO.getInstance();
      }
 
      public Trotinete(int id, String modelo, String marca, int num_serie, String tipo_motor, int cod_cliente, List<Integer> codsOrdensServico) {
@@ -38,8 +37,6 @@ public class Trotinete {
           this.tipo_motor = tipo_motor;
           this.cod_cliente = cod_cliente;
           this.codsOrdensServico = new ArrayList<>(codsOrdensServico);
-          this.clienteDAO = ClienteDAO.getInstance();
-          this.ordemServicoDAO = OrdemServicoDAO.getInstance();
      }
 
      public int getId() {
