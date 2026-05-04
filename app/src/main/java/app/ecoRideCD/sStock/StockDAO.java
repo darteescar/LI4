@@ -130,10 +130,11 @@ public class StockDAO implements Map<Integer, Stock> {
             if (value instanceof StockComGarantia g) {
                 ps.setString(6, g.getNr_serie());
                 if (g.getGarantia() == null) {
-                    ps.setNull(7, Types.DATE); 
-                }else {
+                    ps.setNull(7, Types.DATE);
+                } else {
                     ps.setDate(7, Date.valueOf(g.getGarantia()));
                 }
+                ps.setString(8, g.getEstado().name());
             } else {
                 ps.setNull(6, Types.VARCHAR);
                 ps.setNull(7, Types.DATE);

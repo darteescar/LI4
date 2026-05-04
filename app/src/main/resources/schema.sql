@@ -144,6 +144,7 @@ CREATE TABLE IF NOT EXISTS Devolucao (
 CREATE TABLE IF NOT EXISTS Encomenda (
     id            INT      NOT NULL,
     codFornecedor INT      NOT NULL,
+    data_criacao  DATETIME NULL,
     data_rececao  DATETIME NULL,
     data_envio    DATETIME NULL,
     estado        ENUM('RASCUNHO', 'ENVIADA', 'RECEBIDA') NOT NULL,

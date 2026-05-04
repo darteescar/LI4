@@ -4,13 +4,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
-import app.ecoRideLN.sStock.Stock;
 import app.ecoRideCD.sClientes.ClienteDAO;
 import app.ecoRideCD.sClientes.TrotineteDAO;
 import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
 import app.ecoRideLN.sReparacoes.Reparacao;
+import app.ecoRideLN.sStock.Stock;
 
 
 public class SOrdensServicoFacade implements ISOrdensServico {
@@ -18,26 +16,27 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      private final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
      private final TrotineteDAO trotineteDAO = TrotineteDAO.getInstance();
      private final ClienteDAO clienteDAO = ClienteDAO.getInstance();
-     private final TrotineteDAO trotineteDAO1 = TrotineteDAO.getInstance();
 
      @Override
-     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao){
-          if(clienteDAO.get(id_cliente) == null || trotineteDAO.get(id_trotinete) == null){
+     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao) {
+          if (clienteDAO.get(id_cliente) == null || trotineteDAO.get(id_trotinete) == null) {
                return null;
           }
-          int id = ordemServicoDAO.getNextId();
+          int id = ordemServicoDAO.generateNewId();
           OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codResponsavel);
-          return ordemServicoDAO.put(os);
+          ordemServicoDAO.put(id, os);
+          return os;
      }
 
      @Override
-     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, List<PecasOrcamento> pecasOrcamento){
-          if(clienteDAO.get(id_cliente) == null || trotineteDAO.get(id_trotinete) == null){
+     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, List<PecasOrcamento> pecasOrcamento) {
+          if (clienteDAO.get(id_cliente) == null || trotineteDAO.get(id_trotinete) == null) {
                return null;
           }
-          int id = ordemServicoDAO.getNextId();
+          int id = ordemServicoDAO.generateNewId();
           OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codResponsavel, fotografias, acessorios);
-          return ordemServicoDAO.put(id, os);
+          ordemServicoDAO.put(id, os);
+          return os;
      }
 
      @Override
@@ -51,10 +50,10 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      }
 
      @Override
-     public void alterarDescricaoOS(int id, String Descricao) {
+     public void alterarDescricaoOS(int id, String descricao) {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
-               os.setDescricao(Descricao);
+               os.setDescricao(descricao);
                ordemServicoDAO.put(id, os);
           }
      }
@@ -90,13 +89,12 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      public void adicionarPecas_Conserto_OS(int id, List<Stock> pecas) {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
-               if (os.getConserto() == null) {
-                    Conserto con = new Conserto();
-                    con.adicionarPecas(pecas);
-                    os.setConserto(con);
-               } else {
-                    os.getConserto().adicionarPecas(pecas);
+               Conserto con = os.getConserto();
+               if (con == null) {
+                    con = new Conserto();
                }
+               con.adicionarPecas(pecas);
+               os.setConserto(con);
                ordemServicoDAO.put(id, os);
           }
      }
@@ -110,11 +108,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
                     numero++;
                }
           }
-          if (numero == 1) {
-               return true;
-          } else {
-               return false;
-          }
+          return numero == 1;
      }
 
      @Override
@@ -132,27 +126,25 @@ public class SOrdensServicoFacade implements ISOrdensServico {
                total += r.getPreco();
           }
           return total;
-          
      }
 
      @Override
      public boolean pecasDiagnosticoDisponiveisReparacao(int id_OS) {
-          // Implementation for checking if parts are available for repair
           return false;
      }
 
      @Override
      public boolean removerPecaConserto_OS(int id_OS, int id_Stock) {
           OrdemServico os = ordemServicoDAO.get(id_OS);
-          if (os != null) {
+          if (os != null && os.getConserto() != null) {
                List<PecasUsadas> pecas = os.getConserto().getListaPecas();
-               for (int i = 0 ; i < pecas.size(); i++) {
+               for (int i = 0; i < pecas.size(); i++) {
                     if (pecas.get(i).getCodStock() == id_Stock) {
                          pecas.remove(i);
                          Conserto con = os.getConserto();
                          con.setListaPecas(pecas);
                          os.setConserto(con);
-                         ordemServicoDAO.put(id_OS,os);
+                         ordemServicoDAO.put(id_OS, os);
                          return true;
                     }
                }
@@ -169,7 +161,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      public void alterarDataCriacaoOS(int id, LocalDateTime data_criacao) {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
-               os.setData_criacao(data_criacao);
+               os.setDataCriacao(data_criacao);
                ordemServicoDAO.put(id, os);
           }
      }
@@ -190,7 +182,6 @@ public class SOrdensServicoFacade implements ISOrdensServico {
                os.setCodCliente(id_cliente);
                ordemServicoDAO.put(id, os);
           }
-     }
      }
 
      @Override
@@ -233,17 +224,17 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      }
 
      @Override
-     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, String descricao, int idMecanico){
+     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, String descricao, int idMecanico) {
           OrdemServico os = ordemServicoDAO.get(idOS);
           if (os != null) {
-               Diagnostico diag = new Diagnostico(descricao, idMecanico, reparacoes, listPecas); 
+               Diagnostico diag = new Diagnostico(descricao, idMecanico, reparacoes, listPecas);
                os.setDiagnostico(diag);
-               ordemServicgetoDAO.put(os);
+               ordemServicoDAO.put(idOS, os);
           }
      }
 
      @Override
-     public List<Reparacao> obterReparacoesDiagnosticoOS(int idOS){
+     public List<Reparacao> obterReparacoesDiagnosticoOS(int idOS) {
           OrdemServico os = ordemServicoDAO.get(idOS);
           if (os != null && os.getDiagnostico() != null) {
                return os.getDiagnostico().obterReparacoesDiagnostico();
@@ -252,7 +243,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      }
 
      @Override
-     public List<PecasOrcamento> obterPecasQuantidadeDiagnosticoOS(int idOS){
+     public List<PecasOrcamento> obterPecasQuantidadeDiagnosticoOS(int idOS) {
           OrdemServico os = ordemServicoDAO.get(idOS);
           if (os != null && os.getDiagnostico() != null) {
                return os.getDiagnostico().getPecasOrcamento();
@@ -261,44 +252,56 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      }
 
      @Override
-     public void adicionarPecaConserto_OS(int id_OS, int id_Stock, int quantidade) {
+     public void adicionarPecaConserto_OS(int id_OS, int id_Stock) {
           OrdemServico os = ordemServicoDAO.get(id_OS);
           if (os != null) {
                Conserto con = os.getConserto();
+               if (con == null) return;
                List<PecasUsadas> pecas = con.getListaPecas();
-               for (PecasUsadas p : pecas){
+               for (PecasUsadas p : pecas) {
                     if (p.getCodStock() == id_Stock) {
-                         p.setQuantidade(p.getQuantidade() + quantidade);
+                         p.setQuantidade(p.getQuantidade() + 1);
                          con.setListaPecas(pecas);
                          os.setConserto(con);
-                         ordemServicoDAO.put(id_OS,os);
+                         ordemServicoDAO.put(id_OS, os);
                          return;
                     }
                }
+               pecas.add(new PecasUsadas(1, id_Stock));
+               con.setListaPecas(pecas);
+               os.setConserto(con);
+               ordemServicoDAO.put(id_OS, os);
           }
      }
 
      @Override
-     public void registarConsertoOS(int id_OS, int idMecanico , List<PecasUsadas> pecas, List<Integer> reparacoes){
+     public void registarConsertoOS(int id_OS, int idMecanico, List<Stock> pecas, List<Reparacao> reparacoes) {
           OrdemServico os = ordemServicoDAO.get(id_OS);
           if (os != null) {
-               Conserto con = new Conserto(idMecanico, pecas, reparacoes);
+               List<PecasUsadas> pecasUsadas = new ArrayList<>();
+               for (Stock s : pecas) {
+                    pecasUsadas.add(new PecasUsadas(s.getQuantidade(), s.getId()));
+               }
+               List<Integer> codReparacoes = new ArrayList<>();
+               for (Reparacao r : reparacoes) {
+                    codReparacoes.add(r.getId());
+               }
+               Conserto con = new Conserto(idMecanico, pecasUsadas, codReparacoes);
                os.setConserto(con);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id_OS, os);
           }
      }
 
      @Override
-     public boolean validarChecklist_ConsertoOS(int idOS){
+     public boolean validarChecklist_ConsertoOS(int idOS) {
           OrdemServico os = ordemServicoDAO.get(idOS);
           if (os != null && os.getConserto() != null) {
                Conserto con = os.getConserto();
                con.validarChecklist();
                os.setConserto(con);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(idOS, os);
                return true;
           }
           return false;
      }
-
 }

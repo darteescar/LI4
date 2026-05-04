@@ -37,7 +37,7 @@ public class Conserto {
           this.codMecanico = conserto.codMecanico;
           this.listaPecas = new ArrayList<>(conserto.listaPecas);
           this.cod_reparacoes = new ArrayList<>(conserto.cod_reparacoes);
-          this.checkList = new CheckList(this.checkList);
+          this.checkList = new CheckList(conserto.checkList);
      }
 
      public Conserto() {

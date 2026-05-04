@@ -98,11 +98,7 @@ public class SClientesFacade implements ISClientes {
 
      @Override
      public boolean removerTrotinete(int id) {
-          Trotinete trotinete = trotinetesDAO.get(id);
-          if (trotinete != null) {
-               return (trotinetesDAO.remove(id, trotinete));
-          }
-          return false;
+          return trotinetesDAO.remove(id) != null;
      }
 
      @Override

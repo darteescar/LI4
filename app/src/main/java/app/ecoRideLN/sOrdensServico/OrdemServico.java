@@ -130,8 +130,8 @@ public class OrdemServico {
      }
 
      public Conserto getConserto() {
-          Conserto novo = new Conserto(this.conserto);
-          return novo;
+          if (this.conserto == null) return null;
+          return new Conserto(this.conserto);
      }
 
      public void setConserto(Conserto conserto) {
@@ -139,8 +139,8 @@ public class OrdemServico {
      }
 
      public Diagnostico getDiagnostico() {
-          Diagnostico novo = new Diagnostico(this.diagnostico);
-          return novo;
+          if (this.diagnostico == null) return null;
+          return new Diagnostico(this.diagnostico);
      }
 
      public void setDiagnostico(Diagnostico diagnostico) {
