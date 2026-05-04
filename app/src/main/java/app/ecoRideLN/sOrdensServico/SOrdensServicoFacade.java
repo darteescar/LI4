@@ -100,7 +100,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      }
 
      @Override
-     public boolean clienteNaoTemPagamentosPendentes(int id) {
+     public boolean clienteTemApenasUmPagamentoPendente(int id) {
           List<OrdemServico> osList = ordemServicoDAO.getOSDoCliente(id);
           int numero = 0;
           for (OrdemServico os : osList) {

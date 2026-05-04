@@ -26,7 +26,7 @@ public interface ISOrdensServico {
 
      public void adicionarPecas_Conserto_OS(int id, List<Stock> pecas);
 
-     public boolean clienteNaoTemPagamentosPendentes(int id);
+     public boolean clienteTemApenasUmPagamentoPendente(int id);
 
      public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, int id_cliente, int id_funcionario);
 

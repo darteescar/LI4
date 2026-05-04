@@ -21,7 +21,9 @@ public class SStockFacade implements ISStock {
      @Override
      public Fornecedor registarFornecedor(String nome, String telemovel, String email){
           int id = fornecedorDAO.generateNewId();
-          return fornecedorDAO.put(id, new Fornecedor(id, nome, telemovel, email));
+          Fornecedor novo = new Fornecedor(id, nome, telemovel, email);
+          fornecedorDAO.put(id, novo);
+          return novo;
      }
 
      @Override
@@ -59,7 +61,9 @@ public class SStockFacade implements ISStock {
      @Override
      public Peca registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor){
           int id = pecaDAO.generateNewId();
-          return pecaDAO.put(id, new Peca(id, ref, stock_minimo, preco_venda, id_fornecedor, true));
+          Peca nova = new Peca(id, ref, stock_minimo, preco_venda, id_fornecedor, true);
+          pecaDAO.put(id, nova);
+          return nova;
      }
 
      @Override
@@ -147,13 +151,17 @@ public class SStockFacade implements ISStock {
      public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data,
                                          LocalDate garantia, String nr_serie){
           int id = stockDAO.generateNewId();
-          return stockDAO.put(id, new StockComGarantia(id, preco_compra, id_peca, data, nr_serie, garantia));
+          Stock novo = new StockComGarantia(id, preco_compra, id_peca, data, nr_serie, garantia);
+          stockDAO.put(id, novo);
+          return novo;
      }
 
      @Override
      public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade){
           int id = stockDAO.generateNewId();
-          return stockDAO.put(id, new Stock(id, preco_compra, id_peca, data, quantidade));
+          Stock novo = new Stock(id, preco_compra, id_peca, data, quantidade);
+          stockDAO.put(id, novo);
+          return novo;
      }
 
      @Override
@@ -257,7 +265,9 @@ public class SStockFacade implements ISStock {
      @Override
      public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock){
           int id = devolucaoDAO.generateNewId();
-          return devolucaoDAO.put(id, new Devolucao(id, data_devolucao, motivo, id_stock));
+          Devolucao nova = new Devolucao(id, data_devolucao, motivo, id_stock);
+          devolucaoDAO.put(id, nova);
+          return nova;
      }
 
       @Override

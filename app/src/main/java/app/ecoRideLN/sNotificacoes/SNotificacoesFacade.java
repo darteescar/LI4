@@ -72,8 +72,9 @@ public class SNotificacoesFacade implements ISNotificacoes {
      @Override
      public Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario) {
           int id = notificacaoDAO.generateNewId();
-          Notificacao notificacao = new Notificacao(id , descricao, id_remetente, id_destinatario);
-          return notificacaoDAO.put(id, notificacao);
+          Notificacao notificacao = new Notificacao(id, descricao, id_remetente, id_destinatario);
+          notificacaoDAO.put(id, notificacao);
+          return notificacao;
      }
 
      @Override
