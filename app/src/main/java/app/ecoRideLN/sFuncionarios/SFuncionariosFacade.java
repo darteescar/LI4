@@ -49,146 +49,6 @@ public class SFuncionariosFacade implements ISFuncionarios {
      }
 
      @Override
-     public void atualizarNomeFuncionario(int id, String nome) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setNome(nome);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarNumeroPortaFuncionario(int id, String numero_porta) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setNumero_porta(numero_porta);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarRuaFuncionario(int id, String rua) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setRua(rua);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarLocalidadeFuncionario(int id, String localidade) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setLocalidade(localidade);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarCodigoPostalFuncionario(int id, String codigo_postal) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setCodigo_postal(codigo_postal);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarTelemovelFuncionario(int id, String telemovel) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setTelemovel(telemovel);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarEmailFuncionario(int id, String email) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setEmail(email);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarDataNascimentoFuncionario(int id, LocalDate data_nascimento) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setData_nascimento(data_nascimento);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarNIFFuncionario(int id, String NIF) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setNIF(NIF);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarNUSFuncionario(int id, String NUS) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setNUS(NUS);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarIBANFuncionario(int id, String IBAN) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setIBAN(IBAN);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarSalarioHoraFuncionario(int id, float salario_hora) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setSalario_hora(salario_hora);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarSalarioBrutoFuncionario(int id, float salario_bruto) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setSalario_bruto(salario_bruto);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
-     public void atualizarSalarioLiquidoFuncionario(int id, float salario_liquido) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setSalario_liquido(salario_liquido);
-          funcionarioDAO.put(id, funcionario);
-     }
-
-     @Override
      public void registarPagamentoFuncionario(int id) {
           Funcionario funcionario = funcionarioDAO.get(id);
           if (funcionario == null) {
@@ -199,12 +59,28 @@ public class SFuncionariosFacade implements ISFuncionarios {
      }
 
      @Override
-     public void atualizarNISSFuncionario(int id, String NISS) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
+     public void atualizarDadosFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal){
+          Funcionario func = funcionarioDAO.get(id);
+          if (func != null) {
+               if (nome != null) func.setNome(nome);
+               if (telemovel != null) func.setTelemovel(telemovel);
+               if (email != null) func.setEmail(email);
+               if (data_nascimento != null) func.setData_nascimento(data_nascimento);
+               if (NISS != null) func.setNISS(NISS);
+               if (NIF != null) func.setNIF(NIF);
+               if (NUS != null) func.setNUS(NUS);
+               if (IBAN != null) func.setIBAN(IBAN);
+               if (salario_hora >= 0) func.setSalario_hora(salario_hora);
+               if (salario_liquido >= 0) func.setSalario_liquido(salario_liquido);
+               if (salario_bruto >= 0) func.setSalario_bruto(salario_bruto);
+               if (horas_extra >= 0) func.setHoras_extra(horas_extra);
+               if (numero_porta != null) func.setNumero_porta(numero_porta);
+               if (rua != null) func.setRua(rua);
+               if (localidade != null) func.setLocalidade(localidade);
+               if (codigo_postal != null) func.setCodigo_postal(codigo_postal);
+               funcionarioDAO.put(id, func);
+          } else {
                throw new EcoRideException("Funcionário com ID " + id + " não existe.");
           }
-          funcionario.setNISS(NISS);
-          funcionarioDAO.put(id, funcionario);
      }
 }

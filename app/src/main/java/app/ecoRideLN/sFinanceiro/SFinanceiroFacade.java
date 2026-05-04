@@ -56,6 +56,8 @@ public class SFinanceiroFacade implements ISFinanceiro {
                     movimento.setData(data);
                 }
                 movimentoFinanceiroDAO.put(id, movimento);
+            } else {
+                throw new IllegalArgumentException("Movimento Financeiro com ID " + id + " não existe.");
             }
         }
 
