@@ -81,7 +81,7 @@ public class Conserto {
      }
 
      public CheckList getCheckList() {
-          return checkList;
+          return new CheckList(checkList);
      }
 
      public void setCheckList(CheckList checkList) {

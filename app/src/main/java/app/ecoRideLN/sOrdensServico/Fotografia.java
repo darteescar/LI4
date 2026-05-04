@@ -6,17 +6,17 @@ public class Fotografia {
      private long tamanho;
 
      public Fotografia(byte[] conteudo, String formato, long tamanho) {
-          this.conteudo = conteudo;
+          this.conteudo = conteudo == null ? null : conteudo.clone();
           this.formato = formato;
           this.tamanho = tamanho;
      }
 
      public byte[] getConteudo() {
-          return conteudo;
+          return conteudo == null ? null : conteudo.clone();
      }
 
      public void setConteudo(byte[] conteudo) {
-          this.conteudo = conteudo;
+          this.conteudo = conteudo == null ? null : conteudo.clone();
      }
 
      public String getFormato() {
