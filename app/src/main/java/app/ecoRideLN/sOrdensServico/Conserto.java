@@ -40,6 +40,14 @@ public class Conserto {
           this.checkList = new CheckList(this.checkList);
      }
 
+     public Conserto() {
+          this.preco_total = 0;
+          this.codMecanico = 0;
+          this.listaPecas = new ArrayList<>();
+          this.cod_reparacoes = new ArrayList<>();
+          this.checkList = new CheckList();
+     }
+
      public float getPreco_total() {
           return preco_total;
      }
@@ -91,6 +99,8 @@ public class Conserto {
      public void validarChecklist() {
           this.checkList.validarChecklist();
      }
+
+     
 
 
 

@@ -1,8 +1,10 @@
-pe
+package app.ecoRideLN.sOrdensServico;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import app.ecoRideLN.sStock.Stock;
 import app.ecoRideCD.sClientes.ClienteDAO;
@@ -88,7 +90,13 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      public void adicionarPecas_Conserto_OS(int id, List<Stock> pecas) {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
-               os.adicionarPecasConserto(pecas);
+               if (os.getConserto() == null) {
+                    Conserto con = new Conserto();
+                    con.adicionarPecas(pecas);
+                    os.setConserto(con);
+               } else {
+                    os.getConserto().adicionarPecas(pecas);
+               }
                ordemServicoDAO.put(id, os);
           }
      }
@@ -138,9 +146,9 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id_OS);
           if (os != null) {
                List<PecasUsadas> pecas = os.getConserto().getListaPecas();
-               for (PecasUsadas p : pecas) {
-                    if (p.getCodStock() == id_Stock) {
-                         pecas.remove(p);
+               for (int i = 0 ; i < pecas.size(); i++) {
+                    if (pecas.get(i).getCodStock() == id_Stock) {
+                         pecas.remove(i);
                          Conserto con = os.getConserto();
                          con.setListaPecas(pecas);
                          os.setConserto(con);

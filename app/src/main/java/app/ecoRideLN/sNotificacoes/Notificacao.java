@@ -11,10 +11,10 @@ public class Notificacao {
      private boolean notificacao_tratada;
      private LocalDateTime data_horaTratada;
 
-     public Notificacao(int id, String descricao, LocalDateTime data_emissao, int id_remetente, int id_destinatario) {
+     public Notificacao(int id, String descricao, int id_remetente, int id_destinatario) {
           this.id = id;
           this.descricao = descricao;
-          this.data_emissao = data_emissao;
+          this.data_emissao = LocalDateTime.now();
           this.id_remetente = id_remetente;
           this.id_destinatario = id_destinatario;
           this.notificacao_tratada = false;
@@ -29,16 +29,6 @@ public class Notificacao {
           this.id_destinatario = id_destinatario;
           this.notificacao_tratada = notificacao_tratada;
           this.data_horaTratada = null;
-     }
-
-     public Notificacao(int id, String descricao, LocalDateTime data_emissao, int id_remetente, int id_destinatario, boolean notificacao_tratada, LocalDateTime data_horaTratada) {
-          this.id = id;
-          this.descricao = descricao;
-          this.data_emissao = data_emissao;
-          this.id_remetente = id_remetente;
-          this.id_destinatario = id_destinatario;
-          this.notificacao_tratada = notificacao_tratada;
-          this.data_horaTratada = data_horaTratada;
      }
 
      public int getId() {

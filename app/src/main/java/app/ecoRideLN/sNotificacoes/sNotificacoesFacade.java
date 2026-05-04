@@ -1,9 +1,9 @@
 package app.ecoRideLN.sNotificacoes;
 
-import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
 
 public class sNotificacoesFacade implements ISSNotificacoes {
      private NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
@@ -72,7 +72,7 @@ public class sNotificacoesFacade implements ISSNotificacoes {
      @Override
      public Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario) {
           int id = notificacaoDAO.generateNewId();
-          Notificacao notificacao = new Notificacao(id , descricao, LocalDateTime.now(), id_remetente, id_destinatario);
+          Notificacao notificacao = new Notificacao(id , descricao, id_remetente, id_destinatario);
           return notificacaoDAO.put(id, notificacao);
      }
 
