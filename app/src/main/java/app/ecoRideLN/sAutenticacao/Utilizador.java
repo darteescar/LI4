@@ -15,7 +15,7 @@ public class Utilizador {
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(int id) {
@@ -23,7 +23,7 @@ public class Utilizador {
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password) {
@@ -31,7 +31,7 @@ public class Utilizador {
     }
 
     public int getIdFuncionario() {
-        return idFuncionario;
+        return this.idFuncionario;
     }
 
     public void setIdFuncionario(int idFuncionario) {
@@ -39,7 +39,7 @@ public class Utilizador {
     }
 
     public Cargo getCargo() {
-        return cargo;
+        return this.cargo;
     }
 
     public void setCargo(Cargo cargo) {

@@ -34,7 +34,7 @@ public class Cliente {
      }
 
      public int getId() {
-          return id;
+          return this.id;
      }
 
      public void setId(int id) {
@@ -42,7 +42,7 @@ public class Cliente {
      }
 
      public String getNome() {
-          return nome;
+          return this.nome;
      }
 
      public void setNome(String nome) {
@@ -50,7 +50,7 @@ public class Cliente {
      }
 
      public String getEmail() {
-          return email;
+          return this.email;
      }
 
      public void setEmail(String email) {
@@ -58,7 +58,7 @@ public class Cliente {
      }
 
      public String getTelemovel() {
-          return telemovel;
+          return this.telemovel;
      }
 
      public void setTelemovel(String telemovel) {
@@ -66,7 +66,7 @@ public class Cliente {
      }
 
      public String getNIF() {
-          return NIF;
+          return this.NIF;
      }
 
      public void setNIF(String NIF) {
@@ -74,7 +74,7 @@ public class Cliente {
      }
 
      public List<Integer> getCodsTrotinetes() {
-          return new ArrayList<>(codsTrotinetes);
+          return new ArrayList<>(this.codsTrotinetes);
      }
 
      public void setCodsTrotinetes(List<Integer> codsTrotinetes) {
