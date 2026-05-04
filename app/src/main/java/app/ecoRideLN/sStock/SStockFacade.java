@@ -106,7 +106,11 @@ public class SStockFacade implements ISStock {
      @Override
      public int obter_quantidade_Stock_Peca_id(int id){
           List<Stock> stocks = stockDAO.getByPecaId(id);
-          return stocks.size();
+          int quantidadeTotal = 0;
+          for (Stock s : stocks) {
+               quantidadeTotal += s.getQuantidade();
+          }
+          return quantidadeTotal;
      }
 
      @Override
@@ -114,7 +118,14 @@ public class SStockFacade implements ISStock {
           Peca peca = pecaDAO.getByReferenceFull(referencia);
           if (peca != null){
                List<Stock> stocks = stockDAO.getByPecaId(peca.getId());
-               return stocks.size();
+               if (stocks == null || stocks.isEmpty()) {
+                    return 0;
+               }
+               int quantidadeTotal = 0;
+               for (Stock s : stocks) {
+                    quantidadeTotal += s.getQuantidade();
+               }
+               return quantidadeTotal;
           }
           return 0;
      }
@@ -133,7 +144,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Stock   registarStock_PecaSuperior70(int id_peca, float preco_compra, LocalDateTime data,
+     public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data,
                                          LocalDate garantia, String nr_serie){
           int id = stockDAO.generateNewId();
           return stockDAO.put(id, new StockComGarantia(id, preco_compra, id_peca, data, nr_serie, garantia));
@@ -313,12 +324,10 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Encomenda criarEncomenda(List<Stock> pecas){
-          int codFornecedor = pecas.isEmpty() ? 0 : pecaDAO.get(pecas.get(0).getCodPeca()).getCodFornecedor();
+     public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor){
           int id = encomendaDAO.generateNewId();
-          Encomenda encomenda = new Encomenda(id, codFornecedor, pecas.stream().map(Stock::getId).toList());
+          Encomenda encomenda = new Encomenda(id, cod_fornecedor, pecas.stream().map(Stock::getId).toList());
           encomendaDAO.put(id, encomenda);
-          adicionar_PecasEncomenda_Stock(id, pecas);
           return encomenda;
      }
 

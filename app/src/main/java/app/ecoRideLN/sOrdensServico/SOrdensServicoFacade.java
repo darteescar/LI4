@@ -29,7 +29,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      }
 
      @Override
-     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, List<PecasOrcamento> pecasOrcamento) {
+     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias) {
           if (clienteDAO.get(id_cliente) == null || trotineteDAO.get(id_trotinete) == null) {
                return null;
           }
@@ -126,11 +126,6 @@ public class SOrdensServicoFacade implements ISOrdensServico {
                total += r.getPreco();
           }
           return total;
-     }
-
-     @Override
-     public boolean pecasDiagnosticoDisponiveisReparacao(int id_OS) {
-          return false;
      }
 
      @Override

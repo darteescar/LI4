@@ -28,7 +28,7 @@ public interface ISStock {
 
     // ------------------- Stock -------------------
 
-    public Stock   registarStock_PecaSuperior70(int id_peca, float preco_compra, LocalDateTime data,
+    public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data,
                                          LocalDate garantia, String nr_serie);
     public Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
     public Stock   obterDadosStock(int id);
@@ -53,7 +53,7 @@ public interface ISStock {
     // ------------------- Encomenda -------------------
 
     public int       quantidade_encomendar_peca(int id_peca);
-    public Encomenda criarEncomenda(List<Stock> pecas);
+    public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor);
     public Encomenda obterDadosEncomenda(int id);
     public void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<Stock> pecas);
     public boolean   removerEncomenda(int id);

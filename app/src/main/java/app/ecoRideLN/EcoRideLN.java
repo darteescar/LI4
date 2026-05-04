@@ -8,7 +8,7 @@ import app.ecoRideLN.sFinanceiro.ISFinanceiro;
 import app.ecoRideLN.sFinanceiro.SFinanceiroFacade;
 import app.ecoRideLN.sFuncionarios.ISFuncionarios;
 import app.ecoRideLN.sFuncionarios.SFuncionariosFacade;
-import app.ecoRideLN.sNotificacoes.ISSNotificacoes;
+import app.ecoRideLN.sNotificacoes.ISNotificacoes;
 import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.SOrdensServicoFacade;
@@ -19,7 +19,7 @@ import app.ecoRideLN.sStock.SStockFacade;
 
 public class EcoRideLN implements IEcoRideLN {
 
-     private ISSNotificacoes sNotificacoes;
+     private ISNotificacoes sNotificacoes;
      private ISAutenticacao sAutenticacao;
      private ISClientes sClientes;
      private ISFinanceiro sFinanceiro;

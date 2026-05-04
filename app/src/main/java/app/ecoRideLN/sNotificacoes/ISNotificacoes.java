@@ -3,7 +3,7 @@ package app.ecoRideLN.sNotificacoes;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface ISSNotificacoes {
+public interface ISNotificacoes {
 
      public Notificacao obterDadosNotificacao(int id);
 

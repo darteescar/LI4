@@ -10,7 +10,7 @@ public interface ISOrdensServico {
 
      public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao);
 
-     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, List<PecasOrcamento> pecasOrcamento);
+     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
 
      public OrdemServico obterDadosOS(int id);
 
@@ -31,8 +31,6 @@ public interface ISOrdensServico {
      public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, int id_cliente, int id_funcionario);
 
      public float calcularOrcamento(List<PecasOrcamento> listaPecas, List<Reparacao> reparacoes);
-
-     public boolean pecasDiagnosticoDisponiveisReparacao(int id_OS);
 
      public boolean removerPecaConserto_OS(int id_OS, int is_Stock);
 
