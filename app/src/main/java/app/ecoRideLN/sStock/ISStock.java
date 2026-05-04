@@ -47,10 +47,7 @@ public interface ISStock {
     public Devolucao obterDadosDevolucao(int id);
     public boolean   existeDevolucao(int id);
     public boolean   removerDevolucao(int id);
-    public void      atualizarDataDevolucao(int id, LocalDateTime data);
-    public void      atualizarMotivoDevolucao(int id, String motivo);
-    public void      atualizarCodStockDevolucao(int id, int codStock);
-    public void      atualizarEstadoDevolucao(int id, EstadoDevolucao estado);
+    public void      atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, EstadoDevolucao estado);
     public boolean   validaEstadoDevolucao_PendenteDevolucao(int id);
 
     // ------------------- Encomenda -------------------
@@ -61,8 +58,5 @@ public interface ISStock {
     public void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<Stock> pecas);
     public boolean   removerEncomenda(int id);
     public boolean   validaEncomenda_Rascunho(int id_Encomenda);
-    public void      atualizarPecasEncomenda(int id, List<Stock> pecas);
-    public void      atualizarDataRececaoEncomenda(int id, LocalDateTime data_chegada);
-    public void      atualizarDataEnvioEncomenda(int id, LocalDateTime data_pedido);
-    public void      atualizarEstadoEncomenda(int id, EstadoEncomenda estado);
+    public void      atualizarEncomenda(int id, List<Stock> pecas, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
 }

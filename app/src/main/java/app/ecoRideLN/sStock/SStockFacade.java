@@ -275,38 +275,22 @@ public class SStockFacade implements ISStock {
           return devolucaoDAO.remove(id) != null;
       }
 
-      @Override
-      public void atualizarDataDevolucao(int id, LocalDateTime data){
-          Devolucao devolucao = devolucaoDAO.get(id);
-          if (devolucao != null) {
-               devolucao.setData(data);
-               devolucaoDAO.put(id, devolucao);
-          }
-     }
-     
      @Override
-     public void atualizarMotivoDevolucao(int id, String motivo){
+     public void atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, EstadoDevolucao estado){
           Devolucao devolucao = devolucaoDAO.get(id);
           if (devolucao != null) {
-               devolucao.setMotivo(motivo);
-               devolucaoDAO.put(id, devolucao);
-          }
-     }
-
-     @Override
-     public void atualizarCodStockDevolucao(int id, int codStock){
-          Devolucao devolucao = devolucaoDAO.get(id);
-          if (devolucao != null) {
-               devolucao.setCodStock(codStock);
-               devolucaoDAO.put(id, devolucao);
-          }
-     }
-
-     @Override
-     public void atualizarEstadoDevolucao(int id, EstadoDevolucao estado){
-          Devolucao devolucao = devolucaoDAO.get(id);
-          if (devolucao != null) {
-               devolucao.setEstado(estado);
+               if (data_devolucao != null) {
+                    devolucao.setData(data_devolucao);
+               }
+               if (motivo != null && !motivo.isEmpty()) {
+                    devolucao.setMotivo(motivo);
+               }
+               if (id_stock >= 0) {
+                    devolucao.setCodStock(id_stock);
+               }
+               if (estado != null) {
+                    devolucao.setEstado(estado);
+               }
                devolucaoDAO.put(id, devolucao);
           }
      }
@@ -365,23 +349,25 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void      atualizarPecasEncomenda(int id, List<Stock> pecas){
-          
-     }
-
-     @Override
-     public void      atualizarDataRececaoEncomenda(int id, LocalDateTime data_chegada){
-          
-     }
-
-     @Override
-     public void      atualizarDataEnvioEncomenda(int id, LocalDateTime data_pedido){
-          
-     }
-
-     @Override
-     public void      atualizarEstadoEncomenda(int id, EstadoEncomenda estado){
-
+     public void      atualizarEncomenda(int id, List<Stock> pecas, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado){
+          Encomenda encomenda = encomendaDAO.get(id);
+          if (encomenda != null) {
+               if (pecas != null && !pecas.isEmpty()) {
+                    List<Integer> codPecasEncomenda = encomenda.getCodEntradasStock();
+                    codPecasEncomenda.clear();
+                    codPecasEncomenda.addAll(pecas.stream().map(Stock::getId).toList());
+               }
+               if (data_pedido != null) {
+                    encomenda.setData_criacao(data_pedido);
+               }
+               if (data_chegada != null) {
+                    encomenda.setData_rececao(data_chegada);
+               }
+               if (estado != null) {
+                    encomenda.setEstado(estado);
+               }
+               encomendaDAO.put(id, encomenda);
+          }
      }
 
 }
