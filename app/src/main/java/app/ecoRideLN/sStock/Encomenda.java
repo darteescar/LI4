@@ -10,6 +10,7 @@ import app.ecoRideCD.sStock.StockDAO;
 public class Encomenda {
      private int id;
      private int codFornecedor;
+     private LocalDateTime data_criacao;
      private LocalDateTime data_rececao;
      private LocalDateTime data_envio;
      private EstadoEncomenda estado;
@@ -18,13 +19,24 @@ public class Encomenda {
      private static final FornecedorDAO fornecedorDAO = FornecedorDAO.getInstance();
      private static final StockDAO stockDAO = StockDAO.getInstance();
 
-     public Encomenda(int id, int codFornecedor, LocalDateTime data_rececao, LocalDateTime data_envio, EstadoEncomenda estado, List<Integer> codEntradasStock) {
+     public Encomenda(int id, int codFornecedor, List<Integer> codEntradasStock) {
           this.id = id;
           this.codFornecedor = codFornecedor;
+          this.data_criacao = LocalDateTime.now();
+          this.data_rececao = null;
+          this.data_envio = null;
+          this.estado = EstadoEncomenda.RASCUNHO;
+          this.codEntradasStock = new ArrayList<>(codEntradasStock);
+     }
+
+     public Encomenda(int id, int codFornecedor, LocalDateTime data_criacao, LocalDateTime data_rececao, LocalDateTime data_envio, EstadoEncomenda estado, List<Integer> codEntradasStock) {
+          this.id = id;
+          this.codFornecedor = codFornecedor;
+          this.data_criacao = data_criacao;
           this.data_rececao = data_rececao;
           this.data_envio = data_envio;
           this.estado = estado;
-          this.codEntradasStock = codEntradasStock;
+          this.codEntradasStock = new ArrayList<>(codEntradasStock);
      }
 
      public int getId() {
@@ -41,6 +53,14 @@ public class Encomenda {
 
      public void setCodFornecedor(int codFornecedor) {
           this.codFornecedor = codFornecedor;
+     }
+
+     public LocalDateTime getData_criacao() {
+          return data_criacao;
+     }
+
+     public void setData_criacao(LocalDateTime data_criacao) {
+          this.data_criacao = data_criacao;
      }
 
      public LocalDateTime getData_rececao() {

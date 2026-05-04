@@ -138,6 +138,28 @@ CREATE TABLE IF NOT EXISTS Devolucao (
     FOREIGN KEY (codStock) REFERENCES Stock(id)
 );
 
+-- Encomenda + tabela de junção para a lista de codEntradasStock.
+-- ordem preserva a posição na List<Integer>; ON DELETE CASCADE limpa
+-- as entradas se a encomenda for apagada.
+CREATE TABLE IF NOT EXISTS Encomenda (
+    id            INT      NOT NULL,
+    codFornecedor INT      NOT NULL,
+    data_rececao  DATETIME NULL,
+    data_envio    DATETIME NULL,
+    estado        ENUM('RASCUNHO', 'ENVIADA', 'RECEBIDA') NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (codFornecedor) REFERENCES Fornecedor(id)
+);
+
+CREATE TABLE IF NOT EXISTS Encomenda_EntradaStock (
+    idEncomenda INT NOT NULL,
+    ordem       INT NOT NULL,
+    codStock    INT NOT NULL,
+    PRIMARY KEY (idEncomenda, ordem),
+    FOREIGN KEY (idEncomenda) REFERENCES Encomenda(id) ON DELETE CASCADE,
+    FOREIGN KEY (codStock)    REFERENCES Stock(id)
+);
+
 -- =========================================================
 -- SFinanceiro
 -- Class table inheritance (modelo normalizado): 1 tabela base com
@@ -186,35 +208,105 @@ CREATE TABLE IF NOT EXISTS MovimentoPeca (
 
 -- =========================================================
 -- SOrdensServico
+-- A OS guarda os campos comuns. Cada coleção (acessorios, fotografias,
+-- pecasOrcamento, pecasUsadas, cod_reparacoes do diagnostico/conserto)
+-- vive em tabela própria com FK para a OS (ou para o Diagnostico/Conserto)
+-- e ON DELETE CASCADE para que apagar a OS limpe tudo o que pendura.
+-- Diagnostico e Conserto têm cardinalidade 0..1 com a OS, por isso
+-- usam idOS como PK e FK simultaneamente.
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS OrdemServico (
-    id           INT          NOT NULL,
-    descricao    TEXT,
-    data_emissao DATETIME     NOT NULL,
-    data_prevista DATetime    NOT NULL,
-    codCliente   INT          NOT NULL,
-    codTrotinete INT          NOT NULL,
-    estado       ENUM('Pendente', 'EmProgresso', 'Concluida') NOT NULL DEFAULT 'Pendente',
+    id             INT      NOT NULL,
+    descricao      TEXT,
+    data_criacao   DATETIME NOT NULL,
+    codTrotinete   INT      NOT NULL,
+    codCliente     INT      NOT NULL,
+    codResponsavel INT      NOT NULL,
+    estado         ENUM('PendenteReparacao', 'PendenteDiagnostico',
+                        'PendenteAprovacaoOrcamento', 'PendentePagamento',
+                        'Paga', 'OrcamentoNaoAprovado', 'AguardarPecas',
+                        'Eliminada') NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (codCliente) REFERENCES Cliente(id),
-    FOREIGN KEY (codTrotinete) REFERENCES Trotinete(id)
+    FOREIGN KEY (codTrotinete)   REFERENCES Trotinete(id),
+    FOREIGN KEY (codCliente)     REFERENCES Cliente(id),
+    FOREIGN KEY (codResponsavel) REFERENCES Funcionario(id)
 );
 
-
-CREATE TABLE IF NOT EXISTS OrdemServico_Acessorios (
-    idOrdemServico INT NOT NULL,
-    acessorio     VARCHAR(255) NOT NULL,
-    PRIMARY KEY (idOrdemServico, acessorio),
-    FOREIGN KEY (idOrdemServico) REFERENCES OrdemServico(id) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS OrdemServico_Acessorio (
+    idOS  INT          NOT NULL,
+    ordem INT          NOT NULL,
+    valor VARCHAR(255) NOT NULL,
+    PRIMARY KEY (idOS, ordem),
+    FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Fotografia(
-    idOrdemServico  INT NOT NULL,
-    conteudo        MEDIUMBLOB NOT NULL,
-    formato         VARCHAR(50) NOT NULL,
-    tamanho         LONG NOT NULL,
-    PRIMARY KEY (idOrdemServico),
-    FOREIGN KEY (idOrdemServico) REFERENCES OrdemServico(id) ON DELETE CASCADE
-)
+CREATE TABLE IF NOT EXISTS Fotografia (
+    id       INT          NOT NULL AUTO_INCREMENT,
+    idOS     INT          NOT NULL,
+    conteudo MEDIUMBLOB,
+    formato  VARCHAR(20),
+    tamanho  BIGINT,
+    PRIMARY KEY (id),
+    FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Diagnostico (
+    idOS        INT   NOT NULL,
+    descricao   TEXT,
+    orcamento   FLOAT NOT NULL,
+    codMecanico INT   NOT NULL,
+    PRIMARY KEY (idOS),
+    FOREIGN KEY (idOS)        REFERENCES OrdemServico(id) ON DELETE CASCADE,
+    FOREIGN KEY (codMecanico) REFERENCES Funcionario(id)
+);
+
+CREATE TABLE IF NOT EXISTS Diagnostico_PecaOrcamento (
+    idOS       INT NOT NULL,
+    codPeca    INT NOT NULL,
+    quantidade INT NOT NULL,
+    PRIMARY KEY (idOS, codPeca),
+    FOREIGN KEY (idOS)    REFERENCES Diagnostico(idOS) ON DELETE CASCADE,
+    FOREIGN KEY (codPeca) REFERENCES Peca(id)
+);
+
+CREATE TABLE IF NOT EXISTS Diagnostico_Reparacao (
+    idOS         INT NOT NULL,
+    codReparacao INT NOT NULL,
+    PRIMARY KEY (idOS, codReparacao),
+    FOREIGN KEY (idOS)         REFERENCES Diagnostico(idOS) ON DELETE CASCADE,
+    FOREIGN KEY (codReparacao) REFERENCES Reparacao(id)
+);
+
+CREATE TABLE IF NOT EXISTS Conserto (
+    idOS              INT     NOT NULL,
+    preco_total       FLOAT   NOT NULL,
+    codMecanico       INT     NOT NULL,
+    chk_luzes         BOOLEAN NOT NULL DEFAULT FALSE,
+    chk_pneus         BOOLEAN NOT NULL DEFAULT FALSE,
+    chk_aceleracao    BOOLEAN NOT NULL DEFAULT FALSE,
+    chk_travagem      BOOLEAN NOT NULL DEFAULT FALSE,
+    chk_visor         BOOLEAN NOT NULL DEFAULT FALSE,
+    chk_teste_pratico BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (idOS),
+    FOREIGN KEY (idOS)        REFERENCES OrdemServico(id) ON DELETE CASCADE,
+    FOREIGN KEY (codMecanico) REFERENCES Funcionario(id)
+);
+
+CREATE TABLE IF NOT EXISTS Conserto_PecaUsada (
+    idOS       INT NOT NULL,
+    codStock   INT NOT NULL,
+    quantidade INT NOT NULL,
+    PRIMARY KEY (idOS, codStock),
+    FOREIGN KEY (idOS)     REFERENCES Conserto(idOS) ON DELETE CASCADE,
+    FOREIGN KEY (codStock) REFERENCES Stock(id)
+);
+
+CREATE TABLE IF NOT EXISTS Conserto_Reparacao (
+    idOS         INT NOT NULL,
+    codReparacao INT NOT NULL,
+    PRIMARY KEY (idOS, codReparacao),
+    FOREIGN KEY (idOS)         REFERENCES Conserto(idOS) ON DELETE CASCADE,
+    FOREIGN KEY (codReparacao) REFERENCES Reparacao(id)
+);
 

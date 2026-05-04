@@ -9,9 +9,11 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,8 +47,7 @@ public class StockDAO implements Map<Integer, Stock> {
         Date garantia = rs.getDate("garantia");
 
         if (nrSerie != null) {
-            return new StockComGarantia(id, preco, codPeca, dataChegada, qtd,
-                    nrSerie, garantia == null ? null : garantia.toLocalDate());
+            return new StockComGarantia(id, preco, codPeca, dataChegada, nrSerie, garantia == null ? null : garantia.toLocalDate());
         }
         return new Stock(id, preco, codPeca, dataChegada, qtd);
     }
@@ -224,5 +225,24 @@ public class StockDAO implements Map<Integer, Stock> {
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gerar novo ID para stock", e);
         }
+    }
+
+    public List<Stock> getByPecaId(int id_peca) {
+        List<Stock> out = new ArrayList<>();
+        String sql = """
+                SELECT id, preco_compra, codPeca, data_chegada, quantidade, nr_serie, garantia
+                FROM Stock WHERE codPeca = ?
+                """;
+        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id_peca);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    out.add(buildFromRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter stocks da peça " + id_peca, e);
+        }
+        return out;
     }
 }

@@ -1,14 +1,15 @@
-package app.ecoRideLN.sOrdensServico;
+pe
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.ecoRideLN.sStock.Stock;
 import app.ecoRideCD.sClientes.ClienteDAO;
 import app.ecoRideCD.sClientes.TrotineteDAO;
 import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
 import app.ecoRideLN.sReparacoes.Reparacao;
-import app.ecoRideLN.sStock.Stock;
+
 
 public class SOrdensServicoFacade implements ISOrdensServico {
 
@@ -34,7 +35,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           }
           int id = ordemServicoDAO.getNextId();
           OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codResponsavel, fotografias, acessorios);
-          return ordemServicoDAO.put(os);
+          return ordemServicoDAO.put(id, os);
      }
 
      @Override
@@ -44,7 +45,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
      @Override
      public boolean removerOS(int id) {
-          return ordemServicoDAO.remove(id);
+          return ordemServicoDAO.remove(id) != null;
      }
 
      @Override
@@ -52,7 +53,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setDescricao(Descricao);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 
@@ -61,7 +62,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setAcessorios(acessorios);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 
@@ -70,7 +71,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setFotografias(fotografias);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 
@@ -79,7 +80,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setEstado(estado);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 
@@ -88,7 +89,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.adicionarPecasConserto(pecas);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 
@@ -161,7 +162,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setData_criacao(data_criacao);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 
@@ -170,7 +171,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setCodResponsavel(codResponsavel);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 
@@ -179,7 +180,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setCodCliente(id_cliente);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
      }
@@ -189,7 +190,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           OrdemServico os = ordemServicoDAO.get(id);
           if (os != null) {
                os.setCodTrotinete(id_trotinete);
-               ordemServicoDAO.put(os);
+               ordemServicoDAO.put(id, os);
           }
      }
 

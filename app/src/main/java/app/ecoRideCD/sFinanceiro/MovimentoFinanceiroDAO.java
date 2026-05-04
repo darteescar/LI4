@@ -1,13 +1,5 @@
 package app.ecoRideCD.sFinanceiro;
 
-import app.common.EcoRideException;
-import app.ecoRideCD.DAOconfig.ConnectionFactory;
-import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
-import app.ecoRideLN.sFinanceiro.MovimentoFuncionario;
-import app.ecoRideLN.sFinanceiro.MovimentoPeca;
-import app.ecoRideLN.sFinanceiro.MovimentoReparacao;
-import app.ecoRideLN.sFinanceiro.TipoMovimento;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +13,14 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import app.common.EcoRideException;
+import app.ecoRideCD.DAOconfig.ConnectionFactory;
+import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
+import app.ecoRideLN.sFinanceiro.MovimentoFuncionario;
+import app.ecoRideLN.sFinanceiro.MovimentoPeca;
+import app.ecoRideLN.sFinanceiro.MovimentoReparacao;
+import app.ecoRideLN.sFinanceiro.TipoMovimento;
 
 public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro> {
 
@@ -265,7 +265,6 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
     // --------- Aliases / domínio ---------
 
     public boolean exists(int id)                       { return containsKey(id); }
-    public MovimentoFinanceiro getMovimentoById(int id) { return get(id); }
     public void add(MovimentoFinanceiro m)              { put(m.getId(), m); }
 
     public int generateNewId() {

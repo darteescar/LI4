@@ -12,5 +12,3 @@ Adicionar filtro por trotinete na listagem de OS (atenção no use case tbm)
 Alterar use case de pesquisa dos Clientes (dá nome, email e NIF)
 Alterar use case de pesquisa das Trotinetes (dá marca, modelo, numero serie, cliente e tipo de motor)
 Alterar use case de pesquisa dos fornecedores (dá nome, nif, email)
-
-Estende o tamanho da caixa de pesquisa da página das trotinetes de maneira a que se poss visualizar a mensagem de opções de pesquisa toda e adiciona a opção de pesquisa por numero de telefone na pagina dos clientes.

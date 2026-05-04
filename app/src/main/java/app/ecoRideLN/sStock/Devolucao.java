@@ -1,8 +1,8 @@
 package app.ecoRideLN.sStock;
 
-import app.ecoRideCD.sStock.StockDAO;
-
 import java.time.LocalDateTime;
+
+import app.ecoRideCD.sStock.StockDAO;
 
 public class Devolucao {
      private int id;
@@ -11,6 +11,14 @@ public class Devolucao {
      private EstadoDevolucao estado;
      private int codStock;
      private static final StockDAO stockDAO = StockDAO.getInstance();
+
+     public Devolucao(int id, LocalDateTime data, String motivo, int codStock) {
+          this.id = id;
+          this.data = data;
+          this.motivo = motivo;
+          this.estado = EstadoDevolucao.PendenteDevolucao;
+          this.codStock = codStock;
+     }
 
      public Devolucao(int id, LocalDateTime data, String motivo, EstadoDevolucao estado, int codStock) {
           this.id = id;

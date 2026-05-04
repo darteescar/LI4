@@ -1,25 +1,35 @@
 package app.ecoRideCD.sOrdensServico;
 
+import app.common.EcoRideException;
+import app.ecoRideCD.DAOconfig.ConnectionFactory;
+import app.ecoRideLN.sOrdensServico.CheckList;
+import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.Diagnostico;
+import app.ecoRideLN.sOrdensServico.EstadoOS;
+import app.ecoRideLN.sOrdensServico.Fotografia;
+import app.ecoRideLN.sOrdensServico.OrdemServico;
+import app.ecoRideLN.sOrdensServico.PecasOrcamento;
+import app.ecoRideLN.sOrdensServico.PecasUsadas;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import app.common.EcoRideException;
-import app.ecoRideCD.DAOconfig.ConnectionFactory;
-import app.ecoRideLN.sNotificacoes.Notificacao;
-import app.ecoRideLN.sOrdensServico.OrdemServico;
-
 public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
-    private static OrdemServicoDAO instance = new OrdemServicoDAO();
+
+    private static OrdemServicoDAO instance;
 
     private OrdemServicoDAO() {}
 
@@ -28,244 +38,489 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         return instance;
     }
 
-    private OrdemServico buildFromRow(ResultSet rs) throws SQLException {
-        Timestamp tratada = rs.getTimestamp("data_horaTratada");
-        return new OrdemServico(
-                rs.getInt("id"),
-                rs.getString("descricao"),
-                rs.getTimestamp("data_emissao").toLocalDateTime(),
-                rs.getInt("id_remetente"),
-                rs.getInt("id_destinatario"),
-                rs.getBoolean("notificacao_tratada"),
-                tratada == null ? null : tratada.toLocalDateTime());
+    // SELECT só dos campos da tabela base; os filhos são carregados em queries separadas.
+    private static final String SELECT_BASE = """
+            SELECT id, descricao, data_criacao, codTrotinete, codCliente,
+                   codResponsavel, estado
+            FROM   OrdemServico
+            """;
+
+    // ---------------- Helpers de leitura ----------------
+
+    private List<String> loadAcessorios(Connection c, int idOS) throws SQLException {
+        List<String> out = new ArrayList<>();
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT valor FROM OrdemServico_Acessorio WHERE idOS = ? ORDER BY ordem")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(rs.getString(1));
+            }
+        }
+        return out;
     }
+
+    private List<Fotografia> loadFotografias(Connection c, int idOS) throws SQLException {
+        List<Fotografia> out = new ArrayList<>();
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT conteudo, formato, tamanho FROM Fotografia WHERE idOS = ? ORDER BY id")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    out.add(new Fotografia(
+                            rs.getBytes("conteudo"),
+                            rs.getString("formato"),
+                            rs.getLong("tamanho")));
+                }
+            }
+        }
+        return out;
+    }
+
+    private Diagnostico loadDiagnostico(Connection c, int idOS) throws SQLException {
+        String desc;
+        float orc;
+        int codMec;
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT descricao, orcamento, codMecanico FROM Diagnostico WHERE idOS = ?")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                desc = rs.getString("descricao");
+                orc = rs.getFloat("orcamento");
+                codMec = rs.getInt("codMecanico");
+            }
+        }
+        List<Integer> reps = new ArrayList<>();
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT codReparacao FROM Diagnostico_Reparacao WHERE idOS = ?")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) reps.add(rs.getInt(1));
+            }
+        }
+        List<PecasOrcamento> pecas = new ArrayList<>();
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT codPeca, quantidade FROM Diagnostico_PecaOrcamento WHERE idOS = ?")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    pecas.add(new PecasOrcamento(rs.getInt("quantidade"), rs.getInt("codPeca")));
+                }
+            }
+        }
+        Diagnostico d = new Diagnostico(desc, codMec, reps, pecas);
+        d.setOrcamento(orc);
+        return d;
+    }
+
+    private Conserto loadConserto(Connection c, int idOS) throws SQLException {
+        float preco;
+        int codMec;
+        CheckList chk = new CheckList();
+        try (PreparedStatement ps = c.prepareStatement("""
+                SELECT preco_total, codMecanico,
+                       chk_luzes, chk_pneus, chk_aceleracao,
+                       chk_travagem, chk_visor, chk_teste_pratico
+                FROM   Conserto WHERE idOS = ?
+                """)) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                preco = rs.getFloat("preco_total");
+                codMec = rs.getInt("codMecanico");
+                chk.setLuzes(rs.getBoolean("chk_luzes"));
+                chk.setPneus(rs.getBoolean("chk_pneus"));
+                chk.setAceleracao(rs.getBoolean("chk_aceleracao"));
+                chk.setTravagem(rs.getBoolean("chk_travagem"));
+                chk.setVisor(rs.getBoolean("chk_visor"));
+                chk.setTeste_pratico(rs.getBoolean("chk_teste_pratico"));
+            }
+        }
+        List<Integer> reps = new ArrayList<>();
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT codReparacao FROM Conserto_Reparacao WHERE idOS = ?")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) reps.add(rs.getInt(1));
+            }
+        }
+        List<PecasUsadas> pecas = new ArrayList<>();
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT codStock, quantidade FROM Conserto_PecaUsada WHERE idOS = ?")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    pecas.add(new PecasUsadas(rs.getInt("quantidade"), rs.getInt("codStock")));
+                }
+            }
+        }
+        Conserto con = new Conserto(codMec, pecas, reps);
+        con.setPreco_total(preco);
+        con.setCheckList(chk);
+        return con;
+    }
+
+    private OrdemServico buildFromRow(Connection c, ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        OrdemServico os = new OrdemServico(
+                id,
+                rs.getString("descricao"),
+                rs.getTimestamp("data_criacao").toLocalDateTime(),
+                rs.getInt("codTrotinete"),
+                rs.getInt("codCliente"),
+                rs.getInt("codResponsavel"),
+                loadFotografias(c, id),
+                loadAcessorios(c, id));
+        os.setEstado(EstadoOS.valueOf(rs.getString("estado")));
+        Diagnostico d = loadDiagnostico(c, id);
+        if (d != null) os.setDiagnostico(d);
+        Conserto con = loadConserto(c, id);
+        if (con != null) os.setConserto(con);
+        return os;
+    }
+
+    // ---------------- Helpers de escrita ----------------
+
+    private void upsertBase(Connection c, int id, OrdemServico os) throws SQLException {
+        String sql = """
+                INSERT INTO OrdemServico (id, descricao, data_criacao, codTrotinete,
+                                          codCliente, codResponsavel, estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    descricao      = VALUES(descricao),
+                    data_criacao   = VALUES(data_criacao),
+                    codTrotinete   = VALUES(codTrotinete),
+                    codCliente     = VALUES(codCliente),
+                    codResponsavel = VALUES(codResponsavel),
+                    estado         = VALUES(estado)
+                """;
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setString(2, os.getDescricao());
+            ps.setTimestamp(3, Timestamp.valueOf(os.getDataCriacao()));
+            ps.setInt(4, os.getCodTrotinete());
+            ps.setInt(5, os.getCodCliente());
+            ps.setInt(6, os.getCodResponsavel());
+            ps.setString(7, os.getEstado().name());
+            ps.executeUpdate();
+        }
+    }
+
+    // Apaga directamente o que pendura na OS. CASCADE remove os "netos"
+    // (Diagnostico_PecaOrcamento, Conserto_PecaUsada, etc.).
+    private void clearChildren(Connection c, int id) throws SQLException {
+        for (String tbl : new String[]{
+                "Conserto", "Diagnostico", "Fotografia", "OrdemServico_Acessorio" }) {
+            try (PreparedStatement ps = c.prepareStatement(
+                    "DELETE FROM " + tbl + " WHERE idOS = ?")) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    private void insertAcessorios(Connection c, int idOS, List<String> acessorios) throws SQLException {
+        if (acessorios == null || acessorios.isEmpty()) return;
+        try (PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO OrdemServico_Acessorio (idOS, ordem, valor) VALUES (?, ?, ?)")) {
+            int i = 0;
+            for (String a : acessorios) {
+                ps.setInt(1, idOS);
+                ps.setInt(2, i++);
+                ps.setString(3, a);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    private void insertFotografias(Connection c, int idOS, List<Fotografia> fotos) throws SQLException {
+        if (fotos == null || fotos.isEmpty()) return;
+        try (PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO Fotografia (idOS, conteudo, formato, tamanho) VALUES (?, ?, ?, ?)")) {
+            for (Fotografia f : fotos) {
+                ps.setInt(1, idOS);
+                ps.setBytes(2, f.getConteudo());
+                ps.setString(3, f.getFormato());
+                ps.setLong(4, f.getTamanho());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    private void insertDiagnostico(Connection c, int idOS, Diagnostico d) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("""
+                INSERT INTO Diagnostico (idOS, descricao, orcamento, codMecanico)
+                VALUES (?, ?, ?, ?)
+                """)) {
+            ps.setInt(1, idOS);
+            ps.setString(2, d.getDescricao());
+            ps.setFloat(3, d.getOrcamento());
+            ps.setInt(4, d.getCodMecanico());
+            ps.executeUpdate();
+        }
+        if (!d.getCod_reparacoes().isEmpty()) {
+            try (PreparedStatement ps = c.prepareStatement(
+                    "INSERT INTO Diagnostico_Reparacao (idOS, codReparacao) VALUES (?, ?)")) {
+                for (Integer cod : d.getCod_reparacoes()) {
+                    ps.setInt(1, idOS);
+                    ps.setInt(2, cod);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        }
+        if (!d.getPecasOrcamento().isEmpty()) {
+            try (PreparedStatement ps = c.prepareStatement("""
+                    INSERT INTO Diagnostico_PecaOrcamento (idOS, codPeca, quantidade)
+                    VALUES (?, ?, ?)
+                    """)) {
+                for (PecasOrcamento p : d.getPecasOrcamento()) {
+                    ps.setInt(1, idOS);
+                    ps.setInt(2, p.getCodPeca());
+                    ps.setInt(3, p.getQuantidade());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        }
+    }
+
+    private void insertConserto(Connection c, int idOS, Conserto con) throws SQLException {
+        CheckList chk = con.getCheckList();
+        try (PreparedStatement ps = c.prepareStatement("""
+                INSERT INTO Conserto (idOS, preco_total, codMecanico,
+                                      chk_luzes, chk_pneus, chk_aceleracao,
+                                      chk_travagem, chk_visor, chk_teste_pratico)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """)) {
+            ps.setInt(1, idOS);
+            ps.setFloat(2, con.getPreco_total());
+            ps.setInt(3, con.getCodMecanico());
+            ps.setBoolean(4, chk.getLuzes());
+            ps.setBoolean(5, chk.getPneus());
+            ps.setBoolean(6, chk.getAceleracao());
+            ps.setBoolean(7, chk.getTravagem());
+            ps.setBoolean(8, chk.getVisor());
+            ps.setBoolean(9, chk.getTeste_pratico());
+            ps.executeUpdate();
+        }
+        if (!con.getCod_reparacoes().isEmpty()) {
+            try (PreparedStatement ps = c.prepareStatement(
+                    "INSERT INTO Conserto_Reparacao (idOS, codReparacao) VALUES (?, ?)")) {
+                for (Integer cod : con.getCod_reparacoes()) {
+                    ps.setInt(1, idOS);
+                    ps.setInt(2, cod);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        }
+        if (!con.getListaPecas().isEmpty()) {
+            try (PreparedStatement ps = c.prepareStatement("""
+                    INSERT INTO Conserto_PecaUsada (idOS, codStock, quantidade)
+                    VALUES (?, ?, ?)
+                    """)) {
+                for (PecasUsadas p : con.getListaPecas()) {
+                    ps.setInt(1, idOS);
+                    ps.setInt(2, p.getCodStock());
+                    ps.setInt(3, p.getQuantidade());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        }
+    }
+
+    // ---------------- Map<Integer, OrdemServico> ----------------
 
     @Override
     public int size() {
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Notificacao")) {
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM OrdemServico")) {
             return rs.next() ? rs.getInt(1) : 0;
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a contar notificacoes", e);
+            throw new EcoRideException("Erro a contar ordens de serviço", e);
         }
     }
 
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
-    }
+    @Override public boolean isEmpty() { return size() == 0; }
 
     @Override
     public boolean containsKey(Object key) {
-        if (!(key instanceof Integer id)) {
-            return false;
-        }
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Notificacao WHERE id = ?")) {
+        if (!(key instanceof Integer id)) return false;
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement("SELECT 1 FROM OrdemServico WHERE id = ?")) {
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a verificar notificacao " + id, e);
+            throw new EcoRideException("Erro a verificar OS " + id, e);
         }
     }
 
     @Override
     public boolean containsValue(Object value) {
-        if (!(value instanceof Notificacao n)) {
-            return false;
-        }
-        Notificacao stored = get(n.getId());
-        return stored != null && stored.getId_destinatario() == n.getId_destinatario();
+        if (!(value instanceof OrdemServico os)) return false;
+        OrdemServico stored = get(os.getId());
+        return stored != null && stored.getEstado() == os.getEstado();
     }
 
     @Override
-    public Notificacao get(Object key) {
-        if (!(key instanceof Integer id)) {
-            return null;
-        }
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM Notificacao WHERE id = ?
-                """;
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
+    public OrdemServico get(Object key) {
+        if (!(key instanceof Integer id)) return null;
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(SELECT_BASE + " WHERE id = ?")) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? buildFromRow(rs) : null;
+                return rs.next() ? buildFromRow(c, rs) : null;
             }
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter notificacao " + id, e);
+            throw new EcoRideException("Erro a obter OS " + id, e);
         }
     }
 
     @Override
-    public Notificacao put(Integer key, Notificacao value) {
-        Notificacao prev = get(key);
-        String sql = """
-                INSERT INTO Notificacao (id, descricao, data_emissao, id_remetente,
-                                         id_destinatario, notificacao_tratada, data_horaTratada)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    descricao = VALUES(descricao), data_emissao = VALUES(data_emissao),
-                    id_remetente = VALUES(id_remetente), id_destinatario = VALUES(id_destinatario),
-                    notificacao_tratada = VALUES(notificacao_tratada),
-                    data_horaTratada = VALUES(data_horaTratada)
-                """;
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getDescricao());
-            ps.setTimestamp(3, Timestamp.valueOf(value.getData_emissao()));
-            ps.setInt(4, value.getId_remetente());
-            ps.setInt(5, value.getId_destinatario());
-            ps.setBoolean(6, value.isNotificacao_tratada());
-            if (value.getData_horaTratada() == null) {
-                ps.setNull(7, java.sql.Types.TIMESTAMP); 
-            }else {
-                ps.setTimestamp(7, Timestamp.valueOf(value.getData_horaTratada()));
+    public OrdemServico put(Integer key, OrdemServico value) {
+        OrdemServico prev = get(key);
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                upsertBase(c, key, value);
+                clearChildren(c, key);
+                insertAcessorios(c, key, value.getAcessorios());
+                insertFotografias(c, key, value.getFotografias());
+                if (value.getDiagnostico() != null) insertDiagnostico(c, key, value.getDiagnostico());
+                if (value.getConserto() != null)    insertConserto(c, key, value.getConserto());
+                c.commit();
+            } catch (SQLException e) {
+                c.rollback();
+                throw new EcoRideException("Erro a gravar OS " + key, e);
+            } finally {
+                c.setAutoCommit(true);
             }
-            ps.executeUpdate();
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a gravar notificacao " + key, e);
+            throw new EcoRideException("Erro de ligação ao gravar OS " + key, e);
         }
         return prev;
     }
 
     @Override
-    public Notificacao remove(Object key) {
-        if (!(key instanceof Integer id)) {
-            return null;
-        }
-        Notificacao prev = get(id);
-        if (prev == null) {
-            return null;
-        }
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement("DELETE FROM Notificacao WHERE id = ?")) {
+    public OrdemServico remove(Object key) {
+        if (!(key instanceof Integer id)) return null;
+        OrdemServico prev = get(id);
+        if (prev == null) return null;
+        // ON DELETE CASCADE nas tabelas filhas faz a limpeza automaticamente.
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement("DELETE FROM OrdemServico WHERE id = ?")) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a remover notificacao " + id, e);
+            throw new EcoRideException("Erro a remover OS " + id, e);
         }
         return prev;
     }
 
     @Override
-    public void putAll(Map<? extends Integer, ? extends Notificacao> m) {
+    public void putAll(Map<? extends Integer, ? extends OrdemServico> m) {
         m.forEach(this::put);
     }
 
     @Override
     public void clear() {
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement()) {
-            s.executeUpdate("DELETE FROM Notificacao");
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement()) {
+            s.executeUpdate("DELETE FROM OrdemServico");
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a limpar notificacoes", e);
+            throw new EcoRideException("Erro a limpar ordens de serviço", e);
         }
     }
 
     @Override
     public Set<Integer> keySet() {
         Set<Integer> out = new LinkedHashSet<>();
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT id FROM Notificacao")) {
-            while (rs.next()) {
-                out.add(rs.getInt(1));
-            }
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery("SELECT id FROM OrdemServico")) {
+            while (rs.next()) out.add(rs.getInt(1));
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter ids de notificacoes", e);
+            throw new EcoRideException("Erro a obter ids de OSs", e);
         }
         return out;
     }
 
     @Override
-    public Collection<Notificacao> values() {
-        Set<Notificacao> out = new LinkedHashSet<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada FROM Notificacao
-                """;
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
-            while (rs.next()) {
-                out.add(buildFromRow(rs));
-            }
+    public Collection<OrdemServico> values() {
+        Set<OrdemServico> out = new LinkedHashSet<>();
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery(SELECT_BASE + " ORDER BY id")) {
+            while (rs.next()) out.add(buildFromRow(c, rs));
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter notificacoes", e);
+            throw new EcoRideException("Erro a obter OSs", e);
         }
         return out;
     }
 
     @Override
-    public Set<Entry<Integer, Notificacao>> entrySet() {
-        Set<Entry<Integer, Notificacao>> out = new HashSet<>();
-        for (Notificacao n : values()) {
-            out.add(new AbstractMap.SimpleEntry<>(n.getId(), n));
+    public Set<Entry<Integer, OrdemServico>> entrySet() {
+        Set<Entry<Integer, OrdemServico>> out = new HashSet<>();
+        for (OrdemServico os : values()) {
+            out.add(new AbstractMap.SimpleEntry<>(os.getId(), os));
         }
         return out;
     }
 
-    // --------- Aliases / domínio ---------
-
-    public void add(Notificacao n) {
-        put(n.getId(), n);
-    }
+    // ---------------- generateNewId + queries específicas ----------------
 
     public int generateNewId() {
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Notificacao")) {
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM OrdemServico")) {
             return rs.next() ? rs.getInt(1) + 1 : 1;
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para notificacao", e);
+            throw new EcoRideException("Erro a gerar novo ID para OS", e);
         }
     }
 
-    // Notificações em que o funcionário é remetente OU destinatário,
-    // dentro do intervalo [data_inicio, data_fim] (inclusivo nas duas pontas).
-    public List<Notificacao> getByEmployeeAndDateRange(int id_funcionario,
-                                                       LocalDateTime data_inicio,
-                                                       LocalDateTime data_fim) {
-        List<Notificacao> out = new ArrayList<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM   Notificacao
-                WHERE  (id_remetente = ? OR id_destinatario = ?)
-                  AND  data_emissao BETWEEN ? AND ?
-                ORDER BY data_emissao
-                """;
+    public List<OrdemServico> getOSDoCliente(int idCliente) {
+        List<OrdemServico> out = new ArrayList<>();
         try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id_funcionario);
-            ps.setInt(2, id_funcionario);
-            ps.setTimestamp(3, Timestamp.valueOf(data_inicio));
-            ps.setTimestamp(4, Timestamp.valueOf(data_fim));
+             PreparedStatement ps = c.prepareStatement(
+                     SELECT_BASE + " WHERE codCliente = ? ORDER BY id")) {
+            ps.setInt(1, idCliente);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) out.add(buildFromRow(rs));
+                while (rs.next()) out.add(buildFromRow(c, rs));
             }
         } catch (SQLException e) {
-            throw new EcoRideException(
-                    "Erro a obter notificacoes do funcionario " + id_funcionario, e);
+            throw new EcoRideException("Erro a obter OSs do cliente " + idCliente, e);
         }
         return out;
     }
 
-    // Todas as notificações emitidas dentro do intervalo [data_inicio, data_fim].
-    public List<Notificacao> getByDateRange(LocalDateTime data_inicio, LocalDateTime data_fim) {
-        List<Notificacao> out = new ArrayList<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM   Notificacao
-                WHERE  data_emissao BETWEEN ? AND ?
-                ORDER BY data_emissao
-                """;
+    // Filtra por qualquer combinação dos critérios; passar null ignora o critério.
+    public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate,
+                                         Integer idCliente, Integer idFuncionario) {
+        StringBuilder sql = new StringBuilder(SELECT_BASE).append(" WHERE 1 = 1");
+        List<Object> params = new ArrayList<>();
+        if (estado != null)        { sql.append(" AND estado = ?");        params.add(estado.name()); }
+        if (desde != null)         { sql.append(" AND data_criacao >= ?"); params.add(Timestamp.valueOf(desde)); }
+        if (ate != null)           { sql.append(" AND data_criacao <= ?"); params.add(Timestamp.valueOf(ate)); }
+        if (idCliente != null)     { sql.append(" AND codCliente = ?");    params.add(idCliente); }
+        if (idFuncionario != null) { sql.append(" AND codResponsavel = ?"); params.add(idFuncionario); }
+        sql.append(" ORDER BY id");
+
+        List<OrdemServico> out = new ArrayList<>();
         try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setTimestamp(1, Timestamp.valueOf(data_inicio));
-            ps.setTimestamp(2, Timestamp.valueOf(data_fim));
+             PreparedStatement ps = c.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) ps.setObject(i + 1, params.get(i));
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) out.add(buildFromRow(rs));
+                while (rs.next()) out.add(buildFromRow(c, rs));
             }
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter notificacoes no intervalo", e);
+            throw new EcoRideException("Erro a filtrar OSs", e);
         }
         return out;
     }
-
 }

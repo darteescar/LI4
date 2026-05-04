@@ -99,7 +99,7 @@ public class PecaDAO implements Map<Integer, Peca> {
             ps.setInt(1, key);
             ps.setString(2, value.getReferencia());
             ps.setInt(3, value.getStock_minimo());
-            ps.setInt(4, value.getPreco_venda());
+            ps.setFloat(4, value.getPreco_venda());
             ps.setInt(5, value.getCodFornecedor());
             ps.setBoolean(6, value.isAtiva());
             ps.executeUpdate();
@@ -181,6 +181,32 @@ public class PecaDAO implements Map<Integer, Peca> {
             return rs.next() ? rs.getInt(1) + 1 : 1;
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gerar novo ID para peca", e);
+        }
+    }
+
+    public boolean getByReference(String ref){
+        String sql = "SELECT 1 FROM Peca WHERE referencia = ?";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, ref);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter peca por referencia " + ref, e);
+        }
+    }
+
+    public Peca getByReferenceFull(String ref){
+        String sql = "SELECT id, referencia, stock_minimo, preco_venda, codFornecedor, ativa FROM Peca WHERE referencia = ?";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, ref);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? buildFromRow(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter peca por referencia " + ref, e);
         }
     }
 }
