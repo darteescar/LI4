@@ -5,7 +5,7 @@ import java.util.List;
 import app.common.EcoRideException;
 import app.ecoRideCD.sReparacoes.ReparacaoDAO;
 
-public class sReparacoesFacade implements ISReparacoes {
+public class SReparacoesFacade implements ISReparacoes {
      private final ReparacaoDAO reparacaoDAO = ReparacaoDAO.getInstance();
 
      @Override

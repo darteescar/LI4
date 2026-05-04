@@ -5,7 +5,7 @@ import java.util.List;
 
 import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
 
-public class sNotificacoesFacade implements ISSNotificacoes {
+public class SNotificacoesFacade implements ISSNotificacoes {
      private NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
 
      @Override
