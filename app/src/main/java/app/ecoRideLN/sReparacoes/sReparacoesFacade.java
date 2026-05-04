@@ -27,40 +27,27 @@ public class sReparacoesFacade implements ISReparacoes {
      }
 
      @Override
-     public void atualizarDescricaoReparacao(int id, String novaDescricao){
-          Reparacao reparacao = reparacaoDAO.get(id);
-          if (reparacao != null) {
-               reparacao.setDescricao(novaDescricao);
-               reparacaoDAO.put(id, reparacao);
-          } else {
-               throw new EcoRideException("Reparação não encontrada para atualizar descrição.");
-          }
+     public List<Reparacao> obterReparacoesDisponiveis(){
+          return reparacaoDAO.values().stream().filter(Reparacao::isDisponivel).toList();
      }
 
      @Override
-     public void atualizarPrecoReparacao(int id, float novoPreco){
+     public void atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade) {
           Reparacao reparacao = reparacaoDAO.get(id);
           if (reparacao != null) {
-               reparacao.setPreco(novoPreco);
-               reparacaoDAO.put(id, reparacao);
-          } else {
-               throw new EcoRideException("Reparação não encontrada para atualizar preço.");
-          }
-     }
-
-     @Override
-     public void atualizarFlagDisponibilidadeReparacao(int id, boolean novaDisponibilidade){
-          Reparacao reparacao = reparacaoDAO.get(id);
-          if (reparacao != null) {
+               if (novaNomenclatura != null && !novaNomenclatura.isEmpty()) {
+                    reparacao.setNomenclatura(novaNomenclatura);
+               }
+               if (novaDescricao != null && !novaDescricao.isEmpty()) {
+                    reparacao.setDescricao(novaDescricao);
+               }
+               if (novoPreco >= 0) {
+                    reparacao.setPreco(novoPreco);
+               }
                reparacao.setDisponivel(novaDisponibilidade);
                reparacaoDAO.put(id, reparacao);
           } else {
-               throw new EcoRideException("Reparação não encontrada para atualizar disponibilidade.");
+               throw new EcoRideException("Reparação não encontrada para atualizar.");
           }
-     }
-
-     @Override
-     public List<Reparacao> obterReparacoesDisponiveis(){
-          return reparacaoDAO.values().stream().filter(Reparacao::isDisponivel).toList();
      }
 }
