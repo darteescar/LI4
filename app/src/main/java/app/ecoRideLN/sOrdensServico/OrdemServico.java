@@ -81,6 +81,9 @@ public class OrdemServico {
      }
      public void setDiagnostico(Diagnostico diagnostico) { this.diagnostico = diagnostico; }
 
+     public Metodo_Pagamento getMetodo_pagamento() { return metodo_pagamento; }
+     public void setMetodo_pagamento(Metodo_Pagamento metodo_pagamento) { this.metodo_pagamento = metodo_pagamento; }
+
      public void adicionarPecasConserto(List<app.ecoRideLN.sStock.Stock> pecas) {
           this.conserto.adicionarPecas(pecas);
      }

@@ -24,6 +24,7 @@ import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
+import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sOrdensServico.PecasOrcamento;
 import app.ecoRideLN.sOrdensServico.SOrdensServicoFacade;
@@ -81,6 +82,21 @@ public class EcoRideLN implements IEcoRideLN {
         return sNotificacoes.removerNotificacao(id);
     }
 
+    @Override
+    public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario) {
+        return sNotificacoes.obterNotificacoesPorDestinatario(id_destinatario);
+    }
+
+    @Override
+    public boolean sinalizarNotificacao_comoTratada(int id) {
+        return sNotificacoes.sinalizarNotificacao_comoTratada(id);
+    }
+
+    @Override
+    public boolean sinalizarNotificacao_comoLida(int id) {
+        return sNotificacoes.sinalizarNotificacao_comoLida(id);
+    }
+
     // ------------------- Ordens de Serviço -------------------
     @Override
     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias) {
@@ -96,6 +112,32 @@ public class EcoRideLN implements IEcoRideLN {
     public boolean removerOS(int id) {
         return sOrdensServico.removerOS(id);
     }
+
+    @Override
+    public void cancelarOS(int id) {
+        sOrdensServico.cancelarOS(id);
+    }
+
+    @Override
+    public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int idMecanico) {
+        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, reparacoes, descricao, idMecanico);
+    }
+
+    @Override
+    public void registarConsertoOS(int id_OS, int idMecanico, List<Stock> pecas, List<Reparacao> reparacoes) {
+        sOrdensServico.registarConsertoOS(id_OS, idMecanico, pecas, reparacoes);
+    }
+
+    @Override
+    public void registarNotificacaoClienteOS(int id_OS) {
+        sOrdensServico.registarNotificacaoClienteOS(id_OS);
+    }
+
+    @Override
+    public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
+        sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
+    }
+
 
     // ------------------- Clientes -------------------
     @Override
@@ -116,6 +158,11 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public boolean removerCliente(int id) {
         return sClientes.removerCliente(id);
+    }
+
+    @Override
+    public List<Cliente> obterClientes() {
+        return sClientes.obterClientes();
     }
 
     // ------------------- Trotinetes -------------------
@@ -139,6 +186,11 @@ public class EcoRideLN implements IEcoRideLN {
         return sClientes.removerTrotinete(id);
     }
 
+    @Override
+    public List<Trotinete> obterTrotinetes() {
+        return sClientes.obterTrotinetes();
+    }
+
     // ------------------- Reparações -------------------
     @Override
     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco) {
@@ -158,6 +210,11 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public boolean removerReparacao(int id) {
         return sReparacoes.removerReparacao(id);
+    }
+
+    @Override
+    public List<Reparacao> obterReparacoes() {
+        return sReparacoes.obterReparacoes();
     }
 
     // ------------------- Peças -------------------
@@ -233,6 +290,21 @@ public class EcoRideLN implements IEcoRideLN {
         return sStock.removerDevolucao(id);
     }
 
+    @Override
+    public void marcarDevolucaoComoEnviada(int id) {
+        sStock.marcarDevolucaoComoEnviada(id);
+    }
+
+    @Override
+    public void marcarDevolucaoComoDevolvida(int id) {
+        sStock.marcarDevolucaoComoDevolvida(id);
+    }
+
+    @Override
+    public void marcarDevolucaoComoInvalida(int id) {
+        sStock.marcarDevolucaoComoInvalida(id);
+    }
+
     // ------------------- Encomendas -------------------
     @Override
     public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor) {
@@ -247,6 +319,21 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public boolean removerEncomenda(int id) {
         return sStock.removerEncomenda(id);
+    }
+
+    @Override
+    public List<Encomenda> obterTodasEncomendas() {
+        return sStock.obterTodasEncomendas();
+    }
+
+    @Override
+    public void marcarEncomendaComoEnviada(int id) {
+        sStock.marcarEncomendaComoEnviada(id);
+    }
+
+    @Override
+    public void marcarEncomendaComoRecebida(int id) {
+        sStock.marcarEncomendaComoRecebida(id);
     }
 
     // ------------------- Fornecedores -------------------
@@ -291,19 +378,29 @@ public class EcoRideLN implements IEcoRideLN {
         return sFuncionarios.removerFuncionario(id);
     }
 
+    @Override
+    public void        registarHorasExtraFuncionario(int id_funcionario, int horas_extra) {
+        sFuncionarios.registarHorasExtraFuncionario(id_funcionario, horas_extra);
+    }
+
+    @Override
+    public void        registarPagamentoFuncionario(int id_funcionario) {
+        sFuncionarios.registarPagamentoFuncionario(id_funcionario);
+    }
+
     // ------------------- Movimentos Financeiros -------------------
     @Override
-    public MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario) {
+    private MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario) {
         return sFinanceiro.criarMovimentoFuncionario(valor, descricao, codFuncionario);
     }
 
     @Override
-    public MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao) {
+    private MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao) {
         return sFinanceiro.criarMovimentoReparacao(valor, descricao, codReparacao);
     }
 
     @Override
-    public MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca) {
+    private MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca) {
         return sFinanceiro.criarMovimentoPeca(valor, descricao, tipo, codPeca);
     }
 
@@ -313,18 +410,18 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean existeMovimentoFinanceiro(int id) {
-        return sFinanceiro.existeMovimentoFinanceiro(id);
+    public List<MovimentoFinanceiro> obterMovimentosFinanceiros() {
+        return sFinanceiro.obterMovimentosFinanceiros();
     }
 
     @Override
-    public boolean removerMovimentoFinanceiro(int id) {
-        return sFinanceiro.removerMovimentoFinanceiro(id);
+    public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo) {
+        return sFinanceiro.obterMovimentosFinanceirosFiltrados(desde, ate, tipo);
     }
 
     // ------------------- Cross-cutting -------------------
     @Override
-    public boolean pecasDiagnosticoDisponiveisReparacao(int id_OS) {
+    private boolean pecasDiagnosticoDisponiveisReparacao(int id_OS) {
         List<PecasOrcamento> pecas = sOrdensServico.obterPecasQuantidadeDiagnosticoOS(id_OS);
         for (PecasOrcamento po : pecas) {
             if (sStock.obter_quantidade_Stock_Peca_id(po.getCodPeca()) < po.getQuantidade()) {

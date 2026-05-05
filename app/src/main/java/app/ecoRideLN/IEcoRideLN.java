@@ -119,17 +119,19 @@ public interface IEcoRideLN {
      public Funcionario obterFuncionario(int id);
      public boolean     existeFuncionario(int id);
      public boolean     removerFuncionario(int id);
+     public void        registarHorasExtraFuncionario(int id_funcionario, int horas_extra);
+     public void        registarPagamentoFuncionario(int id_funcionario);
 
      // ------------------- Movimentos Financeiros -------------------
 
-     public MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario);
-     public MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao);
-     public MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca);
+     private MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario);
+     private MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao);
+     private MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca);
      public MovimentoFinanceiro obterMovimentoFinanceiro(int id);
-     public boolean             existeMovimentoFinanceiro(int id);
-     public boolean             removerMovimentoFinanceiro(int id);
+     public List<MovimentoFinanceiro> obterMovimentosFinanceiros();
+     public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
 
      // ------------------- Cross-cutting -------------------
 
-     public boolean pecasDiagnosticoDisponiveisReparacao(int id_OS);
+     private boolean pecasDiagnosticoDisponiveisReparacao(int id_OS);
 }
