@@ -8,64 +8,97 @@ import app.ecoRideLN.sStock.Stock;
 
 public interface ISOrdensServico {
 
-     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao);
+     // ------------------- Registo -------------------
 
-     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
+     OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao);
 
-     public OrdemServico obterDadosOS(int id);
+     OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
 
-     public boolean removerOS(int id);
+     // ------------------- Consulta -------------------
 
-     public void alterarDescricaoOS(int id, String Descricao);
+     OrdemServico obterDadosOS(int id);
 
-     public void alterarAcessoriosOS(int id, List<String> acessorios);
+     List<OrdemServico> obterTodasOSs();
 
-     public void alterarFotografiasOS(int id, List<Fotografia> fotografias);
+     boolean removerOS(int id);
 
-     public void alterarEstadoOS(int id, EstadoOS estado);
+     // ------------------- Alterações de campos -------------------
 
-     public void adicionarPecas_Conserto_OS(int id, List<Stock> pecas);
+     void alterarDescricaoOS(int id, String descricao);
 
-     public boolean clienteTemApenasUmPagamentoPendente(int id);
+     void alterarAcessoriosOS(int id, List<String> acessorios);
 
-     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, int id_cliente, int id_funcionario);
+     void alterarFotografiasOS(int id, List<Fotografia> fotografias);
 
-     public float calcularOrcamento(List<PecasOrcamento> listaPecas, List<Reparacao> reparacoes);
+     void alterarDataCriacaoOS(int id, LocalDateTime data_criacao);
 
-     public boolean removerPecaConserto_OS(int id_OS, int is_Stock);
+     void alterarFuncionarioResponsavelOS(int id, int codResponsavel);
 
-     public boolean validarFotografia(Fotografia foto);
+     void alterarClienteOS(int id, int id_cliente);
 
-     public void alterarDataCriacaoOS(int id, LocalDateTime data_criacao);
+     void alterarTrotineteOS(int id, int id_trotinete);
 
-     public void alterarFuncionarioResponsavelOS(int id, int codResponsavel);
+     // ------------------- Máquina de estados -------------------
 
-     public void alterarClienteOS(int id, int id_cliente);
+     void alterarEstadoOS(int id, EstadoOS estado);
 
-     public void alterarTrotineteOS(int id, int id_trotinete);
+     void submeterDiagnosticoOS(int id);
 
-     public List<OrdemServico> filtrarOSsPorCliente(int id_cliente);
+     void aprovarOrcamentoOS(int id);
 
-     public List<OrdemServico> filtrarOSsPorFuncionario(int id_funcionario);
+     void rejeitarOrcamentoOS(int id);
 
-     public List<OrdemServico> filtrarOSsPorIntervalo(LocalDateTime desde, LocalDateTime ate);
+     void marcarAguardarPecasOS(int id);
 
-     public List<OrdemServico> filtrarOSsPorClienteEIntervalo(int id_funcionario, LocalDateTime desde, LocalDateTime ate);
+     void pecasRecebidasOS(int id);
 
-     public List<OrdemServico> filtrarOSsPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime desde, LocalDateTime ate);
+     void concluirReparacaoOS(int id);
 
-     public List<OrdemServico> filtrarOSsPorClienteEFuncionario(int id_cliente, int id_funcionario);
+     void pagarOS(int id);
 
-     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, String descricao, int idMecanico);
+     void eliminarOS(int id);
 
-     public List<Reparacao> obterReparacoesDiagnosticoOS(int idOS);
+     // ------------------- Diagnóstico -------------------
 
-     public List<PecasOrcamento> obterPecasQuantidadeDiagnosticoOS(int idOS);
+     void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int idMecanico);
 
-     public void adicionarPecaConserto_OS(int id_OS, int id_Stock);
+     List<Reparacao> obterReparacoesDiagnosticoOS(int idOS);
 
-     public void registarConsertoOS(int id_OS, int idMecanico , List<Stock> pecas, List<Reparacao> reparacoes);
+     List<PecasOrcamento> obterPecasQuantidadeDiagnosticoOS(int idOS);
 
-     public boolean validarChecklist_ConsertoOS(int idOS);
+     // ------------------- Conserto -------------------
 
+     void registarConsertoOS(int id_OS, int idMecanico, List<Stock> pecas, List<Reparacao> reparacoes);
+
+     void adicionarPecas_Conserto_OS(int id, List<Stock> pecas);
+
+     void adicionarPecaConserto_OS(int id_OS, int id_Stock);
+
+     boolean removerPecaConserto_OS(int id_OS, int id_Stock);
+
+     boolean validarChecklist_ConsertoOS(int idOS);
+
+     // ------------------- Filtragem -------------------
+
+     List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
+
+     List<OrdemServico> filtrarOSsPorCliente(int id_cliente);
+
+     List<OrdemServico> filtrarOSsPorFuncionario(int id_funcionario);
+
+     List<OrdemServico> filtrarOSsPorIntervalo(LocalDateTime desde, LocalDateTime ate);
+
+     List<OrdemServico> filtrarOSsPorClienteEIntervalo(int id_cliente, LocalDateTime desde, LocalDateTime ate);
+
+     List<OrdemServico> filtrarOSsPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime desde, LocalDateTime ate);
+
+     List<OrdemServico> filtrarOSsPorClienteEFuncionario(int id_cliente, int id_funcionario);
+
+     // ------------------- Utilitários -------------------
+
+     boolean clienteTemApenasUmPagamentoPendente(int id);
+
+     float calcularOrcamento(List<PecasOrcamento> listaPecas, List<Reparacao> reparacoes);
+
+     boolean validarFotografia(Fotografia foto);
 }

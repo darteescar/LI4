@@ -2,8 +2,6 @@ package app.ecoRideLN.sStock;
 
 import java.time.LocalDateTime;
 
-import app.ecoRideCD.sStock.PecaDAO;
-
 public class Stock {
      private int id;
      private float preco_compra;
@@ -11,8 +9,6 @@ public class Stock {
      private LocalDateTime data_chegada;
      private int quantidade;
      private EstadoStock estado;
-     private static final PecaDAO pecaDAO = PecaDAO.getInstance();
-
 
      public Stock(int id, float preco_compra, int codPeca, LocalDateTime data_chegada, int quantidade) {
           this.id = id;
@@ -32,58 +28,21 @@ public class Stock {
           this.estado = estado;
      }
 
-     public int getId() {
-          return id;
-     }
+     public int getId() { return id; }
+     public void setId(int id) { this.id = id; }
 
-     public void setId(int id) {
-          this.id = id;
-     }
+     public float getPreco_compra() { return preco_compra; }
+     public void setPreco_compra(float preco_compra) { this.preco_compra = preco_compra; }
 
-     public float getPreco_compra() {
-          return preco_compra;
-     }
+     public int getCodPeca() { return codPeca; }
+     public void setCodPeca(int codPeca) { this.codPeca = codPeca; }
 
-     public void setPreco_compra(float preco_compra) {
-          this.preco_compra = preco_compra;
-     }
+     public LocalDateTime getData_chegada() { return data_chegada; }
+     public void setData_chegada(LocalDateTime data_chegada) { this.data_chegada = data_chegada; }
 
-     public int getCodPeca() {
-          return codPeca;
-     }
+     public int getQuantidade() { return quantidade; }
+     public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
 
-     public void setCodPeca(int codPeca) {
-          this.codPeca = codPeca;
-     }
-
-     public LocalDateTime getData_chegada() {
-          return data_chegada;
-     }
-
-     public void setData_chegada(LocalDateTime data_chegada) {
-          this.data_chegada = data_chegada;
-     }
-
-     public int getQuantidade() {
-          return quantidade;
-     }
-
-     public void setQuantidade(int quantidade) {
-          this.quantidade = quantidade;
-     }
-
-     public EstadoStock getEstado() {
-          return estado;
-     }
-
-     public void setEstado(EstadoStock estado) {
-          this.estado = estado;
-     }
-
-     // Métodos a mais
-
-     public float getPrecoPeca() {
-          return pecaDAO.get(this.codPeca).getPreco_venda();
-     }
-
+     public EstadoStock getEstado() { return estado; }
+     public void setEstado(EstadoStock estado) { this.estado = estado; }
 }

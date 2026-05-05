@@ -6,12 +6,14 @@ import java.util.List;
 import app.common.EcoRideException;
 import app.ecoRideCD.sClientes.ClienteDAO;
 import app.ecoRideCD.sClientes.TrotineteDAO;
+import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
 import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 
 public class SClientesFacade implements ISClientes {
      private ClienteDAO clientesDAO = ClienteDAO.getInstance();
      private TrotineteDAO trotinetesDAO = TrotineteDAO.getInstance();
+     private OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
 
      public SClientesFacade() {
      }
@@ -33,10 +35,15 @@ public class SClientesFacade implements ISClientes {
      public List<OrdemServico> obterOS_Cliente(int id){
           Cliente cliente = clientesDAO.get(id);
           if (cliente != null) {
-               List<Trotinete> trotinetes = cliente.getTrotinetes();
                List<OrdemServico> ordensServico = new ArrayList<>();
-               for (Trotinete trotinete : trotinetes) {
-                    ordensServico.addAll(trotinete.getOSs());
+               for (Integer codTrotinete : cliente.getCodsTrotinetes()) {
+                    Trotinete trotinete = trotinetesDAO.get(codTrotinete);
+                    if (trotinete != null) {
+                         for (Integer codOS : trotinete.getCodsOrdensServico()) {
+                              OrdemServico os = ordemServicoDAO.get(codOS);
+                              if (os != null) ordensServico.add(os);
+                         }
+                    }
                }
                return ordensServico;
           }
@@ -54,7 +61,12 @@ public class SClientesFacade implements ISClientes {
      public List<Trotinete> obterTrotinetes_Cliente(int id) {
           Cliente cliente = clientesDAO.get(id);
           if (cliente != null) {
-               return cliente.getTrotinetes();
+               List<Trotinete> trotinetes = new ArrayList<>();
+               for (Integer cod : cliente.getCodsTrotinetes()) {
+                    Trotinete t = trotinetesDAO.get(cod);
+                    if (t != null) trotinetes.add(t);
+               }
+               return trotinetes;
           }
           else {
                throw new EcoRideException("Cliente com ID " + id + " não encontrado.");
@@ -84,7 +96,12 @@ public class SClientesFacade implements ISClientes {
      public List<OrdemServico> obterOS_Trotinete(int id_trotinete){
           Trotinete trotinete = trotinetesDAO.get(id_trotinete);
           if (trotinete != null) {
-               return trotinete.getOSs();
+               List<OrdemServico> ordensServico = new ArrayList<>();
+               for (Integer codOS : trotinete.getCodsOrdensServico()) {
+                    OrdemServico os = ordemServicoDAO.get(codOS);
+                    if (os != null) ordensServico.add(os);
+               }
+               return ordensServico;
           }
           else {
                throw new EcoRideException("Trotinete com ID " + id_trotinete + " não encontrada.");
@@ -97,15 +114,39 @@ public class SClientesFacade implements ISClientes {
      }
 
      @Override
+     public boolean existeTrotinete(int id) {
+          return trotinetesDAO.containsKey(id);
+     }
+
+     @Override
      public boolean removerTrotinete(int id) {
           return trotinetesDAO.remove(id) != null;
+     }
+
+     @Override
+     public void atualizarDadosTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor) {
+          Trotinete t = trotinetesDAO.get(id);
+          if (t != null) {
+               if (modelo != null) t.setModelo(modelo);
+               if (marca != null) t.setMarca(marca);
+               if (num_serie > 0) t.setNum_serie(num_serie);
+               if (tipo_motor != null) t.setTipo_motor(tipo_motor);
+               trotinetesDAO.put(id, t);
+          }
      }
 
      @Override
      public List<Conserto> obterConsertosAnteriores(int id_trotinete) {
           Trotinete trotinete = trotinetesDAO.get(id_trotinete);
           if (trotinete != null) {
-               return trotinete.getConsertos();
+               List<Conserto> consertos = new ArrayList<>();
+               for (Integer codOS : trotinete.getCodsOrdensServico()) {
+                    OrdemServico os = ordemServicoDAO.get(codOS);
+                    if (os != null && os.getConserto() != null) {
+                         consertos.add(os.getConserto());
+                    }
+               }
+               return consertos;
           }
           else {
                throw new EcoRideException("Trotinete com ID " + id_trotinete + " não encontrada.");

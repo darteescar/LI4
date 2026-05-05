@@ -6,27 +6,32 @@ import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 
 public interface ISClientes {
-     public Cliente registarCliente(String nome, String email, String telemovel, String nif);
 
-     public Cliente obterDadosCliente(int id);
+     Cliente registarCliente(String nome, String email, String telemovel, String nif);
 
-     public List<OrdemServico> obterOS_Cliente(int id);
+     Cliente obterDadosCliente(int id);
 
-     public boolean removerCliente(int id);
+     boolean removerCliente(int id);
 
-     public List<Trotinete> obterTrotinetes_Cliente(int id);
+     boolean existeCliente(int id);
 
-     public boolean existeCliente(int id);
+     void atualizarDadosCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
 
-     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
+     List<OrdemServico> obterOS_Cliente(int id);
 
-     public List<OrdemServico> obterOS_Trotinete(int id_trotinete);
+     List<Trotinete> obterTrotinetes_Cliente(int id);
 
-     public Trotinete obterDadosTrotinete(int id);
+     Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
-     public boolean removerTrotinete(int id);
+     Trotinete obterDadosTrotinete(int id);
 
-     public List<Conserto> obterConsertosAnteriores(int id_trotinete);
+     boolean existeTrotinete(int id);
 
-     public void atualizarDadosCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
+     boolean removerTrotinete(int id);
+
+     void atualizarDadosTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
+
+     List<OrdemServico> obterOS_Trotinete(int id_trotinete);
+
+     List<Conserto> obterConsertosAnteriores(int id_trotinete);
 }

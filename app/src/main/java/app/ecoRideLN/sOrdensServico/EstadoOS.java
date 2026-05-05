@@ -1,12 +1,25 @@
 package app.ecoRideLN.sOrdensServico;
 
 public enum EstadoOS {
-     PendenteReparacao,
-     PendenteDiagnostico,
-     PendenteAprovacaoOrcamento,
-     PendentePagamento,
-     Paga,
-     OrcamentoNaoAprovado,
-     AguardarPecas,
-     Eliminada
+
+    PendenteDiagnostico,
+    PendenteAprovacaoOrcamento,
+    OrcamentoNaoAprovado,
+    PendenteReparacao,
+    AguardarPecas,
+    PendentePagamento,
+    Paga,
+    Eliminada;
+
+    public boolean podeTransicionar(EstadoOS destino) {
+        return switch (this) {
+            case PendenteDiagnostico         -> destino == PendenteAprovacaoOrcamento || destino == Eliminada;
+            case PendenteAprovacaoOrcamento  -> destino == PendenteReparacao || destino == OrcamentoNaoAprovado || destino == Eliminada;
+            case OrcamentoNaoAprovado        -> destino == Eliminada;
+            case PendenteReparacao           -> destino == AguardarPecas || destino == PendentePagamento || destino == Eliminada;
+            case AguardarPecas               -> destino == PendenteReparacao || destino == Eliminada;
+            case PendentePagamento           -> destino == Paga || destino == Eliminada;
+            case Paga, Eliminada             -> false;
+        };
+    }
 }

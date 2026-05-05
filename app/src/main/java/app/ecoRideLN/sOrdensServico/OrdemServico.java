@@ -4,14 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import app.ecoRideCD.sClientes.ClienteDAO;
-import app.ecoRideCD.sClientes.TrotineteDAO;
-import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
-import app.ecoRideLN.sClientes.Cliente;
-import app.ecoRideLN.sClientes.Trotinete;
-import app.ecoRideLN.sFuncionarios.Funcionario;
-import app.ecoRideLN.sStock.Stock;
-
 public class OrdemServico {
      private int id;
      private String descricao;
@@ -24,10 +16,6 @@ public class OrdemServico {
      private List<String> acessorios;
      private Conserto conserto;
      private Diagnostico diagnostico;
-     
-     private static final TrotineteDAO trotDAO = TrotineteDAO.getInstance();
-     private static final ClienteDAO clienteDAO = ClienteDAO.getInstance();
-     private static final FuncionarioDAO funcionarioDAO = FuncionarioDAO.getInstance();
 
      public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codResponsavel) {
           this.id = id;
@@ -57,112 +45,46 @@ public class OrdemServico {
           this.diagnostico = null;
      }
 
-     public int getId() {
-          return id;
-     } 
+     public int getId() { return id; }
+     public void setId(int id) { this.id = id; }
 
-     public void setId(int id) {
-          this.id = id;
-     }
+     public String getDescricao() { return descricao; }
+     public void setDescricao(String descricao) { this.descricao = descricao; }
 
-     public String getDescricao() {
-          return descricao;
-     }
+     public LocalDateTime getDataCriacao() { return data_criacao; }
+     public void setDataCriacao(LocalDateTime data_criacao) { this.data_criacao = data_criacao; }
 
-     public void setDescricao(String descricao) {
-          this.descricao = descricao;
-     }
+     public int getCodTrotinete() { return codTrotinete; }
+     public void setCodTrotinete(int codTrotinete) { this.codTrotinete = codTrotinete; }
 
-     public LocalDateTime getDataCriacao() {
-          return data_criacao;
-     }
+     public int getCodCliente() { return codCliente; }
+     public void setCodCliente(int codCliente) { this.codCliente = codCliente; }
 
-     public void setDataCriacao(LocalDateTime data_criacao) {
-          this.data_criacao = data_criacao;
-     }
+     public int getCodResponsavel() { return codResponsavel; }
+     public void setCodResponsavel(int codResponsavel) { this.codResponsavel = codResponsavel; }
 
-     public int getCodTrotinete() {
-          return codTrotinete;
-     }
+     public List<Fotografia> getFotografias() { return new ArrayList<>(fotografias); }
+     public void setFotografias(List<Fotografia> fotografias) { this.fotografias = new ArrayList<>(fotografias); }
 
-     public void setCodTrotinete(int codTrotinete) {
-          this.codTrotinete = codTrotinete;
-     }
+     public EstadoOS getEstado() { return estado; }
+     public void setEstado(EstadoOS estado) { this.estado = estado; }
 
-     public int getCodCliente() {
-          return codCliente;
-     }
-
-     public void setCodCliente(int codCliente) {
-          this.codCliente = codCliente;
-     }
-
-     public int getCodResponsavel() {
-          return codResponsavel;
-     }
-
-     public void setCodResponsavel(int codResponsavel) {
-          this.codResponsavel = codResponsavel;
-     }
-
-     public List<Fotografia> getFotografias() {
-          return new ArrayList<>(fotografias);
-     }
-
-     public void setFotografias(List<Fotografia> fotografias) {
-          this.fotografias = new ArrayList<>(fotografias);
-     }
-
-     public EstadoOS getEstado() {
-          return estado;
-     }
-
-     public void setEstado(EstadoOS estado) {
-          this.estado = estado;
-     }
-
-     public List<String> getAcessorios() {
-          return new ArrayList<>(acessorios);
-     }
-
-     public void setAcessorios(List<String> acessorios) {
-          this.acessorios = new ArrayList<>(acessorios);
-     }
+     public List<String> getAcessorios() { return new ArrayList<>(acessorios); }
+     public void setAcessorios(List<String> acessorios) { this.acessorios = new ArrayList<>(acessorios); }
 
      public Conserto getConserto() {
           if (this.conserto == null) return null;
           return new Conserto(this.conserto);
      }
-
-     public void setConserto(Conserto conserto) {
-          this.conserto = conserto;
-     }
+     public void setConserto(Conserto conserto) { this.conserto = conserto; }
 
      public Diagnostico getDiagnostico() {
           if (this.diagnostico == null) return null;
           return new Diagnostico(this.diagnostico);
      }
+     public void setDiagnostico(Diagnostico diagnostico) { this.diagnostico = diagnostico; }
 
-     public void setDiagnostico(Diagnostico diagnostico) {
-          this.diagnostico = diagnostico;
-     }
-
-     // Métodos a mais
-
-     public void adicionarPecasConserto(List<Stock> pecas) {
+     public void adicionarPecasConserto(List<app.ecoRideLN.sStock.Stock> pecas) {
           this.conserto.adicionarPecas(pecas);
      }
-
-     public Trotinete getTrotinete() {
-          return trotDAO.get(codTrotinete);
-     }
-
-     public Cliente getCliente() {
-          return clienteDAO.get(codCliente);
-     }
-
-     public Funcionario getResponsavel() {
-          return funcionarioDAO.get(codResponsavel);
-     }
-
 }

@@ -1,13 +1,8 @@
 package app.ecoRideLN.sOrdensServico;
 
-import app.ecoRideCD.sStock.StockDAO;
-import app.ecoRideLN.sStock.Stock;
-
 public class PecasUsadas {
      private int quantidade;
      private int codStock;
-
-     private static final StockDAO stockDAO = StockDAO.getInstance();
 
      public PecasUsadas(int quantidade, int codStock) {
           this.quantidade = quantidade;
@@ -29,17 +24,4 @@ public class PecasUsadas {
      public void setCodStock(int codStock) {
           this.codStock = codStock;
      }
-
-     // Métodos a mais
-
-     public Stock getStock() {
-          return stockDAO.get(codStock);
-     }
-
-     public float calcularValor() {
-          Stock stock = getStock();
-          float preco = stock.getPrecoPeca();
-          return quantidade * preco;
-     }
-
 }

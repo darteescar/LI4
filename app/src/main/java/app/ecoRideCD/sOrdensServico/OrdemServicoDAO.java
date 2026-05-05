@@ -105,9 +105,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 }
             }
         }
-        Diagnostico d = new Diagnostico(desc, codMec, reps, pecas);
-        d.setOrcamento(orc);
-        return d;
+        return new Diagnostico(desc, codMec, reps, pecas, orc);
     }
 
     private Conserto loadConserto(Connection c, int idOS) throws SQLException {
@@ -151,8 +149,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 }
             }
         }
-        Conserto con = new Conserto(codMec, pecas, reps);
-        con.setPreco_total(preco);
+        Conserto con = new Conserto(codMec, pecas, reps, preco);
         con.setCheckList(chk);
         return con;
     }
