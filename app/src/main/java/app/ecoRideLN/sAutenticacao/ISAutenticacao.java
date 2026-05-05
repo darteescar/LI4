@@ -6,7 +6,7 @@ public interface ISAutenticacao {
 
      Utilizador criarUtilizador(String password, int idFuncionario, Cargo cargo);
 
-     Utilizador obterDadosUtilizador(int id);
+     Utilizador obterUtilizador(int id);
 
      boolean existeUtilizador(int id);
 

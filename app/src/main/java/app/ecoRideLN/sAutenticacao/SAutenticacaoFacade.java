@@ -23,7 +23,7 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
-    public Utilizador obterDadosUtilizador(int id) {
+    public Utilizador obterUtilizador(int id) {
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }

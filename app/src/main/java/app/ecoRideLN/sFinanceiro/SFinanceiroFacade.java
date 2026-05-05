@@ -38,7 +38,7 @@ public class SFinanceiroFacade implements ISFinanceiro {
      // ------------------- Consulta -------------------
 
      @Override
-     public MovimentoFinanceiro obterDadosMovimentoFinanceiro(int id) {
+     public MovimentoFinanceiro obterMovimentoFinanceiro(int id) {
           return movimentoFinanceiroDAO.get(id);
      }
 

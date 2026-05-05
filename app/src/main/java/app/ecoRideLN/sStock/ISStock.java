@@ -9,7 +9,7 @@ public interface ISStock {
      // ------------------- Fornecedor -------------------
 
      Fornecedor registarFornecedor(String nome, String telemovel, String email);
-     Fornecedor obterDadosFornecedor(int id);
+     Fornecedor obterFornecedor(int id);
      List<Fornecedor> obterTodosFornecedores();
      boolean existeFornecedor(int id);
      boolean removerFornecedor(int id);
@@ -18,7 +18,7 @@ public interface ISStock {
      // ------------------- Peca -------------------
 
      Peca    registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor);
-     Peca    obterDadosPeca(int id);
+     Peca    obterPeca(int id);
      List<Peca> obterTodasPecas();
      boolean existePeca_id(int id);
      boolean existePeca_ref(String ref);
@@ -32,7 +32,7 @@ public interface ISStock {
 
      Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie);
      Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
-     Stock   obterDadosStock(int id);
+     Stock   obterStock(int id);
      List<Stock> obterTodosStocks();
      boolean existeStock(int id);
      boolean removerStock(int id);
@@ -46,7 +46,7 @@ public interface ISStock {
 
      Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock);
      void      devolverPecas(List<Integer> pecas);
-     Devolucao obterDadosDevolucao(int id);
+     Devolucao obterDevolucao(int id);
      List<Devolucao> obterTodasDevolucoes();
      boolean   existeDevolucao(int id);
      boolean   removerDevolucao(int id);
@@ -57,7 +57,7 @@ public interface ISStock {
 
      int       quantidade_encomendar_peca(int id_peca);
      Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor);
-     Encomenda obterDadosEncomenda(int id);
+     Encomenda obterEncomenda(int id);
      List<Encomenda> obterTodasEncomendas();
      List<Encomenda> obterEncomendasPorEstado(EstadoEncomenda estado);
      void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<Stock> pecas);

@@ -28,7 +28,7 @@ public class SClientesFacade implements ISClientes {
      }
 
      @Override
-     public Cliente obterDadosCliente(int id) {
+     public Cliente obterCliente(int id) {
           return clientesDAO.get(id);
      }
 
@@ -77,7 +77,7 @@ public class SClientesFacade implements ISClientes {
      }
 
      @Override
-     public Trotinete obterDadosTrotinete(int id) {
+     public Trotinete obterTrotinete(int id) {
           return trotinetesDAO.get(id);
      }
 
@@ -108,7 +108,7 @@ public class SClientesFacade implements ISClientes {
      // ------------------- Consultas cruzadas -------------------
 
      @Override
-     public List<OrdemServico> obterOS_Cliente(int id) {
+     public List<OrdemServico> obterOSs_Cliente(int id) {
           Cliente cliente = clientesDAO.get(id);
           if (cliente != null) {
                List<OrdemServico> ordensServico = new ArrayList<>();

@@ -16,7 +16,7 @@ public interface ISOrdensServico {
 
      // ------------------- Consulta -------------------
 
-     OrdemServico obterDadosOS(int id);
+     OrdemServico obterOS(int id);
 
      List<OrdemServico> obterTodasOSs();
 

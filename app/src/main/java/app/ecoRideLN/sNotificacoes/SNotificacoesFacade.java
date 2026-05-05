@@ -22,7 +22,7 @@ public class SNotificacoesFacade implements ISNotificacoes {
      // ------------------- Consulta -------------------
 
      @Override
-     public Notificacao obterDadosNotificacao(int id) {
+     public Notificacao obterNotificacao(int id) {
           return notificacaoDAO.get(id);
      }
 

@@ -45,7 +45,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      // ------------------- Consulta -------------------
 
      @Override
-     public OrdemServico obterDadosOS(int id) {
+     public OrdemServico obterOS(int id) {
           return ordemServicoDAO.get(id);
      }
 

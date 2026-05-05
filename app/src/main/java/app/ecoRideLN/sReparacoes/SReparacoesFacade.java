@@ -22,13 +22,8 @@ public class SReparacoesFacade implements ISReparacoes {
      }
 
      @Override
-     public Reparacao obterDadosReparacao(int id) {
+     public Reparacao obterReparacao(int id) {
           return reparacaoDAO.get(id);
-     }
-
-     @Override
-     public List<Reparacao> obterReparacoesDisponiveis() {
-          return reparacaoDAO.values().stream().filter(Reparacao::isDisponivel).toList();
      }
 
      @Override
@@ -39,6 +34,11 @@ public class SReparacoesFacade implements ISReparacoes {
      @Override
      public List<Reparacao> obterTodasReparacoes() {
           return reparacaoDAO.values().stream().toList();
+     }
+
+     @Override
+     public List<Reparacao> obterReparacoesDisponiveis() {
+          return reparacaoDAO.values().stream().filter(Reparacao::isDisponivel).toList();
      }
 
      @Override

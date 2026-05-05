@@ -15,7 +15,7 @@ public interface ISFinanceiro {
 
      // ------------------- Consulta -------------------
 
-     MovimentoFinanceiro obterDadosMovimentoFinanceiro(int id);
+     MovimentoFinanceiro obterMovimentoFinanceiro(int id);
 
      List<MovimentoFinanceiro> obterMovimentos();
 

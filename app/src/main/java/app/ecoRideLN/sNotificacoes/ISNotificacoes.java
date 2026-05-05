@@ -11,7 +11,7 @@ public interface ISNotificacoes {
 
      // ------------------- Consulta -------------------
 
-     Notificacao obterDadosNotificacao(int id);
+     Notificacao obterNotificacao(int id);
 
      List<Notificacao> obterTodasNotificacoes();
 

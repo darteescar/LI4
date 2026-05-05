@@ -11,9 +11,7 @@ public interface ISClientes {
 
      Cliente registarCliente(String nome, String email, String telemovel, String nif);
 
-     Cliente obterDadosCliente(int id);
-
-     List<Cliente> obterTodosClientes();
+     Cliente obterCliente(int id);
 
      boolean existeCliente(int id);
 
@@ -21,11 +19,13 @@ public interface ISClientes {
 
      void atualizarDadosCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
 
+     List<Cliente> obterTodosClientes();
+
      // ------------------- Trotinete -------------------
 
      Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
-     Trotinete obterDadosTrotinete(int id);
+     Trotinete obterTrotinete(int id);
 
      boolean existeTrotinete(int id);
 
@@ -35,7 +35,7 @@ public interface ISClientes {
 
      // ------------------- Consultas cruzadas -------------------
 
-     List<OrdemServico> obterOS_Cliente(int id);
+     List<OrdemServico> obterOSs_Cliente(int id);
 
      List<Trotinete> obterTrotinetes_Cliente(int id);
 

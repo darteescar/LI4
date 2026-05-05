@@ -29,7 +29,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Fornecedor obterDadosFornecedor(int id) {
+     public Fornecedor obterFornecedor(int id) {
           return fornecedorDAO.get(id);
      }
 
@@ -70,7 +70,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Peca obterDadosPeca(int id) {
+     public Peca obterPeca(int id) {
           return pecaDAO.get(id);
      }
 
@@ -155,7 +155,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Stock obterDadosStock(int id) {
+     public Stock obterStock(int id) {
           return stockDAO.get(id);
      }
 
@@ -251,7 +251,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Devolucao obterDadosDevolucao(int id) {
+     public Devolucao obterDevolucao(int id) {
           return devolucaoDAO.get(id);
      }
 
@@ -306,7 +306,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Encomenda obterDadosEncomenda(int id) {
+     public Encomenda obterEncomenda(int id) {
           return encomendaDAO.get(id);
      }
 
