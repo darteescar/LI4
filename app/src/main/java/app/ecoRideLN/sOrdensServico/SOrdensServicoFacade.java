@@ -25,16 +25,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
      // ------------------- Registo -------------------
 
      @Override
-     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao) {
-          if (clienteDAO.get(id_cliente) == null || trotineteDAO.get(id_trotinete) == null) return null;
-          int id = ordemServicoDAO.generateNewId();
-          OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codResponsavel);
-          ordemServicoDAO.put(id, os);
-          return os;
-     }
-
-     @Override
-     public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias) {
+     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias) {
           if (clienteDAO.get(id_cliente) == null || trotineteDAO.get(id_trotinete) == null) return null;
           int id = ordemServicoDAO.generateNewId();
           OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codResponsavel, fotografias, acessorios);

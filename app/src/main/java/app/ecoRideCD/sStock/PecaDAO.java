@@ -26,12 +26,17 @@ public class PecaDAO implements Map<Integer, Peca> {
         return instance;
     }
 
+    private static final String BASE_SELECT =
+            "SELECT id, referencia, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa FROM Peca";
+
     private Peca buildFromRow(ResultSet rs) throws SQLException {
         return new Peca(
                 rs.getInt("id"),
                 rs.getString("referencia"),
+                rs.getString("nome"),
+                rs.getString("descricao"),
                 rs.getInt("stock_minimo"),
-                rs.getInt("preco_venda"),
+                rs.getFloat("preco_venda"),
                 rs.getInt("codFornecedor"),
                 rs.getBoolean("ativa"));
     }
@@ -71,9 +76,8 @@ public class PecaDAO implements Map<Integer, Peca> {
     @Override
     public Peca get(Object key) {
         if (!(key instanceof Integer id)) return null;
-        String sql = "SELECT id, referencia, stock_minimo, preco_venda, codFornecedor, ativa FROM Peca WHERE id = ?";
         try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+             PreparedStatement ps = c.prepareStatement(BASE_SELECT + " WHERE id = ?")) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? buildFromRow(rs) : null;
@@ -87,21 +91,23 @@ public class PecaDAO implements Map<Integer, Peca> {
     public Peca put(Integer key, Peca value) {
         Peca prev = get(key);
         String sql = """
-                INSERT INTO Peca (id, referencia, stock_minimo, preco_venda, codFornecedor, ativa)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO Peca (id, referencia, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
-                    referencia = VALUES(referencia), stock_minimo = VALUES(stock_minimo),
-                    preco_venda = VALUES(preco_venda), codFornecedor = VALUES(codFornecedor),
-                    ativa = VALUES(ativa)
+                    referencia = VALUES(referencia), nome = VALUES(nome), descricao = VALUES(descricao),
+                    stock_minimo = VALUES(stock_minimo), preco_venda = VALUES(preco_venda),
+                    codFornecedor = VALUES(codFornecedor), ativa = VALUES(ativa)
                 """;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
             ps.setString(2, value.getReferencia());
-            ps.setInt(3, value.getStock_minimo());
-            ps.setFloat(4, value.getPreco_venda());
-            ps.setInt(5, value.getCodFornecedor());
-            ps.setBoolean(6, value.isAtiva());
+            ps.setString(3, value.getNome());
+            ps.setString(4, value.getDescricao());
+            ps.setInt(5, value.getStock_minimo());
+            ps.setFloat(6, value.getPreco_venda());
+            ps.setInt(7, value.getCodFornecedor());
+            ps.setBoolean(8, value.isAtiva());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar peca " + key, e);
@@ -152,10 +158,9 @@ public class PecaDAO implements Map<Integer, Peca> {
     @Override
     public Collection<Peca> values() {
         Set<Peca> out = new LinkedHashSet<>();
-        String sql = "SELECT id, referencia, stock_minimo, preco_venda, codFornecedor, ativa FROM Peca";
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery(sql)) {
+             ResultSet rs = s.executeQuery(BASE_SELECT)) {
             while (rs.next()) out.add(buildFromRow(rs));
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter pecas", e);
@@ -172,7 +177,7 @@ public class PecaDAO implements Map<Integer, Peca> {
 
     // --------- Aliases / domínio ---------
 
-    public void add(Peca p)               { put(p.getId(), p); }
+    public void add(Peca p) { put(p.getId(), p); }
 
     public int generateNewId() {
         try (Connection c = ConnectionFactory.get();
@@ -184,23 +189,19 @@ public class PecaDAO implements Map<Integer, Peca> {
         }
     }
 
-    public boolean getByReference(String ref){
-        String sql = "SELECT 1 FROM Peca WHERE referencia = ?";
+    public boolean getByReference(String ref) {
         try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+             PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Peca WHERE referencia = ?")) {
             ps.setString(1, ref);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter peca por referencia " + ref, e);
+            throw new EcoRideException("Erro a verificar peca por referencia " + ref, e);
         }
     }
 
-    public Peca getByReferenceFull(String ref){
-        String sql = "SELECT id, referencia, stock_minimo, preco_venda, codFornecedor, ativa FROM Peca WHERE referencia = ?";
+    public Peca getByReferenceFull(String ref) {
         try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+             PreparedStatement ps = c.prepareStatement(BASE_SELECT + " WHERE referencia = ?")) {
             ps.setString(1, ref);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? buildFromRow(rs) : null;

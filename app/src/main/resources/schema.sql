@@ -108,6 +108,8 @@ CREATE TABLE IF NOT EXISTS Fornecedor (
 CREATE TABLE IF NOT EXISTS Peca (
     id            INT          NOT NULL,
     referencia    VARCHAR(100) NOT NULL,
+    nome          VARCHAR(150) NULL,
+    descricao     TEXT         NULL,
     stock_minimo  INT          NOT NULL DEFAULT 0,
     preco_venda   FLOAT        NOT NULL,
     codFornecedor INT          NOT NULL,

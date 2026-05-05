@@ -4,113 +4,132 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
-import app.ecoRideLN.sFinanceiro.TipoMovimento;
 import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.Trotinete;
+import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
+import app.ecoRideLN.sFinanceiro.TipoMovimento;
+import app.ecoRideLN.sFuncionarios.Funcionario;
 import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sNotificacoes.NotificacaoOS;
 import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sOrdensServico.Fotografia;
+import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
+import app.ecoRideLN.sOrdensServico.PecasOrcamento;
 import app.ecoRideLN.sReparacoes.Reparacao;
 import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.Stock;
-import app.ecoRideLN.sFuncionarios.Funcionario;
 
 public interface IEcoRideLN {
 
      // ------------------- Notificações -------------------
 
-     NotificacaoOS    criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
-     NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
-     Notificacao      obterNotificacao(int id);
-     boolean          removerNotificacao(int id);
+     public NotificacaoOS    criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
+     public NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
+     public Notificacao      obterNotificacao(int id);
+     public boolean          removerNotificacao(int id);
+     public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
+     public boolean sinalizarNotificacao_comoTratada(int id);
+     public boolean sinalizarNotificacao_comoLida(int id);
 
      // ------------------- Ordens de Serviço -------------------
 
-     OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao);
-     OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
-     OrdemServico obterOS(int id);
-     boolean      removerOS(int id);
+     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
+     public OrdemServico obterOS(int id);
+     public boolean removerOS(int id);
+     public void cancelarOS(int id);
+     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int idMecanico);
+     public void registarConsertoOS(int id_OS, int idMecanico, List<Stock> pecas, List<Reparacao> reparacoes);
+     public void registarNotificacaoClienteOS(int id_OS);
+     public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
+
 
      // ------------------- Clientes -------------------
 
-     Cliente registarCliente(String nome, String email, String telemovel, String nif);
-     Cliente obterCliente(int id);
-     boolean existeCliente(int id);
-     boolean removerCliente(int id);
+     public Cliente registarCliente(String nome, String email, String telemovel, String nif);
+     public Cliente obterCliente(int id);
+     public boolean existeCliente(int id);
+     public boolean removerCliente(int id);
+     public List<Cliente> obterClientes();
 
      // ------------------- Trotinetes -------------------
 
-     Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
-     Trotinete obterTrotinete(int id);
-     boolean   existeTrotinete(int id);
-     boolean   removerTrotinete(int id);
+     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
+     public Trotinete obterTrotinete(int id);
+     public boolean   existeTrotinete(int id);
+     public boolean   removerTrotinete(int id);
+     public List<Trotinete> obterTrotinetes();
 
      // ------------------- Reparações -------------------
 
-     Reparacao registarReparacao(String nomenclatura, String descricao, float preco);
-     Reparacao obterReparacao(int id);
-     boolean   existeReparacao(int id);
-     boolean   removerReparacao(int id);
+     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco);
+     public Reparacao obterReparacao(int id);
+     public boolean   existeReparacao(int id);
+     public boolean   removerReparacao(int id);
+     public List<Reparacao> obterReparacoes();
 
      // ------------------- Peças -------------------
 
-     Peca    registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor);
-     Peca    obterPeca(int id);
-     boolean existePeca_id(int id);
-     boolean existePeca_ref(String ref);
-     boolean removerPeca(int id);
+     public Peca    registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor);
+     public Peca    obterPeca(int id);
+     public boolean existePeca_id(int id);
+     public boolean existePeca_ref(String ref);
+     public boolean removerPeca(int id);
 
      // ------------------- Stock -------------------
 
-     Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie);
-     Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
-     Stock   obterStock(int id);
-     boolean existeStock(int id);
-     boolean removerStock(int id);
+     public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie);
+     public Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
+     public Stock   obterStock(int id);
+     public boolean existeStock(int id);
+     public boolean removerStock(int id);
 
      // ------------------- Devoluções -------------------
 
-     Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock);
-     Devolucao obterDevolucao(int id);
-     boolean   existeDevolucao(int id);
-     boolean   removerDevolucao(int id);
+     public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock);
+     public Devolucao obterDevolucao(int id);
+     public boolean   existeDevolucao(int id);
+     public boolean   removerDevolucao(int id);
+     public void marcarDevolucaoComoEnviada(int id);
+     public void marcarDevolucaoComoDevolvida(int id);
+     public void marcarDevolucaoComoInvalida(int id);
 
      // ------------------- Encomendas -------------------
 
-     Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor);
-     Encomenda obterEncomenda(int id);
-     boolean   removerEncomenda(int id);
+     public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor);
+     public Encomenda obterEncomenda(int id);
+     public boolean   removerEncomenda(int id);
+     public List<Encomenda> obterTodasEncomendas();
+     public void marcarEncomendaComoEnviada(int id);
+     public void marcarEncomendaComoRecebida(int id);
 
      // ------------------- Fornecedores -------------------
 
-     Fornecedor registarFornecedor(String nome, String telemovel, String email);
-     Fornecedor obterFornecedor(int id);
-     boolean    existeFornecedor(int id);
-     boolean    removerFornecedor(int id);
+     public Fornecedor registarFornecedor(String nome, String telemovel, String email);
+     public Fornecedor obterFornecedor(int id);
+     public boolean    existeFornecedor(int id);
+     public boolean    removerFornecedor(int id);
 
      // ------------------- Funcionários -------------------
 
-     Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
-     Funcionario obterFuncionario(int id);
-     boolean     existeFuncionario(int id);
-     boolean     removerFuncionario(int id);
+     public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
+     public Funcionario obterFuncionario(int id);
+     public boolean     existeFuncionario(int id);
+     public boolean     removerFuncionario(int id);
 
      // ------------------- Movimentos Financeiros -------------------
 
-     MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario);
-     MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao);
-     MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca);
-     MovimentoFinanceiro obterMovimentoFinanceiro(int id);
-     boolean             existeMovimentoFinanceiro(int id);
-     boolean             removerMovimentoFinanceiro(int id);
+     public MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario);
+     public MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao);
+     public MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca);
+     public MovimentoFinanceiro obterMovimentoFinanceiro(int id);
+     public boolean             existeMovimentoFinanceiro(int id);
+     public boolean             removerMovimentoFinanceiro(int id);
 
      // ------------------- Cross-cutting -------------------
 
-     boolean pecasDiagnosticoDisponiveisReparacao(int id_OS);
+     public boolean pecasDiagnosticoDisponiveisReparacao(int id_OS);
 }

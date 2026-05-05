@@ -62,9 +62,9 @@ public class SStockFacade implements ISStock {
      // ------------------- Peca -------------------
 
      @Override
-     public Peca registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor) {
+     public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
           int id = pecaDAO.generateNewId();
-          Peca nova = new Peca(id, ref, stock_minimo, preco_venda, id_fornecedor, true);
+          Peca nova = new Peca(id, ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor, true);
           pecaDAO.put(id, nova);
           return nova;
      }
@@ -95,13 +95,15 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarPeca(int id, String referencia, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
+     public void atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
           Peca peca = pecaDAO.get(id);
           if (peca != null) {
                if (referencia != null && !referencia.isEmpty()) peca.setReferencia(referencia);
-               if (stock_minimo >= 0)  peca.setStock_minimo(stock_minimo);
-               if (preco_venda >= 0)   peca.setPreco_venda(preco_venda);
-               if (id_fornecedor >= 0) peca.setCodFornecedor(id_fornecedor);
+               if (nome != null)        peca.setNome(nome);
+               if (descricao != null)   peca.setDescricao(descricao);
+               if (stock_minimo >= 0)   peca.setStock_minimo(stock_minimo);
+               if (preco_venda >= 0)    peca.setPreco_venda(preco_venda);
+               if (id_fornecedor >= 0)  peca.setCodFornecedor(id_fornecedor);
                peca.setAtiva(ativa);
                pecaDAO.put(id, peca);
           }

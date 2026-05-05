@@ -1,6 +1,5 @@
 package app.ecoRideLN.sNotificacoes;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ISNotificacoes {
@@ -20,10 +19,6 @@ public interface ISNotificacoes {
      List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
 
      List<Notificacao> obterNotificacoesNaoTratadas(int id_destinatario);
-
-     List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime data_inicio, LocalDateTime data_fim);
-
-     List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime data_inicio, LocalDateTime data_fim);
 
      // ------------------- Remove -------------------
 

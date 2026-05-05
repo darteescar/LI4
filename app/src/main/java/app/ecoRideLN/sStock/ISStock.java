@@ -17,13 +17,13 @@ public interface ISStock {
 
      // ------------------- Peca -------------------
 
-     Peca    registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor);
+     Peca    registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor);
      Peca    obterPeca(int id);
      List<Peca> obterTodasPecas();
      boolean existePeca_id(int id);
      boolean existePeca_ref(String ref);
      boolean removerPeca(int id);
-     void    atualizarPeca(int id, String referencia, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
+     void    atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
      int     obter_quantidade_Stock_Peca_id(int id);
      int     obter_quantidade_Stock_Peca_ref(String referencia);
      List<Integer> obter_Pecas_baixo_Stock_minimo();

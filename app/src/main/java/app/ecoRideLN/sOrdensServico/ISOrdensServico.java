@@ -10,9 +10,7 @@ public interface ISOrdensServico {
 
      // ------------------- Registo -------------------
 
-     OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao);
-
-     OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
+     OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
 
      // ------------------- Consulta -------------------
 

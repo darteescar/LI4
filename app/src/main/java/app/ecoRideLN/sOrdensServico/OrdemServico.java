@@ -16,20 +16,7 @@ public class OrdemServico {
      private List<String> acessorios;
      private Conserto conserto;
      private Diagnostico diagnostico;
-
-     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codResponsavel) {
-          this.id = id;
-          this.descricao = descricao;
-          this.data_criacao = data_criacao;
-          this.codTrotinete = codTrotinete;
-          this.codCliente = codCliente;
-          this.codResponsavel = codResponsavel;
-          this.fotografias = new ArrayList<>();
-          this.estado = EstadoOS.PendenteDiagnostico;
-          this.acessorios = new ArrayList<>();
-          this.conserto = null;
-          this.diagnostico = null;
-     }
+     private Metodo_Pagamento metodo_pagamento;
 
      public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codResponsavel, List<Fotografia> fotografias, List<String> acessorios) {
           this.id = id;
@@ -38,9 +25,19 @@ public class OrdemServico {
           this.codTrotinete = codTrotinete;
           this.codCliente = codCliente;
           this.codResponsavel = codResponsavel;
-          this.fotografias = new ArrayList<>(fotografias);
+          if (fotografias == null) {
+               this.fotografias = new ArrayList<>();
+          }
+          else {
+               this.fotografias = new ArrayList<>(fotografias);
+          }
           this.estado = EstadoOS.PendenteDiagnostico;
-          this.acessorios = new ArrayList<>(acessorios);
+          if (acessorios == null) {
+               this.acessorios = new ArrayList<>();
+          }
+          else {
+               this.acessorios = new ArrayList<>(acessorios);
+          }
           this.conserto = null;
           this.diagnostico = null;
      }

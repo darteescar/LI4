@@ -49,16 +49,6 @@ public class SNotificacoesFacade implements ISNotificacoes {
           return notificacaoDAO.getUntreatedByDestinatario(id_destinatario);
      }
 
-     @Override
-     public List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime data_inicio, LocalDateTime data_fim) {
-          return notificacaoDAO.getByEmployeeAndDateRange(id_funcionario, data_inicio, data_fim);
-     }
-
-     @Override
-     public List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime data_inicio, LocalDateTime data_fim) {
-          return notificacaoDAO.getByDateRange(data_inicio, data_fim);
-     }
-
      // ------------------- Remove -------------------
 
      @Override

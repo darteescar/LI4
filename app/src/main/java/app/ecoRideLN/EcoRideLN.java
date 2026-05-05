@@ -83,13 +83,8 @@ public class EcoRideLN implements IEcoRideLN {
 
     // ------------------- Ordens de Serviço -------------------
     @Override
-    public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao) {
-        return sOrdensServico.registarOS(codResponsavel, id_cliente, id_trotinete, descricao);
-    }
-
-    @Override
-    public OrdemServico registarOS_Extras(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias) {
-        return sOrdensServico.registarOS_Extras(codResponsavel, id_cliente, id_trotinete, descricao, acessorios, fotografias);
+    public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias) {
+        return sOrdensServico.registarOS(codResponsavel, id_cliente, id_trotinete, descricao, acessorios, fotografias);
     }
 
     @Override
@@ -167,8 +162,8 @@ public class EcoRideLN implements IEcoRideLN {
 
     // ------------------- Peças -------------------
     @Override
-    public Peca registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor) {
-        return sStock.registarPeca(ref, stock_minimo, preco_venda, id_fornecedor);
+    public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
+        return sStock.registarPeca(ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor);
     }
 
     @Override
