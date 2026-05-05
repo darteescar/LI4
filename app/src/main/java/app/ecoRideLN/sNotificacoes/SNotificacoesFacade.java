@@ -51,12 +51,7 @@ public class SNotificacoesFacade implements ISNotificacoes {
           return notificacaoDAO.getByDateRange(data_inicio, data_fim);
      }
 
-     // ------------------- Existe / Remove -------------------
-
-     @Override
-     public boolean existeNotificacao(int id) {
-          return notificacaoDAO.containsKey(id);
-     }
+     // ------------------- Remove -------------------
 
      @Override
      public boolean removerNotificacao(int id) {

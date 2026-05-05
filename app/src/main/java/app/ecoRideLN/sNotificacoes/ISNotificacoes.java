@@ -23,9 +23,8 @@ public interface ISNotificacoes {
 
      List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime data_inicio, LocalDateTime data_fim);
 
-     // ------------------- Existe / Remove -------------------
+     // ------------------- Remove -------------------
 
-     boolean existeNotificacao(int id);
 
      boolean removerNotificacao(int id);
 
