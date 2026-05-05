@@ -8,11 +8,11 @@ public interface ISAutenticacao {
 
      Utilizador obterDadosUtilizador(int id);
 
-     List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo);
-
      boolean existeUtilizador(int id);
 
      boolean removerUtilizador(int id);
+
+     List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo);
 
      boolean autenticar(int id, String password);
 

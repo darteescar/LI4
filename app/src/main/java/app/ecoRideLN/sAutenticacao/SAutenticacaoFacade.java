@@ -31,13 +31,6 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
-    public List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo) {
-        return utilizadoresDAO.values().stream()
-                .filter(u -> u.getCargo() == cargo)
-                .toList();
-    }
-
-    @Override
     public boolean existeUtilizador(int id) {
         return utilizadoresDAO.containsKey(id);
     }
@@ -49,6 +42,13 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         }
         utilizadoresDAO.remove(id);
         return true;
+    }
+
+    @Override
+    public List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo) {
+        return utilizadoresDAO.values().stream()
+                .filter(u -> u.getCargo() == cargo)
+                .toList();
     }
 
     @Override
