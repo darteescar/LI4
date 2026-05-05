@@ -82,18 +82,6 @@ public interface ISOrdensServico {
 
      List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
 
-     List<OrdemServico> filtrarOSsPorCliente(int id_cliente);
-
-     List<OrdemServico> filtrarOSsPorFuncionario(int id_funcionario);
-
-     List<OrdemServico> filtrarOSsPorIntervalo(LocalDateTime desde, LocalDateTime ate);
-
-     List<OrdemServico> filtrarOSsPorClienteEIntervalo(int id_cliente, LocalDateTime desde, LocalDateTime ate);
-
-     List<OrdemServico> filtrarOSsPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime desde, LocalDateTime ate);
-
-     List<OrdemServico> filtrarOSsPorClienteEFuncionario(int id_cliente, int id_funcionario);
-
      // ------------------- Utilitários -------------------
 
      boolean clienteTemApenasUmPagamentoPendente(int id);

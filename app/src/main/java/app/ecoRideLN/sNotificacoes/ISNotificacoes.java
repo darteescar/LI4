@@ -31,15 +31,7 @@ public interface ISNotificacoes {
 
      // ------------------- Atualização -------------------
 
-     void atualizarDescricaoNotificacao(int id, String descricao);
-
-     void atualizarDataEmissaoNotificacao(int id, LocalDateTime data_emissao);
-
-     void atualizarIdRemetenteNotificacao(int id, int id_remetente);
-
-     void atualizarIdDestinatarioNotificacao(int id, int id_destinatario);
-
-     void atualizarDataConfirmacaoTratamentoNotificacao(int id, LocalDateTime data);
-
      boolean sinalizarNotificacao_comoTratada(int id);
+
+     boolean sinalizarNotificacao_comoLida(int id);
 }

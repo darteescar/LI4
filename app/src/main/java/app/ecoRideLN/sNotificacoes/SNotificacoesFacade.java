@@ -66,51 +66,6 @@ public class SNotificacoesFacade implements ISNotificacoes {
      // ------------------- Atualização -------------------
 
      @Override
-     public void atualizarDescricaoNotificacao(int id, String descricao) {
-          Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
-               notificacao.setDescricao(descricao);
-               notificacaoDAO.put(id, notificacao);
-          }
-     }
-
-     @Override
-     public void atualizarDataEmissaoNotificacao(int id, LocalDateTime data_emissao) {
-          Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
-               notificacao.setData_emissao(data_emissao);
-               notificacaoDAO.put(id, notificacao);
-          }
-     }
-
-     @Override
-     public void atualizarIdRemetenteNotificacao(int id, int id_remetente) {
-          Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
-               notificacao.setId_remetente(id_remetente);
-               notificacaoDAO.put(id, notificacao);
-          }
-     }
-
-     @Override
-     public void atualizarIdDestinatarioNotificacao(int id, int id_destinatario) {
-          Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
-               notificacao.setId_destinatario(id_destinatario);
-               notificacaoDAO.put(id, notificacao);
-          }
-     }
-
-     @Override
-     public void atualizarDataConfirmacaoTratamentoNotificacao(int id, LocalDateTime data) {
-          Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
-               notificacao.setData_horaTratada(data);
-               notificacaoDAO.put(id, notificacao);
-          }
-     }
-
-     @Override
      public boolean sinalizarNotificacao_comoTratada(int id) {
           Notificacao notificacao = notificacaoDAO.get(id);
           if (notificacao != null) {
@@ -120,4 +75,16 @@ public class SNotificacoesFacade implements ISNotificacoes {
           }
           return false;
      }
+
+     @Override
+     public boolean sinalizarNotificacao_comoLida(int id) {
+          Notificacao notificacao = notificacaoDAO.get(id);
+          if (notificacao != null) {
+               notificacao.setNotificacao_lida(true);
+               notificacaoDAO.put(id, notificacao);
+               return true;
+          }
+          return false;
+     }
+     
 }

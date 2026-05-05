@@ -11,6 +11,7 @@ public class Notificacao {
      private int id_remetente;
      private int id_destinatario;
      private boolean notificacao_tratada;
+     private boolean notificacao_lida;
      private LocalDateTime data_horaTratada;
 
      private static final UtilizadorDAO utilizadorDAO = UtilizadorDAO.getInstance();
@@ -23,16 +24,7 @@ public class Notificacao {
           this.id_destinatario = id_destinatario;
           this.notificacao_tratada = false;
           this.data_horaTratada = null;
-     }
-
-     public Notificacao(int id, String descricao, LocalDateTime data_emissao, int id_remetente, int id_destinatario, boolean notificacao_tratada) {
-          this.id = id;
-          this.descricao = descricao;
-          this.data_emissao = data_emissao;
-          this.id_remetente = id_remetente;
-          this.id_destinatario = id_destinatario;
-          this.notificacao_tratada = notificacao_tratada;
-          this.data_horaTratada = null;
+          this.notificacao_lida = false;
      }
 
      public Notificacao(int id, String descricao, LocalDateTime data_emissao, int id_remetente, int id_destinatario, boolean notificacao_tratada, LocalDateTime data_horaTratada) {
@@ -91,6 +83,7 @@ public class Notificacao {
 
      public void setNotificacao_tratada(boolean notificacao_tratada) {
           this.notificacao_tratada = notificacao_tratada;
+          this.data_horaTratada = LocalDateTime.now();
      }
 
      public LocalDateTime getData_horaTratada() {
@@ -99,5 +92,13 @@ public class Notificacao {
 
      public void setData_horaTratada(LocalDateTime data_horaTratada) {
           this.data_horaTratada = data_horaTratada;
+     }
+
+     public boolean isNotificacao_lida() {
+          return notificacao_lida;
+     }
+
+     public void setNotificacao_lida(boolean notificacao_lida) {
+          this.notificacao_lida = notificacao_lida;
      }
 }

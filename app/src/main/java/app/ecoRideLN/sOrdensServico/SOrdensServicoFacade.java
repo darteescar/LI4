@@ -286,36 +286,6 @@ public class SOrdensServicoFacade implements ISOrdensServico {
           return ordemServicoDAO.filtrarOSs(estado, desde, ate, id_cliente, id_funcionario);
      }
 
-     @Override
-     public List<OrdemServico> filtrarOSsPorCliente(int id_cliente) {
-          return ordemServicoDAO.filtrarOSs(null, null, null, id_cliente, null);
-     }
-
-     @Override
-     public List<OrdemServico> filtrarOSsPorFuncionario(int id_funcionario) {
-          return ordemServicoDAO.filtrarOSs(null, null, null, null, id_funcionario);
-     }
-
-     @Override
-     public List<OrdemServico> filtrarOSsPorIntervalo(LocalDateTime desde, LocalDateTime ate) {
-          return ordemServicoDAO.filtrarOSs(null, desde, ate, null, null);
-     }
-
-     @Override
-     public List<OrdemServico> filtrarOSsPorClienteEIntervalo(int id_cliente, LocalDateTime desde, LocalDateTime ate) {
-          return ordemServicoDAO.filtrarOSs(null, desde, ate, id_cliente, null);
-     }
-
-     @Override
-     public List<OrdemServico> filtrarOSsPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime desde, LocalDateTime ate) {
-          return ordemServicoDAO.filtrarOSs(null, desde, ate, null, id_funcionario);
-     }
-
-     @Override
-     public List<OrdemServico> filtrarOSsPorClienteEFuncionario(int id_cliente, int id_funcionario) {
-          return ordemServicoDAO.filtrarOSs(null, null, null, id_cliente, id_funcionario);
-     }
-
      // ------------------- Utilitários -------------------
 
      @Override
