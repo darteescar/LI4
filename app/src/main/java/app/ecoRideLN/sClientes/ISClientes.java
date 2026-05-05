@@ -7,21 +7,21 @@ import app.ecoRideLN.sOrdensServico.OrdemServico;
 
 public interface ISClientes {
 
+     // ------------------- Cliente -------------------
+
      Cliente registarCliente(String nome, String email, String telemovel, String nif);
 
      Cliente obterDadosCliente(int id);
 
-     boolean removerCliente(int id);
+     List<Cliente> obterTodosClientes();
 
      boolean existeCliente(int id);
 
+     boolean removerCliente(int id);
+
      void atualizarDadosCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
 
-     List<OrdemServico> obterOS_Cliente(int id);
-
-     List<Trotinete> obterTrotinetes_Cliente(int id);
-
-     List<Cliente> obterTodosClientes();
+     // ------------------- Trotinete -------------------
 
      Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
@@ -32,6 +32,12 @@ public interface ISClientes {
      boolean removerTrotinete(int id);
 
      void atualizarDadosTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
+
+     // ------------------- Consultas cruzadas -------------------
+
+     List<OrdemServico> obterOS_Cliente(int id);
+
+     List<Trotinete> obterTrotinetes_Cliente(int id);
 
      List<OrdemServico> obterOS_Trotinete(int id_trotinete);
 

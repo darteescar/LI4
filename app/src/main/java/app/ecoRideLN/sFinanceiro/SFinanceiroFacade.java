@@ -9,13 +9,33 @@ import app.ecoRideCD.sFinanceiro.MovimentoFinanceiroDAO;
 public class SFinanceiroFacade implements ISFinanceiro {
      private final MovimentoFinanceiroDAO movimentoFinanceiroDAO = MovimentoFinanceiroDAO.getInstance();
 
+     // ------------------- Registo -------------------
+
      @Override
-     public MovimentoFinanceiro criarMovimentoFinanceiro(TipoMovimento tipo, float valor, String descricao) {
+     public MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario) {
           int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFinanceiro novo = new MovimentoFinanceiro(id, descricao, valor, LocalDateTime.now(), tipo);
+          MovimentoFuncionario novo = new MovimentoFuncionario(id, descricao, valor, LocalDateTime.now(), codFuncionario);
           movimentoFinanceiroDAO.put(id, novo);
           return novo;
      }
+
+     @Override
+     public MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao) {
+          int id = movimentoFinanceiroDAO.generateNewId();
+          MovimentoReparacao novo = new MovimentoReparacao(id, descricao, valor, LocalDateTime.now(), codReparacao);
+          movimentoFinanceiroDAO.put(id, novo);
+          return novo;
+     }
+
+     @Override
+     public MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca) {
+          int id = movimentoFinanceiroDAO.generateNewId();
+          MovimentoPeca novo = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), tipo, codPeca);
+          movimentoFinanceiroDAO.put(id, novo);
+          return novo;
+     }
+
+     // ------------------- Consulta -------------------
 
      @Override
      public MovimentoFinanceiro obterDadosMovimentoFinanceiro(int id) {
@@ -28,6 +48,22 @@ public class SFinanceiroFacade implements ISFinanceiro {
      }
 
      @Override
+     public List<MovimentoFinanceiro> obterMovimentosPorTipo(TipoMovimento tipo) {
+          return movimentoFinanceiroDAO.values().stream()
+                    .filter(m -> m.getTipo() == tipo)
+                    .toList();
+     }
+
+     @Override
+     public List<MovimentoFinanceiro> obterMovimentosPorIntervalo(LocalDateTime desde, LocalDateTime ate) {
+          return movimentoFinanceiroDAO.values().stream()
+                    .filter(m -> !m.getData().isBefore(desde) && !m.getData().isAfter(ate))
+                    .toList();
+     }
+
+     // ------------------- Existe / Remove -------------------
+
+     @Override
      public boolean existeMovimentoFinanceiro(int id) {
           return movimentoFinanceiroDAO.containsKey(id);
      }
@@ -36,6 +72,8 @@ public class SFinanceiroFacade implements ISFinanceiro {
      public boolean removerMovimentoFinanceiro(int id) {
           return movimentoFinanceiroDAO.remove(id) != null;
      }
+
+     // ------------------- Atualização -------------------
 
      @Override
      public void atualizarMovimentoFinanceiro(int id, TipoMovimento tipo, float valor, String descricao, LocalDateTime data) {
@@ -49,5 +87,20 @@ public class SFinanceiroFacade implements ISFinanceiro {
           } else {
                throw new EcoRideException("Movimento Financeiro com ID " + id + " não existe.");
           }
+     }
+
+     // ------------------- Cálculos -------------------
+
+     @Override
+     public float calcularSaldoTotal() {
+          float total = 0;
+          for (MovimentoFinanceiro m : movimentoFinanceiroDAO.values()) {
+               if (m.getTipo() == TipoMovimento.LucroMaoObra || m.getTipo() == TipoMovimento.LucroVendaPecas) {
+                    total += m.getValor();
+               } else {
+                    total -= m.getValor();
+               }
+          }
+          return total;
      }
 }

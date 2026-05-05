@@ -4,15 +4,36 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ISFinanceiro {
-     public MovimentoFinanceiro obterDadosMovimentoFinanceiro(int id);
 
-     public boolean removerMovimentoFinanceiro(int id);
+     // ------------------- Registo -------------------
 
-     public boolean existeMovimentoFinanceiro(int id);
+     MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario);
 
-     public List<MovimentoFinanceiro> obterMovimentos();
+     MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao);
 
-     public MovimentoFinanceiro criarMovimentoFinanceiro(TipoMovimento tipo, float valor, String descricao);
+     MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca);
 
-     public void atualizarMovimentoFinanceiro(int id, TipoMovimento tipo, float valor, String descricao, LocalDateTime data);
+     // ------------------- Consulta -------------------
+
+     MovimentoFinanceiro obterDadosMovimentoFinanceiro(int id);
+
+     List<MovimentoFinanceiro> obterMovimentos();
+
+     List<MovimentoFinanceiro> obterMovimentosPorTipo(TipoMovimento tipo);
+
+     List<MovimentoFinanceiro> obterMovimentosPorIntervalo(LocalDateTime desde, LocalDateTime ate);
+
+     // ------------------- Existe / Remove -------------------
+
+     boolean existeMovimentoFinanceiro(int id);
+
+     boolean removerMovimentoFinanceiro(int id);
+
+     // ------------------- Atualização -------------------
+
+     void atualizarMovimentoFinanceiro(int id, TipoMovimento tipo, float valor, String descricao, LocalDateTime data);
+
+     // ------------------- Cálculos -------------------
+
+     float calcularSaldoTotal();
 }

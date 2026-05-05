@@ -6,57 +6,62 @@ import java.util.List;
 
 public interface ISStock {
 
-    // ------------------- Fornecedor -------------------
+     // ------------------- Fornecedor -------------------
 
-    public Fornecedor registarFornecedor(String nome, String telemovel, String email);
-    public Fornecedor obterDadosFornecedor(int id);
-    public boolean    existeFornecedor(int id);
-    public boolean    removerFornecedor(int id);
-    public void atualizarFornecedor(int id, String nome, String telemovel, String email);
+     Fornecedor registarFornecedor(String nome, String telemovel, String email);
+     Fornecedor obterDadosFornecedor(int id);
+     List<Fornecedor> obterTodosFornecedores();
+     boolean existeFornecedor(int id);
+     boolean removerFornecedor(int id);
+     void atualizarFornecedor(int id, String nome, String telemovel, String email);
 
-    // ------------------- Peca -------------------
+     // ------------------- Peca -------------------
 
-    public Peca    registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor);
-    public Peca    obterDadosPeca(int id);
-    public boolean existePeca_id(int id);
-    public boolean existePeca_ref(String ref);
-    public boolean removerPeca(int id);
-    public void atualizarPeca(int id, String referencia, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
-    public int     obter_quantidade_Stock_Peca_id(int id);
-    public int     obter_quantidade_Stock_Peca_ref(String referencia);
-    public List<Integer> obter_Pecas_baixo_Stock_minimo();
+     Peca    registarPeca(String ref, int stock_minimo, float preco_venda, int id_fornecedor);
+     Peca    obterDadosPeca(int id);
+     List<Peca> obterTodasPecas();
+     boolean existePeca_id(int id);
+     boolean existePeca_ref(String ref);
+     boolean removerPeca(int id);
+     void    atualizarPeca(int id, String referencia, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
+     int     obter_quantidade_Stock_Peca_id(int id);
+     int     obter_quantidade_Stock_Peca_ref(String referencia);
+     List<Integer> obter_Pecas_baixo_Stock_minimo();
 
-    // ------------------- Stock -------------------
+     // ------------------- Stock -------------------
 
-    public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data,
-                                         LocalDate garantia, String nr_serie);
-    public Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
-    public Stock   obterDadosStock(int id);
-    public boolean existeStock(int id);
-    public boolean removerStock(int id);
-    public void    atualizaEstadoStock(int id, EstadoStock estado);
-    public int     pecasDefeituosas_Stock(int id_peca);
-    public void    registar_Defeito_entradaStock(int id_Stock);
-    public void atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
-    public void    atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie);
+     Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie);
+     Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
+     Stock   obterDadosStock(int id);
+     List<Stock> obterTodosStocks();
+     boolean existeStock(int id);
+     boolean removerStock(int id);
+     void    atualizaEstadoStock(int id, EstadoStock estado);
+     int     pecasDefeituosas_Stock(int id_peca);
+     void    registar_Defeito_entradaStock(int id_Stock);
+     void    atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
+     void    atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie);
 
-    // ------------------- Devolucao -------------------
+     // ------------------- Devolucao -------------------
 
-    public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock);
-    public void      devolverPecas(List<Integer> pecas);
-    public Devolucao obterDadosDevolucao(int id);
-    public boolean   existeDevolucao(int id);
-    public boolean   removerDevolucao(int id);
-    public void      atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, EstadoDevolucao estado);
-    public boolean   validaEstadoDevolucao_PendenteDevolucao(int id);
+     Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock);
+     void      devolverPecas(List<Integer> pecas);
+     Devolucao obterDadosDevolucao(int id);
+     List<Devolucao> obterTodasDevolucoes();
+     boolean   existeDevolucao(int id);
+     boolean   removerDevolucao(int id);
+     void      atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, EstadoDevolucao estado);
+     boolean   validaEstadoDevolucao_PendenteDevolucao(int id);
 
-    // ------------------- Encomenda -------------------
+     // ------------------- Encomenda -------------------
 
-    public int       quantidade_encomendar_peca(int id_peca);
-    public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor);
-    public Encomenda obterDadosEncomenda(int id);
-    public void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<Stock> pecas);
-    public boolean   removerEncomenda(int id);
-    public boolean   validaEncomenda_Rascunho(int id_Encomenda);
-    public void      atualizarEncomenda(int id, List<Stock> pecas, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
+     int       quantidade_encomendar_peca(int id_peca);
+     Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor);
+     Encomenda obterDadosEncomenda(int id);
+     List<Encomenda> obterTodasEncomendas();
+     List<Encomenda> obterEncomendasPorEstado(EstadoEncomenda estado);
+     void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<Stock> pecas);
+     boolean   removerEncomenda(int id);
+     boolean   validaEncomenda_Rascunho(int id_Encomenda);
+     void      atualizarEncomenda(int id, List<Stock> pecas, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
 }

@@ -19,4 +19,6 @@ public interface ISAutenticacao {
      Cargo obterCargoUtilizador(int id);
 
      void atualizarPalavraPasseUtilizador(int id, String novaPassword);
+
+     void atualizarCargoUtilizador(int id, Cargo novoCargo);
 }

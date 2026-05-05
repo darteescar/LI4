@@ -1,12 +1,15 @@
 package app.ecoRideLN.sNotificacoes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
 
 public class SNotificacoesFacade implements ISNotificacoes {
      private final NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
+
+     // ------------------- Registo -------------------
 
      @Override
      public Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario) {
@@ -16,10 +19,39 @@ public class SNotificacoesFacade implements ISNotificacoes {
           return notificacao;
      }
 
+     // ------------------- Consulta -------------------
+
      @Override
      public Notificacao obterDadosNotificacao(int id) {
           return notificacaoDAO.get(id);
      }
+
+     @Override
+     public List<Notificacao> obterTodasNotificacoes() {
+          return new ArrayList<>(notificacaoDAO.values());
+     }
+
+     @Override
+     public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario) {
+          return notificacaoDAO.getByDestinatario(id_destinatario);
+     }
+
+     @Override
+     public List<Notificacao> obterNotificacoesNaoTratadas(int id_destinatario) {
+          return notificacaoDAO.getUntreatedByDestinatario(id_destinatario);
+     }
+
+     @Override
+     public List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime data_inicio, LocalDateTime data_fim) {
+          return notificacaoDAO.getByEmployeeAndDateRange(id_funcionario, data_inicio, data_fim);
+     }
+
+     @Override
+     public List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime data_inicio, LocalDateTime data_fim) {
+          return notificacaoDAO.getByDateRange(data_inicio, data_fim);
+     }
+
+     // ------------------- Existe / Remove -------------------
 
      @Override
      public boolean existeNotificacao(int id) {
@@ -30,6 +62,8 @@ public class SNotificacoesFacade implements ISNotificacoes {
      public boolean removerNotificacao(int id) {
           return notificacaoDAO.remove(id) != null;
      }
+
+     // ------------------- Atualização -------------------
 
      @Override
      public void atualizarDescricaoNotificacao(int id, String descricao) {
@@ -74,16 +108,6 @@ public class SNotificacoesFacade implements ISNotificacoes {
                notificacao.setData_horaTratada(data);
                notificacaoDAO.put(id, notificacao);
           }
-     }
-
-     @Override
-     public List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime data_inicio, LocalDateTime data_fim) {
-          return notificacaoDAO.getByEmployeeAndDateRange(id_funcionario, data_inicio, data_fim);
-     }
-
-     @Override
-     public List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime data_inicio, LocalDateTime data_fim) {
-          return notificacaoDAO.getByDateRange(data_inicio, data_fim);
      }
 
      @Override

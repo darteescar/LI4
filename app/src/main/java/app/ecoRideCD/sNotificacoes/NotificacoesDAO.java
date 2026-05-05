@@ -251,6 +251,48 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
         return out;
     }
 
+    public List<Notificacao> getByDestinatario(int id_destinatario) {
+        List<Notificacao> out = new ArrayList<>();
+        String sql = """
+                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
+                       notificacao_tratada, data_horaTratada
+                FROM   Notificacao
+                WHERE  id_destinatario = ?
+                ORDER  BY data_emissao DESC
+                """;
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id_destinatario);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter notificações do destinatário " + id_destinatario, e);
+        }
+        return out;
+    }
+
+    public List<Notificacao> getUntreatedByDestinatario(int id_destinatario) {
+        List<Notificacao> out = new ArrayList<>();
+        String sql = """
+                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
+                       notificacao_tratada, data_horaTratada
+                FROM   Notificacao
+                WHERE  id_destinatario = ? AND notificacao_tratada = false
+                ORDER  BY data_emissao DESC
+                """;
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id_destinatario);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter notificações não tratadas do destinatário " + id_destinatario, e);
+        }
+        return out;
+    }
+
     // Todas as notificações emitidas dentro do intervalo [data_inicio, data_fim].
     public List<Notificacao> getByDateRange(LocalDateTime data_inicio, LocalDateTime data_fim) {
         List<Notificacao> out = new ArrayList<>();

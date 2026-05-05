@@ -74,4 +74,12 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         }
         utilizadoresDAO.updatePassword(id, novaPassword);
     }
+
+    @Override
+    public void atualizarCargoUtilizador(int id, Cargo novoCargo) {
+        Utilizador u = utilizadoresDAO.get(id);
+        if (u == null) throw new EcoRideException("Utilizador com ID " + id + " não existe.");
+        u.setCargo(novoCargo);
+        utilizadoresDAO.put(id, u);
+    }
 }
