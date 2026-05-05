@@ -9,6 +9,8 @@ import app.ecoRideLN.sFinanceiro.TipoMovimento;
 import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.Trotinete;
 import app.ecoRideLN.sNotificacoes.Notificacao;
+import app.ecoRideLN.sNotificacoes.NotificacaoOS;
+import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sReparacoes.Reparacao;
@@ -23,10 +25,10 @@ public interface IEcoRideLN {
 
      // ------------------- Notificações -------------------
 
-     Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario);
-     Notificacao obterNotificacao(int id);
-     boolean     existeNotificacao(int id);
-     boolean     removerNotificacao(int id);
+     NotificacaoOS    criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
+     NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
+     Notificacao      obterNotificacao(int id);
+     boolean          removerNotificacao(int id);
 
      // ------------------- Ordens de Serviço -------------------
 

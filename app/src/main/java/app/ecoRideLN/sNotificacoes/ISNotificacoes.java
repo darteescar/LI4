@@ -7,7 +7,9 @@ public interface ISNotificacoes {
 
      // ------------------- Registo -------------------
 
-     Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario);
+     NotificacaoOS    criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
+
+     NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
 
      // ------------------- Consulta -------------------
 
@@ -24,7 +26,6 @@ public interface ISNotificacoes {
      List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime data_inicio, LocalDateTime data_fim);
 
      // ------------------- Remove -------------------
-
 
      boolean removerNotificacao(int id);
 

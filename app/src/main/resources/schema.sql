@@ -81,13 +81,13 @@ CREATE TABLE IF NOT EXISTS Reparacao (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS Notificacao (
-    id                  INT      NOT NULL,
-    descricao           TEXT,
-    data_emissao        DATETIME NOT NULL,
-    id_remetente        INT      NOT NULL,
-    id_destinatario     INT      NOT NULL,
-    notificacao_tratada BOOLEAN  NOT NULL DEFAULT FALSE,
-    data_horaTratada    DATETIME NULL,
+    id               INT      NOT NULL,
+    descricao        TEXT,
+    data_emissao     DATETIME NOT NULL,
+    id_remetente     INT      NOT NULL,
+    id_destinatario  INT      NOT NULL,
+    estado           ENUM('NAOLIDA', 'LIDA', 'TRATADA') NOT NULL DEFAULT 'NAOLIDA',
+    data_horaTratada DATETIME NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id_remetente)    REFERENCES Utilizador(id),
     FOREIGN KEY (id_destinatario) REFERENCES Utilizador(id)
@@ -310,5 +310,27 @@ CREATE TABLE IF NOT EXISTS Conserto_Reparacao (
     PRIMARY KEY (idOS, codReparacao),
     FOREIGN KEY (idOS)         REFERENCES Conserto(idOS) ON DELETE CASCADE,
     FOREIGN KEY (codReparacao) REFERENCES Reparacao(id)
+);
+
+-- =========================================================
+-- SNotificacoes (subtipos)
+-- Dependem de OrdemServico e Peca, por isso ficam no final.
+-- ON DELETE CASCADE: apagar a Notificacao base elimina a linha filha.
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS NotificacaoOS (
+    id    INT NOT NULL,
+    id_os INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id)    REFERENCES Notificacao(id)   ON DELETE CASCADE,
+    FOREIGN KEY (id_os) REFERENCES OrdemServico(id)
+);
+
+CREATE TABLE IF NOT EXISTS NotificacaoStock (
+    id      INT NOT NULL,
+    id_peca INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id)      REFERENCES Notificacao(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_peca) REFERENCES Peca(id)
 );
 

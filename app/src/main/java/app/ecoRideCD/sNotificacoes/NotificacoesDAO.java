@@ -18,37 +18,59 @@ import java.util.Set;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
+import app.ecoRideLN.sNotificacoes.EstadoNotificacao;
 import app.ecoRideLN.sNotificacoes.Notificacao;
+import app.ecoRideLN.sNotificacoes.NotificacaoOS;
+import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 
 public class NotificacoesDAO implements Map<Integer, Notificacao> {
 
     private static NotificacoesDAO instance;
 
-    private NotificacoesDAO() {
-    }
+    private NotificacoesDAO() {}
 
     public static NotificacoesDAO getInstance() {
-        if (instance == null) {
-            instance = new NotificacoesDAO();
-        }
+        if (instance == null) instance = new NotificacoesDAO();
         return instance;
     }
 
+    // Colunas base + LEFT JOINs para os subtipos — usado em todos os SELECTs.
+    private static final String BASE_SELECT = """
+            SELECT n.id, n.descricao, n.data_emissao, n.id_remetente, n.id_destinatario,
+                   n.estado, n.data_horaTratada,
+                   nos.id_os, nst.id_peca
+            FROM Notificacao n
+            LEFT JOIN NotificacaoOS nos ON n.id = nos.id
+            LEFT JOIN NotificacaoStock nst ON n.id = nst.id
+            """;
+
     private Notificacao buildFromRow(ResultSet rs) throws SQLException {
-        Timestamp tratada = rs.getTimestamp("data_horaTratada");
-        return new Notificacao(
-                rs.getInt("id"),
-                rs.getString("descricao"),
-                rs.getTimestamp("data_emissao").toLocalDateTime(),
-                rs.getInt("id_remetente"),
-                rs.getInt("id_destinatario"),
-                rs.getBoolean("notificacao_tratada"),
-                tratada == null ? null : tratada.toLocalDateTime());
+        Timestamp ts = rs.getTimestamp("data_horaTratada");
+        LocalDateTime dataTratada = ts == null ? null : ts.toLocalDateTime();
+
+        int id             = rs.getInt("id");
+        String descricao   = rs.getString("descricao");
+        LocalDateTime data = rs.getTimestamp("data_emissao").toLocalDateTime();
+        int idRem          = rs.getInt("id_remetente");
+        int idDest         = rs.getInt("id_destinatario");
+        EstadoNotificacao estado = EstadoNotificacao.valueOf(rs.getString("estado"));
+
+        int id_os = rs.getInt("id_os");
+        if (!rs.wasNull()) {
+            return new NotificacaoOS(id, descricao, data, idRem, idDest, estado, dataTratada, id_os);
+        }
+        int id_peca = rs.getInt("id_peca");
+        if (!rs.wasNull()) {
+            return new NotificacaoStock(id, descricao, data, idRem, idDest, estado, dataTratada, id_peca);
+        }
+        return new Notificacao(id, descricao, data, idRem, idDest, estado, dataTratada);
     }
 
     @Override
     public int size() {
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Notificacao")) {
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Notificacao")) {
             return rs.next() ? rs.getInt(1) : 0;
         } catch (SQLException e) {
             throw new EcoRideException("Erro a contar notificacoes", e);
@@ -56,20 +78,15 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return size() == 0;
-    }
+    public boolean isEmpty() { return size() == 0; }
 
     @Override
     public boolean containsKey(Object key) {
-        if (!(key instanceof Integer id)) {
-            return false;
-        }
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Notificacao WHERE id = ?")) {
+        if (!(key instanceof Integer id)) return false;
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Notificacao WHERE id = ?")) {
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
         } catch (SQLException e) {
             throw new EcoRideException("Erro a verificar notificacao " + id, e);
         }
@@ -77,24 +94,17 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
 
     @Override
     public boolean containsValue(Object value) {
-        if (!(value instanceof Notificacao n)) {
-            return false;
-        }
+        if (!(value instanceof Notificacao n)) return false;
         Notificacao stored = get(n.getId());
         return stored != null && stored.getId_destinatario() == n.getId_destinatario();
     }
 
     @Override
     public Notificacao get(Object key) {
-        if (!(key instanceof Integer id)) {
-            return null;
-        }
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM Notificacao WHERE id = ?
-                """;
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
+        if (!(key instanceof Integer id)) return null;
+        String sql = BASE_SELECT + "WHERE n.id = ?";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? buildFromRow(rs) : null;
@@ -107,29 +117,51 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
     @Override
     public Notificacao put(Integer key, Notificacao value) {
         Notificacao prev = get(key);
-        String sql = """
+        String sqlBase = """
                 INSERT INTO Notificacao (id, descricao, data_emissao, id_remetente,
-                                         id_destinatario, notificacao_tratada, data_horaTratada)
+                                         id_destinatario, estado, data_horaTratada)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     descricao = VALUES(descricao), data_emissao = VALUES(data_emissao),
                     id_remetente = VALUES(id_remetente), id_destinatario = VALUES(id_destinatario),
-                    notificacao_tratada = VALUES(notificacao_tratada),
+                    estado = VALUES(estado),
                     data_horaTratada = VALUES(data_horaTratada)
                 """;
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getDescricao());
-            ps.setTimestamp(3, Timestamp.valueOf(value.getData_emissao()));
-            ps.setInt(4, value.getId_remetente());
-            ps.setInt(5, value.getId_destinatario());
-            ps.setBoolean(6, value.isNotificacao_tratada());
-            if (value.getData_horaTratada() == null) {
-                ps.setNull(7, java.sql.Types.TIMESTAMP); 
-            }else {
-                ps.setTimestamp(7, Timestamp.valueOf(value.getData_horaTratada()));
+        try (Connection c = ConnectionFactory.get()) {
+            try (PreparedStatement ps = c.prepareStatement(sqlBase)) {
+                ps.setInt(1, key);
+                ps.setString(2, value.getDescricao());
+                ps.setTimestamp(3, Timestamp.valueOf(value.getData_emissao()));
+                ps.setInt(4, value.getId_remetente());
+                ps.setInt(5, value.getId_destinatario());
+                ps.setString(6, value.getEstado().name());
+                if (value.getData_horaTratada() == null)
+                    ps.setNull(7, java.sql.Types.TIMESTAMP);
+                else
+                    ps.setTimestamp(7, Timestamp.valueOf(value.getData_horaTratada()));
+                ps.executeUpdate();
             }
-            ps.executeUpdate();
+            if (value instanceof NotificacaoOS nos) {
+                String sqlChild = """
+                        INSERT INTO NotificacaoOS (id, id_os) VALUES (?, ?)
+                        ON DUPLICATE KEY UPDATE id_os = VALUES(id_os)
+                        """;
+                try (PreparedStatement ps = c.prepareStatement(sqlChild)) {
+                    ps.setInt(1, key);
+                    ps.setInt(2, nos.getId_os());
+                    ps.executeUpdate();
+                }
+            } else if (value instanceof NotificacaoStock nst) {
+                String sqlChild = """
+                        INSERT INTO NotificacaoStock (id, id_peca) VALUES (?, ?)
+                        ON DUPLICATE KEY UPDATE id_peca = VALUES(id_peca)
+                        """;
+                try (PreparedStatement ps = c.prepareStatement(sqlChild)) {
+                    ps.setInt(1, key);
+                    ps.setInt(2, nst.getId_peca());
+                    ps.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar notificacao " + key, e);
         }
@@ -138,14 +170,12 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
 
     @Override
     public Notificacao remove(Object key) {
-        if (!(key instanceof Integer id)) {
-            return null;
-        }
+        if (!(key instanceof Integer id)) return null;
         Notificacao prev = get(id);
-        if (prev == null) {
-            return null;
-        }
-        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement("DELETE FROM Notificacao WHERE id = ?")) {
+        if (prev == null) return null;
+        // ON DELETE CASCADE limpa as linhas filhas automaticamente
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement("DELETE FROM Notificacao WHERE id = ?")) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -155,9 +185,7 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
     }
 
     @Override
-    public void putAll(Map<? extends Integer, ? extends Notificacao> m) {
-        m.forEach(this::put);
-    }
+    public void putAll(Map<? extends Integer, ? extends Notificacao> m) { m.forEach(this::put); }
 
     @Override
     public void clear() {
@@ -171,10 +199,10 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
     @Override
     public Set<Integer> keySet() {
         Set<Integer> out = new LinkedHashSet<>();
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT id FROM Notificacao")) {
-            while (rs.next()) {
-                out.add(rs.getInt(1));
-            }
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery("SELECT id FROM Notificacao")) {
+            while (rs.next()) out.add(rs.getInt(1));
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter ids de notificacoes", e);
         }
@@ -183,15 +211,11 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
 
     @Override
     public Collection<Notificacao> values() {
-        Set<Notificacao> out = new LinkedHashSet<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada FROM Notificacao
-                """;
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
-            while (rs.next()) {
-                out.add(buildFromRow(rs));
-            }
+        List<Notificacao> out = new ArrayList<>();
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery(BASE_SELECT)) {
+            while (rs.next()) out.add(buildFromRow(rs));
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter notificacoes", e);
         }
@@ -201,39 +225,60 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
     @Override
     public Set<Entry<Integer, Notificacao>> entrySet() {
         Set<Entry<Integer, Notificacao>> out = new HashSet<>();
-        for (Notificacao n : values()) {
-            out.add(new AbstractMap.SimpleEntry<>(n.getId(), n));
-        }
+        for (Notificacao n : values()) out.add(new AbstractMap.SimpleEntry<>(n.getId(), n));
         return out;
     }
 
     // --------- Aliases / domínio ---------
 
-    public void add(Notificacao n) {
-        put(n.getId(), n);
-    }
+    public void add(Notificacao n) { put(n.getId(), n); }
 
     public int generateNewId() {
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Notificacao")) {
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Notificacao")) {
             return rs.next() ? rs.getInt(1) + 1 : 1;
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gerar novo ID para notificacao", e);
         }
     }
 
-    // Notificações em que o funcionário é remetente OU destinatário,
-    // dentro do intervalo [data_inicio, data_fim] (inclusivo nas duas pontas).
-    public List<Notificacao> getByEmployeeAndDateRange(int id_funcionario,
-                                                       LocalDateTime data_inicio,
-                                                       LocalDateTime data_fim) {
+    public List<Notificacao> getByDestinatario(int id_destinatario) {
         List<Notificacao> out = new ArrayList<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM   Notificacao
-                WHERE  (id_remetente = ? OR id_destinatario = ?)
-                  AND  data_emissao BETWEEN ? AND ?
-                ORDER BY data_emissao
+        String sql = BASE_SELECT + "WHERE n.id_destinatario = ? ORDER BY n.data_emissao DESC";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id_destinatario);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter notificacoes do destinatario " + id_destinatario, e);
+        }
+        return out;
+    }
+
+    public List<Notificacao> getUntreatedByDestinatario(int id_destinatario) {
+        List<Notificacao> out = new ArrayList<>();
+        String sql = BASE_SELECT + "WHERE n.id_destinatario = ? AND n.estado != 'TRATADA' ORDER BY n.data_emissao DESC";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id_destinatario);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter notificacoes nao tratadas do destinatario " + id_destinatario, e);
+        }
+        return out;
+    }
+
+    public List<Notificacao> getByEmployeeAndDateRange(int id_funcionario, LocalDateTime data_inicio, LocalDateTime data_fim) {
+        List<Notificacao> out = new ArrayList<>();
+        String sql = BASE_SELECT + """
+                WHERE (n.id_remetente = ? OR n.id_destinatario = ?)
+                  AND n.data_emissao BETWEEN ? AND ?
+                ORDER BY n.data_emissao
                 """;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -245,64 +290,14 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
                 while (rs.next()) out.add(buildFromRow(rs));
             }
         } catch (SQLException e) {
-            throw new EcoRideException(
-                    "Erro a obter notificacoes do funcionario " + id_funcionario, e);
+            throw new EcoRideException("Erro a obter notificacoes do funcionario " + id_funcionario, e);
         }
         return out;
     }
 
-    public List<Notificacao> getByDestinatario(int id_destinatario) {
-        List<Notificacao> out = new ArrayList<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM   Notificacao
-                WHERE  id_destinatario = ?
-                ORDER  BY data_emissao DESC
-                """;
-        try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id_destinatario);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) out.add(buildFromRow(rs));
-            }
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter notificações do destinatário " + id_destinatario, e);
-        }
-        return out;
-    }
-
-    public List<Notificacao> getUntreatedByDestinatario(int id_destinatario) {
-        List<Notificacao> out = new ArrayList<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM   Notificacao
-                WHERE  id_destinatario = ? AND notificacao_tratada = false
-                ORDER  BY data_emissao DESC
-                """;
-        try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id_destinatario);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) out.add(buildFromRow(rs));
-            }
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter notificações não tratadas do destinatário " + id_destinatario, e);
-        }
-        return out;
-    }
-
-    // Todas as notificações emitidas dentro do intervalo [data_inicio, data_fim].
     public List<Notificacao> getByDateRange(LocalDateTime data_inicio, LocalDateTime data_fim) {
         List<Notificacao> out = new ArrayList<>();
-        String sql = """
-                SELECT id, descricao, data_emissao, id_remetente, id_destinatario,
-                       notificacao_tratada, data_horaTratada
-                FROM   Notificacao
-                WHERE  data_emissao BETWEEN ? AND ?
-                ORDER BY data_emissao
-                """;
+        String sql = BASE_SELECT + "WHERE n.data_emissao BETWEEN ? AND ? ORDER BY n.data_emissao";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(data_inicio));

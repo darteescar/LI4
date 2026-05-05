@@ -12,9 +12,17 @@ public class SNotificacoesFacade implements ISNotificacoes {
      // ------------------- Registo -------------------
 
      @Override
-     public Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario) {
+     public NotificacaoOS criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
           int id = notificacaoDAO.generateNewId();
-          Notificacao notificacao = new Notificacao(id, descricao, id_remetente, id_destinatario);
+          NotificacaoOS notificacao = new NotificacaoOS(id, descricao, id_remetente, id_destinatario, id_os);
+          notificacaoDAO.put(id, notificacao);
+          return notificacao;
+     }
+
+     @Override
+     public NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
+          int id = notificacaoDAO.generateNewId();
+          NotificacaoStock notificacao = new NotificacaoStock(id, descricao, id_remetente, id_destinatario, id_peca);
           notificacaoDAO.put(id, notificacao);
           return notificacao;
      }
@@ -64,7 +72,7 @@ public class SNotificacoesFacade implements ISNotificacoes {
      public boolean sinalizarNotificacao_comoTratada(int id) {
           Notificacao notificacao = notificacaoDAO.get(id);
           if (notificacao != null) {
-               notificacao.setNotificacao_tratada(true);
+               notificacao.setNotificacao_tratada();
                notificacaoDAO.put(id, notificacao);
                return true;
           }
@@ -75,11 +83,10 @@ public class SNotificacoesFacade implements ISNotificacoes {
      public boolean sinalizarNotificacao_comoLida(int id) {
           Notificacao notificacao = notificacaoDAO.get(id);
           if (notificacao != null) {
-               notificacao.setNotificacao_lida(true);
+               notificacao.setNotificacao_lida();
                notificacaoDAO.put(id, notificacao);
                return true;
           }
           return false;
      }
-     
 }

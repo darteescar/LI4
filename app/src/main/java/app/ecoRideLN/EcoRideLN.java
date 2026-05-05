@@ -19,6 +19,8 @@ import app.ecoRideLN.sFuncionarios.ISFuncionarios;
 import app.ecoRideLN.sFuncionarios.SFuncionariosFacade;
 import app.ecoRideLN.sNotificacoes.ISNotificacoes;
 import app.ecoRideLN.sNotificacoes.Notificacao;
+import app.ecoRideLN.sNotificacoes.NotificacaoOS;
+import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
@@ -60,18 +62,18 @@ public class EcoRideLN implements IEcoRideLN {
 
     // ------------------- Notificações -------------------
     @Override
-    public Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario) {
-        return sNotificacoes.criarNotificacao(descricao, id_remetente, id_destinatario);
+    public NotificacaoOS criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
+        return sNotificacoes.criarNotificacaoOS(descricao, id_remetente, id_destinatario, id_os);
+    }
+
+    @Override
+    public NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
+        return sNotificacoes.criarNotificacaoStock(descricao, id_remetente, id_destinatario, id_peca);
     }
 
     @Override
     public Notificacao obterNotificacao(int id) {
         return sNotificacoes.obterNotificacao(id);
-    }
-
-    @Override
-    public boolean existeNotificacao(int id) {
-        return sNotificacoes.existeNotificacao(id);
     }
 
     @Override
