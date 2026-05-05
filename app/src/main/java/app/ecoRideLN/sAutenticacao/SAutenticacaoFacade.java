@@ -1,22 +1,15 @@
 package app.ecoRideLN.sAutenticacao;
 
+import java.util.List;
+
 import app.common.EcoRideException;
 import app.ecoRideCD.sAutenticacao.UtilizadorDAO;
 
 public class SAutenticacaoFacade implements ISAutenticacao {
     private final UtilizadorDAO utilizadoresDAO;
-    
 
     public SAutenticacaoFacade() {
         this.utilizadoresDAO = UtilizadorDAO.getInstance();
-    }
-
-    @Override
-    public void atualizarPalavraPasseUtilizador(int id, String novaPassword){
-        if (!utilizadoresDAO.containsKey(id)) {
-            throw new EcoRideException("Utilizador com ID " + id + " não existe.");
-        }
-        utilizadoresDAO.updatePassword(id, novaPassword);
     }
 
     @Override
@@ -38,17 +31,24 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
+    public List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo) {
+        return utilizadoresDAO.values().stream()
+                .filter(u -> u.getCargo() == cargo)
+                .toList();
+    }
+
+    @Override
+    public boolean existeUtilizador(int id) {
+        return utilizadoresDAO.containsKey(id);
+    }
+
+    @Override
     public boolean removerUtilizador(int id) {
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
         utilizadoresDAO.remove(id);
         return true;
-    }
-
-    @Override
-    public boolean existeUtilizador(int id) {
-        return utilizadoresDAO.containsKey(id);
     }
 
     @Override
@@ -65,5 +65,13 @@ public class SAutenticacaoFacade implements ISAutenticacao {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
         return utilizadoresDAO.get(id).getCargo();
+    }
+
+    @Override
+    public void atualizarPalavraPasseUtilizador(int id, String novaPassword) {
+        if (!utilizadoresDAO.containsKey(id)) {
+            throw new EcoRideException("Utilizador com ID " + id + " não existe.");
+        }
+        utilizadoresDAO.updatePassword(id, novaPassword);
     }
 }

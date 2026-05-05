@@ -21,6 +21,8 @@ public interface ISClientes {
 
      List<Trotinete> obterTrotinetes_Cliente(int id);
 
+     List<Cliente> obterTodosClientes();
+
      Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
      Trotinete obterDadosTrotinete(int id);

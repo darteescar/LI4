@@ -6,9 +6,13 @@ public interface ISReparacoes {
 
      public Reparacao registarReparacao(String nomenclatura, String descricao, float preco);
 
+     public boolean existeReparacao(int id);
+
      public Reparacao obterDadosReparacao(int id);
 
      public boolean removerReparacao(int id);
+
+     public List<Reparacao> obterTodasReparacoes();
 
      public List<Reparacao> obterReparacoesDisponiveis();
 

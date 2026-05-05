@@ -6,7 +6,15 @@ import java.util.List;
 import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
 
 public class SNotificacoesFacade implements ISNotificacoes {
-     private NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
+     private final NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
+
+     @Override
+     public Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario) {
+          int id = notificacaoDAO.generateNewId();
+          Notificacao notificacao = new Notificacao(id, descricao, id_remetente, id_destinatario);
+          notificacaoDAO.put(id, notificacao);
+          return notificacao;
+     }
 
      @Override
      public Notificacao obterDadosNotificacao(int id) {
@@ -60,21 +68,22 @@ public class SNotificacoesFacade implements ISNotificacoes {
      }
 
      @Override
-     public java.util.List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime data_inicio, LocalDateTime data_fim) {
+     public void atualizarDataConfirmacaoTratamentoNotificacao(int id, LocalDateTime data) {
+          Notificacao notificacao = notificacaoDAO.get(id);
+          if (notificacao != null) {
+               notificacao.setData_horaTratada(data);
+               notificacaoDAO.put(id, notificacao);
+          }
+     }
+
+     @Override
+     public List<Notificacao> obterNotificacoesPorFuncionarioEIntervalo(int id_funcionario, LocalDateTime data_inicio, LocalDateTime data_fim) {
           return notificacaoDAO.getByEmployeeAndDateRange(id_funcionario, data_inicio, data_fim);
      }
 
      @Override
      public List<Notificacao> obterNotificacoesPorIntervalo(LocalDateTime data_inicio, LocalDateTime data_fim) {
           return notificacaoDAO.getByDateRange(data_inicio, data_fim);
-     }
-
-     @Override
-     public Notificacao criarNotificacao(String descricao, int id_remetente, int id_destinatario) {
-          int id = notificacaoDAO.generateNewId();
-          Notificacao notificacao = new Notificacao(id, descricao, id_remetente, id_destinatario);
-          notificacaoDAO.put(id, notificacao);
-          return notificacao;
      }
 
      @Override
@@ -87,14 +96,4 @@ public class SNotificacoesFacade implements ISNotificacoes {
           }
           return false;
      }
-
-     @Override
-     public void atualizarDataConfirmacaoTratamentoNotificacao(int id, LocalDateTime data) {
-          Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
-               notificacao.setData_horaTratada(data);
-               notificacaoDAO.put(id, notificacao);
-          }
-     }
-
 }
