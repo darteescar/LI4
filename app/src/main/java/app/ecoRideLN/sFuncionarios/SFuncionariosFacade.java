@@ -1,6 +1,7 @@
 package app.ecoRideLN.sFuncionarios;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
@@ -13,21 +14,6 @@ public class SFuncionariosFacade implements ISFuncionarios {
      }
 
      @Override
-     public Funcionario obterDadosFuncionario(int id) {
-          return funcionarioDAO.get(id);
-     }
-
-     @Override
-     public boolean removerFuncionario(int id) {
-          return funcionarioDAO.remove(id) != null;
-     }
-
-     @Override
-     public boolean existeFuncionario(int id) {
-          return funcionarioDAO.containsKey(id);
-     }
-
-     @Override
      public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal){
           int id = funcionarioDAO.generateNewId();
           Funcionario funcionario = new Funcionario(id, nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
@@ -36,26 +22,18 @@ public class SFuncionariosFacade implements ISFuncionarios {
      }
 
      @Override
-     public float adicionarHorasExtra(int id, int horas_extra) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          int horas_totais = funcionario.getHoras_extra() + horas_extra;
-          funcionario.setHoras_extra(horas_totais);
-          funcionarioDAO.put(id, funcionario);
-          float valor_a_pagar = horas_extra * funcionario.getSalario_hora() + funcionario.getSalario_liquido();
-          return valor_a_pagar;
+     public Funcionario obterFuncionario(int id) {
+          return funcionarioDAO.get(id);
      }
 
      @Override
-     public void registarPagamentoFuncionario(int id) {
-          Funcionario funcionario = funcionarioDAO.get(id);
-          if (funcionario == null) {
-               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
-          }
-          funcionario.setHoras_extra(0);
-          funcionarioDAO.put(id, funcionario);
+     public boolean existeFuncionario(int id) {
+          return funcionarioDAO.containsKey(id);
+     }
+
+     @Override
+     public boolean removerFuncionario(int id) {
+          return funcionarioDAO.remove(id) != null;
      }
 
      @Override
@@ -82,5 +60,33 @@ public class SFuncionariosFacade implements ISFuncionarios {
           } else {
                throw new EcoRideException("Funcionário com ID " + id + " não existe.");
           }
+     }
+
+     @Override
+     public List<Funcionario> obterTodosFuncionarios(){
+          return funcionarioDAO.values().stream().toList();
+     }
+
+     @Override
+     public float adicionarHorasExtra(int id, int horas_extra) {
+          Funcionario funcionario = funcionarioDAO.get(id);
+          if (funcionario == null) {
+               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
+          }
+          int horas_totais = funcionario.getHoras_extra() + horas_extra;
+          funcionario.setHoras_extra(horas_totais);
+          funcionarioDAO.put(id, funcionario);
+          float valor_a_pagar = horas_extra * funcionario.getSalario_hora() + funcionario.getSalario_liquido();
+          return valor_a_pagar;
+     }
+
+     @Override
+     public void registarPagamentoFuncionario(int id) {
+          Funcionario funcionario = funcionarioDAO.get(id);
+          if (funcionario == null) {
+               throw new EcoRideException("Funcionário com ID " + id + " não existe.");
+          }
+          funcionario.setHoras_extra(0);
+          funcionarioDAO.put(id, funcionario);
      }
 }

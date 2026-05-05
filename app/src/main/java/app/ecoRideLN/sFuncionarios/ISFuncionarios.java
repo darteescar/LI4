@@ -5,19 +5,19 @@ import java.util.List;
 
 public interface ISFuncionarios {
 
-     Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
+     public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
 
-     Funcionario obterDadosFuncionario(int id);
+     public Funcionario obterFuncionario(int id);
 
-     List<Funcionario> obterTodosFuncionarios();
+     public boolean existeFuncionario(int id);
 
-     boolean existeFuncionario(int id);
+     public boolean removerFuncionario(int id);
 
-     boolean removerFuncionario(int id);
+     public void atualizarDadosFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
 
-     void atualizarDadosFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
+     public List<Funcionario> obterTodosFuncionarios();
 
-     float adicionarHorasExtra(int id, int horas_extra);
+     public float adicionarHorasExtra(int id, int horas_extra);
 
-     void registarPagamentoFuncionario(int id);
+     public void registarPagamentoFuncionario(int id);
 }
