@@ -2,9 +2,6 @@ package app.ecoRideLN.sClientes;
 
 import java.util.List;
 
-import app.ecoRideLN.sOrdensServico.Conserto;
-import app.ecoRideLN.sOrdensServico.OrdemServico;
-
 public interface ISClientes {
 
      // ------------------- Cliente -------------------
@@ -33,13 +30,11 @@ public interface ISClientes {
 
      void atualizarDadosTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
 
-     // ------------------- Consultas cruzadas -------------------
+     List<Trotinete> obterTodasTrotinetes();
 
-     List<OrdemServico> obterOSs_Cliente(int id);
+     // ------------------- Consultas cruzadas -------------------
 
      List<Trotinete> obterTrotinetes_Cliente(int id);
 
-     List<OrdemServico> obterOS_Trotinete(int id_trotinete);
 
-     List<Conserto> obterConsertosAnteriores(int id_trotinete);
 }

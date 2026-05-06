@@ -12,6 +12,7 @@ import app.ecoRideLN.sFuncionarios.Funcionario;
 import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sNotificacoes.NotificacaoOS;
 import app.ecoRideLN.sNotificacoes.NotificacaoStock;
+import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
@@ -44,6 +45,10 @@ public interface IEcoRideLN {
      public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao);
      public void registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes);
      public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
+     public List<OrdemServico> obterOSs_Cliente(int id);
+     public List<OrdemServico> obterOS_Trotinete(int id_trotinete);
+     public List<Conserto> obterConsertosAnteriores(int id_trotinete);
+
 
      // ------------------- Clientes -------------------
 
