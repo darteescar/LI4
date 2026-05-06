@@ -13,7 +13,7 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
-    public Utilizador criarUtilizador(String password, int idFuncionario, Cargo cargo) {
+    public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo) {
         if (utilizadoresDAO.containsKey(idFuncionario)) {
             throw new EcoRideException("Utilizador com ID " + idFuncionario + " já existe.");
         }
@@ -43,6 +43,13 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         utilizadoresDAO.remove(id);
         return true;
     }
+
+    @Override
+    public List<Utilizador> obterUtilizadores() {
+        return utilizadoresDAO.values().stream().toList();
+    }
+
+    // Utilitários
 
     @Override
     public List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo) {

@@ -4,13 +4,17 @@ import java.util.List;
 
 public interface ISAutenticacao {
 
-     Utilizador criarUtilizador(String password, int idFuncionario, Cargo cargo);
+     Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo);
 
      Utilizador obterUtilizador(int id);
 
      boolean existeUtilizador(int id);
 
      boolean removerUtilizador(int id);
+
+     List<Utilizador> obterUtilizadores();
+
+     // Utilitários
 
      List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo);
 
