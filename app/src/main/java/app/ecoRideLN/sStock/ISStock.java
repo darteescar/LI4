@@ -9,38 +9,37 @@ public interface ISStock {
      // ------------------- Fornecedor -------------------
 
      Fornecedor registarFornecedor(String nome, String telemovel, String email);
+     void atualizarFornecedor(int id, String nome, String telemovel, String email);
      Fornecedor obterFornecedor(int id);
-     List<Fornecedor> obterTodosFornecedores();
      boolean existeFornecedor(int id);
      boolean removerFornecedor(int id);
-     void atualizarFornecedor(int id, String nome, String telemovel, String email);
+     List<Fornecedor> obterFornecedores();
 
      // ------------------- Peca -------------------
 
      Peca    registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor);
+     void    atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
      Peca    obterPeca(int id);
-     List<Peca> obterTodasPecas();
      boolean existePeca_id(int id);
      boolean existePeca_ref(String ref);
      boolean removerPeca(int id);
-     void    atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
+     List<Peca> obterTodasPecas();
      int     obter_quantidade_Stock_Peca_id(int id);
-     int     obter_quantidade_Stock_Peca_ref(String referencia);
      List<Integer> obter_Pecas_baixo_Stock_minimo();
 
      // ------------------- Stock -------------------
 
      Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie);
      Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
+     void    atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
+     void    atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie);
      Stock   obterStock(int id);
-     List<Stock> obterTodosStocks();
      boolean existeStock(int id);
      boolean removerStock(int id);
+     List<Stock> obterTodosStocks();
      void    atualizaEstadoStock(int id, EstadoStock estado);
      int     pecasDefeituosas_Stock(int id_peca);
      void    registar_Defeito_entradaStock(int id_Stock);
-     void    atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
-     void    atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie);
 
      // ------------------- Devolucao -------------------
 

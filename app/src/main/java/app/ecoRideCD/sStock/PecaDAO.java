@@ -199,15 +199,4 @@ public class PecaDAO implements Map<Integer, Peca> {
         }
     }
 
-    public Peca getByReferenceFull(String ref) {
-        try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement(BASE_SELECT + " WHERE referencia = ?")) {
-            ps.setString(1, ref);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? buildFromRow(rs) : null;
-            }
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter peca por referencia " + ref, e);
-        }
-    }
 }

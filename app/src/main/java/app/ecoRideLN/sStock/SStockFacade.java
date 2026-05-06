@@ -29,13 +29,19 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Fornecedor obterFornecedor(int id) {
-          return fornecedorDAO.get(id);
+     public void atualizarFornecedor(int id, String nome, String telemovel, String email) {
+          Fornecedor fornecedor = fornecedorDAO.get(id);
+          if (fornecedor != null) {
+               if (nome != null && !nome.isEmpty())           fornecedor.setNome(nome);
+               if (telemovel != null && !telemovel.isEmpty()) fornecedor.setTelemovel(telemovel);
+               if (email != null && !email.isEmpty())         fornecedor.setEmail(email);
+               fornecedorDAO.put(id, fornecedor);
+          }
      }
 
      @Override
-     public List<Fornecedor> obterTodosFornecedores() {
-          return new ArrayList<>(fornecedorDAO.values());
+     public Fornecedor obterFornecedor(int id) {
+          return fornecedorDAO.get(id);
      }
 
      @Override
@@ -49,17 +55,13 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarFornecedor(int id, String nome, String telemovel, String email) {
-          Fornecedor fornecedor = fornecedorDAO.get(id);
-          if (fornecedor != null) {
-               if (nome != null && !nome.isEmpty())           fornecedor.setNome(nome);
-               if (telemovel != null && !telemovel.isEmpty()) fornecedor.setTelemovel(telemovel);
-               if (email != null && !email.isEmpty())         fornecedor.setEmail(email);
-               fornecedorDAO.put(id, fornecedor);
-          }
+     public List<Fornecedor> obterFornecedores() {
+          return new ArrayList<>(fornecedorDAO.values());
      }
 
+     // --------------------------------------------
      // ------------------- Peca -------------------
+     // --------------------------------------------
 
      @Override
      public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
@@ -67,31 +69,6 @@ public class SStockFacade implements ISStock {
           Peca nova = new Peca(id, ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor, true);
           pecaDAO.put(id, nova);
           return nova;
-     }
-
-     @Override
-     public Peca obterPeca(int id) {
-          return pecaDAO.get(id);
-     }
-
-     @Override
-     public List<Peca> obterTodasPecas() {
-          return new ArrayList<>(pecaDAO.values());
-     }
-
-     @Override
-     public boolean existePeca_id(int id) {
-          return pecaDAO.containsKey(id);
-     }
-
-     @Override
-     public boolean existePeca_ref(String ref) {
-          return pecaDAO.getByReference(ref);
-     }
-
-     @Override
-     public boolean removerPeca(int id) {
-          return pecaDAO.remove(id) != null;
      }
 
      @Override
@@ -110,19 +87,33 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public int obter_quantidade_Stock_Peca_id(int id) {
-          List<Stock> stocks = stockDAO.getByPecaId(id);
-          int quantidadeTotal = 0;
-          for (Stock s : stocks) quantidadeTotal += s.getQuantidade();
-          return quantidadeTotal;
+     public Peca obterPeca(int id) {
+          return pecaDAO.get(id);
      }
 
      @Override
-     public int obter_quantidade_Stock_Peca_ref(String referencia) {
-          Peca peca = pecaDAO.getByReferenceFull(referencia);
-          if (peca == null) return 0;
-          List<Stock> stocks = stockDAO.getByPecaId(peca.getId());
-          if (stocks == null || stocks.isEmpty()) return 0;
+     public boolean existePeca_id(int id) {
+          return pecaDAO.containsKey(id);
+     }
+
+     @Override
+     public boolean existePeca_ref(String ref) {
+          return pecaDAO.getByReference(ref);
+     }
+
+     @Override
+     public boolean removerPeca(int id) {
+          return pecaDAO.remove(id) != null;
+     }
+
+     @Override
+     public List<Peca> obterTodasPecas() {
+          return new ArrayList<>(pecaDAO.values());
+     }
+
+     @Override
+     public int obter_quantidade_Stock_Peca_id(int id) {
+          List<Stock> stocks = stockDAO.getByPecaId(id);
           int quantidadeTotal = 0;
           for (Stock s : stocks) quantidadeTotal += s.getQuantidade();
           return quantidadeTotal;
@@ -138,7 +129,9 @@ public class SStockFacade implements ISStock {
           return pecas_baixo_stock;
      }
 
-     // ------------------- Stock -------------------
+     // --------------------------------------------
+     // ------------------- Stock ------------------
+     // --------------------------------------------
 
      @Override
      public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie) {
@@ -154,53 +147,6 @@ public class SStockFacade implements ISStock {
           Stock novo = new Stock(id, preco_compra, id_peca, data, quantidade);
           stockDAO.put(id, novo);
           return novo;
-     }
-
-     @Override
-     public Stock obterStock(int id) {
-          return stockDAO.get(id);
-     }
-
-     @Override
-     public List<Stock> obterTodosStocks() {
-          return new ArrayList<>(stockDAO.values());
-     }
-
-     @Override
-     public boolean existeStock(int id) {
-          return stockDAO.containsKey(id);
-     }
-
-     @Override
-     public boolean removerStock(int id) {
-          return stockDAO.remove(id) != null;
-     }
-
-     @Override
-     public void atualizaEstadoStock(int id, EstadoStock estado) {
-          Stock stock = stockDAO.get(id);
-          if (stock != null) {
-               stock.setEstado(estado);
-               stockDAO.put(id, stock);
-          }
-     }
-
-     @Override
-     public int pecasDefeituosas_Stock(int id_peca) {
-          int defeituosos = 0;
-          for (Stock s : stockDAO.getByPecaId(id_peca)) {
-               if (s.getEstado() == EstadoStock.PossivelDefeito) defeituosos++;
-          }
-          return defeituosos;
-     }
-
-     @Override
-     public void registar_Defeito_entradaStock(int id_Stock) {
-          Stock stock = stockDAO.get(id_Stock);
-          if (stock != null) {
-               stock.setEstado(EstadoStock.PossivelDefeito);
-               stockDAO.put(id_Stock, stock);
-          }
      }
 
      @Override
@@ -228,6 +174,53 @@ public class SStockFacade implements ISStock {
                if (garantia != null)                stockGarantia.setGarantia(garantia);
                if (nr_serie != null && !nr_serie.isEmpty()) stockGarantia.setNr_serie(nr_serie);
                stockDAO.put(id_stock, stockGarantia);
+          }
+     }
+
+     @Override
+     public Stock obterStock(int id) {
+          return stockDAO.get(id);
+     }
+
+     @Override
+     public boolean existeStock(int id) {
+          return stockDAO.containsKey(id);
+     }
+
+     @Override
+     public boolean removerStock(int id) {
+          return stockDAO.remove(id) != null;
+     }
+
+     @Override
+     public List<Stock> obterTodosStocks() {
+          return new ArrayList<>(stockDAO.values());
+     }
+
+     @Override
+     public void atualizaEstadoStock(int id, EstadoStock estado) {
+          Stock stock = stockDAO.get(id);
+          if (stock != null) {
+               stock.setEstado(estado);
+               stockDAO.put(id, stock);
+          }
+     }
+
+     @Override
+     public int pecasDefeituosas_Stock(int id_peca) {
+          int defeituosos = 0;
+          for (Stock s : stockDAO.getByPecaId(id_peca)) {
+               if (s.getEstado() == EstadoStock.PossivelDefeito) defeituosos++;
+          }
+          return defeituosos;
+     }
+
+     @Override
+     public void registar_Defeito_entradaStock(int id_Stock) {
+          Stock stock = stockDAO.get(id_Stock);
+          if (stock != null) {
+               stock.setEstado(EstadoStock.PossivelDefeito);
+               stockDAO.put(id_Stock, stock);
           }
      }
 

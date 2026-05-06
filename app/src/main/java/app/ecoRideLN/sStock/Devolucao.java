@@ -2,15 +2,12 @@ package app.ecoRideLN.sStock;
 
 import java.time.LocalDateTime;
 
-import app.ecoRideCD.sStock.StockDAO;
-
 public class Devolucao {
      private int id;
      private LocalDateTime data;
      private String motivo;
      private EstadoDevolucao estado;
      private int codStock;
-     private static final StockDAO stockDAO = StockDAO.getInstance();
 
      public Devolucao(int id, LocalDateTime data, String motivo, int codStock) {
           this.id = id;
