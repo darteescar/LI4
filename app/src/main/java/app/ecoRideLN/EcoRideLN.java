@@ -3,6 +3,7 @@ package app.ecoRideLN;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import app.ecoRideLN.sAutenticacao.ISAutenticacao;
 import app.ecoRideLN.sAutenticacao.SAutenticacaoFacade;
@@ -193,6 +194,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public Cliente atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif){
+        return sClientes.atualizarCliente(id_cliente, novo_nome, novo_email, novo_telemovel, novo_nif);
+    }
+
+    @Override
     public Cliente obterCliente(int id) {
         return sClientes.obterCliente(id);
     }
@@ -220,6 +226,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, int num_serie, String tipo_motor) {
+        return sClientes.atualizarTrotinete(id, id_cliente, modelo, marca, num_serie, tipo_motor);
+    }
+
+    @Override
     public Trotinete obterTrotinete(int id) {
         return sClientes.obterTrotinete(id);
     }
@@ -232,6 +243,11 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public boolean removerTrotinete(int id) {
         return sClientes.removerTrotinete(id);
+    }
+
+    @Override
+    public List<Trotinete> obterTrotinetes() {
+        return sClientes.obterTrotinetes();
     }
 
     // ------------------- Reparações -------------------
@@ -404,11 +420,20 @@ public class EcoRideLN implements IEcoRideLN {
         sStock.marcarEncomendaComoRecebida(id);
     }
 
+    @Override
+    public Map<Integer, List<ItemEncomenda>> gerarListaAutomatica(){
+        return sStock.gerarListaAutomatica();
+    }
+
     // ------------------- Fornecedores -------------------
 
     @Override
     public Fornecedor registarFornecedor(String nome, String telemovel, String email) {
         return sStock.registarFornecedor(nome, telemovel, email);
+    }
+    @Override
+    public Fornecedor atualizarFornecedor(int id, String nome, String telemovel, String email){
+        return sStock.atualizarFornecedor(id, nome, telemovel, email);
     }
 
     @Override
@@ -426,11 +451,20 @@ public class EcoRideLN implements IEcoRideLN {
         return sStock.removerFornecedor(id);
     }
 
+    @Override
+    public List<Fornecedor> obterFornecedores(){
+        return sStock.obterFornecedores();
+    }
+
     // ------------------- Funcionários -------------------
 
     @Override
     public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal) {
         return sFuncionarios.registarFuncionario(nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
+    }
+    @Override
+    public Funcionario atualizarFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal){
+        return sFuncionarios.atualizarFuncionario(id, nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
     }
 
     @Override
@@ -449,6 +483,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public List<Funcionario> obterFuncionarios(){
+        return sFuncionarios.obterFuncionarios();
+    }
+
+    @Override
     public void registarHorasExtraFuncionario(int id_funcionario, int horas_extra) {
         sFuncionarios.adicionarHorasExtra(id_funcionario, horas_extra);
     }
@@ -459,11 +498,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Movimentos Financeiros -------------------
-
-    @Override
-    public MovimentoFinanceiro obterMovimentoFinanceiro(int id) {
-        return sFinanceiro.obterMovimentoFinanceiro(id);
-    }
 
     @Override
     public List<MovimentoFinanceiro> obterMovimentosFinanceiros() {

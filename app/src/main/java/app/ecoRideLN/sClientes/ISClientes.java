@@ -8,7 +8,7 @@ public interface ISClientes {
 
      public Cliente registarCliente(String nome, String email, String telemovel, String nif);
 
-     public void atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
+     public Cliente atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
 
      public Cliente obterCliente(int id);
 
@@ -22,7 +22,7 @@ public interface ISClientes {
 
      public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
-     public void atualizarTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
+     public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
      public Trotinete obterTrotinete(int id);
 

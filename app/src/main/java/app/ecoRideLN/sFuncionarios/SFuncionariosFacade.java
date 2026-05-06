@@ -22,22 +22,7 @@ public class SFuncionariosFacade implements ISFuncionarios {
      }
 
      @Override
-     public Funcionario obterFuncionario(int id) {
-          return funcionarioDAO.get(id);
-     }
-
-     @Override
-     public boolean existeFuncionario(int id) {
-          return funcionarioDAO.containsKey(id);
-     }
-
-     @Override
-     public boolean removerFuncionario(int id) {
-          return funcionarioDAO.remove(id) != null;
-     }
-
-     @Override
-     public void atualizarDadosFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal){
+     public Funcionario atualizarFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal){
           Funcionario func = funcionarioDAO.get(id);
           if (func != null) {
                if (nome != null) func.setNome(nome);
@@ -57,9 +42,25 @@ public class SFuncionariosFacade implements ISFuncionarios {
                if (localidade != null) func.setLocalidade(localidade);
                if (codigo_postal != null) func.setCodigo_postal(codigo_postal);
                funcionarioDAO.put(id, func);
+               return func;
           } else {
                throw new EcoRideException("Funcionário com ID " + id + " não existe.");
           }
+     }
+
+     @Override
+     public Funcionario obterFuncionario(int id) {
+          return funcionarioDAO.get(id);
+     }
+
+     @Override
+     public boolean existeFuncionario(int id) {
+          return funcionarioDAO.containsKey(id);
+     }
+
+     @Override
+     public boolean removerFuncionario(int id) {
+          return funcionarioDAO.remove(id) != null;
      }
 
      @Override
