@@ -8,13 +8,13 @@ public interface ISClientes {
 
      Cliente registarCliente(String nome, String email, String telemovel, String nif);
 
+     void atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
+
      Cliente obterCliente(int id);
 
      boolean existeCliente(int id);
 
      boolean removerCliente(int id);
-
-     void atualizarDadosCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
 
      List<Cliente> obterClientes();
 
@@ -22,19 +22,18 @@ public interface ISClientes {
 
      Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
+     void atualizarTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
+
      Trotinete obterTrotinete(int id);
 
      boolean existeTrotinete(int id);
 
      boolean removerTrotinete(int id);
 
-     void atualizarDadosTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
-
      List<Trotinete> obterTrotinetes();
 
-     // ------------------- Consultas cruzadas -------------------
+     // Utilitários
 
      List<Trotinete> obterTrotinetes_Cliente(int id);
-
 
 }
