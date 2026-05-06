@@ -3,76 +3,71 @@ package app.ecoRideLN.sOrdensServico;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import app.ecoRideLN.sReparacoes.Reparacao;
-import app.ecoRideLN.sStock.Stock;
-
 public interface ISOrdensServico {
 
      // ------------------- Registo -------------------
 
-     OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
+     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
 
-     // ------------------- Consulta -------------------
+     public void atualizarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete);
 
-     OrdemServico obterOS(int id);
+     public OrdemServico obterOS(int id);
 
-     List<OrdemServico> obterTodasOSs();
+     public boolean existeOS(int id);
 
-     boolean removerOS(int id);
+     public List<OrdemServico> obterTodasOSs();
 
-     // ------------------- Alterações de campos -------------------
-
-     void alterarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete);
+     public boolean removerOS(int id);
 
      // ------------------- Máquina de estados -------------------
 
-     void alterarEstadoOS(int id, EstadoOS estado);
+     public void alterarEstadoOS(int id, EstadoOS estado);
 
-     void submeterDiagnosticoOS(int id);
+     public void submeterDiagnosticoOS(int id);
 
-     void aprovarOrcamentoOS(int id);
+     public void aprovarOrcamentoOS(int id);
 
-     void rejeitarOrcamentoOS(int id);
+     public void rejeitarOrcamentoOS(int id);
 
-     void marcarAguardarPecasOS(int id);
+     public void marcarAguardarPecasOS(int id);
 
-     void pecasRecebidasOS(int id);
+     public void pecasRecebidasOS(int id);
 
-     void concluirReparacaoOS(int id);
+     public void concluirReparacaoOS(int id);
 
-     void pagarOS(int id);
+     public void pagarOS(int id);
 
-     void eliminarOS(int id);
+     public void eliminarOS(int id);
+
+     public void atribuirOS(int id, int id_funcionario);
+
+     public void registarNotificacaoPagamentoOS(int id_OS);
 
      // ------------------- Diagnóstico -------------------
 
-     void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao);
+     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao);
 
-     List<Reparacao> obterReparacoesDiagnosticoOS(int idOS);
+     public List<Integer> obterReparacoesDiagnosticoOS(int idOS);
 
-     List<PecasOrcamento> obterPecasQuantidadeDiagnosticoOS(int idOS);
+     public List<PecasOrcamento> obterPecasDiagnosticoOS(int idOS);
 
      // ------------------- Conserto -------------------
 
-     void registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes);
+     public void registarConsertoOS(int id_OS, List<PecasUsadas> pecas, List<Integer> reparacoes, float orcamento);
 
-     void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
+     public List <Integer> obterReparacoesConsertoOS(int id_OS);
 
-     void adicionarPecas_Conserto_OS(int id, List<Stock> pecas);
+     public List <PecasUsadas> obterPecasUsadasConsertoOS(int id_OS);
 
-     void adicionarPecaConserto_OS(int id_OS, int id_Stock);
+     public boolean validarChecklist_ConsertoOS(int idOS);
 
-     boolean removerPecaConserto_OS(int id_OS, int id_Stock);
+     // ------------------- Pagamento -------------------
 
-     boolean validarChecklist_ConsertoOS(int idOS);
-
-     // ------------------- Filtragem -------------------
-
-     List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
+     public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
 
      // ------------------- Utilitários -------------------
 
-     float calcularOrcamento(List<PecasOrcamento> listaPecas, List<Reparacao> reparacoes);
+     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
 
-     boolean validarFotografia(Fotografia foto);
+     public boolean validarFotografia(Fotografia foto);
 }
