@@ -1,6 +1,7 @@
 package app.ecoRideLN.sStock;
 
 public class Peca {
+
      private int id;
      private String referencia;
      private String nome;
@@ -21,27 +22,67 @@ public class Peca {
           this.ativa = ativa;
      }
 
-     public int getId() { return id; }
-     public void setId(int id) { this.id = id; }
+     public int getId() {
+          return id;
+     }
 
-     public String getReferencia() { return referencia; }
-     public void setReferencia(String referencia) { this.referencia = referencia; }
+     public void setId(int id) {
+          this.id = id;
+     }
 
-     public String getNome() { return nome; }
-     public void setNome(String nome) { this.nome = nome; }
+     public String getReferencia() {
+          return referencia;
+     }
 
-     public String getDescricao() { return descricao; }
-     public void setDescricao(String descricao) { this.descricao = descricao; }
+     public void setReferencia(String referencia) {
+          this.referencia = referencia;
+     }
 
-     public int getStock_minimo() { return stock_minimo; }
-     public void setStock_minimo(int stock_minimo) { this.stock_minimo = stock_minimo; }
+     public String getNome() {
+          return nome;
+     }
 
-     public float getPreco_venda() { return preco_venda; }
-     public void setPreco_venda(float preco_venda) { this.preco_venda = preco_venda; }
+     public void setNome(String nome) {
+          this.nome = nome;
+     }
 
-     public int getCodFornecedor() { return codFornecedor; }
-     public void setCodFornecedor(int codFornecedor) { this.codFornecedor = codFornecedor; }
+     public String getDescricao() {
+          return descricao;
+     }
 
-     public boolean isAtiva() { return ativa; }
-     public void setAtiva(boolean ativa) { this.ativa = ativa; }
+     public void setDescricao(String descricao) {
+          this.descricao = descricao;
+     }
+
+     public int getStock_minimo() {
+          return stock_minimo;
+     }
+
+     public void setStock_minimo(int stock_minimo) {
+          this.stock_minimo = stock_minimo;
+     }
+
+     public float getPreco_venda() {
+          return preco_venda;
+     }
+
+     public void setPreco_venda(float preco_venda) {
+          this.preco_venda = preco_venda;
+     }
+
+     public int getCodFornecedor() {
+          return codFornecedor;
+     }
+
+     public void setCodFornecedor(int codFornecedor) {
+          this.codFornecedor = codFornecedor;
+     }
+
+     public boolean isAtiva() {
+          return ativa;
+     }
+
+     public void setAtiva(boolean ativa) {
+          this.ativa = ativa;
+     }
 }

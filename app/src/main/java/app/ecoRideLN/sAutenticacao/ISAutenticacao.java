@@ -4,25 +4,25 @@ import java.util.List;
 
 public interface ISAutenticacao {
 
-     Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo);
+     public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo);
 
-     Utilizador obterUtilizador(int id);
+     public Utilizador obterUtilizador(int id);
 
-     boolean existeUtilizador(int id);
+     public boolean existeUtilizador(int id);
 
-     boolean removerUtilizador(int id);
+     public boolean removerUtilizador(int id);
 
-     List<Utilizador> obterUtilizadores();
+     public List<Utilizador> obterUtilizadores();
 
      // Utilitários
 
-     List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo);
+     public List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo);
 
-     boolean autenticar(int id, String password);
+     public boolean autenticar(int id, String password);
 
-     Cargo obterCargoUtilizador(int id);
+     public Cargo obterCargoUtilizador(int id);
 
-     void atualizarPalavraPasseUtilizador(int id, String novaPassword);
+     public void atualizarPalavraPasseUtilizador(int id, String novaPassword);
 
-     void atualizarCargoUtilizador(int id, Cargo novoCargo);
+     public void atualizarCargoUtilizador(int id, Cargo novoCargo);
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Diagnostico {
+
      private String descricao;
      private float orcamento;
      private List<PecasOrcamento> pecasOrcamento;
@@ -30,15 +31,35 @@ public class Diagnostico {
           this.cod_reparacoes = new ArrayList<>(diagnostico.cod_reparacoes);
      }
 
-     public String getDescricao() { return descricao; }
-     public void setDescricao(String descricao) { this.descricao = descricao; }
+     public String getDescricao() {
+          return descricao;
+     }
 
-     public float getOrcamento() { return orcamento; }
-     public void setOrcamento(float orcamento) { this.orcamento = orcamento; }
+     public void setDescricao(String descricao) {
+          this.descricao = descricao;
+     }
 
-     public List<PecasOrcamento> getPecasOrcamento() { return new ArrayList<>(pecasOrcamento); }
-     public void setPecasOrcamento(List<PecasOrcamento> pecasOrcamento) { this.pecasOrcamento = new ArrayList<>(pecasOrcamento); }
+     public float getOrcamento() {
+          return orcamento;
+     }
 
-     public List<Integer> getCod_reparacoes() { return new ArrayList<>(cod_reparacoes); }
-     public void setCod_reparacoes(List<Integer> cod_reparacoes) { this.cod_reparacoes = new ArrayList<>(cod_reparacoes); }
+     public void setOrcamento(float orcamento) {
+          this.orcamento = orcamento;
+     }
+
+     public List<PecasOrcamento> getPecasOrcamento() {
+          return new ArrayList<>(pecasOrcamento);
+     }
+
+     public void setPecasOrcamento(List<PecasOrcamento> pecasOrcamento) {
+          this.pecasOrcamento = new ArrayList<>(pecasOrcamento);
+     }
+
+     public List<Integer> getCod_reparacoes() {
+          return new ArrayList<>(cod_reparacoes);
+     }
+
+     public void setCod_reparacoes(List<Integer> cod_reparacoes) {
+          this.cod_reparacoes = new ArrayList<>(cod_reparacoes);
+     }
 }

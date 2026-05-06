@@ -6,6 +6,7 @@ import java.util.List;
 import app.ecoRideLN.sStock.Stock;
 
 public class Conserto {
+
      private float preco_total;
      private List<PecasUsadas> listaPecas;
      private List<Integer> cod_reparacoes;
@@ -32,17 +33,37 @@ public class Conserto {
           this.checkList = new CheckList();
      }
 
-     public float getPreco_total() { return preco_total; }
-     public void setPreco_total(float preco_total) { this.preco_total = preco_total; }
+     public float getPreco_total() {
+          return preco_total;
+     }
 
-     public List<PecasUsadas> getListaPecas() { return new ArrayList<>(this.listaPecas); }
-     public void setListaPecas(List<PecasUsadas> listaPecas) { this.listaPecas = new ArrayList<>(listaPecas); }
+     public void setPreco_total(float preco_total) {
+          this.preco_total = preco_total;
+     }
 
-     public List<Integer> getCod_reparacoes() { return new ArrayList<>(this.cod_reparacoes); }
-     public void setCod_reparacoes(List<Integer> cod_reparacoes) { this.cod_reparacoes = new ArrayList<>(cod_reparacoes); }
+     public List<PecasUsadas> getListaPecas() {
+          return new ArrayList<>(this.listaPecas);
+     }
 
-     public CheckList getCheckList() { return new CheckList(checkList); }
-     public void setCheckList(CheckList checkList) { this.checkList = checkList; }
+     public void setListaPecas(List<PecasUsadas> listaPecas) {
+          this.listaPecas = new ArrayList<>(listaPecas);
+     }
+
+     public List<Integer> getCod_reparacoes() {
+          return new ArrayList<>(this.cod_reparacoes);
+     }
+
+     public void setCod_reparacoes(List<Integer> cod_reparacoes) {
+          this.cod_reparacoes = new ArrayList<>(cod_reparacoes);
+     }
+
+     public CheckList getCheckList() {
+          return new CheckList(checkList);
+     }
+
+     public void setCheckList(CheckList checkList) {
+          this.checkList = checkList;
+     }
 
      public void adicionarPecas(List<Stock> pecas) {
           for (Stock stock : pecas) {

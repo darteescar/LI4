@@ -1,6 +1,7 @@
 package app.ecoRideLN.sStock;
 
 public class ItemEncomenda {
+
     private int codPeca;
     private int quantidade;
     private float preco_unitario;
@@ -11,12 +12,27 @@ public class ItemEncomenda {
         this.preco_unitario = preco_unitario;
     }
 
-    public int getCodPeca() { return codPeca; }
-    public void setCodPeca(int codPeca) { this.codPeca = codPeca; }
+    public int getCodPeca() {
+        return codPeca;
+    }
 
-    public int getQuantidade() { return quantidade; }
-    public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
+    public void setCodPeca(int codPeca) {
+        this.codPeca = codPeca;
+    }
 
-    public float getPreco_unitario() { return preco_unitario; }
-    public void setPreco_unitario(float preco_unitario) { this.preco_unitario = preco_unitario; }
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    public float getPreco_unitario() {
+        return preco_unitario;
+    }
+
+    public void setPreco_unitario(float preco_unitario) {
+        this.preco_unitario = preco_unitario;
+    }
 }

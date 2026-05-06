@@ -3,6 +3,7 @@ package app.ecoRideLN.sNotificacoes;
 import java.time.LocalDateTime;
 
 public class Notificacao {
+
      private int id;
      private String descricao;
      private LocalDateTime data_emissao;
@@ -31,25 +32,57 @@ public class Notificacao {
           this.data_horaTratada = data_horaTratada;
      }
 
-     public int getId() { return id; }
-     public void setId(int id) { this.id = id; }
+     public int getId() {
+          return id;
+     }
 
-     public String getDescricao() { return descricao; }
-     public void setDescricao(String descricao) { this.descricao = descricao; }
+     public void setId(int id) {
+          this.id = id;
+     }
 
-     public LocalDateTime getData_emissao() { return data_emissao; }
-     public void setData_emissao(LocalDateTime data_emissao) { this.data_emissao = data_emissao; }
+     public String getDescricao() {
+          return descricao;
+     }
 
-     public int getId_remetente() { return id_remetente; }
-     public void setId_remetente(int id_remetente) { this.id_remetente = id_remetente; }
+     public void setDescricao(String descricao) {
+          this.descricao = descricao;
+     }
 
-     public int getId_destinatario() { return id_destinatario; }
-     public void setId_destinatario(int id_destinatario) { this.id_destinatario = id_destinatario; }
+     public LocalDateTime getData_emissao() {
+          return data_emissao;
+     }
 
-     public EstadoNotificacao getEstado() { return estado; }
+     public void setData_emissao(LocalDateTime data_emissao) {
+          this.data_emissao = data_emissao;
+     }
 
-     public LocalDateTime getData_horaTratada() { return data_horaTratada; }
-     public void setData_horaTratada(LocalDateTime data_horaTratada) { this.data_horaTratada = data_horaTratada; }
+     public int getId_remetente() {
+          return id_remetente;
+     }
+
+     public void setId_remetente(int id_remetente) {
+          this.id_remetente = id_remetente;
+     }
+
+     public int getId_destinatario() {
+          return id_destinatario;
+     }
+
+     public void setId_destinatario(int id_destinatario) {
+          this.id_destinatario = id_destinatario;
+     }
+
+     public EstadoNotificacao getEstado() {
+          return estado;
+     }
+
+     public LocalDateTime getData_horaTratada() {
+          return data_horaTratada;
+     }
+
+     public void setData_horaTratada(LocalDateTime data_horaTratada) {
+          this.data_horaTratada = data_horaTratada;
+     }
 
      public void setNotificacao_lida() {
           this.estado = EstadoNotificacao.LIDA;

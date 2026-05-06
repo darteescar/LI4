@@ -3,6 +3,7 @@ package app.ecoRideLN.sStock;
 import java.time.LocalDateTime;
 
 public class Devolucao {
+
     private int id;
     private LocalDateTime data;
     private String motivo;
@@ -28,21 +29,51 @@ public class Devolucao {
         this.quantidade = quantidade;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public LocalDateTime getData() { return data; }
-    public void setData(LocalDateTime data) { this.data = data; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getMotivo() { return motivo; }
-    public void setMotivo(String motivo) { this.motivo = motivo; }
+    public LocalDateTime getData() {
+        return data;
+    }
 
-    public EstadoDevolucao getEstado() { return estado; }
-    public void setEstado(EstadoDevolucao estado) { this.estado = estado; }
+    public void setData(LocalDateTime data) {
+        this.data = data;
+    }
 
-    public int getCodStock() { return codStock; }
-    public void setCodStock(int codStock) { this.codStock = codStock; }
+    public String getMotivo() {
+        return motivo;
+    }
 
-    public int getQuantidade() { return quantidade; }
-    public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
+
+    public EstadoDevolucao getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoDevolucao estado) {
+        this.estado = estado;
+    }
+
+    public int getCodStock() {
+        return codStock;
+    }
+
+    public void setCodStock(int codStock) {
+        this.codStock = codStock;
+    }
+
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
 }

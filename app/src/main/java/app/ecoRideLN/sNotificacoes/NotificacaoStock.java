@@ -3,6 +3,7 @@ package app.ecoRideLN.sNotificacoes;
 import java.time.LocalDateTime;
 
 public class NotificacaoStock extends Notificacao {
+
      private int id_peca;
 
      public NotificacaoStock(int id, String descricao, int id_remetente, int id_destinatario, int id_peca) {
@@ -15,6 +16,11 @@ public class NotificacaoStock extends Notificacao {
           this.id_peca = id_peca;
      }
 
-     public int getId_peca() { return id_peca; }
-     public void setId_peca(int id_peca) { this.id_peca = id_peca; }
+     public int getId_peca() {
+          return id_peca;
+     }
+
+     public void setId_peca(int id_peca) {
+          this.id_peca = id_peca;
+     }
 }

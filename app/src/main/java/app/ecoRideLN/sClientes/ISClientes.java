@@ -6,34 +6,34 @@ public interface ISClientes {
 
      // ------------------- Cliente -------------------
 
-     Cliente registarCliente(String nome, String email, String telemovel, String nif);
+     public Cliente registarCliente(String nome, String email, String telemovel, String nif);
 
-     void atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
+     public void atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
 
-     Cliente obterCliente(int id);
+     public Cliente obterCliente(int id);
 
-     boolean existeCliente(int id);
+     public boolean existeCliente(int id);
 
-     boolean removerCliente(int id);
+     public boolean removerCliente(int id);
 
-     List<Cliente> obterClientes();
+     public List<Cliente> obterClientes();
 
      // ------------------- Trotinete -------------------
 
-     Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
+     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
 
-     void atualizarTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
+     public void atualizarTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
 
-     Trotinete obterTrotinete(int id);
+     public Trotinete obterTrotinete(int id);
 
-     boolean existeTrotinete(int id);
+     public boolean existeTrotinete(int id);
 
-     boolean removerTrotinete(int id);
+     public boolean removerTrotinete(int id);
 
-     List<Trotinete> obterTrotinetes();
+     public List<Trotinete> obterTrotinetes();
 
      // Utilitários
 
-     List<Trotinete> obterTrotinetes_Cliente(int id);
+     public List<Trotinete> obterTrotinetes_Cliente(int id);
 
 }
