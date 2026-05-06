@@ -55,7 +55,7 @@ public class SClientesFacade implements ISClientes {
      }
 
      @Override
-     public List<Cliente> obterTodosClientes() {
+     public List<Cliente> obterClientes() {
           return new ArrayList<>(clientesDAO.values());
      }
 
@@ -104,7 +104,7 @@ public class SClientesFacade implements ISClientes {
      }
 
      @Override
-     public List<Trotinete> obterTodasTrotinetes() {
+     public List<Trotinete> obterTrotinetes() {
           return new ArrayList<>(trotinetesDAO.values());
      }
 

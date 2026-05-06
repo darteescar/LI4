@@ -16,7 +16,7 @@ public interface ISClientes {
 
      void atualizarDadosCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
 
-     List<Cliente> obterTodosClientes();
+     List<Cliente> obterClientes();
 
      // ------------------- Trotinete -------------------
 
@@ -30,7 +30,7 @@ public interface ISClientes {
 
      void atualizarDadosTrotinete(int id, String modelo, String marca, int num_serie, String tipo_motor);
 
-     List<Trotinete> obterTodasTrotinetes();
+     List<Trotinete> obterTrotinetes();
 
      // ------------------- Consultas cruzadas -------------------
 

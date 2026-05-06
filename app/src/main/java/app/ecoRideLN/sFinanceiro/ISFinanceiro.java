@@ -1,5 +1,6 @@
 package app.ecoRideLN.sFinanceiro;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface ISFinanceiro {
 
      List<MovimentoFinanceiro> obterMovimentosPorIntervalo(LocalDateTime desde, LocalDateTime ate);
 
-     List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(java.time.LocalDate desde, java.time.LocalDate ate, TipoMovimento tipo);
+     List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
 
      // ------------------- Existe / Remove -------------------
 
