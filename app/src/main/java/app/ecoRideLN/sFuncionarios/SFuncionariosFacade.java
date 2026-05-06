@@ -63,7 +63,7 @@ public class SFuncionariosFacade implements ISFuncionarios {
      }
 
      @Override
-     public List<Funcionario> obterTodosFuncionarios(){
+     public List<Funcionario> obterFuncionarios(){
           return funcionarioDAO.values().stream().toList();
      }
 
