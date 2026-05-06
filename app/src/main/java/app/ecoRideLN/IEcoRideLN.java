@@ -68,21 +68,24 @@ public interface IEcoRideLN {
      public boolean   removerTrotinete(int id);
 
      // ------------------- Reparações -------------------
-
+     // feito
      public Reparacao registarReparacao(String nomenclatura, String descricao, float preco);
+     public Reparacao atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade);
      public Reparacao obterReparacao(int id);
      public boolean   existeReparacao(int id);
      public boolean   removerReparacao(int id);
      public List<Reparacao> obterReparacoes();
+     public List<Reparacao> obterReparacoesDisponiveis();
 
      // ------------------- Peças -------------------
-
+     // feito
      public Peca    registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor);
-     public Peca    
+     public Peca    atualizarPeca(int id, String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
      public Peca    obterPeca(int id);
      public boolean existePeca_id(int id);
      public boolean existePeca_ref(String ref);
      public boolean removerPeca(int id);
+     public List<Peca> obterPecas();
 
      // ------------------- Stock -------------------
 

@@ -31,7 +31,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarFornecedor(int id, String nome, String telemovel, String email) {
+     public Fornecedor atualizarFornecedor(int id, String nome, String telemovel, String email) {
           Fornecedor fornecedor = fornecedorDAO.get(id);
           if (fornecedor != null) {
                if (nome != null && !nome.isEmpty())           fornecedor.setNome(nome);
@@ -39,6 +39,7 @@ public class SStockFacade implements ISStock {
                if (email != null && !email.isEmpty())         fornecedor.setEmail(email);
                fornecedorDAO.put(id, fornecedor);
           }
+          return fornecedor;
      }
 
      @Override
@@ -74,7 +75,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
+     public Peca atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
           Peca peca = pecaDAO.get(id);
           if (peca != null) {
                if (referencia != null && !referencia.isEmpty()) peca.setReferencia(referencia);
@@ -86,6 +87,7 @@ public class SStockFacade implements ISStock {
                peca.setAtiva(ativa);
                pecaDAO.put(id, peca);
           }
+          return peca;
      }
 
      @Override
@@ -152,7 +154,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado) {
+     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado) {
           Stock stock = stockDAO.get(id_stock);
           if (stock != null) {
                if (preco_compra >= 0)   stock.setPreco_compra(preco_compra);
@@ -162,6 +164,7 @@ public class SStockFacade implements ISStock {
                if (estado != null)      stock.setEstado(estado);
                stockDAO.put(id_stock, stock);
           }
+          return stock;
      }
 
      @Override
@@ -245,7 +248,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+     public Devolucao atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
           Devolucao devolucao = devolucaoDAO.get(id);
           if (devolucao != null) {
                if (data_devolucao != null)           devolucao.setData(data_devolucao);
@@ -254,6 +257,7 @@ public class SStockFacade implements ISStock {
                if (quantidade >= 0)                 devolucao.setQuantidade(quantidade);
                devolucaoDAO.put(id, devolucao);
           }
+          return devolucao;
      }
 
      @Override
@@ -336,7 +340,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado) {
+     public Encomenda atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado) {
           Encomenda encomenda = encomendaDAO.get(id);
           if (encomenda != null) {
                if (itens != null && !itens.isEmpty()) encomenda.setItensEncomendados(itens);
@@ -345,6 +349,7 @@ public class SStockFacade implements ISStock {
                if (estado != null)       encomenda.setEstado(estado);
                encomendaDAO.put(id, encomenda);
           }
+          return encomenda;
      }
 
      @Override

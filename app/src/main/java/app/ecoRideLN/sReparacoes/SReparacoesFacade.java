@@ -17,7 +17,7 @@ public class SReparacoesFacade implements ISReparacoes {
      }
 
      @Override
-     public void atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade) {
+     public Reparacao atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade) {
           Reparacao reparacao = reparacaoDAO.get(id);
           if (reparacao != null) {
                if (novaNomenclatura != null && !novaNomenclatura.isEmpty()) reparacao.setNomenclatura(novaNomenclatura);
@@ -25,6 +25,7 @@ public class SReparacoesFacade implements ISReparacoes {
                if (novoPreco >= 0)                                           reparacao.setPreco(novoPreco);
                reparacao.setDisponivel(novaDisponibilidade);
                reparacaoDAO.put(id, reparacao);
+               return reparacao;
           } else {
                throw new EcoRideException("Reparação com ID " + id + " não encontrada.");
           }
@@ -57,15 +58,4 @@ public class SReparacoesFacade implements ISReparacoes {
           return reparacaoDAO.values().stream().filter(Reparacao::isDisponivel).toList();
      }
 
-     @Override
-     public void mudarDisponibilidade(int id, boolean novaDisponibilidade) {
-          Reparacao reparacao = reparacaoDAO.get(id);
-          if (reparacao != null) {
-               reparacao.setDisponivel(novaDisponibilidade);
-               reparacaoDAO.put(id, reparacao);
-          } else {
-               throw new EcoRideException("Reparação com ID " + id + " não encontrada");
-          }
-     }
-          
 }

@@ -11,7 +11,7 @@ public interface ISStock {
 
     public Fornecedor registarFornecedor(String nome, String telemovel, String email);
 
-    public void atualizarFornecedor(int id, String nome, String telemovel, String email);
+    public Fornecedor atualizarFornecedor(int id, String nome, String telemovel, String email);
 
     public Fornecedor obterFornecedor(int id);
 
@@ -25,7 +25,7 @@ public interface ISStock {
 
     public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor);
 
-    public void atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
+    public Peca atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
 
     public Peca obterPeca(int id);
 
@@ -49,7 +49,7 @@ public interface ISStock {
 
     public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
 
-    public void atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
+    public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
 
     public void atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie);
 
@@ -73,7 +73,7 @@ public interface ISStock {
 
     public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
 
-    public void atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
+    public Devolucao atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
 
     public void devolverPecas(List<Integer> pecas);
 
@@ -99,7 +99,7 @@ public interface ISStock {
 
     public Encomenda registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
 
-    public void atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
+    public Encomenda atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
 
     public Encomenda obterEncomenda(int id);
 

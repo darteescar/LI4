@@ -242,6 +242,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public Reparacao atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade) {
+        return sReparacoes.atualizarReparacao(id, novaNomenclatura, novaDescricao, novoPreco, novaDisponibilidade);
+    }
+
+    @Override
     public Reparacao obterReparacao(int id) {
         return sReparacoes.obterReparacao(id);
     }
@@ -261,11 +266,21 @@ public class EcoRideLN implements IEcoRideLN {
         return sReparacoes.obterReparacoes();
     }
 
+    @Override
+    public List<Reparacao> obterReparacoesDisponiveis() {
+        return sReparacoes.obterReparacoesDisponiveis();
+    }
+
     // ------------------- Peças -------------------
 
     @Override
     public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
         return sStock.registarPeca(ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor);
+    }
+
+    @Override
+    public Peca atualizarPeca(int id, String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa){
+        return sStock.atualizarPeca(id, ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor, ativa);
     }
 
     @Override
@@ -286,6 +301,11 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public boolean removerPeca(int id) {
         return sStock.removerPeca(id);
+    }
+
+    @Override
+    public List<Peca> obterPecas() {
+        return sStock.obterPecas();
     }
 
     // ------------------- Stock -------------------
