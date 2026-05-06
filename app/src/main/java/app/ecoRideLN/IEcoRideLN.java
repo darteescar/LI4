@@ -93,7 +93,7 @@ public interface IEcoRideLN {
 
      // ------------------- Devoluções -------------------
 
-     public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
+     public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
      public Devolucao obterDevolucao(int id);
      public boolean   existeDevolucao(int id);
      public boolean   removerDevolucao(int id);
@@ -103,10 +103,10 @@ public interface IEcoRideLN {
 
      // ------------------- Encomendas -------------------
 
-     public Encomenda criarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
+     public Encomenda registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
      public Encomenda obterEncomenda(int id);
      public boolean   removerEncomenda(int id);
-     public List<Encomenda> obterTodasEncomendas();
+     public List<Encomenda> obterEncomendas();
      public void marcarEncomendaComoEnviada(int id);
      public void marcarEncomendaComoRecebida(int id);
 

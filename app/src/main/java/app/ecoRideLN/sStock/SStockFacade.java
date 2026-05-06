@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.sStock.DevolucaoDAO;
@@ -108,7 +109,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public List<Peca> obterTodasPecas() {
+     public List<Peca> obterPecas() {
           return new ArrayList<>(pecaDAO.values());
      }
 
@@ -194,9 +195,11 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public List<Stock> obterTodosStocks() {
+     public List<Stock> obterStocks() {
           return new ArrayList<>(stockDAO.values());
      }
+
+     // Utilitários
 
      @Override
      public void atualizaEstadoStock(int id, EstadoStock estado) {
@@ -228,7 +231,7 @@ public class SStockFacade implements ISStock {
      // ------------------- Devolucao -------------------
 
      @Override
-     public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+     public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
           Stock s = stockDAO.get(id_stock);
           if (s == null) throw new EcoRideException("Stock " + id_stock + " não encontrado.");
           if (quantidade <= 0 || quantidade > s.getQuantidade())
@@ -239,6 +242,18 @@ public class SStockFacade implements ISStock {
           Devolucao nova = new Devolucao(id, data_devolucao, motivo, id_stock, quantidade);
           devolucaoDAO.put(id, nova);
           return nova;
+     }
+
+     @Override
+     public void atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+          Devolucao devolucao = devolucaoDAO.get(id);
+          if (devolucao != null) {
+               if (data_devolucao != null)           devolucao.setData(data_devolucao);
+               if (motivo != null && !motivo.isEmpty()) devolucao.setMotivo(motivo);
+               if (id_stock >= 0)                   devolucao.setCodStock(id_stock);
+               if (quantidade >= 0)                 devolucao.setQuantidade(quantidade);
+               devolucaoDAO.put(id, devolucao);
+          }
      }
 
      @Override
@@ -258,11 +273,6 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public List<Devolucao> obterTodasDevolucoes() {
-          return new ArrayList<>(devolucaoDAO.values());
-     }
-
-     @Override
      public boolean existeDevolucao(int id) {
           return devolucaoDAO.containsKey(id);
      }
@@ -273,15 +283,8 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, EstadoDevolucao estado) {
-          Devolucao devolucao = devolucaoDAO.get(id);
-          if (devolucao != null) {
-               if (data_devolucao != null)           devolucao.setData(data_devolucao);
-               if (motivo != null && !motivo.isEmpty()) devolucao.setMotivo(motivo);
-               if (id_stock >= 0)                   devolucao.setCodStock(id_stock);
-               if (estado != null)                  devolucao.setEstado(estado);
-               devolucaoDAO.put(id, devolucao);
-          }
+     public List<Devolucao> obterDevolucoes() {
+          return new ArrayList<>(devolucaoDAO.values());
      }
 
      @Override
@@ -325,18 +328,23 @@ public class SStockFacade implements ISStock {
      // ------------------- Encomenda -------------------
 
      @Override
-     public int quantidade_encomendar_peca(int id_peca) {
-          Peca peca = pecaDAO.get(id_peca);
-          if (peca == null) return 0;
-          return Math.max(0, peca.getStock_minimo() - obter_quantidade_Stock_Peca_id(id_peca));
-     }
-
-     @Override
-     public Encomenda criarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor) {
+     public Encomenda registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor) {
           int id = encomendaDAO.generateNewId();
           Encomenda encomenda = new Encomenda(id, cod_fornecedor, itens);
           encomendaDAO.put(id, encomenda);
           return encomenda;
+     }
+
+     @Override
+     public void atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado) {
+          Encomenda encomenda = encomendaDAO.get(id);
+          if (encomenda != null) {
+               if (itens != null && !itens.isEmpty()) encomenda.setItensEncomendados(itens);
+               if (data_pedido != null)  encomenda.setData_criacao(data_pedido);
+               if (data_chegada != null) encomenda.setData_rececao(data_chegada);
+               if (estado != null)       encomenda.setEstado(estado);
+               encomendaDAO.put(id, encomenda);
+          }
      }
 
      @Override
@@ -345,32 +353,16 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public List<Encomenda> obterTodasEncomendas() {
-          return new ArrayList<>(encomendaDAO.values());
-     }
-
-     @Override
-     public List<Encomenda> obterEncomendasPorEstado(EstadoEncomenda estado) {
-          return encomendaDAO.values().stream()
-                    .filter(e -> e.getEstado() == estado)
-                    .toList();
-     }
-
-     @Override
-     public void adicionar_PecasEncomenda_Stock(int idEncomenda, List<ItemEncomenda> itens) {
-          Encomenda encomenda = encomendaDAO.get(idEncomenda);
-          if (encomenda != null) {
-               List<ItemEncomenda> itensAtuais = encomenda.getItensEncomendados();
-               itensAtuais.addAll(itens);
-               encomenda.setItensEncomendados(itensAtuais);
-               encomendaDAO.put(idEncomenda, encomenda);
-          }
-     }
-
-     @Override
      public boolean removerEncomenda(int id) {
           return encomendaDAO.remove(id) != null;
      }
+
+     @Override
+     public List<Encomenda> obterEncomendas() {
+          return new ArrayList<>(encomendaDAO.values());
+     }
+
+     // Utilitários
 
      @Override
      public void marcarEncomendaComoEnviada(int id) {
@@ -385,7 +377,7 @@ public class SStockFacade implements ISStock {
      @Override
      public void marcarEncomendaComoRecebida(int id) {
           Encomenda e = encomendaDAO.get(id);
-          if (e != null) {
+          if (e != null && e.getEstado() == EstadoEncomenda.RASCUNHO) {
                List<Integer> novosStocks = new ArrayList<>();
                for (ItemEncomenda item : e.getItensEncomendados()) {
                     int idStock = stockDAO.generateNewId();
@@ -407,14 +399,24 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado) {
-          Encomenda encomenda = encomendaDAO.get(id);
-          if (encomenda != null) {
-               if (itens != null && !itens.isEmpty()) encomenda.setItensEncomendados(itens);
-               if (data_pedido != null)  encomenda.setData_criacao(data_pedido);
-               if (data_chegada != null) encomenda.setData_rececao(data_chegada);
-               if (estado != null)       encomenda.setEstado(estado);
-               encomendaDAO.put(id, encomenda);
-          }
+     public int quantidade_encomendar_peca(int id_peca) {
+          Peca peca = pecaDAO.get(id_peca);
+          if (peca == null) return 0;
+          return Math.max(0, peca.getStock_minimo() - obter_quantidade_Stock_Peca_id(id_peca));
      }
+
+     @Override
+     public Map<Integer, List<ItemEncomenda>> gerarListaAutomatica(){
+          Map<Integer, List<ItemEncomenda>> listaAutomatica = new java.util.HashMap<>();
+          for (Peca p : pecaDAO.values()) {
+               int quantidadeNecessaria = quantidade_encomendar_peca(p.getId());
+               if (quantidadeNecessaria > 0) {
+                    ItemEncomenda item = new ItemEncomenda(p.getId(), quantidadeNecessaria, p.getPreco_venda());
+                    listaAutomatica.computeIfAbsent(p.getCodFornecedor(), k -> new ArrayList<>()).add(item);
+               }
+          }
+          return listaAutomatica;
+     }
+
+
 }

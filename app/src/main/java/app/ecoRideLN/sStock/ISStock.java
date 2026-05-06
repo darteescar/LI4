@@ -3,6 +3,7 @@ package app.ecoRideLN.sStock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface ISStock {
 
@@ -23,7 +24,10 @@ public interface ISStock {
      boolean existePeca_id(int id);
      boolean existePeca_ref(String ref);
      boolean removerPeca(int id);
-     List<Peca> obterTodasPecas();
+     List<Peca> obterPecas();
+
+     // Utilitários
+
      int     obter_quantidade_Stock_Peca_id(int id);
      List<Integer> obter_Pecas_baixo_Stock_minimo();
 
@@ -36,20 +40,26 @@ public interface ISStock {
      Stock   obterStock(int id);
      boolean existeStock(int id);
      boolean removerStock(int id);
-     List<Stock> obterTodosStocks();
+     List<Stock> obterStocks();
+
+     // Utilitários
+
      void    atualizaEstadoStock(int id, EstadoStock estado);
      int     pecasDefeituosas_Stock(int id_peca);
      void    registar_Defeito_entradaStock(int id_Stock);
 
      // ------------------- Devolucao -------------------
 
-     Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
+     Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
+     void      atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
      void      devolverPecas(List<Integer> pecas);
      Devolucao obterDevolucao(int id);
-     List<Devolucao> obterTodasDevolucoes();
      boolean   existeDevolucao(int id);
      boolean   removerDevolucao(int id);
-     void      atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, EstadoDevolucao estado);
+     List<Devolucao> obterDevolucoes();
+
+     // Utilitários
+
      boolean   validaEstadoDevolucao_PendenteDevolucao(int id);
      void      marcarDevolucaoComoEnviada(int id);
      void      marcarDevolucaoComoDevolvida(int id);
@@ -57,15 +67,17 @@ public interface ISStock {
 
      // ------------------- Encomenda -------------------
 
-     int       quantidade_encomendar_peca(int id_peca);
-     Encomenda criarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
+     Encomenda registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
+     void      atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
      Encomenda obterEncomenda(int id);
-     List<Encomenda> obterTodasEncomendas();
-     List<Encomenda> obterEncomendasPorEstado(EstadoEncomenda estado);
-     void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<ItemEncomenda> itens);
      boolean   removerEncomenda(int id);
+     List<Encomenda> obterEncomendas();
+
+     // Utilitários
+
      void      marcarEncomendaComoEnviada(int id);
      void      marcarEncomendaComoRecebida(int id);
      boolean   validaEncomenda_Rascunho(int id_Encomenda);
-     void      atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
+     int       quantidade_encomendar_peca(int id_peca);
+     public Map<Integer, List<ItemEncomenda>> gerarListaAutomatica();
 }

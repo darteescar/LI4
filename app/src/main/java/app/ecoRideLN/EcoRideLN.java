@@ -36,8 +36,8 @@ import app.ecoRideLN.sReparacoes.SReparacoesFacade;
 import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
-import app.ecoRideLN.sStock.ItemEncomenda;
 import app.ecoRideLN.sStock.ISStock;
+import app.ecoRideLN.sStock.ItemEncomenda;
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.SStockFacade;
 import app.ecoRideLN.sStock.Stock;
@@ -318,8 +318,8 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Devoluções -------------------
 
     @Override
-    public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
-        return sStock.criarDevolucao(data_devolucao, motivo, id_stock, quantidade);
+    public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+        return sStock.registarDevolucao(data_devolucao, motivo, id_stock, quantidade);
     }
 
     @Override
@@ -355,8 +355,8 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Encomendas -------------------
 
     @Override
-    public Encomenda criarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor) {
-        return sStock.criarEncomenda(itens, cod_fornecedor);
+    public Encomenda registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor) {
+        return sStock.registarEncomenda(itens, cod_fornecedor);
     }
 
     @Override
@@ -370,8 +370,8 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public List<Encomenda> obterTodasEncomendas() {
-        return sStock.obterTodasEncomendas();
+    public List<Encomenda> obterEncomendas() {
+        return sStock.obterEncomendas();
     }
 
     @Override
