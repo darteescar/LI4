@@ -134,11 +134,12 @@ CREATE TABLE IF NOT EXISTS Stock (
 );
 
 CREATE TABLE IF NOT EXISTS Devolucao (
-    id       INT          NOT NULL,
-    data     DATETIME     NOT NULL,
-    motivo   VARCHAR(255),
-    estado   ENUM('PendenteDevolucao', 'Devolvida', 'Invalida') NOT NULL,
-    codStock INT          NOT NULL,
+    id         INT          NOT NULL,
+    data       DATETIME     NOT NULL,
+    motivo     VARCHAR(255),
+    estado     ENUM('PendenteDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
+    codStock   INT          NOT NULL,
+    quantidade INT          NOT NULL DEFAULT 1,
     PRIMARY KEY (id),
     FOREIGN KEY (codStock) REFERENCES Stock(id)
 );
@@ -157,6 +158,19 @@ CREATE TABLE IF NOT EXISTS Encomenda (
     FOREIGN KEY (codFornecedor) REFERENCES Fornecedor(id)
 );
 
+-- Itens encomendados (o que foi pedido ao fornecedor)
+CREATE TABLE IF NOT EXISTS Encomenda_Item (
+    idEncomenda    INT   NOT NULL,
+    ordem          INT   NOT NULL,
+    codPeca        INT   NOT NULL,
+    quantidade     INT   NOT NULL,
+    preco_unitario FLOAT NOT NULL,
+    PRIMARY KEY (idEncomenda, ordem),
+    FOREIGN KEY (idEncomenda) REFERENCES Encomenda(id) ON DELETE CASCADE,
+    FOREIGN KEY (codPeca)     REFERENCES Peca(id)
+);
+
+-- Entradas de stock geradas ao marcar a encomenda como recebida
 CREATE TABLE IF NOT EXISTS Encomenda_EntradaStock (
     idEncomenda INT NOT NULL,
     ordem       INT NOT NULL,

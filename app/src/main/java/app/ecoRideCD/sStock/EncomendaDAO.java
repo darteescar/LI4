@@ -19,6 +19,7 @@ import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.EstadoEncomenda;
+import app.ecoRideLN.sStock.ItemEncomenda;
 
 
 public class EncomendaDAO implements Map<Integer, Encomenda> {
@@ -30,6 +31,19 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
      public static EncomendaDAO getInstance() {
           if (instance == null) instance = new EncomendaDAO();
           return instance;
+     }
+
+     private List<ItemEncomenda> loadItens(Connection c, int idEncomenda) throws SQLException {
+          List<ItemEncomenda> out = new ArrayList<>();
+          String sql = "SELECT codPeca, quantidade, preco_unitario FROM Encomenda_Item WHERE idEncomenda = ? ORDER BY ordem";
+          try (PreparedStatement ps = c.prepareStatement(sql)) {
+               ps.setInt(1, idEncomenda);
+               try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next())
+                         out.add(new ItemEncomenda(rs.getInt("codPeca"), rs.getInt("quantidade"), rs.getFloat("preco_unitario")));
+               }
+          }
+          return out;
      }
 
      private List<Integer> loadEntradasStock(Connection c, int idEncomenda) throws SQLException {
@@ -53,6 +67,7 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                     rs.getTimestamp("data_rececao") != null ? rs.getTimestamp("data_rececao").toLocalDateTime() : null,
                     rs.getTimestamp("data_envio") != null ? rs.getTimestamp("data_envio").toLocalDateTime() : null,
                     EstadoEncomenda.valueOf(rs.getString("estado")),
+                    loadItens(c, id),
                     loadEntradasStock(c, id)
           );
      }
@@ -73,6 +88,31 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                ps.setTimestamp(5, value.getData_envio() != null ? Timestamp.valueOf(value.getData_envio()) : null);
                ps.setString(6, value.getEstado().name());
                ps.executeUpdate();
+          }
+     }
+
+     private void clearItens(Connection c, int idEncomenda) throws SQLException {
+          try (PreparedStatement ps = c.prepareStatement(
+                    "DELETE FROM Encomenda_Item WHERE idEncomenda = ?")) {
+               ps.setInt(1, idEncomenda);
+               ps.executeUpdate();
+          }
+     }
+
+     private void insertItens(Connection c, int idEncomenda, List<ItemEncomenda> itens) throws SQLException {
+          if (itens == null || itens.isEmpty()) return;
+          try (PreparedStatement ps = c.prepareStatement(
+                    "INSERT INTO Encomenda_Item (idEncomenda, ordem, codPeca, quantidade, preco_unitario) VALUES (?, ?, ?, ?, ?)")) {
+               for (int i = 0; i < itens.size(); i++) {
+                    ItemEncomenda item = itens.get(i);
+                    ps.setInt(1, idEncomenda);
+                    ps.setInt(2, i);
+                    ps.setInt(3, item.getCodPeca());
+                    ps.setInt(4, item.getQuantidade());
+                    ps.setFloat(5, item.getPreco_unitario());
+                    ps.addBatch();
+               }
+               ps.executeBatch();
           }
      }
 
@@ -151,6 +191,8 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                c.setAutoCommit(false);
                try {
                     upsertBase(c, key, value);
+                    clearItens(c, key);
+                    insertItens(c, key, value.getItensEncomendados());
                     clearEntradas(c, key);
                     insertEntradas(c, key, value.getCodEntradasStock());
                     c.commit();

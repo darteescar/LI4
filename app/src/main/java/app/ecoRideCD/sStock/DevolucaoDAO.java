@@ -38,7 +38,8 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
                 rs.getTimestamp("data").toLocalDateTime(),
                 rs.getString("motivo"),
                 EstadoDevolucao.valueOf(rs.getString("estado")),
-                rs.getInt("codStock"));
+                rs.getInt("codStock"),
+                rs.getInt("quantidade"));
     }
 
     @Override
@@ -84,7 +85,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
         if (!(key instanceof Integer id)) {
             return null;
         }
-        String sql = "SELECT id, data, motivo, estado, codStock FROM Devolucao WHERE id = ?";
+        String sql = "SELECT id, data, motivo, estado, codStock, quantidade FROM Devolucao WHERE id = ?";
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -99,11 +100,11 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
     public Devolucao put(Integer key, Devolucao value) {
         Devolucao prev = get(key);
         String sql = """
-                INSERT INTO Devolucao (id, data, motivo, estado, codStock)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO Devolucao (id, data, motivo, estado, codStock, quantidade)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     data = VALUES(data), motivo = VALUES(motivo),
-                    estado = VALUES(estado), codStock = VALUES(codStock)
+                    estado = VALUES(estado), codStock = VALUES(codStock), quantidade = VALUES(quantidade)
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
@@ -111,6 +112,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
             ps.setString(3, value.getMotivo());
             ps.setString(4, value.getEstado().name());
             ps.setInt(5, value.getCodStock());
+            ps.setInt(6, value.getQuantidade());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar devolucao " + key, e);
@@ -166,7 +168,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
     @Override
     public Collection<Devolucao> values() {
         Set<Devolucao> out = new LinkedHashSet<>();
-        String sql = "SELECT id, data, motivo, estado, codStock FROM Devolucao";
+        String sql = "SELECT id, data, motivo, estado, codStock, quantidade FROM Devolucao";
         try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
             while (rs.next()) {
                 out.add(buildFromRow(rs));

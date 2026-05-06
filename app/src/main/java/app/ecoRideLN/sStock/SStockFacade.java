@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.common.EcoRideException;
 import app.ecoRideCD.sStock.DevolucaoDAO;
 import app.ecoRideCD.sStock.EncomendaDAO;
 import app.ecoRideCD.sStock.FornecedorDAO;
@@ -227,9 +228,15 @@ public class SStockFacade implements ISStock {
      // ------------------- Devolucao -------------------
 
      @Override
-     public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock) {
+     public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+          Stock s = stockDAO.get(id_stock);
+          if (s == null) throw new EcoRideException("Stock " + id_stock + " não encontrado.");
+          if (quantidade <= 0 || quantidade > s.getQuantidade())
+               throw new EcoRideException("Quantidade inválida para devolução: " + quantidade + " (disponível: " + s.getQuantidade() + ").");
+          s.setQuantidade(s.getQuantidade() - quantidade);
+          stockDAO.put(id_stock, s);
           int id = devolucaoDAO.generateNewId();
-          Devolucao nova = new Devolucao(id, data_devolucao, motivo, id_stock);
+          Devolucao nova = new Devolucao(id, data_devolucao, motivo, id_stock, quantidade);
           devolucaoDAO.put(id, nova);
           return nova;
      }
@@ -305,6 +312,11 @@ public class SStockFacade implements ISStock {
      public void marcarDevolucaoComoInvalida(int id) {
           Devolucao d = devolucaoDAO.get(id);
           if (d != null) {
+               Stock s = stockDAO.get(d.getCodStock());
+               if (s != null) {
+                    s.setQuantidade(s.getQuantidade() + d.getQuantidade());
+                    stockDAO.put(d.getCodStock(), s);
+               }
                d.setEstado(EstadoDevolucao.Invalida);
                devolucaoDAO.put(id, d);
           }
@@ -320,9 +332,9 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor) {
+     public Encomenda criarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor) {
           int id = encomendaDAO.generateNewId();
-          Encomenda encomenda = new Encomenda(id, cod_fornecedor, pecas.stream().map(Stock::getId).toList());
+          Encomenda encomenda = new Encomenda(id, cod_fornecedor, itens);
           encomendaDAO.put(id, encomenda);
           return encomenda;
      }
@@ -345,11 +357,12 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void adicionar_PecasEncomenda_Stock(int idEncomenda, List<Stock> pecas) {
+     public void adicionar_PecasEncomenda_Stock(int idEncomenda, List<ItemEncomenda> itens) {
           Encomenda encomenda = encomendaDAO.get(idEncomenda);
           if (encomenda != null) {
-               List<Integer> codPecasEncomenda = encomenda.getCodEntradasStock();
-               codPecasEncomenda.addAll(pecas.stream().map(Stock::getId).toList());
+               List<ItemEncomenda> itensAtuais = encomenda.getItensEncomendados();
+               itensAtuais.addAll(itens);
+               encomenda.setItensEncomendados(itensAtuais);
                encomendaDAO.put(idEncomenda, encomenda);
           }
      }
@@ -373,8 +386,16 @@ public class SStockFacade implements ISStock {
      public void marcarEncomendaComoRecebida(int id) {
           Encomenda e = encomendaDAO.get(id);
           if (e != null) {
+               List<Integer> novosStocks = new ArrayList<>();
+               for (ItemEncomenda item : e.getItensEncomendados()) {
+                    int idStock = stockDAO.generateNewId();
+                    Stock novoStock = new Stock(idStock, item.getPreco_unitario(), item.getCodPeca(), LocalDateTime.now(), item.getQuantidade());
+                    stockDAO.put(idStock, novoStock);
+                    novosStocks.add(idStock);
+               }
                e.setEstado(EstadoEncomenda.RECEBIDA);
                e.setData_rececao(LocalDateTime.now());
+               e.setCodEntradasStock(novosStocks);
                encomendaDAO.put(id, e);
           }
      }
@@ -386,14 +407,10 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public void atualizarEncomenda(int id, List<Stock> pecas, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado) {
+     public void atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado) {
           Encomenda encomenda = encomendaDAO.get(id);
           if (encomenda != null) {
-               if (pecas != null && !pecas.isEmpty()) {
-                    List<Integer> cods = encomenda.getCodEntradasStock();
-                    cods.clear();
-                    cods.addAll(pecas.stream().map(Stock::getId).toList());
-               }
+               if (itens != null && !itens.isEmpty()) encomenda.setItensEncomendados(itens);
                if (data_pedido != null)  encomenda.setData_criacao(data_pedido);
                if (data_chegada != null) encomenda.setData_rececao(data_chegada);
                if (estado != null)       encomenda.setEstado(estado);

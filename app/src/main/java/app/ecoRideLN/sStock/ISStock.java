@@ -43,7 +43,7 @@ public interface ISStock {
 
      // ------------------- Devolucao -------------------
 
-     Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock);
+     Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
      void      devolverPecas(List<Integer> pecas);
      Devolucao obterDevolucao(int id);
      List<Devolucao> obterTodasDevolucoes();
@@ -58,14 +58,14 @@ public interface ISStock {
      // ------------------- Encomenda -------------------
 
      int       quantidade_encomendar_peca(int id_peca);
-     Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor);
+     Encomenda criarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
      Encomenda obterEncomenda(int id);
      List<Encomenda> obterTodasEncomendas();
      List<Encomenda> obterEncomendasPorEstado(EstadoEncomenda estado);
-     void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<Stock> pecas);
+     void      adicionar_PecasEncomenda_Stock(int idEncomenda, List<ItemEncomenda> itens);
      boolean   removerEncomenda(int id);
      void      marcarEncomendaComoEnviada(int id);
      void      marcarEncomendaComoRecebida(int id);
      boolean   validaEncomenda_Rascunho(int id_Encomenda);
-     void      atualizarEncomenda(int id, List<Stock> pecas, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
+     void      atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
 }

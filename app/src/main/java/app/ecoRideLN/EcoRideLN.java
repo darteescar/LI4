@@ -22,11 +22,13 @@ import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sNotificacoes.NotificacaoOS;
 import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
+import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sOrdensServico.PecasOrcamento;
+import app.ecoRideLN.sOrdensServico.PecasUsadas;
 import app.ecoRideLN.sOrdensServico.SOrdensServicoFacade;
 import app.ecoRideLN.sReparacoes.ISReparacoes;
 import app.ecoRideLN.sReparacoes.Reparacao;
@@ -34,6 +36,7 @@ import app.ecoRideLN.sReparacoes.SReparacoesFacade;
 import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
+import app.ecoRideLN.sStock.ItemEncomenda;
 import app.ecoRideLN.sStock.ISStock;
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.SStockFacade;
@@ -122,17 +125,64 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao) {
-        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, reparacoes, descricao);
+        List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
+        float orcamento = 0;
+        for (Reparacao r : reparacoes) orcamento += r.getPreco();
+        for (PecasOrcamento po : listPecas) {
+            Peca p = sStock.obterPeca(po.getCodPeca());
+            if (p != null) orcamento += po.getQuantidade() * p.getPreco_venda();
+        }
+        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, codReps, orcamento, descricao);
     }
 
     @Override
     public void registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes) {
-        sOrdensServico.registarConsertoOS(id_OS, pecas, reparacoes);
+        List<PecasUsadas> pecasUsadas = pecas.stream()
+            .map(s -> new PecasUsadas(s.getQuantidade(), s.getId()))
+            .collect(java.util.stream.Collectors.toList());
+        List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
+        float orcamento = 0;
+        for (Reparacao r : reparacoes) orcamento += r.getPreco();
+        for (Stock s : pecas) {
+            Peca p = sStock.obterPeca(s.getCodPeca());
+            if (p != null) orcamento += s.getQuantidade() * p.getPreco_venda();
+        }
+        sOrdensServico.registarConsertoOS(id_OS, pecasUsadas, codReps, orcamento);
     }
 
     @Override
     public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
         sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
+    }
+
+    @Override
+    public boolean clienteTemApenasUmPagamentoPendente(int id) {
+        long count = sOrdensServico.obterTodasOSs().stream()
+            .filter(os -> os.getCodCliente() == id && os.getEstado() == app.ecoRideLN.sOrdensServico.EstadoOS.PendentePagamento)
+            .count();
+        return count <= 1;
+    }
+
+    @Override
+    public List<OrdemServico> obterOSs_Cliente(int id) {
+        return sOrdensServico.obterTodasOSs().stream()
+            .filter(os -> os.getCodCliente() == id)
+            .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public List<OrdemServico> obterOS_Trotinete(int id_trotinete) {
+        return sOrdensServico.obterTodasOSs().stream()
+            .filter(os -> os.getCodTrotinete() == id_trotinete)
+            .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public List<Conserto> obterConsertosAnteriores(int id_trotinete) {
+        return sOrdensServico.obterTodasOSs().stream()
+            .filter(os -> os.getCodTrotinete() == id_trotinete && os.getConserto() != null)
+            .map(OrdemServico::getConserto)
+            .collect(java.util.stream.Collectors.toList());
     }
 
     // ------------------- Clientes -------------------
@@ -159,7 +209,7 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<Cliente> obterClientes() {
-        return sClientes.obterTodosClientes();
+        return sClientes.obterClientes();
     }
 
     // ------------------- Trotinetes -------------------
@@ -208,7 +258,7 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<Reparacao> obterReparacoes() {
-        return sReparacoes.obterTodasReparacoes();
+        return sReparacoes.obterReparacoes();
     }
 
     // ------------------- Peças -------------------
@@ -268,8 +318,8 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Devoluções -------------------
 
     @Override
-    public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock) {
-        return sStock.criarDevolucao(data_devolucao, motivo, id_stock);
+    public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+        return sStock.criarDevolucao(data_devolucao, motivo, id_stock, quantidade);
     }
 
     @Override
@@ -305,8 +355,8 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Encomendas -------------------
 
     @Override
-    public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor) {
-        return sStock.criarEncomenda(pecas, cod_fornecedor);
+    public Encomenda criarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor) {
+        return sStock.criarEncomenda(itens, cod_fornecedor);
     }
 
     @Override
@@ -408,7 +458,7 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Cross-cutting -------------------
 
     private boolean pecasDiagnosticoDisponiveisReparacao(int id_OS) {
-        List<PecasOrcamento> pecas = sOrdensServico.obterPecasQuantidadeDiagnosticoOS(id_OS);
+        List<PecasOrcamento> pecas = sOrdensServico.obterPecasDiagnosticoOS(id_OS);
         for (PecasOrcamento po : pecas) {
             if (sStock.obter_quantidade_Stock_Peca_id(po.getCodPeca()) < po.getQuantidade()) {
                 return false;
