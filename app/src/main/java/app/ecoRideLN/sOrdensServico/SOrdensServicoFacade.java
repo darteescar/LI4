@@ -269,17 +269,6 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     // ------------------- Utilitários -------------------
-    @Override
-    public boolean clienteTemApenasUmPagamentoPendente(int id) {
-        List<OrdemServico> osList = ordemServicoDAO.getOSDoCliente(id);
-        int numero = 0;
-        for (OrdemServico os : osList) {
-            if (os.getEstado() == EstadoOS.PendentePagamento) {
-                numero++;
-            }
-        }
-        return numero == 1;
-    }
 
     @Override
     public float calcularOrcamento(List<PecasOrcamento> listaPecas, List<Reparacao> reparacoes) {

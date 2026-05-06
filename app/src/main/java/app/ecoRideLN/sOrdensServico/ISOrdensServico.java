@@ -72,8 +72,6 @@ public interface ISOrdensServico {
 
      // ------------------- Utilitários -------------------
 
-     boolean clienteTemApenasUmPagamentoPendente(int id);
-
      float calcularOrcamento(List<PecasOrcamento> listaPecas, List<Reparacao> reparacoes);
 
      boolean validarFotografia(Fotografia foto);

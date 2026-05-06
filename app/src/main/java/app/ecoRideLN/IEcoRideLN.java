@@ -48,6 +48,7 @@ public interface IEcoRideLN {
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOS_Trotinete(int id_trotinete);
      public List<Conserto> obterConsertosAnteriores(int id_trotinete);
+     boolean clienteTemApenasUmPagamentoPendente(int id);
 
 
      // ------------------- Clientes -------------------
