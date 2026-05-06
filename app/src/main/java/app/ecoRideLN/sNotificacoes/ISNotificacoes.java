@@ -4,27 +4,21 @@ import java.util.List;
 
 public interface ISNotificacoes {
 
-     // ------------------- Registo -------------------
+     NotificacaoOS registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
 
-     NotificacaoOS    criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
-
-     NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
-
-     // ------------------- Consulta -------------------
+     NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
 
      Notificacao obterNotificacao(int id);
 
+     boolean removerNotificacao(int id);
+
      List<Notificacao> obterNotificacoes();
+
+     // Utilitários
 
      List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
 
      List<Notificacao> obterNotificacoesNaoTratadas(int id_destinatario);
-
-     // ------------------- Remove -------------------
-
-     boolean removerNotificacao(int id);
-
-     // ------------------- Atualização -------------------
 
      boolean sinalizarNotificacao_comoTratada(int id);
 

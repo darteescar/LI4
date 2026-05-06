@@ -8,10 +8,8 @@ import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
 public class SNotificacoesFacade implements ISNotificacoes {
      private final NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
 
-     // ------------------- Registo -------------------
-
      @Override
-     public NotificacaoOS criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
+     public NotificacaoOS registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
           int id = notificacaoDAO.generateNewId();
           NotificacaoOS notificacao = new NotificacaoOS(id, descricao, id_remetente, id_destinatario, id_os);
           notificacaoDAO.put(id, notificacao);
@@ -19,14 +17,12 @@ public class SNotificacoesFacade implements ISNotificacoes {
      }
 
      @Override
-     public NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
+     public NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
           int id = notificacaoDAO.generateNewId();
           NotificacaoStock notificacao = new NotificacaoStock(id, descricao, id_remetente, id_destinatario, id_peca);
           notificacaoDAO.put(id, notificacao);
           return notificacao;
      }
-
-     // ------------------- Consulta -------------------
 
      @Override
      public Notificacao obterNotificacao(int id) {
@@ -34,9 +30,16 @@ public class SNotificacoesFacade implements ISNotificacoes {
      }
 
      @Override
+     public boolean removerNotificacao(int id) {
+          return notificacaoDAO.remove(id) != null;
+     }
+
+     @Override
      public List<Notificacao> obterNotificacoes() {
           return new ArrayList<>(notificacaoDAO.values());
      }
+
+     // Utilitários
 
      @Override
      public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario) {
@@ -47,15 +50,6 @@ public class SNotificacoesFacade implements ISNotificacoes {
      public List<Notificacao> obterNotificacoesNaoTratadas(int id_destinatario) {
           return notificacaoDAO.getUntreatedByDestinatario(id_destinatario);
      }
-
-     // ------------------- Remove -------------------
-
-     @Override
-     public boolean removerNotificacao(int id) {
-          return notificacaoDAO.remove(id) != null;
-     }
-
-     // ------------------- Atualização -------------------
 
      @Override
      public boolean sinalizarNotificacao_comoTratada(int id) {

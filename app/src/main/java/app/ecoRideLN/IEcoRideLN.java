@@ -28,8 +28,8 @@ public interface IEcoRideLN {
 
      // ------------------- Notificações -------------------
 
-     public NotificacaoOS    criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
-     public NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
+     public NotificacaoOS    registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
+     public NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
      public Notificacao      obterNotificacao(int id);
      public boolean          removerNotificacao(int id);
      public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);

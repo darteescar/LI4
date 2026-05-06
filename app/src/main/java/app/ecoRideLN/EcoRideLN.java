@@ -64,13 +64,13 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Notificações -------------------
 
     @Override
-    public NotificacaoOS criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
-        return sNotificacoes.criarNotificacaoOS(descricao, id_remetente, id_destinatario, id_os);
+    public NotificacaoOS registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
+        return sNotificacoes.registarNotificacaoOS(descricao, id_remetente, id_destinatario, id_os);
     }
 
     @Override
-    public NotificacaoStock criarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
-        return sNotificacoes.criarNotificacaoStock(descricao, id_remetente, id_destinatario, id_peca);
+    public NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
+        return sNotificacoes.registarNotificacaoStock(descricao, id_remetente, id_destinatario, id_peca);
     }
 
     @Override
