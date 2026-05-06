@@ -11,6 +11,7 @@ import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.ISClientes;
 import app.ecoRideLN.sClientes.SClientesFacade;
 import app.ecoRideLN.sClientes.Trotinete;
+import app.ecoRideLN.sFinanceiro.AnaliseFinanceira;
 import app.ecoRideLN.sFinanceiro.ISFinanceiro;
 import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
 import app.ecoRideLN.sFinanceiro.SFinanceiroFacade;
@@ -507,6 +508,11 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo) {
         return sFinanceiro.obterMovimentosFinanceirosFiltrados(desde, ate, tipo);
+    }
+
+    @Override
+    public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos){
+        return sFinanceiro.calcularAnaliseFinanceira(movimentos);
     }
 
     // ------------------- Cross-cutting -------------------

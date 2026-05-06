@@ -18,10 +18,6 @@ public interface ISFinanceiro {
 
      public List<MovimentoFinanceiro> obterMovimentos();
 
-     public List<MovimentoFinanceiro> obterMovimentosPorTipo(TipoMovimento tipo);
-
-     public List<MovimentoFinanceiro> obterMovimentosPorIntervalo(LocalDateTime desde, LocalDateTime ate);
-
      public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
 
      // ------------------- Existe / Remove -------------------
@@ -36,5 +32,5 @@ public interface ISFinanceiro {
 
      // ------------------- Cálculos -------------------
 
-     public float calcularSaldoTotal();
+     public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos);
 }

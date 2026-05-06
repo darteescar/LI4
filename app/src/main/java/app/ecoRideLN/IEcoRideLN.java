@@ -7,6 +7,7 @@ import java.util.Map;
 
 import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.Trotinete;
+import app.ecoRideLN.sFinanceiro.AnaliseFinanceira;
 import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
 import app.ecoRideLN.sFinanceiro.TipoMovimento;
 import app.ecoRideLN.sFuncionarios.Funcionario;
@@ -109,13 +110,13 @@ public interface IEcoRideLN {
      public void      marcarDevolucaoComoInvalida(int id);
 
      // ------------------- Encomendas -------------------
-
-     public Encomenda         registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
-     public Encomenda         obterEncomenda(int id);
-     public boolean           removerEncomenda(int id);
-     public List<Encomenda>   obterEncomendas();
-     public void              marcarEncomendaComoEnviada(int id);
-     public void              marcarEncomendaComoRecebida(int id);
+     // feito
+     public Encomenda                         registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
+     public Encomenda                         obterEncomenda(int id);
+     public boolean                           removerEncomenda(int id);
+     public List<Encomenda>                   obterEncomendas();
+     public void                              marcarEncomendaComoEnviada(int id);
+     public void                              marcarEncomendaComoRecebida(int id);
      public Map<Integer, List<ItemEncomenda>> gerarListaAutomatica();
 
      // ------------------- Fornecedores -------------------
@@ -128,7 +129,7 @@ public interface IEcoRideLN {
      public List<Fornecedor> obterFornecedores();
 
      // ------------------- Funcionários -------------------
-
+     // feito
      public Funcionario       registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
      public Funcionario       atualizarFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal);
      public Funcionario       obterFuncionario(int id);
@@ -142,4 +143,7 @@ public interface IEcoRideLN {
 
      public List<MovimentoFinanceiro> obterMovimentosFinanceiros();
      public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
+     public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos);
+
+
 }

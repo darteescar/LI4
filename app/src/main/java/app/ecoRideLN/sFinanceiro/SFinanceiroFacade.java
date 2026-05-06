@@ -3,6 +3,8 @@ package app.ecoRideLN.sFinanceiro;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.javatuples.Pair;
+
 import app.common.EcoRideException;
 import app.ecoRideCD.sFinanceiro.MovimentoFinanceiroDAO;
 
@@ -40,20 +42,6 @@ public class SFinanceiroFacade implements ISFinanceiro {
      @Override
      public List<MovimentoFinanceiro> obterMovimentos() {
           return movimentoFinanceiroDAO.values().stream().toList();
-     }
-
-     @Override
-     public List<MovimentoFinanceiro> obterMovimentosPorTipo(TipoMovimento tipo) {
-          return movimentoFinanceiroDAO.values().stream()
-                    .filter(m -> m.getTipo() == tipo)
-                    .toList();
-     }
-
-     @Override
-     public List<MovimentoFinanceiro> obterMovimentosPorIntervalo(LocalDateTime desde, LocalDateTime ate) {
-          return movimentoFinanceiroDAO.values().stream()
-                    .filter(m -> !m.getData().isBefore(desde) && !m.getData().isAfter(ate))
-                    .toList();
      }
 
      @Override
@@ -96,15 +84,27 @@ public class SFinanceiroFacade implements ISFinanceiro {
      // ------------------- Cálculos -------------------
 
      @Override
-     public float calcularSaldoTotal() {
-          float total = 0;
-          for (MovimentoFinanceiro m : movimentoFinanceiroDAO.values()) {
-               if (m.getTipo() == TipoMovimento.LucroMaoObra || m.getTipo() == TipoMovimento.LucroVendaPecas) {
-                    total += m.getValor();
-               } else {
-                    total -= m.getValor();
-               }
+     public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos) {
+          AnaliseFinanceira analise = new AnaliseFinanceira(0, 0, 0, movimentos.size(), List.of());
+          float totalMaoObra = 0, totalLucroVendaPecas = 0, totalSalarios = 0, totalCompraPecas = 0;
+          for (MovimentoFinanceiro m : movimentos){
+               TipoMovimento tipo = m.getTipo();
+               if (tipo == TipoMovimento.GastoPecas) totalCompraPecas += m.getValor();
+               else if (tipo == TipoMovimento.LucroMaoObra) totalMaoObra += m.getValor();
+               else if (tipo == TipoMovimento.LucroVendaPecas) totalLucroVendaPecas += m.getValor();
+               else if (tipo == TipoMovimento.Salario) totalSalarios += m.getValor();
           }
-          return total;
+          analise.setReceitas(totalMaoObra + totalLucroVendaPecas);
+          analise.setDespesas(totalCompraPecas + totalSalarios);
+          analise.setSaldo(analise.getReceitas() - analise.getDespesas());
+          analise.setLista_tipos(List.of(
+               new Pair<>(TipoMovimento.GastoPecas, totalCompraPecas),
+               new Pair<>(TipoMovimento.LucroMaoObra, totalMaoObra),
+               new Pair<>(TipoMovimento.LucroVendaPecas, totalLucroVendaPecas),
+               new Pair<>(TipoMovimento.Salario, totalSalarios)
+          ));
+
+          return analise;
      }
+
 }
