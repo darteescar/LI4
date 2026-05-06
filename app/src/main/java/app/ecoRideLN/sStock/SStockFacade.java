@@ -290,6 +290,33 @@ public class SStockFacade implements ISStock {
           return devolucao != null && devolucao.getEstado() == EstadoDevolucao.PendenteDevolucao;
      }
 
+     @Override
+     public void marcarDevolucaoComoEnviada(int id) {
+          Devolucao d = devolucaoDAO.get(id);
+          if (d != null) {
+               d.setEstado(EstadoDevolucao.Enviada);
+               devolucaoDAO.put(id, d);
+          }
+     }
+
+     @Override
+     public void marcarDevolucaoComoDevolvida(int id) {
+          Devolucao d = devolucaoDAO.get(id);
+          if (d != null) {
+               d.setEstado(EstadoDevolucao.Devolvida);
+               devolucaoDAO.put(id, d);
+          }
+     }
+
+     @Override
+     public void marcarDevolucaoComoInvalida(int id) {
+          Devolucao d = devolucaoDAO.get(id);
+          if (d != null) {
+               d.setEstado(EstadoDevolucao.Invalida);
+               devolucaoDAO.put(id, d);
+          }
+     }
+
      // ------------------- Encomenda -------------------
 
      @Override
@@ -337,6 +364,26 @@ public class SStockFacade implements ISStock {
      @Override
      public boolean removerEncomenda(int id) {
           return encomendaDAO.remove(id) != null;
+     }
+
+     @Override
+     public void marcarEncomendaComoEnviada(int id) {
+          Encomenda e = encomendaDAO.get(id);
+          if (e != null) {
+               e.setEstado(EstadoEncomenda.ENVIADA);
+               e.setData_envio(LocalDateTime.now());
+               encomendaDAO.put(id, e);
+          }
+     }
+
+     @Override
+     public void marcarEncomendaComoRecebida(int id) {
+          Encomenda e = encomendaDAO.get(id);
+          if (e != null) {
+               e.setEstado(EstadoEncomenda.RECEBIDA);
+               e.setData_rececao(LocalDateTime.now());
+               encomendaDAO.put(id, e);
+          }
      }
 
      @Override

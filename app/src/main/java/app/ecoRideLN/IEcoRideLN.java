@@ -37,15 +37,13 @@ public interface IEcoRideLN {
 
      // ------------------- Ordens de Serviço -------------------
 
-     public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
+     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
      public OrdemServico obterOS(int id);
      public boolean removerOS(int id);
      public void cancelarOS(int id);
-     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int idMecanico);
-     public void registarConsertoOS(int id_OS, int idMecanico, List<Stock> pecas, List<Reparacao> reparacoes);
-     public void registarNotificacaoClienteOS(int id_OS);
+     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao);
+     public void registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes);
      public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
-
 
      // ------------------- Clientes -------------------
 
@@ -61,7 +59,6 @@ public interface IEcoRideLN {
      public Trotinete obterTrotinete(int id);
      public boolean   existeTrotinete(int id);
      public boolean   removerTrotinete(int id);
-     public List<Trotinete> obterTrotinetes();
 
      // ------------------- Reparações -------------------
 
@@ -124,14 +121,7 @@ public interface IEcoRideLN {
 
      // ------------------- Movimentos Financeiros -------------------
 
-     private MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario);
-     private MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao);
-     private MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca);
      public MovimentoFinanceiro obterMovimentoFinanceiro(int id);
      public List<MovimentoFinanceiro> obterMovimentosFinanceiros();
      public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
-
-     // ------------------- Cross-cutting -------------------
-
-     private boolean pecasDiagnosticoDisponiveisReparacao(int id_OS);
 }

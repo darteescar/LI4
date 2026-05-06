@@ -10,7 +10,8 @@ public class OrdemServico {
      private LocalDateTime data_criacao;
      private int codTrotinete;
      private int codCliente;
-     private int codResponsavel;
+     private int codCriador;
+     private Integer codMecanico;
      private List<Fotografia> fotografias;
      private EstadoOS estado;
      private List<String> acessorios;
@@ -18,13 +19,14 @@ public class OrdemServico {
      private Diagnostico diagnostico;
      private Metodo_Pagamento metodo_pagamento;
 
-     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codResponsavel, List<Fotografia> fotografias, List<String> acessorios) {
+     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codCriador, List<Fotografia> fotografias, List<String> acessorios) {
           this.id = id;
           this.descricao = descricao;
           this.data_criacao = data_criacao;
           this.codTrotinete = codTrotinete;
           this.codCliente = codCliente;
-          this.codResponsavel = codResponsavel;
+          this.codCriador = codCriador;
+          this.codMecanico = null;
           if (fotografias == null) {
                this.fotografias = new ArrayList<>();
           }
@@ -57,8 +59,11 @@ public class OrdemServico {
      public int getCodCliente() { return codCliente; }
      public void setCodCliente(int codCliente) { this.codCliente = codCliente; }
 
-     public int getCodResponsavel() { return codResponsavel; }
-     public void setCodResponsavel(int codResponsavel) { this.codResponsavel = codResponsavel; }
+     public int getCodCriador() { return codCriador; }
+     public void setCodCriador(int codCriador) { this.codCriador = codCriador; }
+
+     public Integer getCodMecanico() { return codMecanico; }
+     public void setCodMecanico(Integer codMecanico) { this.codMecanico = codMecanico; }
 
      public List<Fotografia> getFotografias() { return new ArrayList<>(fotografias); }
      public void setFotografias(List<Fotografia> fotografias) { this.fotografias = new ArrayList<>(fotografias); }

@@ -223,20 +223,23 @@ CREATE TABLE IF NOT EXISTS MovimentoPeca (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS OrdemServico (
-    id             INT      NOT NULL,
-    descricao      TEXT,
-    data_criacao   DATETIME NOT NULL,
-    codTrotinete   INT      NOT NULL,
-    codCliente     INT      NOT NULL,
-    codResponsavel INT      NOT NULL,
-    estado         ENUM('PendenteReparacao', 'PendenteDiagnostico',
-                        'PendenteAprovacaoOrcamento', 'PendentePagamento',
-                        'Paga', 'OrcamentoNaoAprovado', 'AguardarPecas',
-                        'Eliminada') NOT NULL,
+    id               INT      NOT NULL,
+    descricao        TEXT,
+    data_criacao     DATETIME NOT NULL,
+    codTrotinete     INT      NOT NULL,
+    codCliente       INT      NOT NULL,
+    codCriador       INT      NOT NULL,
+    codMecanico      INT      NULL,
+    estado           ENUM('PendenteReparacao', 'PendenteDiagnostico',
+                          'PendenteAprovacaoOrcamento', 'PendentePagamento',
+                          'Paga', 'OrcamentoNaoAprovado', 'AguardarPecas',
+                          'Eliminada') NOT NULL,
+    metodo_pagamento ENUM('NUMERARIO', 'MULTIBANCO', 'MBWAY') NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (codTrotinete)   REFERENCES Trotinete(id),
-    FOREIGN KEY (codCliente)     REFERENCES Cliente(id),
-    FOREIGN KEY (codResponsavel) REFERENCES Funcionario(id)
+    FOREIGN KEY (codTrotinete) REFERENCES Trotinete(id),
+    FOREIGN KEY (codCliente)   REFERENCES Cliente(id),
+    FOREIGN KEY (codCriador)   REFERENCES Funcionario(id),
+    FOREIGN KEY (codMecanico)  REFERENCES Funcionario(id)
 );
 
 CREATE TABLE IF NOT EXISTS OrdemServico_Acessorio (
@@ -256,13 +259,11 @@ CREATE TABLE IF NOT EXISTS Fotografia (
 );
 
 CREATE TABLE IF NOT EXISTS Diagnostico (
-    idOS        INT   NOT NULL,
-    descricao   TEXT,
-    orcamento   FLOAT NOT NULL,
-    codMecanico INT   NOT NULL,
+    idOS      INT   NOT NULL,
+    descricao TEXT,
+    orcamento FLOAT NOT NULL,
     PRIMARY KEY (idOS),
-    FOREIGN KEY (idOS)        REFERENCES OrdemServico(id) ON DELETE CASCADE,
-    FOREIGN KEY (codMecanico) REFERENCES Funcionario(id)
+    FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Diagnostico_PecaOrcamento (
@@ -285,7 +286,6 @@ CREATE TABLE IF NOT EXISTS Diagnostico_Reparacao (
 CREATE TABLE IF NOT EXISTS Conserto (
     idOS              INT     NOT NULL,
     preco_total       FLOAT   NOT NULL,
-    codMecanico       INT     NOT NULL,
     chk_luzes         BOOLEAN NOT NULL DEFAULT FALSE,
     chk_pneus         BOOLEAN NOT NULL DEFAULT FALSE,
     chk_aceleracao    BOOLEAN NOT NULL DEFAULT FALSE,
@@ -293,8 +293,7 @@ CREATE TABLE IF NOT EXISTS Conserto (
     chk_visor         BOOLEAN NOT NULL DEFAULT FALSE,
     chk_teste_pratico BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (idOS),
-    FOREIGN KEY (idOS)        REFERENCES OrdemServico(id) ON DELETE CASCADE,
-    FOREIGN KEY (codMecanico) REFERENCES Funcionario(id)
+    FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Conserto_PecaUsada (

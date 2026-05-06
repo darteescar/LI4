@@ -7,6 +7,7 @@ import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Diagnostico;
 import app.ecoRideLN.sOrdensServico.EstadoOS;
 import app.ecoRideLN.sOrdensServico.Fotografia;
+import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sOrdensServico.PecasOrcamento;
 import app.ecoRideLN.sOrdensServico.PecasUsadas;
@@ -41,7 +42,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     // SELECT só dos campos da tabela base; os filhos são carregados em queries separadas.
     private static final String SELECT_BASE = """
             SELECT id, descricao, data_criacao, codTrotinete, codCliente,
-                   codResponsavel, estado
+                   codCriador, codMecanico, estado, metodo_pagamento
             FROM   OrdemServico
             """;
 
@@ -76,15 +77,13 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     private Diagnostico loadDiagnostico(Connection c, int idOS) throws SQLException {
         String desc;
         float orc;
-        int codMec;
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT descricao, orcamento, codMecanico FROM Diagnostico WHERE idOS = ?")) {
+                "SELECT descricao, orcamento FROM Diagnostico WHERE idOS = ?")) {
             ps.setInt(1, idOS);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
                 desc = rs.getString("descricao");
                 orc = rs.getFloat("orcamento");
-                codMec = rs.getInt("codMecanico");
             }
         }
         List<Integer> reps = new ArrayList<>();
@@ -105,15 +104,14 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 }
             }
         }
-        return new Diagnostico(desc, codMec, reps, pecas, orc);
+        return new Diagnostico(desc, reps, pecas, orc);
     }
 
     private Conserto loadConserto(Connection c, int idOS) throws SQLException {
         float preco;
-        int codMec;
         CheckList chk = new CheckList();
         try (PreparedStatement ps = c.prepareStatement("""
-                SELECT preco_total, codMecanico,
+                SELECT preco_total,
                        chk_luzes, chk_pneus, chk_aceleracao,
                        chk_travagem, chk_visor, chk_teste_pratico
                 FROM   Conserto WHERE idOS = ?
@@ -122,7 +120,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
                 preco = rs.getFloat("preco_total");
-                codMec = rs.getInt("codMecanico");
                 chk.setLuzes(rs.getBoolean("chk_luzes"));
                 chk.setPneus(rs.getBoolean("chk_pneus"));
                 chk.setAceleracao(rs.getBoolean("chk_aceleracao"));
@@ -149,7 +146,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 }
             }
         }
-        Conserto con = new Conserto(codMec, pecas, reps, preco);
+        Conserto con = new Conserto(pecas, reps, preco);
         con.setCheckList(chk);
         return con;
     }
@@ -162,10 +159,13 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 rs.getTimestamp("data_criacao").toLocalDateTime(),
                 rs.getInt("codTrotinete"),
                 rs.getInt("codCliente"),
-                rs.getInt("codResponsavel"),
+                rs.getInt("codCriador"),
                 loadFotografias(c, id),
                 loadAcessorios(c, id));
         os.setEstado(EstadoOS.valueOf(rs.getString("estado")));
+        os.setCodMecanico(rs.getObject("codMecanico", Integer.class));
+        String mp = rs.getString("metodo_pagamento");
+        if (mp != null) os.setMetodo_pagamento(Metodo_Pagamento.valueOf(mp));
         Diagnostico d = loadDiagnostico(c, id);
         if (d != null) os.setDiagnostico(d);
         Conserto con = loadConserto(c, id);
@@ -178,15 +178,17 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     private void upsertBase(Connection c, int id, OrdemServico os) throws SQLException {
         String sql = """
                 INSERT INTO OrdemServico (id, descricao, data_criacao, codTrotinete,
-                                          codCliente, codResponsavel, estado)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                                          codCliente, codCriador, codMecanico, estado, metodo_pagamento)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
-                    descricao      = VALUES(descricao),
-                    data_criacao   = VALUES(data_criacao),
-                    codTrotinete   = VALUES(codTrotinete),
-                    codCliente     = VALUES(codCliente),
-                    codResponsavel = VALUES(codResponsavel),
-                    estado         = VALUES(estado)
+                    descricao        = VALUES(descricao),
+                    data_criacao     = VALUES(data_criacao),
+                    codTrotinete     = VALUES(codTrotinete),
+                    codCliente       = VALUES(codCliente),
+                    codCriador       = VALUES(codCriador),
+                    codMecanico      = VALUES(codMecanico),
+                    estado           = VALUES(estado),
+                    metodo_pagamento = VALUES(metodo_pagamento)
                 """;
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -194,8 +196,16 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
             ps.setTimestamp(3, Timestamp.valueOf(os.getDataCriacao()));
             ps.setInt(4, os.getCodTrotinete());
             ps.setInt(5, os.getCodCliente());
-            ps.setInt(6, os.getCodResponsavel());
-            ps.setString(7, os.getEstado().name());
+            ps.setInt(6, os.getCodCriador());
+            if (os.getCodMecanico() == null)
+                ps.setNull(7, java.sql.Types.INTEGER);
+            else
+                ps.setInt(7, os.getCodMecanico());
+            ps.setString(8, os.getEstado().name());
+            if (os.getMetodo_pagamento() == null)
+                ps.setNull(9, java.sql.Types.VARCHAR);
+            else
+                ps.setString(9, os.getMetodo_pagamento().name());
             ps.executeUpdate();
         }
     }
@@ -243,13 +253,12 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
 
     private void insertDiagnostico(Connection c, int idOS, Diagnostico d) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement("""
-                INSERT INTO Diagnostico (idOS, descricao, orcamento, codMecanico)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO Diagnostico (idOS, descricao, orcamento)
+                VALUES (?, ?, ?)
                 """)) {
             ps.setInt(1, idOS);
             ps.setString(2, d.getDescricao());
             ps.setFloat(3, d.getOrcamento());
-            ps.setInt(4, d.getCodMecanico());
             ps.executeUpdate();
         }
         if (!d.getCod_reparacoes().isEmpty()) {
@@ -282,20 +291,19 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     private void insertConserto(Connection c, int idOS, Conserto con) throws SQLException {
         CheckList chk = con.getCheckList();
         try (PreparedStatement ps = c.prepareStatement("""
-                INSERT INTO Conserto (idOS, preco_total, codMecanico,
+                INSERT INTO Conserto (idOS, preco_total,
                                       chk_luzes, chk_pneus, chk_aceleracao,
                                       chk_travagem, chk_visor, chk_teste_pratico)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """)) {
             ps.setInt(1, idOS);
             ps.setFloat(2, con.getPreco_total());
-            ps.setInt(3, con.getCodMecanico());
-            ps.setBoolean(4, chk.getLuzes());
-            ps.setBoolean(5, chk.getPneus());
-            ps.setBoolean(6, chk.getAceleracao());
-            ps.setBoolean(7, chk.getTravagem());
-            ps.setBoolean(8, chk.getVisor());
-            ps.setBoolean(9, chk.getTeste_pratico());
+            ps.setBoolean(3, chk.getLuzes());
+            ps.setBoolean(4, chk.getPneus());
+            ps.setBoolean(5, chk.getAceleracao());
+            ps.setBoolean(6, chk.getTravagem());
+            ps.setBoolean(7, chk.getVisor());
+            ps.setBoolean(8, chk.getTeste_pratico());
             ps.executeUpdate();
         }
         if (!con.getCod_reparacoes().isEmpty()) {
@@ -500,7 +508,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         if (desde != null)         { sql.append(" AND data_criacao >= ?"); params.add(Timestamp.valueOf(desde)); }
         if (ate != null)           { sql.append(" AND data_criacao <= ?"); params.add(Timestamp.valueOf(ate)); }
         if (idCliente != null)     { sql.append(" AND codCliente = ?");    params.add(idCliente); }
-        if (idFuncionario != null) { sql.append(" AND codResponsavel = ?"); params.add(idFuncionario); }
+        if (idFuncionario != null) { sql.append(" AND codMecanico = ?"); params.add(idFuncionario); }
         sql.append(" ORDER BY id");
 
         List<OrdemServico> out = new ArrayList<>();

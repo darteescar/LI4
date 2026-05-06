@@ -10,7 +10,7 @@ public interface ISOrdensServico {
 
      // ------------------- Registo -------------------
 
-     OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias);
+     OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
 
      // ------------------- Consulta -------------------
 
@@ -22,19 +22,7 @@ public interface ISOrdensServico {
 
      // ------------------- Alterações de campos -------------------
 
-     void alterarDescricaoOS(int id, String descricao);
-
-     void alterarAcessoriosOS(int id, List<String> acessorios);
-
-     void alterarFotografiasOS(int id, List<Fotografia> fotografias);
-
-     void alterarDataCriacaoOS(int id, LocalDateTime data_criacao);
-
-     void alterarFuncionarioResponsavelOS(int id, int codResponsavel);
-
-     void alterarClienteOS(int id, int id_cliente);
-
-     void alterarTrotineteOS(int id, int id_trotinete);
+     void alterarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete);
 
      // ------------------- Máquina de estados -------------------
 
@@ -58,7 +46,7 @@ public interface ISOrdensServico {
 
      // ------------------- Diagnóstico -------------------
 
-     void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int idMecanico);
+     void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao);
 
      List<Reparacao> obterReparacoesDiagnosticoOS(int idOS);
 
@@ -66,7 +54,9 @@ public interface ISOrdensServico {
 
      // ------------------- Conserto -------------------
 
-     void registarConsertoOS(int id_OS, int idMecanico, List<Stock> pecas, List<Reparacao> reparacoes);
+     void registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes);
+
+     void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
 
      void adicionarPecas_Conserto_OS(int id, List<Stock> pecas);
 

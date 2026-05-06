@@ -7,14 +7,12 @@ import app.ecoRideLN.sStock.Stock;
 
 public class Conserto {
      private float preco_total;
-     private int codMecanico;
      private List<PecasUsadas> listaPecas;
      private List<Integer> cod_reparacoes;
      private CheckList checkList;
 
-     public Conserto(int codMecanico, List<PecasUsadas> listaPecas, List<Integer> cod_reparacoes, float preco_total) {
+     public Conserto(List<PecasUsadas> listaPecas, List<Integer> cod_reparacoes, float preco_total) {
           this.preco_total = preco_total;
-          this.codMecanico = codMecanico;
           this.listaPecas = new ArrayList<>(listaPecas);
           this.cod_reparacoes = new ArrayList<>(cod_reparacoes);
           this.checkList = new CheckList();
@@ -22,7 +20,6 @@ public class Conserto {
 
      public Conserto(Conserto conserto) {
           this.preco_total = conserto.preco_total;
-          this.codMecanico = conserto.codMecanico;
           this.listaPecas = new ArrayList<>(conserto.listaPecas);
           this.cod_reparacoes = new ArrayList<>(conserto.cod_reparacoes);
           this.checkList = new CheckList(conserto.checkList);
@@ -30,7 +27,6 @@ public class Conserto {
 
      public Conserto() {
           this.preco_total = 0;
-          this.codMecanico = 0;
           this.listaPecas = new ArrayList<>();
           this.cod_reparacoes = new ArrayList<>();
           this.checkList = new CheckList();
@@ -38,9 +34,6 @@ public class Conserto {
 
      public float getPreco_total() { return preco_total; }
      public void setPreco_total(float preco_total) { this.preco_total = preco_total; }
-
-     public int getCodMecanico() { return codMecanico; }
-     public void setCodMecanico(int codMecanico) { this.codMecanico = codMecanico; }
 
      public List<PecasUsadas> getListaPecas() { return new ArrayList<>(this.listaPecas); }
      public void setListaPecas(List<PecasUsadas> listaPecas) { this.listaPecas = new ArrayList<>(listaPecas); }

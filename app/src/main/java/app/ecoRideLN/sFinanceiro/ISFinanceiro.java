@@ -23,6 +23,8 @@ public interface ISFinanceiro {
 
      List<MovimentoFinanceiro> obterMovimentosPorIntervalo(LocalDateTime desde, LocalDateTime ate);
 
+     List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(java.time.LocalDate desde, java.time.LocalDate ate, TipoMovimento tipo);
+
      // ------------------- Existe / Remove -------------------
 
      boolean existeMovimentoFinanceiro(int id);

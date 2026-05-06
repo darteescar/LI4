@@ -62,6 +62,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Notificações -------------------
+
     @Override
     public NotificacaoOS criarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
         return sNotificacoes.criarNotificacaoOS(descricao, id_remetente, id_destinatario, id_os);
@@ -98,9 +99,10 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Ordens de Serviço -------------------
+
     @Override
-    public OrdemServico registarOS(int codResponsavel, int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias) {
-        return sOrdensServico.registarOS(codResponsavel, id_cliente, id_trotinete, descricao, acessorios, fotografias);
+    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador) {
+        return sOrdensServico.registarOS(id_cliente, id_trotinete, descricao, acessorios, fotografias, codCriador);
     }
 
     @Override
@@ -115,22 +117,17 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public void cancelarOS(int id) {
-        sOrdensServico.cancelarOS(id);
+        sOrdensServico.eliminarOS(id);
     }
 
     @Override
-    public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int idMecanico) {
-        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, reparacoes, descricao, idMecanico);
+    public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao) {
+        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, reparacoes, descricao);
     }
 
     @Override
-    public void registarConsertoOS(int id_OS, int idMecanico, List<Stock> pecas, List<Reparacao> reparacoes) {
-        sOrdensServico.registarConsertoOS(id_OS, idMecanico, pecas, reparacoes);
-    }
-
-    @Override
-    public void registarNotificacaoClienteOS(int id_OS) {
-        sOrdensServico.registarNotificacaoClienteOS(id_OS);
+    public void registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes) {
+        sOrdensServico.registarConsertoOS(id_OS, pecas, reparacoes);
     }
 
     @Override
@@ -138,8 +135,8 @@ public class EcoRideLN implements IEcoRideLN {
         sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
     }
 
-
     // ------------------- Clientes -------------------
+
     @Override
     public Cliente registarCliente(String nome, String email, String telemovel, String nif) {
         return sClientes.registarCliente(nome, email, telemovel, nif);
@@ -162,10 +159,11 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<Cliente> obterClientes() {
-        return sClientes.obterClientes();
+        return sClientes.obterTodosClientes();
     }
 
     // ------------------- Trotinetes -------------------
+
     @Override
     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor) {
         return sClientes.registarTrotinete(id_cliente, modelo, marca, num_serie, tipo_motor);
@@ -186,12 +184,8 @@ public class EcoRideLN implements IEcoRideLN {
         return sClientes.removerTrotinete(id);
     }
 
-    @Override
-    public List<Trotinete> obterTrotinetes() {
-        return sClientes.obterTrotinetes();
-    }
-
     // ------------------- Reparações -------------------
+
     @Override
     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco) {
         return sReparacoes.registarReparacao(nomenclatura, descricao, preco);
@@ -214,10 +208,11 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<Reparacao> obterReparacoes() {
-        return sReparacoes.obterReparacoes();
+        return sReparacoes.obterTodasReparacoes();
     }
 
     // ------------------- Peças -------------------
+
     @Override
     public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
         return sStock.registarPeca(ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor);
@@ -244,6 +239,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Stock -------------------
+
     @Override
     public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie) {
         return sStock.registarStockComGarantia(id_peca, preco_compra, data, garantia, nr_serie);
@@ -270,6 +266,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Devoluções -------------------
+
     @Override
     public Devolucao criarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock) {
         return sStock.criarDevolucao(data_devolucao, motivo, id_stock);
@@ -306,6 +303,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Encomendas -------------------
+
     @Override
     public Encomenda criarEncomenda(List<Stock> pecas, int cod_fornecedor) {
         return sStock.criarEncomenda(pecas, cod_fornecedor);
@@ -337,6 +335,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Fornecedores -------------------
+
     @Override
     public Fornecedor registarFornecedor(String nome, String telemovel, String email) {
         return sStock.registarFornecedor(nome, telemovel, email);
@@ -358,6 +357,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Funcionários -------------------
+
     @Override
     public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal) {
         return sFuncionarios.registarFuncionario(nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
@@ -379,30 +379,16 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void        registarHorasExtraFuncionario(int id_funcionario, int horas_extra) {
-        sFuncionarios.registarHorasExtraFuncionario(id_funcionario, horas_extra);
+    public void registarHorasExtraFuncionario(int id_funcionario, int horas_extra) {
+        sFuncionarios.adicionarHorasExtra(id_funcionario, horas_extra);
     }
 
     @Override
-    public void        registarPagamentoFuncionario(int id_funcionario) {
+    public void registarPagamentoFuncionario(int id_funcionario) {
         sFuncionarios.registarPagamentoFuncionario(id_funcionario);
     }
 
     // ------------------- Movimentos Financeiros -------------------
-    @Override
-    private MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario) {
-        return sFinanceiro.criarMovimentoFuncionario(valor, descricao, codFuncionario);
-    }
-
-    @Override
-    private MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao) {
-        return sFinanceiro.criarMovimentoReparacao(valor, descricao, codReparacao);
-    }
-
-    @Override
-    private MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca) {
-        return sFinanceiro.criarMovimentoPeca(valor, descricao, tipo, codPeca);
-    }
 
     @Override
     public MovimentoFinanceiro obterMovimentoFinanceiro(int id) {
@@ -411,7 +397,7 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<MovimentoFinanceiro> obterMovimentosFinanceiros() {
-        return sFinanceiro.obterMovimentosFinanceiros();
+        return sFinanceiro.obterMovimentos();
     }
 
     @Override
@@ -420,7 +406,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Cross-cutting -------------------
-    @Override
+
     private boolean pecasDiagnosticoDisponiveisReparacao(int id_OS) {
         List<PecasOrcamento> pecas = sOrdensServico.obterPecasQuantidadeDiagnosticoOS(id_OS);
         for (PecasOrcamento po : pecas) {
@@ -430,5 +416,4 @@ public class EcoRideLN implements IEcoRideLN {
         }
         return true;
     }
-
 }
