@@ -1,6 +1,5 @@
 package app.ecoRideLN.sNotificacoes;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class SNotificacoesFacade implements ISNotificacoes {
      }
 
      @Override
-     public List<Notificacao> obterTodasNotificacoes() {
+     public List<Notificacao> obterNotificacoes() {
           return new ArrayList<>(notificacaoDAO.values());
      }
 

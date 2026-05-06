@@ -14,7 +14,7 @@ public interface ISNotificacoes {
 
      Notificacao obterNotificacao(int id);
 
-     List<Notificacao> obterTodasNotificacoes();
+     List<Notificacao> obterNotificacoes();
 
      List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
 
