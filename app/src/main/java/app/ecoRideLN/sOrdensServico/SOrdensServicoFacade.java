@@ -6,14 +6,10 @@ import java.util.List;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
-import app.ecoRideCD.sStock.PecaDAO;
-import app.ecoRideLN.sReparacoes.Reparacao;
-import app.ecoRideLN.sStock.Peca;
 
 public class SOrdensServicoFacade implements ISOrdensServico {
 
     private final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
-    private final PecaDAO pecaDAO = PecaDAO.getInstance();
 
     @Override
     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador) {

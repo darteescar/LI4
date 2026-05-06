@@ -6,12 +6,10 @@ import java.util.List;
 import app.common.EcoRideException;
 import app.ecoRideCD.sClientes.ClienteDAO;
 import app.ecoRideCD.sClientes.TrotineteDAO;
-import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
 
 public class SClientesFacade implements ISClientes {
      private final ClienteDAO     clientesDAO     = ClienteDAO.getInstance();
      private final TrotineteDAO   trotinetesDAO   = TrotineteDAO.getInstance();
-     private final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
 
      public SClientesFacade() {}
 
