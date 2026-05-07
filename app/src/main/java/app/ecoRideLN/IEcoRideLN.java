@@ -51,7 +51,11 @@ public interface IEcoRideLN {
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOS_Trotinete(int id_trotinete);
      public List<Conserto>     obterConsertosAnteriores(int id_trotinete);
-     public boolean            clienteTemApenasUmPagamentoPendente(int id);
+     public boolean            clienteTemApenasUmPagamentoPendente(int id_cliente);
+     public void               aprovarOrcamentoOS(int id);
+     public void               rejeitarOrcamentoOS(int id);
+     public void               atribuirOS(int id, int id_funcionario);
+     public void               registarNotificacaoPagamentoOS(int id_OS);
 
      // ------------------- Clientes -------------------
      // feito
@@ -140,7 +144,7 @@ public interface IEcoRideLN {
      public void              registarPagamentoFuncionario(int id_funcionario);
 
      // ------------------- Movimentos Financeiros -------------------
-
+     // feito
      public List<MovimentoFinanceiro> obterMovimentosFinanceiros();
      public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
      public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos);

@@ -187,6 +187,26 @@ public class EcoRideLN implements IEcoRideLN {
             .collect(java.util.stream.Collectors.toList());
     }
 
+    @Override
+    public void aprovarOrcamentoOS(int id){
+        sOrdensServico.aprovarOrcamentoOS(id);
+    }
+
+    @Override
+    public void rejeitarOrcamentoOS(int id){
+        sOrdensServico.rejeitarOrcamentoOS(id);
+    }
+
+    @Override
+    public void atribuirOS(int id, int id_funcionario){
+        sOrdensServico.atribuirOS(id, id_funcionario);
+    }
+
+    @Override
+    public void registarNotificacaoPagamentoOS(int id_OS){
+        sOrdensServico.registarNotificacaoPagamentoOS(id_OS);
+    }
+
     // ------------------- Clientes -------------------
 
     @Override
