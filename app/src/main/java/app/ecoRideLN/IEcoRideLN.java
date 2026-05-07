@@ -145,5 +145,4 @@ public interface IEcoRideLN {
      public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
      public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos);
 
-
 }

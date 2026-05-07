@@ -14,27 +14,31 @@ public class SFinanceiroFacade implements ISFinanceiro {
      // ------------------- Registo -------------------
 
      @Override
-     public MovimentoFinanceiro criarMovimentoFuncionario(float valor, String descricao, int codFuncionario) {
+     public MovimentoFinanceiro registarMovimentoCompraStock(int idPeca, float valor, String descricao) {
           int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFuncionario novo = new MovimentoFuncionario(id, descricao, valor, LocalDateTime.now(), codFuncionario);
-          movimentoFinanceiroDAO.put(id, novo);
-          return novo;
+          MovimentoFinanceiro movimento = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), TipoMovimento.GastoPecas, idPeca);
+          return movimentoFinanceiroDAO.put(id, movimento);
      }
 
      @Override
-     public MovimentoFinanceiro criarMovimentoReparacao(float valor, String descricao, int codReparacao) {
+     public MovimentoFinanceiro registarMovimentoVendaPeca(int idPeca, float valor, String descricao){
           int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoReparacao novo = new MovimentoReparacao(id, descricao, valor, LocalDateTime.now(), codReparacao);
-          movimentoFinanceiroDAO.put(id, novo);
-          return novo;
+          MovimentoFinanceiro movimento = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroVendaPecas, idPeca);
+          return movimentoFinanceiroDAO.put(id, movimento);
      }
 
      @Override
-     public MovimentoFinanceiro criarMovimentoPeca(float valor, String descricao, TipoMovimento tipo, int codPeca) {
+     public MovimentoFinanceiro registarMovimentoPagamentoFuncionario(int idFuncionario, float valor, String descricao){
           int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoPeca novo = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), tipo, codPeca);
-          movimentoFinanceiroDAO.put(id, novo);
-          return novo;
+          MovimentoFinanceiro movimento = new MovimentoFuncionario(id, descricao, valor, LocalDateTime.now(), idFuncionario);
+          return movimentoFinanceiroDAO.put(id, movimento);
+     }
+
+     @Override
+     public MovimentoFinanceiro registarMovimentoPagamentoOS(int idReparacao, float valor, String descricao){
+          int id = movimentoFinanceiroDAO.generateNewId();
+          MovimentoFinanceiro movimento = new MovimentoReparacao(id, descricao, valor, LocalDateTime.now(), idReparacao);
+          return movimentoFinanceiroDAO.put(id, movimento);
      }
 
      // ------------------- Consulta -------------------
