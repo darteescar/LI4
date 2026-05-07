@@ -6,8 +6,8 @@ public class MovimentoFuncionario extends MovimentoFinanceiro {
 
     private int codFuncionario;
 
-    public MovimentoFuncionario(int id, String descricao, float valor, LocalDateTime data, int codFuncionario) {
-        super(id, descricao, valor, data, TipoMovimento.Salario);
+    public MovimentoFuncionario(int id, String descricao, float valor, LocalDateTime data, TipoMovimento tipo, int codFuncionario) {
+        super(id, descricao, valor, data, tipo);
         this.codFuncionario = codFuncionario;
     }
 

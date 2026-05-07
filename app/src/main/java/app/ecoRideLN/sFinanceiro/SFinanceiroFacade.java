@@ -30,14 +30,14 @@ public class SFinanceiroFacade implements ISFinanceiro {
      @Override
      public MovimentoFinanceiro registarMovimentoPagamentoFuncionario(int idFuncionario, float valor, String descricao){
           int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFinanceiro movimento = new MovimentoFuncionario(id, descricao, valor, LocalDateTime.now(), idFuncionario);
+          MovimentoFinanceiro movimento = new MovimentoFuncionario(id, descricao, valor, LocalDateTime.now(), TipoMovimento.Salario, idFuncionario);
           return movimentoFinanceiroDAO.put(id, movimento);
      }
 
      @Override
      public MovimentoFinanceiro registarMovimentoPagamentoOS(int idReparacao, float valor, String descricao){
           int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFinanceiro movimento = new MovimentoReparacao(id, descricao, valor, LocalDateTime.now(), idReparacao);
+          MovimentoFinanceiro movimento = new MovimentoReparacao(id, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroMaoObra, idReparacao);
           return movimentoFinanceiroDAO.put(id, movimento);
      }
 
