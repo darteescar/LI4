@@ -1,10 +1,16 @@
 package app.IecoRideCA.controllers.financeiro;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import app.IecoRideCA.auth.GestorSessoes;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
-import app.ecoRideLN.sStock.Fornecedor;
-import app.IecoRideCA.controllers.financeiro.dto.FornecedorRequest;
+import app.ecoRideLN.sFinanceiro.AnaliseFinanceira;
+import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
+import app.ecoRideLN.sFinanceiro.TipoMovimento;
+import app.IecoRideCA.controllers.financeiro.dto.MovimentoFinanceiroResponse;
 import io.javalin.Javalin;
 
 public class FinanceiroController {
@@ -17,31 +23,45 @@ public class FinanceiroController {
 
     public void register(Javalin app) {
 
-        app.get("/api/fornecedores", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
-            ctx.json(facade.obterFornecedores());
-        });
+        app.get("/api/movimentosfinanceiros", ctx -> {
 
-        app.get("/api/fornecedores/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            Fornecedor f = facade.obterFornecedor(id);
-            if (f == null) ctx.status(404);
-            else ctx.json(f);
-        });
+        GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
 
-        app.post("/api/fornecedores", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
-            FornecedorRequest req = ctx.bodyAsClass(FornecedorRequest.class);
-            Fornecedor criado = facade.registarFornecedor(req.getNome(), req.getEmail(), req.getTelemovel());
-            ctx.status(201).json(criado);
-        });
+        String desdeStr = ctx.queryParam("desde");
+        String ateStr = ctx.queryParam("ate");
+        String tipoStr = ctx.queryParam("tipo");
 
-        app.delete("/api/fornecedores/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            ctx.status(facade.removerFornecedor(id) ? 204 : 404);
-        });
+        LocalDate desde = null;
+        LocalDate ate = null;
+        TipoMovimento tipo = null;
+
+        try {
+
+            if (desdeStr != null) {
+                desde = LocalDate.parse(desdeStr);
+            }
+
+            if (ateStr != null) {
+                ate = LocalDate.parse(ateStr);
+            }
+
+            if (tipoStr != null) {
+                tipo = TipoMovimento.valueOf(tipoStr.toUpperCase());
+            }
+
+        } catch (Exception e) {
+            ctx.status(400).result("Parâmetros inválidos");
+            return;
+        }
+
+        List<MovimentoFinanceiro> movimentos =
+            facade.obterMovimentosFinanceirosFiltrados(desde, ate, tipo);
+
+        AnaliseFinanceira analise =
+            facade.calcularAnaliseFinanceira(movimentos);
+
+        ctx.json(new MovimentoFinanceiroResponse(movimentos, analise));
+    });
 
     }
 }

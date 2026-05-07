@@ -1,5 +1,6 @@
 package app.ecoRideLN.sFinanceiro;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,10 +50,17 @@ public class SFinanceiroFacade implements ISFinanceiro {
      }
 
      @Override
-     public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(java.time.LocalDate desde, java.time.LocalDate ate, TipoMovimento tipo) {
+     public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo) {
+          if (desde == null && ate == null && tipo == null) {
+               return obterMovimentos();
+          }
+          if (desde.isAfter(ate)) {
+               throw new EcoRideException("A data 'desde' não pode ser posterior à data 'ate'.");
+          }
+
           return obterMovimentos().stream()
-                    .filter(m -> desde == null || !m.getData().toLocalDate().isBefore(desde))
-                    .filter(m -> ate == null || !m.getData().toLocalDate().isAfter(ate))
+                    .filter(m -> desde == null || m.getData().toLocalDate().isAfter(desde))
+                    .filter(m -> ate == null || m.getData().toLocalDate().isBefore(ate))
                     .filter(m -> tipo == null || m.getTipo() == tipo)
                     .collect(java.util.stream.Collectors.toList());
      }
