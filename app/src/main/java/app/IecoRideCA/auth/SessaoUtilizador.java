@@ -1,4 +1,4 @@
-package app.ecoRideUI.auth;
+package app.IecoRideCA.auth;
 
 import app.ecoRideLN.sAutenticacao.Cargo;
 import java.time.LocalDateTime;

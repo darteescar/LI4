@@ -61,7 +61,7 @@ public class SClientesFacade implements ISClientes {
      // ------------------- Trotinete -------------------
 
      @Override
-     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor) {
+     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, String num_serie, String tipo_motor) {
           Cliente cliente = clientesDAO.get(id_cliente);
           if (cliente != null) {
                int id = trotinetesDAO.generateNewId();
@@ -74,13 +74,13 @@ public class SClientesFacade implements ISClientes {
      }
 
      @Override
-     public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, int num_serie, String tipo_motor) {
+     public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, String num_serie, String tipo_motor) {
           Trotinete t = trotinetesDAO.get(id);
           if (t != null) {
                t.setCod_cliente(id_cliente);
                if (modelo != null)    t.setModelo(modelo);
                if (marca != null)     t.setMarca(marca);
-               if (num_serie > 0)     t.setNum_serie(num_serie);
+               if (num_serie != null && !num_serie.isEmpty()) t.setNum_serie(num_serie);
                if (tipo_motor != null) t.setTipo_motor(tipo_motor);
                trotinetesDAO.put(id, t);
                return t;

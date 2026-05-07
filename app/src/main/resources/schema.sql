@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS Trotinete (
     id          INT          NOT NULL,
     modelo      VARCHAR(100),
     marca       VARCHAR(100),
-    num_serie   INT,
+    num_serie   VARCHAR(50),
     tipo_motor  VARCHAR(50),
     cod_cliente INT          NOT NULL,
     PRIMARY KEY (id),

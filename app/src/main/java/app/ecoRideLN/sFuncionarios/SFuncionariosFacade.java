@@ -91,12 +91,13 @@ public class SFuncionariosFacade implements ISFuncionarios {
      }
 
      @Override
-     public void registarPagamentoFuncionario(int id) {
+     public boolean registarPagamentoFuncionario(int id) {
           Funcionario funcionario = funcionarioDAO.get(id);
           if (funcionario == null) {
                throw new EcoRideException("Funcionário com ID " + id + " não existe.");
           }
           funcionario.setHoras_extra(0);
           funcionarioDAO.put(id, funcionario);
+          return true;
      }
 }

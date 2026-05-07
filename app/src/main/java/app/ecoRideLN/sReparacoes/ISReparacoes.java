@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ISReparacoes {
 
-     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco);
+     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel);
 
      public Reparacao atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade);
 

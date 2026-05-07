@@ -8,12 +8,12 @@ public class Trotinete {
      private int id;
      private String modelo;
      private String marca;
-     private int num_serie;
+     private String num_serie;
      private String tipo_motor;
      private int cod_cliente;
      private List<Integer> codsOrdensServico;
 
-     public Trotinete(int id, String modelo, String marca, int num_serie, String tipo_motor, int cod_cliente) {
+     public Trotinete(int id, String modelo, String marca, String num_serie, String tipo_motor, int cod_cliente) {
           this.id = id;
           this.modelo = modelo;
           this.marca = marca;
@@ -23,7 +23,7 @@ public class Trotinete {
           this.codsOrdensServico = new ArrayList<>();
      }
 
-     public Trotinete(int id, String modelo, String marca, int num_serie, String tipo_motor, int cod_cliente, List<Integer> codsOrdensServico) {
+     public Trotinete(int id, String modelo, String marca, String num_serie, String tipo_motor, int cod_cliente, List<Integer> codsOrdensServico) {
           this.id = id;
           this.modelo = modelo;
           this.marca = marca;
@@ -57,11 +57,11 @@ public class Trotinete {
           this.marca = marca;
      }
 
-     public int getNum_serie() {
+     public String getNum_serie() {
           return num_serie;
      }
 
-     public void setNum_serie(int num_serie) {
+     public void setNum_serie(String num_serie) {
           this.num_serie = num_serie;
      }
 

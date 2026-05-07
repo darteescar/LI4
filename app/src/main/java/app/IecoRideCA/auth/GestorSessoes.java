@@ -1,4 +1,4 @@
-package app.ecoRideUI.auth;
+package app.IecoRideCA.auth;
 
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.UnauthorizedResponse;

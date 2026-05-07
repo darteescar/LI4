@@ -20,9 +20,9 @@ public interface ISClientes {
 
      // ------------------- Trotinete -------------------
 
-     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
+     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, String num_serie, String tipo_motor);
 
-     public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
+     public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, String num_serie, String tipo_motor);
 
      public Trotinete obterTrotinete(int id);
 

@@ -1,12 +1,18 @@
-package app.ecoRideUI;
+package app.IecoRideCA;
 
+import app.IecoRideCA.auth.GestorSessoes;
+import app.IecoRideCA.auth.SessaoUtilizador;
+import app.IecoRideCA.controllers.auth.AuthController;
+import app.IecoRideCA.controllers.clientes.ClientesController;
+import app.IecoRideCA.controllers.financeiro.FinanceiroController;
+import app.IecoRideCA.controllers.funcionarios.FuncionariosController;
+import app.IecoRideCA.controllers.notificacoes.NotificacoesController;
+import app.IecoRideCA.controllers.ordensservico.OrdemServicoController;
+import app.IecoRideCA.controllers.reparacoes.ReparacoesController;
+import app.IecoRideCA.controllers.stock.StockController;
 import app.common.EcoRideException;
 import app.ecoRideLN.EcoRideLN;
 import app.ecoRideLN.IEcoRideLN;
-import app.ecoRideUI.auth.GestorSessoes;
-import app.ecoRideUI.auth.SessaoUtilizador;
-import app.ecoRideUI.controllers.AuthController;
-import app.ecoRideUI.controllers.ClienteController;
 import io.javalin.Javalin;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
@@ -45,8 +51,13 @@ public class EcoRideApp {
 
         // Registo de controllers
         new AuthController(facade, gestorSessoes).register(app);
-        new ClienteController(facade).register(app);
-        // TODO: adicionar os restantes controllers aqui
+        new ClientesController(facade).register(app);
+        new OrdemServicoController(facade).register(app);
+        new StockController(facade).register(app);
+        new FuncionariosController(facade).register(app);
+        new ReparacoesController(facade).register(app);
+        new NotificacoesController(facade).register(app);
+        new FinanceiroController(facade).register(app);
     }
 
     record ErroResponse(String erro) {}

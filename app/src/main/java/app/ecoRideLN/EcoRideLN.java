@@ -259,12 +259,12 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Trotinetes -------------------
 
     @Override
-    public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor) {
+    public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, String num_serie, String tipo_motor) {
         return sClientes.registarTrotinete(id_cliente, modelo, marca, num_serie, tipo_motor);
     }
 
     @Override
-    public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, int num_serie, String tipo_motor) {
+    public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, String num_serie, String tipo_motor) {
         return sClientes.atualizarTrotinete(id, id_cliente, modelo, marca, num_serie, tipo_motor);
     }
 
@@ -291,8 +291,8 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Reparações -------------------
 
     @Override
-    public Reparacao registarReparacao(String nomenclatura, String descricao, float preco) {
-        return sReparacoes.registarReparacao(nomenclatura, descricao, preco);
+    public Reparacao registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel) {
+        return sReparacoes.registarReparacao(nomenclatura, descricao, preco, disponivel);
     }
 
     @Override
@@ -531,8 +531,8 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void registarPagamentoFuncionario(int id_funcionario) {
-        sFuncionarios.registarPagamentoFuncionario(id_funcionario);
+    public boolean registarPagamentoFuncionario(int id_funcionario) {
+        return sFuncionarios.registarPagamentoFuncionario(id_funcionario);
     }
 
     // ------------------- Movimentos Financeiros -------------------

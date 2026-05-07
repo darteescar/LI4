@@ -51,7 +51,7 @@ public class TrotineteDAO implements Map<Integer, Trotinete> {
                 id,
                 rs.getString("modelo"),
                 rs.getString("marca"),
-                rs.getInt("num_serie"),
+                rs.getString("num_serie"),
                 rs.getString("tipo_motor"),
                 rs.getInt("cod_cliente"),
                 osDaTrotinete(id));
@@ -118,7 +118,7 @@ public class TrotineteDAO implements Map<Integer, Trotinete> {
             ps.setInt(1, key);
             ps.setString(2, value.getModelo());
             ps.setString(3, value.getMarca());
-            ps.setInt(4, value.getNum_serie());
+            ps.setString(4, value.getNum_serie());
             ps.setString(5, value.getTipo_motor());
             ps.setInt(6, value.getCod_cliente());
             ps.executeUpdate();

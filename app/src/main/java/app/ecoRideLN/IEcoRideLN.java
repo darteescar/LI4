@@ -75,8 +75,8 @@ public interface IEcoRideLN {
 
      // ------------------- Trotinetes -------------------
      // feito
-     public Trotinete       registarTrotinete(int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
-     public Trotinete       atualizarTrotinete(int id, int id_cliente, String modelo, String marca, int num_serie, String tipo_motor);
+     public Trotinete       registarTrotinete(int id_cliente, String modelo, String marca, String num_serie, String tipo_motor);
+     public Trotinete       atualizarTrotinete(int id, int id_cliente, String modelo, String marca, String num_serie, String tipo_motor);
      public Trotinete       obterTrotinete(int id);
      public boolean         existeTrotinete(int id);
      public boolean         removerTrotinete(int id);
@@ -84,7 +84,7 @@ public interface IEcoRideLN {
 
      // ------------------- Reparações -------------------
      // feito
-     public Reparacao       registarReparacao(String nomenclatura, String descricao, float preco);
+     public Reparacao       registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel);
      public Reparacao       atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade);
      public Reparacao       obterReparacao(int id);
      public boolean         existeReparacao(int id);
@@ -148,7 +148,7 @@ public interface IEcoRideLN {
      public boolean           removerFuncionario(int id);
      public List<Funcionario> obterFuncionarios();
      public void              registarHorasExtraFuncionario(int id_funcionario, int horas_extra);
-     public void              registarPagamentoFuncionario(int id_funcionario);
+     public boolean           registarPagamentoFuncionario(int id_funcionario);
 
      // ------------------- Movimentos Financeiros -------------------
      // feito

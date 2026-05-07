@@ -9,9 +9,9 @@ public class SReparacoesFacade implements ISReparacoes {
      private final ReparacaoDAO reparacaoDAO = ReparacaoDAO.getInstance();
 
      @Override
-     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco) {
+     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel) {
           int id = reparacaoDAO.generateNewId();
-          Reparacao reparacao = new Reparacao(id, nomenclatura, descricao, preco, true);
+          Reparacao reparacao = new Reparacao(id, nomenclatura, descricao, preco, disponivel);
           reparacaoDAO.put(id, reparacao);
           return reparacao;
      }
