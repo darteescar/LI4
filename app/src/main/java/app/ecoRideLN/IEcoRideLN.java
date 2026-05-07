@@ -24,10 +24,17 @@ import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.ItemEncomenda;
+import app.ecoRideLN.sAutenticacao.Cargo;
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.Stock;
 
 public interface IEcoRideLN {
+
+     // ------------------- Autenticação -------------------
+
+     public boolean autenticar(int idUtilizador, String password);
+     public Cargo   obterCargoUtilizador(int idUtilizador);
+     public int     obterIdFuncionario_Utilizador(int idUtilizador);
 
      // ------------------- Notificações -------------------
 

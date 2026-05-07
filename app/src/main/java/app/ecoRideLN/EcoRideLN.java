@@ -66,6 +66,23 @@ public class EcoRideLN implements IEcoRideLN {
         this.sReparacoes = new SReparacoesFacade();
     }
 
+    // ------------------- Autenticação -------------------
+
+    @Override
+    public boolean autenticar(int idUtilizador, String password) {
+        return sAutenticacao.autenticar(idUtilizador, password);
+    }
+
+    @Override
+    public app.ecoRideLN.sAutenticacao.Cargo obterCargoUtilizador(int idUtilizador) {
+        return sAutenticacao.obterCargoUtilizador(idUtilizador);
+    }
+
+    @Override
+    public int obterIdFuncionario_Utilizador(int idUtilizador) {
+        return sAutenticacao.obterUtilizador(idUtilizador).getIdFuncionario();
+    }
+
     // ------------------- Notificações -------------------
 
     @Override
