@@ -6,5 +6,6 @@ public record PecaRequest (
      String descricao,
      int stock_minimo,
      float preco_venda,
-     int codFornecedor
+     int codFornecedor,
+     boolean ativa
 ) {}

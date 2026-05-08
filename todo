@@ -10,3 +10,19 @@ Adicionar filtro por trotinete na listagem de OS (atenção no use case tbm)
 Alterar use case de pesquisa dos Clientes (dá nome, email e NIF)
 Alterar use case de pesquisa das Trotinetes (dá marca, modelo, numero serie, cliente e tipo de motor)
 Alterar use case de pesquisa dos fornecedores (dá nome, nif, email)
+
+==============================================================
+CODE
+==============================================================
+
+Facade:
+Verificar se é o mecânico atribuido que esta a tentar marcar diagnostico ou conserto
+Verificar se é a segunda vez que se coloca um diagnostico
+Verificar se quando se coloca o conserto, o diagnostico já existe, o orçamento foi aprovado e as peças usadas estão em stock e são as mesmas do orçamento (diagnostico)
+Verificar quando se regista pagamento se o cliente ja foi notificado
+
+
+API:
+feito - financeiro, clientes, reparacoes, notificacoes, funcionarios, stock (peças, encomendas, stock e fornecedores)
+
+Verificar com o Claude a lógica de respostas

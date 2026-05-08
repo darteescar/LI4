@@ -1,17 +1,17 @@
 package app.ecoRideLN.sStock;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Devolucao {
 
     private int id;
-    private LocalDateTime data;
+    private LocalDate data;
     private String motivo;
     private EstadoDevolucao estado;
     private int codStock;
     private int quantidade;
 
-    public Devolucao(int id, LocalDateTime data, String motivo, int codStock, int quantidade) {
+    public Devolucao(int id, LocalDate data, String motivo, int codStock, int quantidade) {
         this.id = id;
         this.data = data;
         this.motivo = motivo;
@@ -20,7 +20,7 @@ public class Devolucao {
         this.quantidade = quantidade;
     }
 
-    public Devolucao(int id, LocalDateTime data, String motivo, EstadoDevolucao estado, int codStock, int quantidade) {
+    public Devolucao(int id, LocalDate data, String motivo, EstadoDevolucao estado, int codStock, int quantidade) {
         this.id = id;
         this.data = data;
         this.motivo = motivo;
@@ -37,11 +37,11 @@ public class Devolucao {
         this.id = id;
     }
 
-    public LocalDateTime getData() {
+    public LocalDate getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(LocalDate data) {
         this.data = data;
     }
 

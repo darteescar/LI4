@@ -1,7 +1,6 @@
 package app.ecoRideLN;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +72,6 @@ public interface IEcoRideLN {
      public Cliente       registarCliente(String nome, String email, String telemovel, String nif);
      public Cliente       atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif);
      public Cliente       obterCliente(int id);
-     public boolean       existeCliente(int id);
      public boolean       removerCliente(int id);
      public List<Cliente> obterClientes();
 
@@ -82,7 +80,6 @@ public interface IEcoRideLN {
      public Trotinete       registarTrotinete(int id_cliente, String modelo, String marca, String num_serie, String tipo_motor);
      public Trotinete       atualizarTrotinete(int id, int id_cliente, String modelo, String marca, String num_serie, String tipo_motor);
      public Trotinete       obterTrotinete(int id);
-     public boolean         existeTrotinete(int id);
      public boolean         removerTrotinete(int id);
      public List<Trotinete> obterTrotinetes();
 
@@ -108,15 +105,19 @@ public interface IEcoRideLN {
 
      // ------------------- Stock -------------------
 
-     public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie);
-     public Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
+     public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie);
+     public Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade);
      public Stock   obterStock(int id);
      public boolean existeStock(int id);
      public boolean removerStock(int id);
+     public List<Stock> obterStocks();
+     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
+     public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie);
+
 
      // ------------------- Devoluções -------------------
 
-     public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
+     public Devolucao registarDevolucao(LocalDate data_devolucao, String motivo, int id_stock, int quantidade);
      public Devolucao obterDevolucao(int id);
      public boolean   existeDevolucao(int id);
      public boolean   removerDevolucao(int id);
@@ -130,8 +131,8 @@ public interface IEcoRideLN {
      public Encomenda                         obterEncomenda(int id);
      public boolean                           removerEncomenda(int id);
      public List<Encomenda>                   obterEncomendas();
-     public void                              marcarEncomendaComoEnviada(int id);
-     public void                              marcarEncomendaComoRecebida(int id);
+     public Encomenda                         marcarEncomendaComoEnviada(int id);
+     public Encomenda                         marcarEncomendaComoRecebida(int id);
      public Map<Integer, List<ItemEncomenda>> gerarListaAutomatica();
 
      // ------------------- Fornecedores -------------------

@@ -1,5 +1,9 @@
 package app.IecoRideCA;
 
+import java.util.Map;
+
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.auth.SessaoUtilizador;
 import app.IecoRideCA.controllers.auth.AuthController;
@@ -14,9 +18,9 @@ import app.common.EcoRideException;
 import app.ecoRideLN.EcoRideLN;
 import app.ecoRideLN.IEcoRideLN;
 import io.javalin.Javalin;
+import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class EcoRideApp {
 
@@ -48,6 +52,20 @@ public class EcoRideApp {
         app.exception(NumberFormatException.class, (e, ctx) ->
             ctx.status(400).json(new ErroResponse("ID inválido"))
         );
+        app.exception(ForbiddenResponse.class, (e, ctx) -> {
+            ctx.status(403).json(Map.of(
+                "status", 403,
+                "erro", "Forbidden",
+                "mensagem", e.getMessage()
+            ));
+        });
+        app.exception(UnauthorizedResponse.class, (e, ctx) -> {
+            ctx.status(401).json(Map.of(
+                "status", 401,
+                "erro", "Unauthorized",
+                "mensagem", e.getMessage()
+            ));
+        });
 
         // Registo de controllers
         new AuthController(facade, gestorSessoes).register(app);

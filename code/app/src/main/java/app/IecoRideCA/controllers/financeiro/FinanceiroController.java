@@ -59,7 +59,7 @@ public class FinanceiroController {
         AnaliseFinanceira analise =
             facade.calcularAnaliseFinanceira(movimentos);
 
-        ctx.json(new MovimentoFinanceiroResponse(movimentos, analise));
+        ctx.status(200).json(new MovimentoFinanceiroResponse(movimentos, analise));
     });
 
     }

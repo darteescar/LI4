@@ -21,11 +21,13 @@ public class OrdemServicoController {
 
     public void register(Javalin app) {
 
+        // List<OrdemServico>
         app.get("/api/ordensservicos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             ctx.json(facade.obterOSs());
         });
 
+        // Obter OrdemServico por id
         app.get("/api/ordensservicos/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -34,6 +36,7 @@ public class OrdemServicoController {
             else ctx.json(c);
         });
 
+        // Registar OrdemServico
         app.post("/api/ordensservicos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             OrdemServicoRequest req = ctx.bodyAsClass(OrdemServicoRequest.class);
@@ -41,13 +44,15 @@ public class OrdemServicoController {
             ctx.status(201).json(criado);
         });
 
+        // Remover OrdemServico
         app.delete("/api/ordensservicos/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerOS(id) ? 204 : 404);
         });
 
-        app.post("api/ordensservicos/pegarNaOs/{id}", ctx -> {
+        // Atribuir OrdemServico a Funcionario
+        app.patch("api/ordensservicos/pegarNaOs/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PegarOSRequest req = ctx.bodyAsClass(PegarOSRequest.class);
@@ -55,14 +60,16 @@ public class OrdemServicoController {
             ctx.status(204);
         });
 
-        app.post("api/ordensservicos/cancelarOS/{id}", ctx -> {
+        // Cancelar OrdemServico
+        app.patch("api/ordensservicos/cancelarOS/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.cancelarOS(id);
             ctx.status(204);
         });
 
-        app.post("api/ordensservicos/addDiagnostico/{id}", ctx -> {
+        // Adicionar Diagnostico a OrdemServico
+        app.patch("api/ordensservicos/addDiagnostico/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             DiagnosticoRequest req = ctx.bodyAsClass(DiagnosticoRequest.class);
@@ -71,7 +78,8 @@ public class OrdemServicoController {
             ctx.status(204);
         });
 
-        app.post("api/ordensservicos/addConserto/{id}", ctx -> {
+        // Adicionar Conserto a OrdemServico
+        app.patch("api/ordensservicos/addConserto/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ConsertoRequest req = ctx.bodyAsClass(ConsertoRequest.class);
@@ -80,28 +88,28 @@ public class OrdemServicoController {
             ctx.status(204);
         });
 
-        app.post("api/ordensservicos/aprovarOrcamento/{id}", ctx -> {
+        app.patch("api/ordensservicos/aprovarOrcamento/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.aprovarOrcamentoOS(id);
             ctx.status(204);
         });
 
-        app.post("api/ordensservicos/rejeitarOrcamento/{id}", ctx -> {
+        app.patch("api/ordensservicos/rejeitarOrcamento/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.rejeitarOrcamentoOS(id);
             ctx.status(204);
         });
 
-        app.post("api/ordensservicos/clienteNotificado/{id}", ctx -> {
+        app.patch("api/ordensservicos/clienteNotificado/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.registarNotificacaoPagamentoOS(id);
             ctx.status(204);
         });
 
-        app.post("api/ordensservicos/pagarOS/{id}", ctx -> {
+        app.patch("api/ordensservicos/pagarOS/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PagamentoRequest req = ctx.bodyAsClass(PagamentoRequest.class);

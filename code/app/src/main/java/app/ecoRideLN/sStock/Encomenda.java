@@ -1,6 +1,6 @@
 package app.ecoRideLN.sStock;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +10,9 @@ public class Encomenda {
 
     private int id;
     private int codFornecedor;
-    private LocalDateTime data_criacao;
-    private LocalDateTime data_rececao;
-    private LocalDateTime data_envio;
+    private LocalDate data_criacao;
+    private LocalDate data_rececao;
+    private LocalDate data_envio;
     private EstadoEncomenda estado;
     private List<ItemEncomenda> itensEncomendados;
     private List<Integer> codEntradasStock;
@@ -22,7 +22,7 @@ public class Encomenda {
     public Encomenda(int id, int codFornecedor, List<ItemEncomenda> itensEncomendados) {
         this.id = id;
         this.codFornecedor = codFornecedor;
-        this.data_criacao = LocalDateTime.now();
+        this.data_criacao = LocalDate.now();
         this.data_rececao = null;
         this.data_envio = null;
         this.estado = EstadoEncomenda.RASCUNHO;
@@ -30,8 +30,8 @@ public class Encomenda {
         this.codEntradasStock = new ArrayList<>();
     }
 
-    public Encomenda(int id, int codFornecedor, LocalDateTime data_criacao, LocalDateTime data_rececao,
-            LocalDateTime data_envio, EstadoEncomenda estado,
+    public Encomenda(int id, int codFornecedor, LocalDate data_criacao, LocalDate data_rececao,
+            LocalDate data_envio, EstadoEncomenda estado,
             List<ItemEncomenda> itensEncomendados, List<Integer> codEntradasStock) {
         this.id = id;
         this.codFornecedor = codFornecedor;
@@ -59,27 +59,27 @@ public class Encomenda {
         this.codFornecedor = codFornecedor;
     }
 
-    public LocalDateTime getData_criacao() {
+    public LocalDate getData_criacao() {
         return data_criacao;
     }
 
-    public void setData_criacao(LocalDateTime data_criacao) {
+    public void setData_criacao(LocalDate data_criacao) {
         this.data_criacao = data_criacao;
     }
 
-    public LocalDateTime getData_rececao() {
+    public LocalDate getData_rececao() {
         return data_rececao;
     }
 
-    public void setData_rececao(LocalDateTime data_rececao) {
+    public void setData_rececao(LocalDate data_rececao) {
         this.data_rececao = data_rececao;
     }
 
-    public LocalDateTime getData_envio() {
+    public LocalDate getData_envio() {
         return data_envio;
     }
 
-    public void setData_envio(LocalDateTime data_envio) {
+    public void setData_envio(LocalDate data_envio) {
         this.data_envio = data_envio;
     }
 

@@ -1,7 +1,6 @@
 package app.ecoRideLN.sStock;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -138,7 +137,7 @@ public class SStockFacade implements ISStock {
      // --------------------------------------------
 
      @Override
-     public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie) {
+     public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
           int id = stockDAO.generateNewId();
           Stock novo = new StockComGarantia(id, preco_compra, id_peca, data, nr_serie, garantia);
           stockDAO.put(id, novo);
@@ -146,7 +145,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade) {
+     public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
           int id = stockDAO.generateNewId();
           Stock novo = new Stock(id, preco_compra, id_peca, data, quantidade);
           stockDAO.put(id, novo);
@@ -154,32 +153,31 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado) {
+     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade) {
           Stock stock = stockDAO.get(id_stock);
           if (stock != null) {
                if (preco_compra >= 0)   stock.setPreco_compra(preco_compra);
                if (cod_Peca >= 0)       stock.setCodPeca(cod_Peca);
                if (data_rececao != null) stock.setData_chegada(data_rececao);
                if (quantidade >= 0)     stock.setQuantidade(quantidade);
-               if (estado != null)      stock.setEstado(estado);
                stockDAO.put(id_stock, stock);
           }
           return stock;
      }
 
      @Override
-     public void atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie) {
+     public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie) {
           Stock stock = stockDAO.get(id_stock);
           if (stock instanceof StockComGarantia stockGarantia) {
                if (preco_compra >= 0)               stockGarantia.setPreco_compra(preco_compra);
                if (cod_Peca >= 0)                   stockGarantia.setCodPeca(cod_Peca);
                if (data_rececao != null)             stockGarantia.setData_chegada(data_rececao);
                if (quantidade >= 0)                 stockGarantia.setQuantidade(quantidade);
-               if (estado != null)                  stockGarantia.setEstado(estado);
-               if (garantia != null)                stockGarantia.setGarantia(garantia);
+               if (garantia != 0)                stockGarantia.setGarantia(garantia);
                if (nr_serie != null && !nr_serie.isEmpty()) stockGarantia.setNr_serie(nr_serie);
                stockDAO.put(id_stock, stockGarantia);
           }
+          return stock;
      }
 
      @Override
@@ -205,12 +203,13 @@ public class SStockFacade implements ISStock {
      // Utilitários
 
      @Override
-     public void atualizaEstadoStock(int id, EstadoStock estado) {
+     public Stock atualizaEstadoStock(int id, EstadoStock estado) {
           Stock stock = stockDAO.get(id);
           if (stock != null) {
                stock.setEstado(estado);
                stockDAO.put(id, stock);
           }
+          return stock;
      }
 
      @Override
@@ -234,7 +233,7 @@ public class SStockFacade implements ISStock {
      // ------------------- Devolucao -------------------
 
      @Override
-     public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+     public Devolucao registarDevolucao(LocalDate data_devolucao, String motivo, int id_stock, int quantidade) {
           Stock s = stockDAO.get(id_stock);
           if (s == null) throw new EcoRideException("Stock " + id_stock + " não encontrado.");
           if (quantidade <= 0 || quantidade > s.getQuantidade())
@@ -248,7 +247,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Devolucao atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+     public Devolucao atualizarDevolucao(int id, LocalDate data_devolucao, String motivo, int id_stock, int quantidade) {
           Devolucao devolucao = devolucaoDAO.get(id);
           if (devolucao != null) {
                if (data_devolucao != null)           devolucao.setData(data_devolucao);
@@ -340,7 +339,7 @@ public class SStockFacade implements ISStock {
      }
 
      @Override
-     public Encomenda atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado) {
+     public Encomenda atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDate data_pedido, LocalDate data_chegada, EstadoEncomenda estado) {
           Encomenda encomenda = encomendaDAO.get(id);
           if (encomenda != null) {
                if (itens != null && !itens.isEmpty()) encomenda.setItensEncomendados(itens);
@@ -370,31 +369,33 @@ public class SStockFacade implements ISStock {
      // Utilitários
 
      @Override
-     public void marcarEncomendaComoEnviada(int id) {
+     public Encomenda marcarEncomendaComoEnviada(int id) {
           Encomenda e = encomendaDAO.get(id);
           if (e != null) {
                e.setEstado(EstadoEncomenda.ENVIADA);
-               e.setData_envio(LocalDateTime.now());
+               e.setData_envio(LocalDate.now());
                encomendaDAO.put(id, e);
           }
+          return e;
      }
 
      @Override
-     public void marcarEncomendaComoRecebida(int id) {
+     public Encomenda marcarEncomendaComoRecebida(int id) {
           Encomenda e = encomendaDAO.get(id);
           if (e != null && e.getEstado() == EstadoEncomenda.RASCUNHO) {
                List<Integer> novosStocks = new ArrayList<>();
                for (ItemEncomenda item : e.getItensEncomendados()) {
                     int idStock = stockDAO.generateNewId();
-                    Stock novoStock = new Stock(idStock, item.getPreco_unitario(), item.getCodPeca(), LocalDateTime.now(), item.getQuantidade());
+                    Stock novoStock = new Stock(idStock, item.getPreco_unitario(), item.getCodPeca(), LocalDate.now(), item.getQuantidade());
                     stockDAO.put(idStock, novoStock);
                     novosStocks.add(idStock);
                }
                e.setEstado(EstadoEncomenda.RECEBIDA);
-               e.setData_rececao(LocalDateTime.now());
+               e.setData_rececao(LocalDate.now());
                e.setCodEntradasStock(novosStocks);
                encomendaDAO.put(id, e);
           }
+          return e;
      }
 
      @Override

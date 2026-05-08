@@ -1,13 +1,12 @@
 package app.ecoRideLN.sStock;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class StockComGarantia extends Stock {
      private String nr_serie;
-     private LocalDate garantia;
+     private int garantia;
 
-     public StockComGarantia(int id, float preco_compra, int codPeca, LocalDateTime data_chegada, String nr_serie, LocalDate garantia) {
+     public StockComGarantia(int id, float preco_compra, int codPeca, LocalDate data_chegada, String nr_serie, int garantia) {
           super(id, preco_compra, codPeca, data_chegada, 1);
           this.nr_serie = nr_serie;
           this.garantia = garantia;
@@ -21,11 +20,11 @@ public class StockComGarantia extends Stock {
           this.nr_serie = nr_serie;
      }
 
-     public LocalDate getGarantia() {
+     public int getGarantia() {
           return garantia;
      }
 
-     public void setGarantia(LocalDate garantia) {
+     public void setGarantia(int garantia) {
           this.garantia = garantia;
      }
 }

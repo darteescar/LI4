@@ -1,17 +1,17 @@
 package app.ecoRideLN.sStock;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Stock {
 
      private int id;
      private float preco_compra;
      private int codPeca;
-     private LocalDateTime data_chegada;
+     private LocalDate data_chegada;
      private int quantidade;
      private EstadoStock estado;
 
-     public Stock(int id, float preco_compra, int codPeca, LocalDateTime data_chegada, int quantidade) {
+     public Stock(int id, float preco_compra, int codPeca, LocalDate data_chegada, int quantidade) {
           this.id = id;
           this.preco_compra = preco_compra;
           this.codPeca = codPeca;
@@ -20,7 +20,7 @@ public class Stock {
           this.estado = EstadoStock.EmStock;
      }
 
-     public Stock(int id, float preco_compra, int codPeca, LocalDateTime data_chegada, int quantidade, EstadoStock estado) {
+     public Stock(int id, float preco_compra, int codPeca, LocalDate data_chegada, int quantidade, EstadoStock estado) {
           this.id = id;
           this.preco_compra = preco_compra;
           this.codPeca = codPeca;
@@ -53,11 +53,11 @@ public class Stock {
           this.codPeca = codPeca;
      }
 
-     public LocalDateTime getData_chegada() {
+     public LocalDate getData_chegada() {
           return data_chegada;
      }
 
-     public void setData_chegada(LocalDateTime data_chegada) {
+     public void setData_chegada(LocalDate data_chegada) {
           this.data_chegada = data_chegada;
      }
 

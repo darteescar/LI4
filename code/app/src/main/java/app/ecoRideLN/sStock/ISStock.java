@@ -1,7 +1,6 @@
 package app.ecoRideLN.sStock;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -45,13 +44,13 @@ public interface ISStock {
 
     // ------------------- Stock -------------------
 
-    public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie);
+    public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie);
 
-    public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade);
+    public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade);
 
-    public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado);
+    public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
 
-    public void atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDateTime data_rececao, int quantidade, EstadoStock estado, LocalDate garantia, String nr_serie);
+    public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie);
 
     public Stock obterStock(int id);
 
@@ -63,7 +62,7 @@ public interface ISStock {
 
     // Utilitários
 
-    public void atualizaEstadoStock(int id, EstadoStock estado);
+    public Stock atualizaEstadoStock(int id, EstadoStock estado);
 
     public int pecasDefeituosas_Stock(int id_peca);
 
@@ -71,9 +70,9 @@ public interface ISStock {
 
     // ------------------- Devolucao -------------------
 
-    public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
+    public Devolucao registarDevolucao(LocalDate data_devolucao, String motivo, int id_stock, int quantidade);
 
-    public Devolucao atualizarDevolucao(int id, LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade);
+    public Devolucao atualizarDevolucao(int id, LocalDate data_devolucao, String motivo, int id_stock, int quantidade);
 
     public void devolverPecas(List<Integer> pecas);
 
@@ -99,7 +98,7 @@ public interface ISStock {
 
     public Encomenda registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
 
-    public Encomenda atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDateTime data_pedido, LocalDateTime data_chegada, EstadoEncomenda estado);
+    public Encomenda atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDate data_pedido, LocalDate data_chegada, EstadoEncomenda estado);
 
     public Encomenda obterEncomenda(int id);
 
@@ -109,9 +108,9 @@ public interface ISStock {
 
     // Utilitários
     
-    public void marcarEncomendaComoEnviada(int id);
+    public Encomenda marcarEncomendaComoEnviada(int id);
 
-    public void marcarEncomendaComoRecebida(int id);
+    public Encomenda marcarEncomendaComoRecebida(int id);
 
     public boolean validaEncomenda_Rascunho(int id_Encomenda);
 

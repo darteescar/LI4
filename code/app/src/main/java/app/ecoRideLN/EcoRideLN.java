@@ -1,7 +1,6 @@
 package app.ecoRideLN;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -258,7 +257,6 @@ public class EcoRideLN implements IEcoRideLN {
         return sClientes.obterCliente(id);
     }
 
-    @Override
     public boolean existeCliente(int id) {
         return sClientes.existeCliente(id);
     }
@@ -290,7 +288,6 @@ public class EcoRideLN implements IEcoRideLN {
         return sClientes.obterTrotinete(id);
     }
 
-    @Override
     public boolean existeTrotinete(int id) {
         return sClientes.existeTrotinete(id);
     }
@@ -382,12 +379,12 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Stock -------------------
 
     @Override
-    public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDateTime data, LocalDate garantia, String nr_serie) {
+    public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
         return sStock.registarStockComGarantia(id_peca, preco_compra, data, garantia, nr_serie);
     }
 
     @Override
-    public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDateTime data, int quantidade) {
+    public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
         return sStock.registarStock_PecaNormal(id_peca, preco_compra, data, quantidade);
     }
 
@@ -406,10 +403,25 @@ public class EcoRideLN implements IEcoRideLN {
         return sStock.removerStock(id);
     }
 
+    @Override
+    public List<Stock> obterStocks() {
+        return sStock.obterStocks();
+    }
+
+    @Override
+    public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade) {
+        return sStock.atualizarStock(id_stock, preco_compra, cod_Peca, data_rececao, quantidade);
+    }
+
+    @Override
+    public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie) {
+        return sStock.atualizarStockComGarantia(id_stock, preco_compra, cod_Peca, data_rececao, quantidade, garantia, nr_serie);
+    }
+
     // ------------------- Devoluções -------------------
 
     @Override
-    public Devolucao registarDevolucao(LocalDateTime data_devolucao, String motivo, int id_stock, int quantidade) {
+    public Devolucao registarDevolucao(LocalDate data_devolucao, String motivo, int id_stock, int quantidade) {
         return sStock.registarDevolucao(data_devolucao, motivo, id_stock, quantidade);
     }
 
@@ -466,13 +478,13 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void marcarEncomendaComoEnviada(int id) {
-        sStock.marcarEncomendaComoEnviada(id);
+    public Encomenda marcarEncomendaComoEnviada(int id) {
+        return sStock.marcarEncomendaComoEnviada(id);
     }
 
     @Override
-    public void marcarEncomendaComoRecebida(int id) {
-        sStock.marcarEncomendaComoRecebida(id);
+    public Encomenda marcarEncomendaComoRecebida(int id) {
+        return sStock.marcarEncomendaComoRecebida(id);
     }
 
     @Override

@@ -17,12 +17,14 @@ public class FuncionariosController {
 
     public void register(Javalin app) {
 
+        // List<Funcionario> 
         app.get("/api/funcionarios", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             ctx.json(facade.obterFuncionarios());
         });
 
-        app.get("/api/funcionarios/{id}", ctx -> {
+        // Obter Funcionario por ID
+        app.get("/api/funcionario/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Funcionario c = facade.obterFuncionario(id);
@@ -30,26 +32,40 @@ public class FuncionariosController {
             else ctx.json(c);
         });
 
-        app.post("/api/funcionarios", ctx -> {
+        // Criar Funcionario
+        app.post("/api/funcionario", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
             Funcionario criado = facade.registarFuncionario(req.nome(), req.email(), req.telemovel(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
-            ctx.status(201).json(criado);
+            ctx.status(200).json(criado);
         });
 
-        app.delete("/api/funcionarios/{id}", ctx -> {
+        // Remover Funcionario
+        app.delete("/api/funcionario/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerFuncionario(id) ? 204 : 404);
         });
 
-        app.patch("/api/funcionarios/pagar/{id}", ctx -> {
+        // Atualizar Funcionario
+        app.patch("/api/funcionario/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
+            Funcionario atualizado = facade.atualizarFuncionario(id, req.nome(), req.email(), req.telemovel(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
+            if (atualizado == null) ctx.status(404);
+            else ctx.json(atualizado);
+        });
+
+        // Pagar Funcionario
+        app.patch("/api/funcionario/pagar/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.registarPagamentoFuncionario(id) ? 204 : 404);
         });
 
-        app.patch("/api/funcionarios/horas_extra/{id}", ctx -> {
+        // Registar Horas Extra Funcionario
+        app.patch("/api/funcionario/horas_extra/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             int horas_extra = Integer.parseInt(ctx.queryParam("horas_extra"));

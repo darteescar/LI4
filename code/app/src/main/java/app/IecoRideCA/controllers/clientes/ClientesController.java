@@ -1,5 +1,7 @@
 package app.IecoRideCA.controllers.clientes;
 
+import java.util.List;
+
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.clientes.dto.ClienteRequest;
 import app.IecoRideCA.controllers.clientes.dto.TrotineteRequest;
@@ -19,56 +21,128 @@ public class ClientesController {
 
     public void register(Javalin app) {
 
+        // Clientes
+
+        // List<Cliente>
         app.get("/api/clientes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
-            ctx.json(facade.obterClientes());
+            List <Cliente> clientes = facade.obterClientes();
+            if (clientes == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(200).json(clientes);
+            }
         });
 
+        // Obter Cliente por id
         app.get("/api/clientes/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Cliente c = facade.obterCliente(id);
-            if (c == null) ctx.status(404);
-            else ctx.json(c);
+            if (c == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(200).json(c);
+            }
         });
 
+        // Criar Cliente
         app.post("/api/clientes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             ClienteRequest req = ctx.bodyAsClass(ClienteRequest.class);
             Cliente criado = facade.registarCliente(req.nome(), req.email(), req.telemovel(), req.nif());
-            ctx.status(201).json(criado);
+            if (criado == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(201).json(criado);
+            }
         });
 
+        // Eliminar Cliente
         app.delete("/api/clientes/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            ctx.status(facade.removerCliente(id) ? 204 : 404);
+            boolean removed = facade.removerCliente(id);
+            if (removed) {
+                ctx.status(204);
+            } else {
+                ctx.status(404);
+            }
         });
 
+        // Editar Cliente
+        app.patch("/api/clientes/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            ClienteRequest req = ctx.bodyAsClass(ClienteRequest.class);
+            Cliente editado = facade.atualizarCliente(id, req.nome(), req.email(), req.telemovel(), req.nif());
+            if (editado == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(200).json(editado);
+            }
+        });
+
+        // Trotinetes
+
+        // List<Trotinete>
         app.get("/api/trotinetes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
-            ctx.json(facade.obterTrotinetes());
+            List<Trotinete> trotinetes = facade.obterTrotinetes();
+            if (trotinetes == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(200).json(trotinetes);
+            }
         });
 
+        // Obter Trotinete por id
         app.get("/api/trotinetes/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Trotinete c = facade.obterTrotinete(id);
-            if (c == null) ctx.status(404);
-            else ctx.json(c);
+            if (c == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(200).json(c);
+            }
         });
 
-        app.post("/api/trotinetes", ctx -> {
+        // Criar Trotinete
+        app.post("/api/clientes/{id}/trotinetes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             TrotineteRequest req = ctx.bodyAsClass(TrotineteRequest.class);
             Trotinete criado = facade.registarTrotinete(req.cod_cliente(), req.modelo(), req.marca(), req.num_serie(), req.motor());
-            ctx.status(201).json(criado);
+            if (criado == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(201).json(criado);
+            }
         });
 
+        // Editar Trotinete
         app.delete("/api/trotinetes/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            ctx.status(facade.removerTrotinete(id) ? 204 : 404);
+            boolean removed = facade.removerTrotinete(id);
+            if (removed) {
+                ctx.status(204);
+            } else {
+                ctx.status(404);
+            }
+        });
+
+        // Atualizar Trotinete
+        app.patch("/api/trotinetes/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            TrotineteRequest req = ctx.bodyAsClass(TrotineteRequest.class);
+            Trotinete editado = facade.atualizarTrotinete(id, req.cod_cliente(), req.modelo(), req.marca(), req.num_serie(), req.motor());
+            if (editado == null) {
+                ctx.status(404);
+            } else {
+                ctx.status(200).json(editado);
+            }
         });
     }
 }
