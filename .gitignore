@@ -26,4 +26,4 @@
 
 /.github
 /.vscode
-**/target
+code/app/target
