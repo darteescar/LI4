@@ -1,11 +1,9 @@
 package app.IecoRideCA.controllers.funcionarios;
 
 import app.IecoRideCA.auth.GestorSessoes;
-import app.IecoRideCA.controllers.clientes.dto.ClienteRequest;
 import app.IecoRideCA.controllers.funcionarios.dto.FuncionarioRequest;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
-import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sFuncionarios.Funcionario;
 import io.javalin.Javalin;
 

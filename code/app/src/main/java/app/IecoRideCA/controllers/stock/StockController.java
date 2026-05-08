@@ -1,14 +1,11 @@
 package app.IecoRideCA.controllers.stock;
 
 import app.IecoRideCA.auth.GestorSessoes;
-import app.IecoRideCA.controllers.clientes.dto.ClienteRequest;
 import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
 import app.IecoRideCA.controllers.stock.dto.FornecedorRequest;
 import app.IecoRideCA.controllers.stock.dto.PecaRequest;
-import app.IecoRideCA.controllers.stock.dto.StockRequest;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
-import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.Peca;

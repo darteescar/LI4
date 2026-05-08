@@ -13,11 +13,11 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
-    public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo) {
+    public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador) {
         if (utilizadoresDAO.containsKey(idFuncionario)) {
             throw new EcoRideException("Utilizador com ID " + idFuncionario + " já existe.");
         }
-        Utilizador utilizador = new Utilizador(utilizadoresDAO.generateNewId(), password, idFuncionario, cargo);
+        Utilizador utilizador = new Utilizador(utilizadoresDAO.generateNewId(), password, idFuncionario, cargo, identificador);
         utilizadoresDAO.add(utilizador);
         return utilizador;
     }
@@ -75,11 +75,15 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
-    public void atualizarPalavraPasseUtilizador(int id, String novaPassword) {
+    public boolean atualizarPalavraPasseUtilizador(int id, String passwordvelha, String novaPassword) {
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
+        if (!utilizadoresDAO.authenticate(id, passwordvelha)) {
+            throw new EcoRideException("Password antiga incorreta para o utilizador com ID " + id + ".");
+        }
         utilizadoresDAO.updatePassword(id, novaPassword);
+        return true;
     }
 
     @Override

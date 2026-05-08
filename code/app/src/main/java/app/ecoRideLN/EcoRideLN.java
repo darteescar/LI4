@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import app.ecoRideLN.sAutenticacao.Cargo;
 import app.ecoRideLN.sAutenticacao.ISAutenticacao;
 import app.ecoRideLN.sAutenticacao.SAutenticacaoFacade;
+import app.ecoRideLN.sAutenticacao.Utilizador;
 import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.ISClientes;
 import app.ecoRideLN.sClientes.SClientesFacade;
@@ -69,18 +71,28 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Autenticação -------------------
 
     @Override
+    public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador) {
+        return sAutenticacao.registarUtilizador(password, idFuncionario, cargo, identificador);
+    }
+
+    @Override
     public boolean autenticar(int idUtilizador, String password) {
         return sAutenticacao.autenticar(idUtilizador, password);
     }
 
     @Override
-    public app.ecoRideLN.sAutenticacao.Cargo obterCargoUtilizador(int idUtilizador) {
+    public Cargo obterCargoUtilizador(int idUtilizador) {
         return sAutenticacao.obterCargoUtilizador(idUtilizador);
     }
 
     @Override
     public int obterIdFuncionario_Utilizador(int idUtilizador) {
         return sAutenticacao.obterUtilizador(idUtilizador).getIdFuncionario();
+    }
+
+    @Override
+    public boolean atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword) {
+        return sAutenticacao.atualizarPalavraPasseUtilizador(idUtilizador, passwordvelha, novaPassword);
     }
 
     // ------------------- Notificações -------------------

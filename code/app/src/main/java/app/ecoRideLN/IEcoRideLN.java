@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import app.ecoRideLN.sAutenticacao.Cargo;
+import app.ecoRideLN.sAutenticacao.Utilizador;
 import app.ecoRideLN.sClientes.Cliente;
 import app.ecoRideLN.sClientes.Trotinete;
 import app.ecoRideLN.sFinanceiro.AnaliseFinanceira;
@@ -24,7 +26,6 @@ import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.ItemEncomenda;
-import app.ecoRideLN.sAutenticacao.Cargo;
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.Stock;
 
@@ -32,9 +33,11 @@ public interface IEcoRideLN {
 
      // ------------------- Autenticação -------------------
 
+     public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador);
      public boolean autenticar(int idUtilizador, String password);
      public Cargo   obterCargoUtilizador(int idUtilizador);
      public int     obterIdFuncionario_Utilizador(int idUtilizador);
+     public boolean atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword);
 
      // ------------------- Notificações -------------------
 

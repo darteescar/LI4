@@ -60,13 +60,14 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
         Utilizador stored = get(u.getId());
         return stored != null && stored.getPassword().equals(u.getPassword())
                               && stored.getIdFuncionario() == u.getIdFuncionario()
-                              && stored.getCargo() == u.getCargo();
+                              && stored.getCargo() == u.getCargo()
+                              && stored.getIdentificador().equals(u.getIdentificador());
     }
 
     @Override
     public Utilizador get(Object key) {
         if (!(key instanceof Integer id)) return null;
-        String sql = "SELECT id, password, idFuncionario, cargo FROM Utilizador WHERE id = ?";
+        String sql = "SELECT id, password, idFuncionario, cargo, identificador FROM Utilizador WHERE id = ?";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -76,7 +77,9 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
                         rs.getInt("id"),
                         rs.getString("password"),
                         rs.getInt("idFuncionario"),
-                        Cargo.valueOf(rs.getString("cargo")));
+                        Cargo.valueOf(rs.getString("cargo")),
+                        rs.getString("identificador")
+                );
             }
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter utilizador " + id, e);
@@ -87,12 +90,13 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
     public Utilizador put(Integer key, Utilizador value) {
         Utilizador prev = get(key);
         String sql = """
-                INSERT INTO Utilizador (id, password, idFuncionario, cargo)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO Utilizador (id, password, idFuncionario, cargo, identificador)
+                VALUES (?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     password      = VALUES(password),
                     idFuncionario = VALUES(idFuncionario),
-                    cargo         = VALUES(cargo)
+                    cargo         = VALUES(cargo),
+                    identificador = VALUES(identificador)
                 """;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -100,6 +104,7 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
             ps.setString(2, value.getPassword());
             ps.setInt(3, value.getIdFuncionario());
             ps.setString(4, value.getCargo().name());
+            ps.setString(5, value.getIdentificador());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar utilizador " + key, e);
@@ -153,7 +158,7 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
     @Override
     public Collection<Utilizador> values() {
         Set<Utilizador> out = new LinkedHashSet<>();
-        String sql = "SELECT id, password, idFuncionario, cargo FROM Utilizador";
+        String sql = "SELECT id, password, idFuncionario, cargo, identificador FROM Utilizador";
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();
              ResultSet rs = s.executeQuery(sql)) {
@@ -162,7 +167,9 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
                         rs.getInt("id"),
                         rs.getString("password"),
                         rs.getInt("idFuncionario"),
-                        Cargo.valueOf(rs.getString("cargo"))));
+                        Cargo.valueOf(rs.getString("cargo")),
+                        rs.getString("identificador")
+                ));
             }
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter utilizadores", e);

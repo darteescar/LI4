@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ISAutenticacao {
 
-     public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo);
+     public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador);
 
      public Utilizador obterUtilizador(int id);
 
@@ -22,7 +22,7 @@ public interface ISAutenticacao {
 
      public Cargo obterCargoUtilizador(int id);
 
-     public void atualizarPalavraPasseUtilizador(int id, String novaPassword);
+     public boolean atualizarPalavraPasseUtilizador(int id, String passwordvelha, String novaPassword);
 
      public void atualizarCargoUtilizador(int id, Cargo novoCargo);
 }

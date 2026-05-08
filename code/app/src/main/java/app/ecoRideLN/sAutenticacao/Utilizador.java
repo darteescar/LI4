@@ -6,9 +6,11 @@ public class Utilizador {
     private String password;
     private int idFuncionario;
     private Cargo cargo;
+    private String identificador;
 
-    public Utilizador(int id, String password, int idFuncionario, Cargo cargo) {
+    public Utilizador(int id, String password, int idFuncionario, Cargo cargo, String identificador) {
         this.id = id;
+        this.identificador = identificador;
         this.password = password;
         this.idFuncionario = idFuncionario;
         this.cargo = cargo;
@@ -44,5 +46,13 @@ public class Utilizador {
 
     public void setCargo(Cargo cargo) {
         this.cargo = cargo;
+    }
+
+    public String getIdentificador() {
+        return this.identificador;
+    }
+
+    public void setIdentificador(String identificador) {
+        this.identificador = identificador;
     }
 }
