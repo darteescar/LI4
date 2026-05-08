@@ -1,7 +1,6 @@
 package app.ecoRideCD.sStock;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,14 +41,14 @@ public class StockDAO implements Map<Integer, Stock> {
         int id = rs.getInt("id");
         float preco = rs.getFloat("preco_compra");
         int codPeca = rs.getInt("codPeca");
-        var dataChegada = rs.getTimestamp("data_chegada").toLocalDateTime();
+        var dataChegada = rs.getTimestamp("data_chegada").toLocalDateTime().toLocalDate();
         int qtd = rs.getInt("quantidade");
         String nrSerie = rs.getString("nr_serie");
-        Date garantia = rs.getDate("garantia");
+        int garantia = rs.getInt("garantia");
         EstadoStock estado = rs.getString("estado") != null ? EstadoStock.valueOf(rs.getString("estado")) : null;
 
         if (nrSerie != null) {
-            return new StockComGarantia(id, preco, codPeca, dataChegada, nrSerie, garantia == null ? null : garantia.toLocalDate());
+            return new StockComGarantia(id, preco, codPeca, dataChegada, nrSerie, garantia );
         }
         return new Stock(id, preco, codPeca, dataChegada, qtd, estado);
     }
@@ -125,15 +124,11 @@ public class StockDAO implements Map<Integer, Stock> {
             ps.setInt(1, key);
             ps.setFloat(2, value.getPreco_compra());
             ps.setInt(3, value.getCodPeca());
-            ps.setTimestamp(4, Timestamp.valueOf(value.getData_chegada()));
+            ps.setTimestamp(4, Timestamp.valueOf(value.getData_chegada().atStartOfDay()));
             ps.setInt(5, value.getQuantidade());
             if (value instanceof StockComGarantia g) {
                 ps.setString(6, g.getNr_serie());
-                if (g.getGarantia() == null) {
-                    ps.setNull(7, Types.DATE);
-                } else {
-                    ps.setDate(7, Date.valueOf(g.getGarantia()));
-                }
+                ps.setInt(7, g.getGarantia());
                 ps.setString(8, g.getEstado().name());
             } else {
                 ps.setNull(6, Types.VARCHAR);

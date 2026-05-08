@@ -63,9 +63,9 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           return new Encomenda(
                     id,
                     rs.getInt("codFornecedor"),
-                    rs.getTimestamp("data_criacao") != null ? rs.getTimestamp("data_criacao").toLocalDateTime() : null,
-                    rs.getTimestamp("data_rececao") != null ? rs.getTimestamp("data_rececao").toLocalDateTime() : null,
-                    rs.getTimestamp("data_envio") != null ? rs.getTimestamp("data_envio").toLocalDateTime() : null,
+                    rs.getTimestamp("data_criacao") != null ? rs.getTimestamp("data_criacao").toLocalDateTime().toLocalDate() : null,
+                    rs.getTimestamp("data_rececao") != null ? rs.getTimestamp("data_rececao").toLocalDateTime().toLocalDate() : null,
+                    rs.getTimestamp("data_envio") != null ? rs.getTimestamp("data_envio").toLocalDateTime().toLocalDate() : null,
                     EstadoEncomenda.valueOf(rs.getString("estado")),
                     loadItens(c, id),
                     loadEntradasStock(c, id)
@@ -83,9 +83,9 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           try (PreparedStatement ps = c.prepareStatement(sql)) {
                ps.setInt(1, id);
                ps.setInt(2, value.getCodFornecedor());
-               ps.setTimestamp(3, value.getData_criacao() != null ? Timestamp.valueOf(value.getData_criacao()) : null);
-               ps.setTimestamp(4, value.getData_rececao() != null ? Timestamp.valueOf(value.getData_rececao()) : null);
-               ps.setTimestamp(5, value.getData_envio() != null ? Timestamp.valueOf(value.getData_envio()) : null);
+               ps.setTimestamp(3, value.getData_criacao() != null ? Timestamp.valueOf(value.getData_criacao().atStartOfDay()) : null);
+               ps.setTimestamp(4, value.getData_rececao() != null ? Timestamp.valueOf(value.getData_rececao().atStartOfDay()) : null);
+               ps.setTimestamp(5, value.getData_envio() != null ? Timestamp.valueOf(value.getData_envio().atStartOfDay()) : null);
                ps.setString(6, value.getEstado().name());
                ps.executeUpdate();
           }

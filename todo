@@ -25,4 +25,4 @@ Verificar quando se regista pagamento se o cliente ja foi notificado
 API:
 feito - financeiro, clientes, reparacoes, notificacoes, funcionarios, stock (peças, encomendas, stock e fornecedores)
 
-Verificar com o Claude a lógica de respostas
+Verificar com o Claude a lógica de respostas (codigos e metodos usados) e verificar se alterações no stock, devoluções e encomendas estão a ser feitas corretamente nos dados

@@ -35,7 +35,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
     private Devolucao buildFromRow(ResultSet rs) throws SQLException {
         return new Devolucao(
                 rs.getInt("id"),
-                rs.getTimestamp("data").toLocalDateTime(),
+                rs.getTimestamp("data").toLocalDateTime().toLocalDate(),
                 rs.getString("motivo"),
                 EstadoDevolucao.valueOf(rs.getString("estado")),
                 rs.getInt("codStock"),
@@ -108,7 +108,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
-            ps.setTimestamp(2, Timestamp.valueOf(value.getData()));
+            ps.setTimestamp(2, Timestamp.valueOf(value.getData().atStartOfDay()));
             ps.setString(3, value.getMotivo());
             ps.setString(4, value.getEstado().name());
             ps.setInt(5, value.getCodStock());
