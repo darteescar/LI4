@@ -43,7 +43,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
-    public List<OrdemServico> obterTodasOSs() {
+    public List<OrdemServico> obterOSs() {
         return new ArrayList<>(ordemServicoDAO.values());
     }
 

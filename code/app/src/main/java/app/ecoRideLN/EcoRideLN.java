@@ -150,6 +150,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public List<OrdemServico> obterOSs() {
+        return sOrdensServico.obterOSs();
+    }
+
+    @Override
     public void cancelarOS(int id) {
         sOrdensServico.eliminarOS(id);
     }
@@ -188,7 +193,7 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean clienteTemApenasUmPagamentoPendente(int id) {
-        long count = sOrdensServico.obterTodasOSs().stream()
+        long count = sOrdensServico.obterOSs().stream()
             .filter(os -> os.getCodCliente() == id && os.getEstado() == app.ecoRideLN.sOrdensServico.EstadoOS.PendentePagamento)
             .count();
         return count <= 1;
@@ -196,21 +201,21 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<OrdemServico> obterOSs_Cliente(int id) {
-        return sOrdensServico.obterTodasOSs().stream()
+        return sOrdensServico.obterOSs().stream()
             .filter(os -> os.getCodCliente() == id)
             .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
     public List<OrdemServico> obterOS_Trotinete(int id_trotinete) {
-        return sOrdensServico.obterTodasOSs().stream()
+        return sOrdensServico.obterOSs().stream()
             .filter(os -> os.getCodTrotinete() == id_trotinete)
             .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
     public List<Conserto> obterConsertosAnteriores(int id_trotinete) {
-        return sOrdensServico.obterTodasOSs().stream()
+        return sOrdensServico.obterOSs().stream()
             .filter(os -> os.getCodTrotinete() == id_trotinete && os.getConserto() != null)
             .map(OrdemServico::getConserto)
             .collect(java.util.stream.Collectors.toList());

@@ -1,11 +1,14 @@
 package app.IecoRideCA.controllers.ordensservico;
 
 import app.IecoRideCA.auth.GestorSessoes;
-import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
+import app.IecoRideCA.controllers.ordensservico.dto.ConsertoRequest;
+import app.IecoRideCA.controllers.ordensservico.dto.DiagnosticoRequest;
+import app.IecoRideCA.controllers.ordensservico.dto.OrdemServicoRequest;
+import app.IecoRideCA.controllers.ordensservico.dto.PagamentoRequest;
+import app.IecoRideCA.controllers.ordensservico.dto.PegarOSRequest;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
-import app.ecoRideLN.sStock.Encomenda;
 import io.javalin.Javalin;
 
 public class OrdemServicoController {
@@ -18,12 +21,12 @@ public class OrdemServicoController {
 
     public void register(Javalin app) {
 
-        app.get("/api/ordensservico", ctx -> {
+        app.get("/api/ordensservicos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             ctx.json(facade.obterOSs());
         });
 
-        app.get("/api/ordensservico/{id}", ctx -> {
+        app.get("/api/ordensservicos/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             OrdemServico c = facade.obterOS(id);
@@ -31,18 +34,81 @@ public class OrdemServicoController {
             else ctx.json(c);
         });
 
-        app.post("/api/ordensservico", ctx -> {
+        app.post("/api/ordensservicos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
-            // Assuming there's a request class for creating OrdemServico
-            // OrdemServicoRequest req = ctx.bodyAsClass(OrdemServicoRequest.class);
-            // OrdemServico criado = facade.registarOS(req...);
-            // ctx.status(201).json(criado);
+            OrdemServicoRequest req = ctx.bodyAsClass(OrdemServicoRequest.class);
+            OrdemServico criado = facade.registarOS(req.id_cliente(), req.id_trotinete(), req.descricao(), req.acessorios(), req.fotografias(), req.codCriador());
+            ctx.status(201).json(criado);
         });
 
-        app.delete("/api/ordensservico/{id}", ctx -> {
+        app.delete("/api/ordensservicos/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerOS(id) ? 204 : 404);
         });
+
+        app.post("api/ordensservicos/pegarNaOs/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            PegarOSRequest req = ctx.bodyAsClass(PegarOSRequest.class);
+            facade.atribuirOS(id, req.id_funcionario());
+            ctx.status(204);
+        });
+
+        app.post("api/ordensservicos/cancelarOS/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.cancelarOS(id);
+            ctx.status(204);
+        });
+
+        app.post("api/ordensservicos/addDiagnostico/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            DiagnosticoRequest req = ctx.bodyAsClass(DiagnosticoRequest.class);
+            facade.registarDiagnosticoOS(id, req.listPecas(), req.reparacoes(), req.descricao());
+            // TODO
+            ctx.status(204);
+        });
+
+        app.post("api/ordensservicos/addConserto/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            ConsertoRequest req = ctx.bodyAsClass(ConsertoRequest.class);
+            facade.registarConsertoOS(id, req.pecas(), req.reparacoes());
+            // TODO
+            ctx.status(204);
+        });
+
+        app.post("api/ordensservicos/aprovarOrcamento/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.aprovarOrcamentoOS(id);
+            ctx.status(204);
+        });
+
+        app.post("api/ordensservicos/rejeitarOrcamento/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.rejeitarOrcamentoOS(id);
+            ctx.status(204);
+        });
+
+        app.post("api/ordensservicos/clienteNotificado/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.registarNotificacaoPagamentoOS(id);
+            ctx.status(204);
+        });
+
+        app.post("api/ordensservicos/pagarOS/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            PagamentoRequest req = ctx.bodyAsClass(PagamentoRequest.class);
+            facade.registarPagamentoOS(id, req.metodo_pagamento());
+            // TODO
+            ctx.status(204);
+        });
+
     }
 }
