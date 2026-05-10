@@ -128,18 +128,28 @@ CREATE TABLE IF NOT EXISTS Stock (
     quantidade   INT          NOT NULL,
     nr_serie     VARCHAR(100) NULL,
     garantia     INT          NULL,
-    estado       ENUM('EmStock','PossivelDefeito','Devolvida','Invalida','PendenteDevolucao','UsadaEmConserto') NULL,
+    estado       ENUM('EmStock','PossivelDefeito','PendenteDevolucao','Enviada','Devolvida','Invalida','UsadaEmConserto') NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codPeca) REFERENCES Peca(id)
 );
 
+CREATE TABLE IF NOT EXISTS Defeito (
+    id            INT          NOT NULL,
+    codStock      INT          NOT NULL,
+    motivo        VARCHAR(255) NOT NULL,
+    idFuncionario INT          NOT NULL,
+    estado        ENUM('Identificado','PendenteDevolucao','Resolvido','Invalido') NOT NULL DEFAULT 'Identificado',
+    PRIMARY KEY (id),
+    FOREIGN KEY (codStock)      REFERENCES Stock(id),
+    FOREIGN KEY (idFuncionario) REFERENCES Funcionario(id)
+);
+
 CREATE TABLE IF NOT EXISTS Devolucao (
-    id         INT          NOT NULL,
-    data       DATE         NOT NULL,
-    motivo     VARCHAR(255),
-    estado     ENUM('PendenteDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
-    codStock   INT          NOT NULL,
-    quantidade INT          NOT NULL DEFAULT 1,
+    id       INT          NOT NULL,
+    data     DATE         NOT NULL,
+    motivo   VARCHAR(255),
+    estado   ENUM('PendenteDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
+    codStock INT          NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codStock) REFERENCES Stock(id)
 );

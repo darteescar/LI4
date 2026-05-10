@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Date;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,37 +14,37 @@ import java.util.Set;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
-import app.ecoRideLN.sStock.Devolucao;
-import app.ecoRideLN.sStock.EstadoDevolucao;
+import app.ecoRideLN.sStock.Defeito;
+import app.ecoRideLN.sStock.EstadoDefeito;
 
-public class DevolucaoDAO implements Map<Integer, Devolucao> {
+public class DefeitoDAO implements Map<Integer, Defeito> {
 
-    private static DevolucaoDAO instance;
+    private static DefeitoDAO instance;
 
-    private DevolucaoDAO() {}
+    private DefeitoDAO() {}
 
-    public static DevolucaoDAO getInstance() {
-        if (instance == null) instance = new DevolucaoDAO();
+    public static DefeitoDAO getInstance() {
+        if (instance == null) instance = new DefeitoDAO();
         return instance;
     }
 
-    private Devolucao buildFromRow(ResultSet rs) throws SQLException {
-        return new Devolucao(
+    private Defeito buildFromRow(ResultSet rs) throws SQLException {
+        return new Defeito(
                 rs.getInt("id"),
-                rs.getDate("data").toLocalDate(),
+                rs.getInt("codStock"),
                 rs.getString("motivo"),
-                EstadoDevolucao.valueOf(rs.getString("estado")),
-                rs.getInt("codStock"));
+                rs.getInt("idFuncionario"),
+                EstadoDefeito.valueOf(rs.getString("estado")));
     }
 
     @Override
     public int size() {
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Devolucao")) {
+             ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Defeito")) {
             return rs.next() ? rs.getInt(1) : 0;
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a contar devolucoes", e);
+            throw new EcoRideException("Erro a contar defeitos", e);
         }
     }
 
@@ -55,82 +54,82 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
     public boolean containsKey(Object key) {
         if (!(key instanceof Integer id)) return false;
         try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Devolucao WHERE id = ?")) {
+             PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Defeito WHERE id = ?")) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a verificar devolucao " + id, e);
+            throw new EcoRideException("Erro a verificar defeito " + id, e);
         }
     }
 
     @Override
     public boolean containsValue(Object value) {
-        if (!(value instanceof Devolucao d)) return false;
+        if (!(value instanceof Defeito d)) return false;
         return get(d.getId()) != null;
     }
 
     @Override
-    public Devolucao get(Object key) {
+    public Defeito get(Object key) {
         if (!(key instanceof Integer id)) return null;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(
-                     "SELECT id, data, motivo, estado, codStock FROM Devolucao WHERE id = ?")) {
+                     "SELECT id, codStock, motivo, idFuncionario, estado FROM Defeito WHERE id = ?")) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? buildFromRow(rs) : null;
             }
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter devolucao " + id, e);
+            throw new EcoRideException("Erro a obter defeito " + id, e);
         }
     }
 
     @Override
-    public Devolucao put(Integer key, Devolucao value) {
-        Devolucao prev = get(key);
+    public Defeito put(Integer key, Defeito value) {
+        Defeito prev = get(key);
         String sql = """
-                INSERT INTO Devolucao (id, data, motivo, estado, codStock)
+                INSERT INTO Defeito (id, codStock, motivo, idFuncionario, estado)
                 VALUES (?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
-                    data = VALUES(data), motivo = VALUES(motivo),
-                    estado = VALUES(estado), codStock = VALUES(codStock)
+                    codStock = VALUES(codStock), motivo = VALUES(motivo),
+                    idFuncionario = VALUES(idFuncionario), estado = VALUES(estado)
                 """;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
-            ps.setDate(2, Date.valueOf(value.getData()));
+            ps.setInt(2, value.getCodStock());
             ps.setString(3, value.getMotivo());
-            ps.setString(4, value.getEstado().name());
-            ps.setInt(5, value.getCodStock());
+            ps.setInt(4, value.getIdFuncionario());
+            ps.setString(5, value.getEstado().name());
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a gravar devolucao " + key, e);
+            throw new EcoRideException("Erro a gravar defeito " + key, e);
         }
         return prev;
     }
 
     @Override
-    public Devolucao remove(Object key) {
+    public Defeito remove(Object key) {
         if (!(key instanceof Integer id)) return null;
-        Devolucao prev = get(id);
+        Defeito prev = get(id);
         if (prev == null) return null;
         try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement("DELETE FROM Devolucao WHERE id = ?")) {
+             PreparedStatement ps = c.prepareStatement("DELETE FROM Defeito WHERE id = ?")) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a remover devolucao " + id, e);
+            throw new EcoRideException("Erro a remover defeito " + id, e);
         }
         return prev;
     }
 
-    @Override public void putAll(Map<? extends Integer, ? extends Devolucao> m) { m.forEach(this::put); }
+    @Override public void putAll(Map<? extends Integer, ? extends Defeito> m) { m.forEach(this::put); }
 
     @Override
     public void clear() {
         try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement()) {
-            s.executeUpdate("DELETE FROM Devolucao");
+            s.executeUpdate("DELETE FROM Defeito");
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a limpar devolucoes", e);
+            throw new EcoRideException("Erro a limpar defeitos", e);
         }
     }
 
@@ -139,31 +138,31 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
         Set<Integer> out = new LinkedHashSet<>();
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT id FROM Devolucao")) {
+             ResultSet rs = s.executeQuery("SELECT id FROM Defeito")) {
             while (rs.next()) out.add(rs.getInt(1));
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter ids de devolucoes", e);
+            throw new EcoRideException("Erro a obter ids de defeitos", e);
         }
         return out;
     }
 
     @Override
-    public Collection<Devolucao> values() {
-        Set<Devolucao> out = new LinkedHashSet<>();
+    public Collection<Defeito> values() {
+        Set<Defeito> out = new LinkedHashSet<>();
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT id, data, motivo, estado, codStock FROM Devolucao")) {
+             ResultSet rs = s.executeQuery("SELECT id, codStock, motivo, idFuncionario, estado FROM Defeito")) {
             while (rs.next()) out.add(buildFromRow(rs));
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter devolucoes", e);
+            throw new EcoRideException("Erro a obter defeitos", e);
         }
         return out;
     }
 
     @Override
-    public Set<Entry<Integer, Devolucao>> entrySet() {
-        Set<Entry<Integer, Devolucao>> out = new HashSet<>();
-        for (Devolucao d : values())
+    public Set<Entry<Integer, Defeito>> entrySet() {
+        Set<Entry<Integer, Defeito>> out = new HashSet<>();
+        for (Defeito d : values())
             out.add(new AbstractMap.SimpleEntry<>(d.getId(), d));
         return out;
     }
@@ -171,10 +170,23 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
     public int generateNewId() {
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Devolucao")) {
+             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Defeito")) {
             return rs.next() ? rs.getInt(1) + 1 : 1;
         } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para devolucao", e);
+            throw new EcoRideException("Erro a gerar novo ID para defeito", e);
+        }
+    }
+
+    public Defeito getByStock(int codStock) {
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(
+                     "SELECT id, codStock, motivo, idFuncionario, estado FROM Defeito WHERE codStock = ? LIMIT 1")) {
+            ps.setInt(1, codStock);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? buildFromRow(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter defeito por stock " + codStock, e);
         }
     }
 }

@@ -132,8 +132,8 @@ public class StockDAO implements Map<Integer, Stock> {
                 ps.setString(8, g.getEstado().name());
             } else {
                 ps.setNull(6, Types.VARCHAR);
-                ps.setNull(7, Types.DATE);
-                ps.setNull(8, Types.VARCHAR);
+                ps.setNull(7, Types.INTEGER);
+                ps.setString(8, value.getEstado() != null ? value.getEstado().name() : null);
             }
             ps.executeUpdate();
         } catch (SQLException e) {
