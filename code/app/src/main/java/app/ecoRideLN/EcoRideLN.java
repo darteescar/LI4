@@ -377,11 +377,13 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
+        sFinanceiro.registarMovimentoCompraStock(id_peca, preco_compra, "Compra "+sStock.obterPeca(id_peca).getNome() +"x1");
         return sStock.registarStockComGarantia(id_peca, preco_compra, data, garantia, nr_serie);
     }
 
     @Override
     public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
+        sFinanceiro.registarMovimentoCompraStock(id_peca, preco_compra * quantidade, "Compra "+sStock.obterPeca(id_peca).getNome() +"x"+ quantidade);
         return sStock.registarStock_PecaNormal(id_peca, preco_compra, data, quantidade);
     }
 
