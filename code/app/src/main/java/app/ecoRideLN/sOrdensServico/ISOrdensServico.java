@@ -23,8 +23,6 @@ public interface ISOrdensServico {
 
      public void alterarEstadoOS(int id, EstadoOS estado);
 
-     public void submeterDiagnosticoOS(int id);
-
      public void aprovarOrcamentoOS(int id);
 
      public void rejeitarOrcamentoOS(int id);
@@ -33,35 +31,15 @@ public interface ISOrdensServico {
 
      public void pecasRecebidasOS(int id);
 
-     public void concluirReparacaoOS(int id);
-
-     public void pagarOS(int id);
-
      public void eliminarOS(int id);
 
      public void atribuirOS(int id, int id_funcionario);
 
      public void registarNotificacaoPagamentoOS(int id_OS);
 
-     // ------------------- Diagnóstico -------------------
+     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario);
 
-     public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao);
-
-     public List<Integer> obterReparacoesDiagnosticoOS(int idOS);
-
-     public List<PecasOrcamento> obterPecasDiagnosticoOS(int idOS);
-
-     // ------------------- Conserto -------------------
-
-     public void registarConsertoOS(int id_OS, List<Integer> codStocks, List<Integer> reparacoes, float orcamento);
-
-     public List<Integer> obterReparacoesConsertoOS(int id_OS);
-
-     public List<Integer> obterStocksConsertoOS(int id_OS);
-
-     public boolean validarChecklist_ConsertoOS(int idOS);
-
-     // ------------------- Pagamento -------------------
+     public void registarConsertoOS(int id_OS, List<Integer> codStocks, List<Integer> reparacoes, float orcamento, int id_funcionario);
 
      public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
 

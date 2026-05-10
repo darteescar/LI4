@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import app.common.EcoRideException;
 import app.ecoRideLN.sAutenticacao.Cargo;
 import app.ecoRideLN.sAutenticacao.ISAutenticacao;
 import app.ecoRideLN.sAutenticacao.SAutenticacaoFacade;
@@ -25,7 +26,7 @@ import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sNotificacoes.NotificacaoOS;
 import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
-import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
@@ -155,7 +156,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao) {
+    public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario) {
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         float orcamento = 0;
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
@@ -163,11 +164,14 @@ public class EcoRideLN implements IEcoRideLN {
             Peca p = sStock.obterPeca(po.getCodPeca());
             if (p != null) orcamento += po.getQuantidade() * p.getPreco_venda();
         }
-        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, codReps, orcamento, descricao);
+        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, codReps, orcamento, descricao, id_funcionario);
     }
 
     @Override
-    public void registarConsertoOS(int id_OS, List<Integer> stockIds, List<Reparacao> reparacoes) {
+    public void registarConsertoOS(int id_OS, List<Integer> stockIds, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
+        if (!checklist.isCheckListComplete()) {
+            throw new EcoRideException("Checklist incompleta. Conserto não pode ser registado.");
+        }
         float orcamento = 0;
         for (int stockId : stockIds) {
             Stock s = sStock.obterStock(stockId);
@@ -179,7 +183,7 @@ public class EcoRideLN implements IEcoRideLN {
         }
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
-        sOrdensServico.registarConsertoOS(id_OS, stockIds, codReps, orcamento);
+        sOrdensServico.registarConsertoOS(id_OS, stockIds, codReps, orcamento, id_funcionario);
     }
 
     @Override
@@ -189,6 +193,20 @@ public class EcoRideLN implements IEcoRideLN {
             .count();
         if (count <= 1) {
             sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
+            List<Integer> reparacoes = sOrdensServico.obterOS(id_OS).getConserto().getCod_reparacoes();
+            List<Integer> stocks = sOrdensServico.obterOS(id_OS).getConserto().getCodStocks();
+            for (int codRep : reparacoes) {
+                Reparacao r = sReparacoes.obterReparacao(codRep);
+                if (r != null) sFinanceiro.registarMovimentoReparacaoOS(codRep, r.getPreco(), "Pagamento reparação " + r.getNomenclatura() + " OS#" + id_OS);
+            }
+            for (int codStock : stocks) {
+                Stock s = sStock.obterStock(codStock);
+                if (s != null) {
+                    Peca p = sStock.obterPeca(s.getCodPeca());
+                    String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
+                    sFinanceiro.registarMovimentoVendaPeca(codStock, s.calcularValorTotal(), "Pagamento peça " + nome + " OS#" + id_OS);
+                }
+            }
             return true;
         }
         return false;
@@ -371,14 +389,16 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
-        sFinanceiro.registarMovimentoCompraStock(id_peca, preco_compra, "Compra "+sStock.obterPeca(id_peca).getNome() +"x1");
-        return sStock.registarStockComGarantia(id_peca, preco_compra, data, garantia, nr_serie);
+        Stock s = sStock.registarStockComGarantia(id_peca, preco_compra, data, garantia, nr_serie);
+        sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra, "Compra " + sStock.obterPeca(id_peca).getNome() + "x1");
+        return s;
     }
 
     @Override
     public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
-        sFinanceiro.registarMovimentoCompraStock(id_peca, preco_compra * quantidade, "Compra "+sStock.obterPeca(id_peca).getNome() +"x"+ quantidade);
-        return sStock.registarStock_PecaNormal(id_peca, preco_compra, data, quantidade);
+        Stock s = sStock.registarStock_PecaNormal(id_peca, preco_compra, data, quantidade);
+        sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra * quantidade, "Compra " + sStock.obterPeca(id_peca).getNome() + "x" + quantidade);
+        return s;
     }
 
     @Override
@@ -464,7 +484,7 @@ public class EcoRideLN implements IEcoRideLN {
                 Peca p = sStock.obterPeca(s.getCodPeca());
                 float valor = s.getPreco_compra() * s.getQuantidade();
                 String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
-                sFinanceiro.registarMovimentoCompraStock(s.getCodPeca(), valor, "Reembolso Peça " + nome + "x" + s.getQuantidade());
+                sFinanceiro.registarMovimentoCompraStock(s.getId(), -valor, "Reembolso Peça " + nome + "x" + s.getQuantidade());
             }
         }
     }
@@ -490,15 +510,16 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias) {
-        List<Integer> stockIds = sStock.marcarEncomendaComoRecebida(id, numeros_serie, garantias).getCodStocks();
-        for (int stockId : stockIds) {
+        Encomenda e = sStock.marcarEncomendaComoRecebida(id, numeros_serie, garantias);
+        for (int stockId : e.getCodStocks()) {
             Stock s = sStock.obterStock(stockId);
             if (s != null) {
-                int codPeca = s.getCodPeca();
-                sFinanceiro.registarMovimentoCompraStock(codPeca, s.calcularValorTotal(), "Compra "+sStock.obterPeca(codPeca).getNome() +"x"+ s.getQuantidade());
+                Peca p = sStock.obterPeca(s.getCodPeca());
+                String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
+                sFinanceiro.registarMovimentoCompraStock(stockId, s.calcularValorTotal(), "Compra " + nome + "x" + s.getQuantidade());
             }
         }
-        return sStock.marcarEncomendaComoRecebida(id, numeros_serie, garantias);
+        return e;
     }
 
     @Override

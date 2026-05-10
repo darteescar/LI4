@@ -4,16 +4,16 @@ import java.time.LocalDateTime;
 
 public class MovimentoPeca extends MovimentoFinanceiro {
 
-    private int codPeca;
+    private int codStock;
 
-    public MovimentoPeca(int id, String descricao, float valor, LocalDateTime data, TipoMovimento tipo, int codPeca) {
+    public MovimentoPeca(int id, String descricao, float valor, LocalDateTime data, TipoMovimento tipo, int codStock) {
         super(id, descricao, valor, data, tipo);
         if (tipo != TipoMovimento.GastoPecas && tipo != TipoMovimento.LucroVendaPecas) {
             throw new IllegalArgumentException("MovimentoPeca apenas aceita GastoPecas ou LucroVendaPecas");
         }
-        this.codPeca = codPeca;
+        this.codStock = codStock;
     }
 
-    public int getCodPeca()           { return codPeca; }
-    public void setCodPeca(int codPeca) { this.codPeca = codPeca; }
+    public int getCodStock()             { return codStock; }
+    public void setCodStock(int codStock) { this.codStock = codStock; }
 }

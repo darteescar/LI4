@@ -40,7 +40,7 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
             SELECT mf.id, mf.valor, mf.data, mf.descricao, mf.tipo,
                    mfn.codFuncionario,
                    mr.codReparacao,
-                   mp.codPeca
+                   mp.codStock
             FROM   MovimentoFinanceiro mf
             LEFT   JOIN MovimentoFuncionario mfn ON mf.id = mfn.id
             LEFT   JOIN MovimentoReparacao   mr  ON mf.id = mr.id
@@ -58,7 +58,7 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
             case Salario      -> new MovimentoFuncionario(id, desc, valor, data, tipo, rs.getInt("codFuncionario"));
             case LucroMaoObra -> new MovimentoReparacao(id, desc, valor, data, tipo, rs.getInt("codReparacao"));
             case GastoPecas, LucroVendaPecas
-                              -> new MovimentoPeca(id, desc, valor, data, tipo, rs.getInt("codPeca"));
+                              -> new MovimentoPeca(id, desc, valor, data, tipo, rs.getInt("codStock"));
         };
     }
 
@@ -163,9 +163,9 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
             }
             case MovimentoPeca mp -> {
                 try (PreparedStatement ps = c.prepareStatement(
-                        "INSERT INTO MovimentoPeca (id, codPeca) VALUES (?, ?)")) {
+                        "INSERT INTO MovimentoPeca (id, codStock) VALUES (?, ?)")) {
                     ps.setInt(1, id);
-                    ps.setInt(2, mp.getCodPeca());
+                    ps.setInt(2, mp.getCodStock());
                     ps.executeUpdate();
                 }
             }

@@ -217,11 +217,11 @@ CREATE TABLE IF NOT EXISTS MovimentoReparacao (
 );
 
 CREATE TABLE IF NOT EXISTS MovimentoPeca (
-    id      INT NOT NULL,
-    codPeca INT NOT NULL,
+    id       INT NOT NULL,
+    codStock INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (id)      REFERENCES MovimentoFinanceiro(id) ON DELETE CASCADE,
-    FOREIGN KEY (codPeca) REFERENCES Peca(id)
+    FOREIGN KEY (id)       REFERENCES MovimentoFinanceiro(id) ON DELETE CASCADE,
+    FOREIGN KEY (codStock) REFERENCES Stock(id) ON DELETE CASCADE
 );
 
 -- =========================================================

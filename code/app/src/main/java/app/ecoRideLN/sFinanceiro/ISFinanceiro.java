@@ -8,10 +8,10 @@ public interface ISFinanceiro {
 
      // ------------------- Registo -------------------
 
-     public MovimentoFinanceiro registarMovimentoCompraStock(int idPeca, float valor, String descricao);
-     public MovimentoFinanceiro registarMovimentoVendaPeca(int idPeca, float valor, String descricao);
+     public MovimentoFinanceiro registarMovimentoCompraStock(int codStock, float valor, String descricao);
+     public MovimentoFinanceiro registarMovimentoVendaPeca(int codStock, float valor, String descricao);
      public MovimentoFinanceiro registarMovimentoPagamentoFuncionario(int idFuncionario, float valor, String descricao);
-     public MovimentoFinanceiro registarMovimentoPagamentoOS(int idReparacao, float valor, String descricao);
+     public MovimentoFinanceiro registarMovimentoReparacaoOS(int idReparacao, float valor, String descricao);
 
      // ------------------- Consulta -------------------
 
