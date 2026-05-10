@@ -14,11 +14,6 @@ public class MovimentoPeca extends MovimentoFinanceiro {
         this.codPeca = codPeca;
     }
 
-    public int getCodPeca() {
-        return codPeca;
-    }
-
-    public void setCodPeca(int codPeca) {
-        this.codPeca = codPeca;
-    }
+    public int getCodPeca()           { return codPeca; }
+    public void setCodPeca(int codPeca) { this.codPeca = codPeca; }
 }

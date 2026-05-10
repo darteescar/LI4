@@ -461,7 +461,19 @@ public class EcoRideLN implements IEcoRideLN {
     public void marcarDevolucaoComoEnviada(int id) { sStock.marcarDevolucaoComoEnviada(id); }
 
     @Override
-    public void marcarDevolucaoComoDevolvida(int id) { sStock.marcarDevolucaoComoDevolvida(id); }
+    public void marcarDevolucaoComoDevolvida(int id) {
+        Devolucao dev = sStock.obterDevolucao(id);
+        sStock.marcarDevolucaoComoDevolvida(id);
+        if (dev != null) {
+            Stock s = sStock.obterStock(dev.getCodStock());
+            if (s != null) {
+                Peca p = sStock.obterPeca(s.getCodPeca());
+                float valor = s.getPreco_compra() * s.getQuantidade();
+                String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
+                sFinanceiro.registarMovimentoCompraStock(s.getCodPeca(), -valor, "Reembolso Peça " + nome + "x" + s.getQuantidade());
+            }
+        }
+    }
 
     @Override
     public void marcarDevolucaoComoInvalida(int id) { sStock.marcarDevolucaoComoInvalida(id); }
