@@ -41,7 +41,6 @@ import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.ISStock;
-
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.SStockFacade;
 import app.ecoRideLN.sStock.Stock;
@@ -96,6 +95,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Notificações -------------------
+    // feito
 
     @Override
     public NotificacaoOS registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
@@ -105,11 +105,6 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
         return sNotificacoes.registarNotificacaoStock(descricao, id_remetente, id_destinatario, id_peca);
-    }
-
-    @Override
-    public Notificacao obterNotificacao(int id) {
-        return sNotificacoes.obterNotificacao(id);
     }
 
     @Override
@@ -499,6 +494,7 @@ public class EcoRideLN implements IEcoRideLN {
     public Map<Integer, List<Integer>> gerarListaAutomatica() { return sStock.gerarListaAutomatica(); }
 
     // ------------------- Fornecedores -------------------
+    // feito
 
     @Override
     public Fornecedor registarFornecedor(String nome, String telemovel, String email) {
@@ -585,17 +581,5 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos){
         return sFinanceiro.calcularAnaliseFinanceira(movimentos);
-    }
-
-    // ------------------- Cross-cutting -------------------
-
-    private boolean pecasDiagnosticoDisponiveisReparacao(int id_OS) {
-        List<PecasOrcamento> pecas = sOrdensServico.obterPecasDiagnosticoOS(id_OS);
-        for (PecasOrcamento po : pecas) {
-            if (sStock.obter_quantidade_Stock_Peca_id(po.getCodPeca()) < po.getQuantidade()) {
-                return false;
-            }
-        }
-        return true;
     }
 }
