@@ -153,7 +153,4 @@ public class OrdemServico {
           this.metodo_pagamento = metodo_pagamento;
      }
 
-     public void adicionarPecasConserto(List<app.ecoRideLN.sStock.Stock> pecas) {
-          this.conserto.adicionarPecas(pecas);
-     }
 }

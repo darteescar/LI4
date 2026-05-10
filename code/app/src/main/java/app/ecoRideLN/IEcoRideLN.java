@@ -55,7 +55,7 @@ public interface IEcoRideLN {
      public List<OrdemServico> obterOSs();
      public void               cancelarOS(int id);
      public void               registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao);
-     public void               registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes);
+     public void               registarConsertoOS(int id_OS, List<Integer> stockIds, List<Reparacao> reparacoes);
      public void               registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOS_Trotinete(int id_trotinete);

@@ -153,10 +153,10 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     // ------------------- Conserto -------------------
 
     @Override
-    public void registarConsertoOS(int id_OS, List<PecasUsadas> pecas, List<Integer> reparacoes, float orcamento) {
+    public void registarConsertoOS(int id_OS, List<Integer> codStocks, List<Integer> reparacoes, float orcamento) {
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
-            Conserto con = new Conserto(pecas, reparacoes, orcamento);
+            Conserto con = new Conserto(codStocks, reparacoes, orcamento);
             os.setConserto(con);
             ordemServicoDAO.put(id_OS, os);
         }
@@ -172,10 +172,10 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
-    public List <PecasUsadas> obterPecasUsadasConsertoOS(int id_OS) {
+    public List<Integer> obterStocksConsertoOS(int id_OS) {
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null && os.getConserto() != null) {
-            return os.getConserto().getListaPecas();
+            return os.getConserto().getCodStocks();
         }
         return new ArrayList<>();
     }

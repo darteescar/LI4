@@ -31,12 +31,12 @@ import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sOrdensServico.PecasOrcamento;
-import app.ecoRideLN.sOrdensServico.PecasUsadas;
 import app.ecoRideLN.sOrdensServico.SOrdensServicoFacade;
 import app.ecoRideLN.sReparacoes.ISReparacoes;
 import app.ecoRideLN.sReparacoes.Reparacao;
 import app.ecoRideLN.sReparacoes.SReparacoesFacade;
 import app.ecoRideLN.sStock.Defeito;
+import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
@@ -167,18 +167,19 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void registarConsertoOS(int id_OS, List<Stock> pecas, List<Reparacao> reparacoes) {
-        List<PecasUsadas> pecasUsadas = pecas.stream()
-            .map(s -> new PecasUsadas(s.getQuantidade(), s.getId()))
-            .collect(java.util.stream.Collectors.toList());
-        List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
+    public void registarConsertoOS(int id_OS, List<Integer> stockIds, List<Reparacao> reparacoes) {
         float orcamento = 0;
-        for (Reparacao r : reparacoes) orcamento += r.getPreco();
-        for (Stock s : pecas) {
-            Peca p = sStock.obterPeca(s.getCodPeca());
-            if (p != null) orcamento += s.getQuantidade() * p.getPreco_venda();
+        for (int stockId : stockIds) {
+            Stock s = sStock.obterStock(stockId);
+            if (s != null) {
+                Peca p = sStock.obterPeca(s.getCodPeca());
+                if (p != null) orcamento += s.getQuantidade() * p.getPreco_venda();
+                sStock.atualizaEstadoStock(stockId, EstadoStock.StockUsadoConserto);
+            }
         }
-        sOrdensServico.registarConsertoOS(id_OS, pecasUsadas, codReps, orcamento);
+        List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
+        for (Reparacao r : reparacoes) orcamento += r.getPreco();
+        sOrdensServico.registarConsertoOS(id_OS, stockIds, codReps, orcamento);
     }
 
     @Override

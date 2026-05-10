@@ -309,9 +309,8 @@ CREATE TABLE IF NOT EXISTS Conserto (
 );
 
 CREATE TABLE IF NOT EXISTS Conserto_PecaUsada (
-    idOS       INT NOT NULL,
-    codStock   INT NOT NULL,
-    quantidade INT NOT NULL,
+    idOS     INT NOT NULL,
+    codStock INT NOT NULL,
     PRIMARY KEY (idOS, codStock),
     FOREIGN KEY (idOS)     REFERENCES Conserto(idOS) ON DELETE CASCADE,
     FOREIGN KEY (codStock) REFERENCES Stock(id)

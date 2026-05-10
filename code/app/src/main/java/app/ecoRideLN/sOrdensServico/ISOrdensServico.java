@@ -53,11 +53,11 @@ public interface ISOrdensServico {
 
      // ------------------- Conserto -------------------
 
-     public void registarConsertoOS(int id_OS, List<PecasUsadas> pecas, List<Integer> reparacoes, float orcamento);
+     public void registarConsertoOS(int id_OS, List<Integer> codStocks, List<Integer> reparacoes, float orcamento);
 
-     public List <Integer> obterReparacoesConsertoOS(int id_OS);
+     public List<Integer> obterReparacoesConsertoOS(int id_OS);
 
-     public List <PecasUsadas> obterPecasUsadasConsertoOS(int id_OS);
+     public List<Integer> obterStocksConsertoOS(int id_OS);
 
      public boolean validarChecklist_ConsertoOS(int idOS);
 

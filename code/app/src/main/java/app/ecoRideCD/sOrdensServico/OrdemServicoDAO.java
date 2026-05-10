@@ -10,7 +10,6 @@ import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sOrdensServico.PecasOrcamento;
-import app.ecoRideLN.sOrdensServico.PecasUsadas;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -136,17 +135,15 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 while (rs.next()) reps.add(rs.getInt(1));
             }
         }
-        List<PecasUsadas> pecas = new ArrayList<>();
+        List<Integer> codStocks = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT codStock, quantidade FROM Conserto_PecaUsada WHERE idOS = ?")) {
+                "SELECT codStock FROM Conserto_PecaUsada WHERE idOS = ?")) {
             ps.setInt(1, idOS);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    pecas.add(new PecasUsadas(rs.getInt("quantidade"), rs.getInt("codStock")));
-                }
+                while (rs.next()) codStocks.add(rs.getInt("codStock"));
             }
         }
-        Conserto con = new Conserto(pecas, reps, preco);
+        Conserto con = new Conserto(codStocks, reps, preco);
         con.setCheckList(chk);
         return con;
     }
@@ -317,15 +314,12 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 ps.executeBatch();
             }
         }
-        if (!con.getListaPecas().isEmpty()) {
-            try (PreparedStatement ps = c.prepareStatement("""
-                    INSERT INTO Conserto_PecaUsada (idOS, codStock, quantidade)
-                    VALUES (?, ?, ?)
-                    """)) {
-                for (PecasUsadas p : con.getListaPecas()) {
+        if (!con.getCodStocks().isEmpty()) {
+            try (PreparedStatement ps = c.prepareStatement(
+                    "INSERT INTO Conserto_PecaUsada (idOS, codStock) VALUES (?, ?)")) {
+                for (int codStock : con.getCodStocks()) {
                     ps.setInt(1, idOS);
-                    ps.setInt(2, p.getCodStock());
-                    ps.setInt(3, p.getQuantidade());
+                    ps.setInt(2, codStock);
                     ps.addBatch();
                 }
                 ps.executeBatch();
