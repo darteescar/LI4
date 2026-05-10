@@ -470,7 +470,7 @@ public class EcoRideLN implements IEcoRideLN {
                 Peca p = sStock.obterPeca(s.getCodPeca());
                 float valor = s.getPreco_compra() * s.getQuantidade();
                 String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
-                sFinanceiro.registarMovimentoCompraStock(s.getCodPeca(), -valor, "Reembolso Peça " + nome + "x" + s.getQuantidade());
+                sFinanceiro.registarMovimentoCompraStock(s.getCodPeca(), valor, "Reembolso Peça " + nome + "x" + s.getQuantidade());
             }
         }
     }
