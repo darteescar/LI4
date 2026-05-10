@@ -106,7 +106,6 @@ public interface IEcoRideLN {
 
      public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie);
      public Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade);
-     public Stock   registarStock_Encomendada(int id_peca, float preco_compra, int quantidade);
      public Stock   obterStock(int id);
      public boolean existeStock(int id);
      public boolean removerStock(int id);
@@ -135,13 +134,12 @@ public interface IEcoRideLN {
 
      // ------------------- Encomendas -------------------
 
-     public Encomenda               registarEncomenda(List<Integer> stockIds, int cod_fornecedor);
-     public Encomenda               obterEncomenda(int id);
-     public boolean                 removerEncomenda(int id);
-     public List<Encomenda>         obterEncomendas();
-     public Encomenda               marcarEncomendaComoEnviada(int id);
-     public Encomenda               marcarEncomendaComoRecebida(int id);
-     public Map<Integer, List<Integer>> gerarListaAutomatica();
+     public Encomenda                   registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor);
+     public boolean                     removerEncomenda(int id);
+     public List<Encomenda>             obterEncomendas();
+     public Encomenda                   marcarEncomendaComoEnviada(int id);
+     public Encomenda                   marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias);
+     public Map<Integer, Encomenda> gerarListaAutomatica();
 
      // ------------------- Fornecedores -------------------
      // feito

@@ -297,7 +297,7 @@ public class SStockFacade implements ISStock {
     // ------------------- Encomenda -------------------
 
     @Override
-    public Stock registarStock_Encomendada(int id_peca, float preco_compra, int quantidade) {
+    public Stock registarStock_Encomenda(int id_peca, float preco_compra, int quantidade) {
         int id = stockDAO.generateNewId();
         Stock novo = new Stock(id, preco_compra, id_peca, null, quantidade, EstadoStock.StockEncomendado);
         stockDAO.put(id, novo);
@@ -305,8 +305,21 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
-    public Encomenda registarEncomenda(List<Integer> stockIds, int cod_fornecedor) {
+    public Encomenda registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor) {
         int id = encomendaDAO.generateNewId();
+        List<Integer> stockIds = new ArrayList<>();
+        for (int i = 0; i < id_peca.size(); i++) {
+            Peca p = pecaDAO.get(id_peca.get(i));
+            if (p.getPreco_venda() >= 70) {
+                StockComGarantia s = new StockComGarantia(stockDAO.generateNewId(), preco_compra.get(i), id_peca.get(i), null, "N/A", 24);
+                stockDAO.put(s.getId(), s);
+                stockIds.add(s.getId());
+            } else {
+                Stock s = new Stock(stockDAO.generateNewId(), preco_compra.get(i), id_peca.get(i), null, quantidade.get(i), EstadoStock.StockEncomendado);
+                stockDAO.put(s.getId(), s);
+                stockIds.add(s.getId());
+            }
+        }
         Encomenda e = new Encomenda(id, cod_fornecedor, stockIds);
         encomendaDAO.put(id, e);
         return e;
@@ -346,41 +359,63 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
-    public Encomenda marcarEncomendaComoRecebida(int id) {
+    public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias) {
         Encomenda e = encomendaDAO.get(id);
-        if (e != null && e.getEstado() == EstadoEncomenda.ENVIADA) {
+        if (numeros_serie.size() != garantias.size())
+            throw new EcoRideException("A lista de números de série e garantias deve ter o mesmo tamanho.");
+        if (numeros_serie.size() > e.getCodStocks().size() || garantias.size() > e.getCodStocks().size())
+            throw new EcoRideException("A lista de números de série e garantias não pode ser maior que a quantidade de stocks na encomenda.");
+        int contador = 0;
+        if (e.getEstado() == EstadoEncomenda.ENVIADA) {
             for (int stockId : e.getCodStocks()) {
                 Stock s = stockDAO.get(stockId);
                 if (s != null) {
+                    Peca p = pecaDAO.get(s.getCodPeca());
+                    if (p.getPreco_venda() >= 70) {
+                        if (s instanceof StockComGarantia scg) {
+                            scg.setNr_serie(numeros_serie.get(contador));
+                            scg.setGarantia(garantias.get(contador));
+                        }
+                    }
                     s.setEstado(EstadoStock.StockEmArmazem);
                     s.setData_chegada(LocalDate.now());
                     stockDAO.put(stockId, s);
                 }
+                contador++;
             }
             e.setEstado(EstadoEncomenda.RECEBIDA);
             e.setData_rececao(LocalDate.now());
             encomendaDAO.put(id, e);
+        } else {
+            throw new EcoRideException("Encomenda " + id + " não está no estado ENVIADA.");
         }
         return e;
     }
 
     @Override
-    public int quantidade_encomendar_peca(int id_peca) {
-        Peca p = pecaDAO.get(id_peca);
-        if (p == null) return 0;
-        return Math.max(0, p.getStock_minimo() - obter_quantidade_Stock_Peca_id(id_peca));
-    }
-
-    @Override
-    public Map<Integer, List<Integer>> gerarListaAutomatica() {
-        Map<Integer, List<Integer>> lista = new java.util.HashMap<>();
+    public Map<Integer, Encomenda> gerarListaAutomatica() {
+        Map<Integer, List<Integer>> idsPecas    = new java.util.HashMap<>();
+        Map<Integer, List<Float>>   precos      = new java.util.HashMap<>();
+        Map<Integer, List<Integer>> quantidades = new java.util.HashMap<>();
         for (Peca p : pecaDAO.values()) {
-            int qtd = quantidade_encomendar_peca(p.getId());
-            if (qtd > 0) {
-                Stock s = registarStock_Encomendada(p.getId(), p.getPreco_venda(), qtd);
-                lista.computeIfAbsent(p.getCodFornecedor(), k -> new ArrayList<>()).add(s.getId());
+            int stockTotal = obter_quantidade_Stock_Peca_id(p.getId());
+            if (stockTotal < p.getStock_minimo()) {
+                int qtd         = p.getStock_minimo() - stockTotal;
+                int fornecedor  = p.getCodFornecedor();
+                idsPecas   .computeIfAbsent(fornecedor, k -> new ArrayList<>()).add(p.getId());
+                precos     .computeIfAbsent(fornecedor, k -> new ArrayList<>()).add(0f);
+                quantidades.computeIfAbsent(fornecedor, k -> new ArrayList<>()).add(qtd);
             }
         }
-        return lista;
+        Map<Integer, Encomenda> resultado = new java.util.HashMap<>();
+        for (int fornecedor : idsPecas.keySet()) {
+            Encomenda e = registarEncomenda(
+                    idsPecas.get(fornecedor),
+                    precos.get(fornecedor),
+                    quantidades.get(fornecedor),
+                    fornecedor);
+            resultado.put(fornecedor, e);
+        }
+        return resultado;
     }
 }

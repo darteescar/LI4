@@ -36,9 +36,9 @@ import app.ecoRideLN.sReparacoes.ISReparacoes;
 import app.ecoRideLN.sReparacoes.Reparacao;
 import app.ecoRideLN.sReparacoes.SReparacoesFacade;
 import app.ecoRideLN.sStock.Defeito;
-import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
+import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.ISStock;
 import app.ecoRideLN.sStock.Peca;
@@ -467,17 +467,9 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Encomendas -------------------
 
     @Override
-    public Stock registarStock_Encomendada(int id_peca, float preco_compra, int quantidade) {
-        return sStock.registarStock_Encomendada(id_peca, preco_compra, quantidade);
+    public Encomenda registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor) {
+        return sStock.registarEncomenda(id_peca, preco_compra, quantidade, cod_fornecedor);
     }
-
-    @Override
-    public Encomenda registarEncomenda(List<Integer> stockIds, int cod_fornecedor) {
-        return sStock.registarEncomenda(stockIds, cod_fornecedor);
-    }
-
-    @Override
-    public Encomenda obterEncomenda(int id) { return sStock.obterEncomenda(id); }
 
     @Override
     public boolean removerEncomenda(int id) { return sStock.removerEncomenda(id); }
@@ -489,10 +481,12 @@ public class EcoRideLN implements IEcoRideLN {
     public Encomenda marcarEncomendaComoEnviada(int id) { return sStock.marcarEncomendaComoEnviada(id); }
 
     @Override
-    public Encomenda marcarEncomendaComoRecebida(int id) { return sStock.marcarEncomendaComoRecebida(id); }
+    public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias) {
+        return sStock.marcarEncomendaComoRecebida(id, numeros_serie, garantias);
+    }
 
     @Override
-    public Map<Integer, List<Integer>> gerarListaAutomatica() { return sStock.gerarListaAutomatica(); }
+    public Map<Integer, Encomenda> gerarListaAutomatica() { return sStock.gerarListaAutomatica(); }
 
     // ------------------- Fornecedores -------------------
     // feito
@@ -527,6 +521,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Funcionários -------------------
+    // feito
 
     @Override
     public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal) {
@@ -564,7 +559,9 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean registarPagamentoFuncionario(int id_funcionario) {
-        return sFuncionarios.registarPagamentoFuncionario(id_funcionario);
+        float resultado = sFuncionarios.registarPagamentoFuncionario(id_funcionario);
+        sFinanceiro.registarMovimentoPagamentoFuncionario(id_funcionario, resultado,"Pagamento "+ sFuncionarios.obterFuncionario(id_funcionario).getNome());
+        return true;
     }
 
     // ------------------- Movimentos Financeiros -------------------

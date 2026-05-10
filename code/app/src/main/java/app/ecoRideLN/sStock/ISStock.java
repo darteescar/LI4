@@ -31,7 +31,7 @@ public interface ISStock {
 
     public Stock       registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie);
     public Stock       registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade);
-    public Stock       registarStock_Encomendada(int id_peca, float preco_compra, int quantidade);
+    public Stock       registarStock_Encomenda(int id_peca, float preco_compra, int quantidade);
     public Stock       atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
     public Stock       atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie);
     public Stock       obterStock(int id);
@@ -67,15 +67,14 @@ public interface ISStock {
 
     // ------------------- Encomenda -------------------
 
-    public Encomenda       registarEncomenda(List<Integer> stockIds, int cod_fornecedor);
+    public Encomenda       registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor);
     public Encomenda       atualizarEncomenda(int id, List<Integer> stockIds, LocalDate data_pedido, LocalDate data_chegada, EstadoEncomenda estado);
     public Encomenda       obterEncomenda(int id);
     public boolean         removerEncomenda(int id);
     public List<Encomenda> obterEncomendas();
 
     public Encomenda marcarEncomendaComoEnviada(int id);
-    public Encomenda marcarEncomendaComoRecebida(int id);
+    public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias);
 
-    public int quantidade_encomendar_peca(int id_peca);
-    public Map<Integer, List<Integer>> gerarListaAutomatica();
+    public Map<Integer, Encomenda> gerarListaAutomatica();
 }

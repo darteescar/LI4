@@ -23,5 +23,5 @@ public interface ISFuncionarios {
 
      public void adicionarHorasExtra(int id, int horas_extra);
 
-     public boolean registarPagamentoFuncionario(int id);
+     public float registarPagamentoFuncionario(int id);
 }
