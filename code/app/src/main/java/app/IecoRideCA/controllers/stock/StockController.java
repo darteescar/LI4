@@ -111,13 +111,13 @@ public class StockController {
         // Stock
 
         // List<Stock>
-        app.get("/api/stock", ctx -> {
+        app.get("/api/stocks", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico);
             ctx.status(200).json(facade.obterStocks());
         });
 
         // Obter Stock por id
-        app.get("/api/stock/{id}", ctx -> {
+        app.get("/api/stocks/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Stock c = facade.obterStock(id);
@@ -126,7 +126,7 @@ public class StockController {
         });
 
         // Criar Stock (Peça Normal)
-        app.post("/api/stock", ctx -> {
+        app.post("/api/stocks", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             StockRequest req = ctx.bodyAsClass(StockRequest.class);
             Stock criado = facade.registarStock_PecaNormal(req.codPeca(), req.preco(),  req.dataChegada(), req.quantidade());
@@ -143,14 +143,14 @@ public class StockController {
         });
 
         // Remover Stock
-        app.delete("/api/stock/{id}", ctx -> {
+        app.delete("/api/stocks/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerStock(id) ? 204 : 404);
         });
 
         // Atualizar Stock Normal
-        app.patch("/api/stock/{id}", ctx -> {
+        app.patch("/api/stocks/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             StockRequest req = ctx.bodyAsClass(StockRequest.class);

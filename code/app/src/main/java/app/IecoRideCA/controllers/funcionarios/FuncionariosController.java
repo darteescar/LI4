@@ -24,7 +24,7 @@ public class FuncionariosController {
         });
 
         // Obter Funcionario por ID
-        app.get("/api/funcionario/{id}", ctx -> {
+        app.get("/api/funcionarios/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Funcionario c = facade.obterFuncionario(id);
@@ -33,7 +33,7 @@ public class FuncionariosController {
         });
 
         // Criar Funcionario
-        app.post("/api/funcionario", ctx -> {
+        app.post("/api/funcionarios", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
             Funcionario criado = facade.registarFuncionario(req.nome(), req.email(), req.telemovel(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
@@ -41,14 +41,14 @@ public class FuncionariosController {
         });
 
         // Remover Funcionario
-        app.delete("/api/funcionario/{id}", ctx -> {
+        app.delete("/api/funcionarios/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerFuncionario(id) ? 204 : 404);
         });
 
         // Atualizar Funcionario
-        app.patch("/api/funcionario/{id}", ctx -> {
+        app.patch("/api/funcionarios/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
@@ -58,7 +58,7 @@ public class FuncionariosController {
         });
 
         // Pagar Funcionario
-        app.patch("/api/funcionario/pagar/{id}", ctx -> {
+        app.patch("/api/funcionarios/pagar/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.registarPagamentoFuncionario(id) ? 204 : 404);
