@@ -216,4 +216,5 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     public boolean validarFotografia(Fotografia foto) {
         return foto.isValid();
     }
+
 }

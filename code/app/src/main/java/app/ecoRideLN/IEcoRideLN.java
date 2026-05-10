@@ -15,7 +15,6 @@ import app.ecoRideLN.sFuncionarios.Funcionario;
 import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sNotificacoes.NotificacaoOS;
 import app.ecoRideLN.sNotificacoes.NotificacaoStock;
-import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
@@ -56,11 +55,9 @@ public interface IEcoRideLN {
      public void               cancelarOS(int id);
      public void               registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao);
      public void               registarConsertoOS(int id_OS, List<Integer> stockIds, List<Reparacao> reparacoes);
-     public void               registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
+     public boolean               registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOS_Trotinete(int id_trotinete);
-     public List<Conserto>     obterConsertosAnteriores(int id_trotinete);
-     public boolean            clienteTemApenasUmPagamentoPendente(int id_cliente);
      public void               aprovarOrcamentoOS(int id);
      public void               rejeitarOrcamentoOS(int id);
      public void               atribuirOS(int id, int id_funcionario);
@@ -104,14 +101,14 @@ public interface IEcoRideLN {
 
      // ------------------- Stock -------------------
 
-     public Stock   registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie);
-     public Stock   registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade);
-     public Stock   obterStock(int id);
-     public boolean existeStock(int id);
-     public boolean removerStock(int id);
-     public List<Stock> obterStocks();
-     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
-     public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie);
+     public Stock        registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie);
+     public Stock        registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade);
+     public Stock        obterStock(int id);
+     public boolean      existeStock(int id);
+     public boolean      removerStock(int id);
+     public List<Stock>  obterStocks();
+     public Stock        atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
+     public Stock        atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie);
 
      // ------------------- Defeitos -------------------
 
@@ -119,8 +116,8 @@ public interface IEcoRideLN {
      public Defeito       obterDefeito(int id);
      public List<Defeito> obterDefeitos();
      public boolean       removerDefeito(int id);
-     public Devolucao confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data);
-     public void      descartarDefeito(int idDefeito);
+     public Devolucao     confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data);
+     public void          descartarDefeito(int idDefeito);
 
      // ------------------- Devoluções -------------------
 
@@ -139,7 +136,7 @@ public interface IEcoRideLN {
      public List<Encomenda>             obterEncomendas();
      public Encomenda                   marcarEncomendaComoEnviada(int id);
      public Encomenda                   marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias);
-     public Map<Integer, Encomenda> gerarListaAutomatica();
+     public Map<Integer, Encomenda>     gerarListaAutomatica();
 
      // ------------------- Fornecedores -------------------
      // feito

@@ -183,16 +183,15 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
-        sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
-    }
-
-    @Override
-    public boolean clienteTemApenasUmPagamentoPendente(int id) {
+    public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
         long count = sOrdensServico.obterOSs().stream()
-            .filter(os -> os.getCodCliente() == id && os.getEstado() == app.ecoRideLN.sOrdensServico.EstadoOS.PendentePagamento)
+            .filter(os -> os.getCodCliente() == id_OS && os.getEstado() == app.ecoRideLN.sOrdensServico.EstadoOS.PendentePagamento)
             .count();
-        return count <= 1;
+        if (count <= 1) {
+            sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -206,14 +205,6 @@ public class EcoRideLN implements IEcoRideLN {
     public List<OrdemServico> obterOS_Trotinete(int id_trotinete) {
         return sOrdensServico.obterOSs().stream()
             .filter(os -> os.getCodTrotinete() == id_trotinete)
-            .collect(java.util.stream.Collectors.toList());
-    }
-
-    @Override
-    public List<Conserto> obterConsertosAnteriores(int id_trotinete) {
-        return sOrdensServico.obterOSs().stream()
-            .filter(os -> os.getCodTrotinete() == id_trotinete && os.getConserto() != null)
-            .map(OrdemServico::getConserto)
             .collect(java.util.stream.Collectors.toList());
     }
 
@@ -238,6 +229,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Clientes -------------------
+    // feito
 
     @Override
     public Cliente registarCliente(String nome, String email, String telemovel, String nif) {
@@ -269,6 +261,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Trotinetes -------------------
+    // feito
 
     @Override
     public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, String num_serie, String tipo_motor) {
@@ -300,6 +293,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Reparações -------------------
+    // feito
 
     @Override
     public Reparacao registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel) {
