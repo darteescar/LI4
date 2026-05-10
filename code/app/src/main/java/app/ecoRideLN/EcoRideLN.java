@@ -436,13 +436,12 @@ public class EcoRideLN implements IEcoRideLN {
     public boolean removerDefeito(int id) { return sStock.removerDefeito(id); }
 
     @Override
-    public void marcarDefeitoComoPendenteDevolucao(int id) { sStock.marcarDefeitoComoPendenteDevolucao(id); }
+    public Devolucao confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data) {
+        return sStock.confirmarDefeitoComDevolucao(idDefeito, motivo, data);
+    }
 
     @Override
-    public void marcarDefeitoComoResolvido(int id) { sStock.marcarDefeitoComoResolvido(id); }
-
-    @Override
-    public void marcarDefeitoComoInvalido(int id) { sStock.marcarDefeitoComoInvalido(id); }
+    public void descartarDefeito(int idDefeito) { sStock.descartarDefeito(idDefeito); }
 
     // ------------------- Devoluções -------------------
 

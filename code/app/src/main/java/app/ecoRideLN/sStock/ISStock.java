@@ -49,9 +49,8 @@ public interface ISStock {
     public List<Defeito> obterDefeitos();
     public boolean       removerDefeito(int id);
 
-    public void marcarDefeitoComoPendenteDevolucao(int id);
-    public void marcarDefeitoComoResolvido(int id);
-    public void marcarDefeitoComoInvalido(int id);
+    public Devolucao confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data);
+    public void      descartarDefeito(int idDefeito);
 
     // ------------------- Devolucao -------------------
 

@@ -97,13 +97,6 @@ public class SStockFacade implements ISStock {
     @Override
     public List<Peca> obterPecas() { return new ArrayList<>(pecaDAO.values()); }
 
-    @Override
-    public int obter_quantidade_Stock_Peca_id(int id) {
-        int total = 0;
-        for (Stock s : stockDAO.getByPecaId(id)) total += s.getQuantidade();
-        return total;
-    }
-
     // ------------------- Stock -------------------
 
     @Override
@@ -172,6 +165,13 @@ public class SStockFacade implements ISStock {
         return s;
     }
 
+    @Override
+    public int obter_quantidade_Stock_Peca_id(int id) {
+        int total = 0;
+        for (Stock s : stockDAO.getByPecaId(id)) total += s.getQuantidade();
+        return total;
+    }
+
     // ------------------- Defeito -------------------
 
     @Override
@@ -203,40 +203,31 @@ public class SStockFacade implements ISStock {
     public boolean removerDefeito(int id) { return defeitoDAO.remove(id) != null; }
 
     @Override
-    public void marcarDefeitoComoPendenteDevolucao(int id) {
-        Defeito d = defeitoDAO.get(id);
-        if (d != null) {
-            d.setEstado(EstadoDefeito.StockPendenteDeDevolucao);
-            defeitoDAO.put(id, d);
+    public Devolucao confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data) {
+        Defeito d = defeitoDAO.get(idDefeito);
+        if (d == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
+        Stock s = stockDAO.get(d.getCodStock());
+        if (s != null) {
+            s.setEstado(EstadoStock.StockPendenteDeDevolucao);
+            stockDAO.put(s.getId(), s);
         }
+        int idDev = devolucaoDAO.generateNewId();
+        Devolucao dev = new Devolucao(idDev, data, motivo, d.getCodStock());
+        devolucaoDAO.put(idDev, dev);
+        defeitoDAO.remove(idDefeito);
+        return dev;
     }
 
     @Override
-    public void marcarDefeitoComoResolvido(int id) {
-        Defeito d = defeitoDAO.get(id);
-        if (d != null) {
-            Stock s = stockDAO.get(d.getCodStock());
-            if (s != null) {
-                s.setEstado(EstadoStock.StockEmArmazem);
-                stockDAO.put(d.getCodStock(), s);
-            }
-            d.setEstado(EstadoDefeito.Resolvido);
-            defeitoDAO.put(id, d);
+    public void descartarDefeito(int idDefeito) {
+        Defeito d = defeitoDAO.get(idDefeito);
+        if (d == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
+        Stock s = stockDAO.get(d.getCodStock());
+        if (s != null) {
+            s.setEstado(EstadoStock.StockEmArmazem);
+            stockDAO.put(s.getId(), s);
         }
-    }
-
-    @Override
-    public void marcarDefeitoComoInvalido(int id) {
-        Defeito d = defeitoDAO.get(id);
-        if (d != null) {
-            Stock s = stockDAO.get(d.getCodStock());
-            if (s != null) {
-                s.setEstado(EstadoStock.StockinvalidoParaDevolucao);
-                stockDAO.put(d.getCodStock(), s);
-            }
-            d.setEstado(EstadoDefeito.Invalido);
-            defeitoDAO.put(id, d);
-        }
+        defeitoDAO.remove(idDefeito);
     }
 
     // ------------------- Devolucao -------------------

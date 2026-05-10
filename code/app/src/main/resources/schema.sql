@@ -139,7 +139,6 @@ CREATE TABLE IF NOT EXISTS Defeito (
     codStock      INT          NOT NULL,
     motivo        VARCHAR(255) NOT NULL,
     idFuncionario INT          NOT NULL,
-    estado        ENUM('Identificado','PendenteDevolucao','Resolvido','Invalido') NOT NULL DEFAULT 'Identificado',
     PRIMARY KEY (id),
     FOREIGN KEY (codStock)      REFERENCES Stock(id),
     FOREIGN KEY (idFuncionario) REFERENCES Funcionario(id)
