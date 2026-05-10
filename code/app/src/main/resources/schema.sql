@@ -124,10 +124,10 @@ CREATE TABLE IF NOT EXISTS Stock (
     id           INT          NOT NULL,
     preco_compra FLOAT        NOT NULL,
     codPeca      INT          NOT NULL,
-    data_chegada DATETIME     NOT NULL,
+    data_chegada DATE         NOT NULL,
     quantidade   INT          NOT NULL,
     nr_serie     VARCHAR(100) NULL,
-    garantia     DATE         NULL,
+    garantia     INT          NULL,
     estado       ENUM('EmStock','PossivelDefeito','Devolvida','Invalida','PendenteDevolucao','UsadaEmConserto') NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codPeca) REFERENCES Peca(id)
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS Stock (
 
 CREATE TABLE IF NOT EXISTS Devolucao (
     id         INT          NOT NULL,
-    data       DATETIME     NOT NULL,
+    data       DATE         NOT NULL,
     motivo     VARCHAR(255),
     estado     ENUM('PendenteDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
     codStock   INT          NOT NULL,
@@ -150,9 +150,9 @@ CREATE TABLE IF NOT EXISTS Devolucao (
 CREATE TABLE IF NOT EXISTS Encomenda (
     id            INT      NOT NULL,
     codFornecedor INT      NOT NULL,
-    data_criacao  DATETIME NULL,
-    data_rececao  DATETIME NULL,
-    data_envio    DATETIME NULL,
+    data_criacao  DATE NULL,
+    data_rececao  DATE NULL,
+    data_envio    DATE NULL,
     estado        ENUM('RASCUNHO', 'ENVIADA', 'RECEBIDA') NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codFornecedor) REFERENCES Fornecedor(id)

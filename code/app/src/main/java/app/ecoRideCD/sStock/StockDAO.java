@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.sql.Types;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class StockDAO implements Map<Integer, Stock> {
         int id = rs.getInt("id");
         float preco = rs.getFloat("preco_compra");
         int codPeca = rs.getInt("codPeca");
-        var dataChegada = rs.getTimestamp("data_chegada").toLocalDateTime().toLocalDate();
+        var dataChegada = rs.getDate("data_chegada").toLocalDate();
         int qtd = rs.getInt("quantidade");
         String nrSerie = rs.getString("nr_serie");
         int garantia = rs.getInt("garantia");
@@ -124,7 +124,7 @@ public class StockDAO implements Map<Integer, Stock> {
             ps.setInt(1, key);
             ps.setFloat(2, value.getPreco_compra());
             ps.setInt(3, value.getCodPeca());
-            ps.setTimestamp(4, Timestamp.valueOf(value.getData_chegada().atStartOfDay()));
+            ps.setDate(4, Date.valueOf(value.getData_chegada()));
             ps.setInt(5, value.getQuantidade());
             if (value instanceof StockComGarantia g) {
                 ps.setString(6, g.getNr_serie());

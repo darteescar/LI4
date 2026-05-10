@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.HashSet;
@@ -35,7 +35,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
     private Devolucao buildFromRow(ResultSet rs) throws SQLException {
         return new Devolucao(
                 rs.getInt("id"),
-                rs.getTimestamp("data").toLocalDateTime().toLocalDate(),
+                rs.getDate("data").toLocalDate(),
                 rs.getString("motivo"),
                 EstadoDevolucao.valueOf(rs.getString("estado")),
                 rs.getInt("codStock"),
@@ -108,7 +108,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
-            ps.setTimestamp(2, Timestamp.valueOf(value.getData().atStartOfDay()));
+            ps.setDate(2, Date.valueOf(value.getData()));
             ps.setString(3, value.getMotivo());
             ps.setString(4, value.getEstado().name());
             ps.setInt(5, value.getCodStock());
