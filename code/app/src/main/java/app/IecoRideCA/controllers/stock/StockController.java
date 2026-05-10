@@ -1,5 +1,8 @@
 package app.IecoRideCA.controllers.stock;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
 import app.IecoRideCA.controllers.stock.dto.FornecedorRequest;
@@ -190,7 +193,10 @@ public class StockController {
         app.post("/api/encomendas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             EncomendaRequest req = ctx.bodyAsClass(EncomendaRequest.class);
-            Encomenda criado = facade.registarEncomenda(req.itens(), req.cod_fornecedor());
+            List<Integer> stockIds = new java.util.ArrayList<>();
+            for (EncomendaRequest.ItemEncomendaRequest i : req.itens())
+                stockIds.add(facade.registarStock_Encomendada(i.codPeca(), i.preco_compra(), i.quantidade()).getId());
+            Encomenda criado = facade.registarEncomenda(stockIds, req.cod_fornecedor());
             ctx.status(201).json(criado);
         });
 

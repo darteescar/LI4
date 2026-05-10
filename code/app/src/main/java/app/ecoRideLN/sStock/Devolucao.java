@@ -14,7 +14,7 @@ public class Devolucao {
         this.id = id;
         this.data = data;
         this.motivo = motivo;
-        this.estado = EstadoDevolucao.PendenteDevolucao;
+        this.estado = EstadoDevolucao.StockPendenteDeDevolucao;
         this.codStock = codStock;
     }
 

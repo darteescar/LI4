@@ -26,12 +26,12 @@ public interface ISStock {
     public List<Peca> obterPecas();
 
     public int         obter_quantidade_Stock_Peca_id(int id);
-    public List<Integer> obter_Pecas_baixo_Stock_minimo();
 
     // ------------------- Stock -------------------
 
     public Stock       registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie);
     public Stock       registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade);
+    public Stock       registarStock_Encomendada(int id_peca, float preco_compra, int quantidade);
     public Stock       atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
     public Stock       atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie);
     public Stock       obterStock(int id);
@@ -40,11 +40,11 @@ public interface ISStock {
     public List<Stock> obterStocks();
 
     public Stock atualizaEstadoStock(int id, EstadoStock estado);
-    public int   pecasDefeituosas_Stock(int id_peca);
 
     // ------------------- Defeito -------------------
 
-    public Defeito       registarDefeito(int codStock, String motivo, int idFuncionario, int quantidade);
+    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario);
+
     public Defeito       obterDefeito(int id);
     public List<Defeito> obterDefeitos();
     public boolean       removerDefeito(int id);
@@ -55,8 +55,8 @@ public interface ISStock {
 
     // ------------------- Devolucao -------------------
 
-    // quantidade: quantas unidades do Stock são devolvidas; parte a entrada de stock se parcial
-    public Devolucao       registarDevolucao(LocalDate data_devolucao, String motivo, int id_stock, int quantidade);
+    public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data);
+
     public Devolucao       obterDevolucao(int id);
     public boolean         existeDevolucao(int id);
     public boolean         removerDevolucao(int id);
@@ -68,16 +68,15 @@ public interface ISStock {
 
     // ------------------- Encomenda -------------------
 
-    public Encomenda       registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor);
-    public Encomenda       atualizarEncomenda(int id, List<ItemEncomenda> itens, LocalDate data_pedido, LocalDate data_chegada, EstadoEncomenda estado);
+    public Encomenda       registarEncomenda(List<Integer> stockIds, int cod_fornecedor);
+    public Encomenda       atualizarEncomenda(int id, List<Integer> stockIds, LocalDate data_pedido, LocalDate data_chegada, EstadoEncomenda estado);
     public Encomenda       obterEncomenda(int id);
     public boolean         removerEncomenda(int id);
     public List<Encomenda> obterEncomendas();
 
     public Encomenda marcarEncomendaComoEnviada(int id);
     public Encomenda marcarEncomendaComoRecebida(int id);
-    public boolean   validaEncomenda_Rascunho(int id_Encomenda);
 
     public int quantidade_encomendar_peca(int id_peca);
-    public Map<Integer, List<ItemEncomenda>> gerarListaAutomatica();
+    public Map<Integer, List<Integer>> gerarListaAutomatica();
 }

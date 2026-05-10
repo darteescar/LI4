@@ -41,7 +41,8 @@ public class StockDAO implements Map<Integer, Stock> {
         int id = rs.getInt("id");
         float preco = rs.getFloat("preco_compra");
         int codPeca = rs.getInt("codPeca");
-        var dataChegada = rs.getDate("data_chegada").toLocalDate();
+        var dataChegadaRaw = rs.getDate("data_chegada");
+        var dataChegada = dataChegadaRaw != null ? dataChegadaRaw.toLocalDate() : null;
         int qtd = rs.getInt("quantidade");
         String nrSerie = rs.getString("nr_serie");
         int garantia = rs.getInt("garantia");
@@ -219,6 +220,18 @@ public class StockDAO implements Map<Integer, Stock> {
             return rs.next() ? rs.getInt(1) + 1 : 1;
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gerar novo ID para stock", e);
+        }
+    }
+
+    public Stock getByNrSerie(String nrSerie) {
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement("SELECT * FROM Stock WHERE nr_serie = ?")) {
+            ps.setString(1, nrSerie);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? buildFromRow(rs) : null;
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter stock por nr_serie " + nrSerie, e);
         }
     }
 

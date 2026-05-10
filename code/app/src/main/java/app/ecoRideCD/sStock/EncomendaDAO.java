@@ -19,8 +19,6 @@ import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.EstadoEncomenda;
-import app.ecoRideLN.sStock.ItemEncomenda;
-
 
 public class EncomendaDAO implements Map<Integer, Encomenda> {
 
@@ -33,20 +31,7 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           return instance;
      }
 
-     private List<ItemEncomenda> loadItens(Connection c, int idEncomenda) throws SQLException {
-          List<ItemEncomenda> out = new ArrayList<>();
-          String sql = "SELECT codPeca, quantidade, preco_unitario FROM Encomenda_Item WHERE idEncomenda = ? ORDER BY ordem";
-          try (PreparedStatement ps = c.prepareStatement(sql)) {
-               ps.setInt(1, idEncomenda);
-               try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next())
-                         out.add(new ItemEncomenda(rs.getInt("codPeca"), rs.getInt("quantidade"), rs.getFloat("preco_unitario")));
-               }
-          }
-          return out;
-     }
-
-     private List<Integer> loadEntradasStock(Connection c, int idEncomenda) throws SQLException {
+     private List<Integer> loadStocks(Connection c, int idEncomenda) throws SQLException {
           List<Integer> out = new ArrayList<>();
           String sql = "SELECT codStock FROM Encomenda_EntradaStock WHERE idEncomenda = ? ORDER BY ordem";
           try (PreparedStatement ps = c.prepareStatement(sql)) {
@@ -67,8 +52,7 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                     rs.getDate("data_rececao") != null ? rs.getDate("data_rececao").toLocalDate() : null,
                     rs.getDate("data_envio")   != null ? rs.getDate("data_envio").toLocalDate()   : null,
                     EstadoEncomenda.valueOf(rs.getString("estado")),
-                    loadItens(c, id),
-                    loadEntradasStock(c, id)
+                    loadStocks(c, id)
           );
      }
 
@@ -91,32 +75,7 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           }
      }
 
-     private void clearItens(Connection c, int idEncomenda) throws SQLException {
-          try (PreparedStatement ps = c.prepareStatement(
-                    "DELETE FROM Encomenda_Item WHERE idEncomenda = ?")) {
-               ps.setInt(1, idEncomenda);
-               ps.executeUpdate();
-          }
-     }
-
-     private void insertItens(Connection c, int idEncomenda, List<ItemEncomenda> itens) throws SQLException {
-          if (itens == null || itens.isEmpty()) return;
-          try (PreparedStatement ps = c.prepareStatement(
-                    "INSERT INTO Encomenda_Item (idEncomenda, ordem, codPeca, quantidade, preco_unitario) VALUES (?, ?, ?, ?, ?)")) {
-               for (int i = 0; i < itens.size(); i++) {
-                    ItemEncomenda item = itens.get(i);
-                    ps.setInt(1, idEncomenda);
-                    ps.setInt(2, i);
-                    ps.setInt(3, item.getCodPeca());
-                    ps.setInt(4, item.getQuantidade());
-                    ps.setFloat(5, item.getPreco_unitario());
-                    ps.addBatch();
-               }
-               ps.executeBatch();
-          }
-     }
-
-     private void clearEntradas(Connection c, int idEncomenda) throws SQLException {
+     private void clearStocks(Connection c, int idEncomenda) throws SQLException {
           try (PreparedStatement ps = c.prepareStatement(
                     "DELETE FROM Encomenda_EntradaStock WHERE idEncomenda = ?")) {
                ps.setInt(1, idEncomenda);
@@ -124,14 +83,14 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           }
      }
 
-     private void insertEntradas(Connection c, int idEncomenda, List<Integer> codEntradasStock) throws SQLException {
-          if (codEntradasStock == null || codEntradasStock.isEmpty()) return;
+     private void insertStocks(Connection c, int idEncomenda, List<Integer> codStocks) throws SQLException {
+          if (codStocks == null || codStocks.isEmpty()) return;
           try (PreparedStatement ps = c.prepareStatement(
                     "INSERT INTO Encomenda_EntradaStock (idEncomenda, ordem, codStock) VALUES (?, ?, ?)")) {
-               for (int i = 0; i < codEntradasStock.size(); i++) {
+               for (int i = 0; i < codStocks.size(); i++) {
                     ps.setInt(1, idEncomenda);
                     ps.setInt(2, i);
-                    ps.setInt(3, codEntradasStock.get(i));
+                    ps.setInt(3, codStocks.get(i));
                     ps.addBatch();
                }
                ps.executeBatch();
@@ -172,9 +131,8 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
      @Override
      public Encomenda get(Object key) {
           if (!(key instanceof Integer id)) return null;
-          String sql = "SELECT * FROM Encomenda WHERE id = ?";
           try (Connection c = ConnectionFactory.get();
-               PreparedStatement ps = c.prepareStatement(sql)) {
+               PreparedStatement ps = c.prepareStatement("SELECT * FROM Encomenda WHERE id = ?")) {
                ps.setInt(1, id);
                try (ResultSet rs = ps.executeQuery()) {
                     return rs.next() ? buildFromRow(c, rs) : null;
@@ -191,10 +149,8 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                c.setAutoCommit(false);
                try {
                     upsertBase(c, key, value);
-                    clearItens(c, key);
-                    insertItens(c, key, value.getItensEncomendados());
-                    clearEntradas(c, key);
-                    insertEntradas(c, key, value.getCodEntradasStock());
+                    clearStocks(c, key);
+                    insertStocks(c, key, value.getCodStocks());
                     c.commit();
                } catch (SQLException e) {
                     c.rollback();
@@ -251,10 +207,9 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
      @Override
      public Collection<Encomenda> values() {
           Set<Encomenda> out = new LinkedHashSet<>();
-          String sql = "SELECT * FROM Encomenda";
           try (Connection c = ConnectionFactory.get();
                Statement s = c.createStatement();
-               ResultSet rs = s.executeQuery(sql)) {
+               ResultSet rs = s.executeQuery("SELECT * FROM Encomenda")) {
                while (rs.next()) out.add(buildFromRow(c, rs));
           } catch (SQLException e) {
                throw new EcoRideException("Erro a obter encomendas", e);
@@ -265,10 +220,9 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
      @Override
      public Set<Entry<Integer, Encomenda>> entrySet() {
           Set<Entry<Integer, Encomenda>> out = new HashSet<>();
-          String sql = "SELECT * FROM Encomenda";
           try (Connection c = ConnectionFactory.get();
                Statement s = c.createStatement();
-               ResultSet rs = s.executeQuery(sql)) {
+               ResultSet rs = s.executeQuery("SELECT * FROM Encomenda")) {
                while (rs.next()) {
                     Encomenda e = buildFromRow(c, rs);
                     out.add(new AbstractMap.SimpleEntry<>(e.getId(), e));
@@ -278,8 +232,6 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           }
           return out;
      }
-
-     // --------- Aliases / domínio ---------
 
      public int generateNewId() {
           try (Connection c = ConnectionFactory.get();
@@ -293,9 +245,8 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
 
      public List<Encomenda> getByEstado(EstadoEncomenda estado) {
           List<Encomenda> out = new ArrayList<>();
-          String sql = "SELECT * FROM Encomenda WHERE estado = ?";
           try (Connection c = ConnectionFactory.get();
-               PreparedStatement ps = c.prepareStatement(sql)) {
+               PreparedStatement ps = c.prepareStatement("SELECT * FROM Encomenda WHERE estado = ?")) {
                ps.setString(1, estado.name());
                try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) out.add(buildFromRow(c, rs));

@@ -36,11 +36,12 @@ import app.ecoRideLN.sOrdensServico.SOrdensServicoFacade;
 import app.ecoRideLN.sReparacoes.ISReparacoes;
 import app.ecoRideLN.sReparacoes.Reparacao;
 import app.ecoRideLN.sReparacoes.SReparacoesFacade;
+import app.ecoRideLN.sStock.Defeito;
 import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.ISStock;
-import app.ecoRideLN.sStock.ItemEncomenda;
+
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.SStockFacade;
 import app.ecoRideLN.sStock.Stock;
@@ -418,79 +419,85 @@ public class EcoRideLN implements IEcoRideLN {
         return sStock.atualizarStockComGarantia(id_stock, preco_compra, cod_Peca, data_rececao, quantidade, garantia, nr_serie);
     }
 
+    // ------------------- Defeitos -------------------
+
+    @Override
+    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario) {
+        return sStock.registarDefeito(stockIds, motivo, idFuncionario);
+    }
+
+    @Override
+    public Defeito obterDefeito(int id) { return sStock.obterDefeito(id); }
+
+    @Override
+    public List<Defeito> obterDefeitos() { return sStock.obterDefeitos(); }
+
+    @Override
+    public boolean removerDefeito(int id) { return sStock.removerDefeito(id); }
+
+    @Override
+    public void marcarDefeitoComoPendenteDevolucao(int id) { sStock.marcarDefeitoComoPendenteDevolucao(id); }
+
+    @Override
+    public void marcarDefeitoComoResolvido(int id) { sStock.marcarDefeitoComoResolvido(id); }
+
+    @Override
+    public void marcarDefeitoComoInvalido(int id) { sStock.marcarDefeitoComoInvalido(id); }
+
     // ------------------- Devoluções -------------------
 
     @Override
-    public Devolucao registarDevolucao(LocalDate data_devolucao, String motivo, int id_stock, int quantidade) {
-        return sStock.registarDevolucao(data_devolucao, motivo, id_stock, quantidade);
+    public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data) {
+        return sStock.registarDevolucao(stockIds, motivo, data);
     }
 
     @Override
-    public Devolucao obterDevolucao(int id) {
-        return sStock.obterDevolucao(id);
-    }
+    public Devolucao obterDevolucao(int id) { return sStock.obterDevolucao(id); }
 
     @Override
-    public boolean existeDevolucao(int id) {
-        return sStock.existeDevolucao(id);
-    }
+    public boolean existeDevolucao(int id) { return sStock.existeDevolucao(id); }
 
     @Override
-    public boolean removerDevolucao(int id) {
-        return sStock.removerDevolucao(id);
-    }
+    public boolean removerDevolucao(int id) { return sStock.removerDevolucao(id); }
 
     @Override
-    public void marcarDevolucaoComoEnviada(int id) {
-        sStock.marcarDevolucaoComoEnviada(id);
-    }
+    public void marcarDevolucaoComoEnviada(int id) { sStock.marcarDevolucaoComoEnviada(id); }
 
     @Override
-    public void marcarDevolucaoComoDevolvida(int id) {
-        sStock.marcarDevolucaoComoDevolvida(id);
-    }
+    public void marcarDevolucaoComoDevolvida(int id) { sStock.marcarDevolucaoComoDevolvida(id); }
 
     @Override
-    public void marcarDevolucaoComoInvalida(int id) {
-        sStock.marcarDevolucaoComoInvalida(id);
-    }
+    public void marcarDevolucaoComoInvalida(int id) { sStock.marcarDevolucaoComoInvalida(id); }
 
     // ------------------- Encomendas -------------------
 
     @Override
-    public Encomenda registarEncomenda(List<ItemEncomenda> itens, int cod_fornecedor) {
-        return sStock.registarEncomenda(itens, cod_fornecedor);
+    public Stock registarStock_Encomendada(int id_peca, float preco_compra, int quantidade) {
+        return sStock.registarStock_Encomendada(id_peca, preco_compra, quantidade);
     }
 
     @Override
-    public Encomenda obterEncomenda(int id) {
-        return sStock.obterEncomenda(id);
+    public Encomenda registarEncomenda(List<Integer> stockIds, int cod_fornecedor) {
+        return sStock.registarEncomenda(stockIds, cod_fornecedor);
     }
 
     @Override
-    public boolean removerEncomenda(int id) {
-        return sStock.removerEncomenda(id);
-    }
+    public Encomenda obterEncomenda(int id) { return sStock.obterEncomenda(id); }
 
     @Override
-    public List<Encomenda> obterEncomendas() {
-        return sStock.obterEncomendas();
-    }
+    public boolean removerEncomenda(int id) { return sStock.removerEncomenda(id); }
 
     @Override
-    public Encomenda marcarEncomendaComoEnviada(int id) {
-        return sStock.marcarEncomendaComoEnviada(id);
-    }
+    public List<Encomenda> obterEncomendas() { return sStock.obterEncomendas(); }
 
     @Override
-    public Encomenda marcarEncomendaComoRecebida(int id) {
-        return sStock.marcarEncomendaComoRecebida(id);
-    }
+    public Encomenda marcarEncomendaComoEnviada(int id) { return sStock.marcarEncomendaComoEnviada(id); }
 
     @Override
-    public Map<Integer, List<ItemEncomenda>> gerarListaAutomatica(){
-        return sStock.gerarListaAutomatica();
-    }
+    public Encomenda marcarEncomendaComoRecebida(int id) { return sStock.marcarEncomendaComoRecebida(id); }
+
+    @Override
+    public Map<Integer, List<Integer>> gerarListaAutomatica() { return sStock.gerarListaAutomatica(); }
 
     // ------------------- Fornecedores -------------------
 

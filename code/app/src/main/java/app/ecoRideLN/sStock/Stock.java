@@ -17,7 +17,7 @@ public class Stock {
           this.codPeca = codPeca;
           this.data_chegada = data_chegada;
           this.quantidade = quantidade;
-          this.estado = EstadoStock.EmStock;
+          this.estado = EstadoStock.StockEmArmazem;
      }
 
      public Stock(int id, float preco_compra, int codPeca, LocalDate data_chegada, int quantidade, EstadoStock estado) {

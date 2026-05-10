@@ -2,7 +2,7 @@ package app.ecoRideLN.sStock;
 
 public enum EstadoDefeito {
     Identificado,
-    PendenteDevolucao,
+    StockPendenteDeDevolucao,
     Resolvido,
     Invalido
 }

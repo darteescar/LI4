@@ -120,15 +120,16 @@ CREATE TABLE IF NOT EXISTS Peca (
 
 -- Stock + StockComGarantia partilham tabela: nr_serie e garantia ficam NULL
 -- para itens sem garantia. O DAO devolve a subclasse certa em runtime.
+-- data_chegada é NULL para stocks em estado StockEncomendado (ainda não recebidos).
 CREATE TABLE IF NOT EXISTS Stock (
     id           INT          NOT NULL,
     preco_compra FLOAT        NOT NULL,
     codPeca      INT          NOT NULL,
-    data_chegada DATE         NOT NULL,
+    data_chegada DATE         NULL,
     quantidade   INT          NOT NULL,
     nr_serie     VARCHAR(100) NULL,
     garantia     INT          NULL,
-    estado       ENUM('EmStock','PossivelDefeito','PendenteDevolucao','Enviada','Devolvida','Invalida','UsadaEmConserto') NULL,
+    estado       ENUM('StockEncomendado','StockEmArmazem','StockComPossivelDefeito','StockPendenteDeDevolucao','StockEnviadoParaFornecedor','Devolvida','Invalida','UsadaEmConserto') NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codPeca) REFERENCES Peca(id)
 );
@@ -168,19 +169,7 @@ CREATE TABLE IF NOT EXISTS Encomenda (
     FOREIGN KEY (codFornecedor) REFERENCES Fornecedor(id)
 );
 
--- Itens encomendados (o que foi pedido ao fornecedor)
-CREATE TABLE IF NOT EXISTS Encomenda_Item (
-    idEncomenda    INT   NOT NULL,
-    ordem          INT   NOT NULL,
-    codPeca        INT   NOT NULL,
-    quantidade     INT   NOT NULL,
-    preco_unitario FLOAT NOT NULL,
-    PRIMARY KEY (idEncomenda, ordem),
-    FOREIGN KEY (idEncomenda) REFERENCES Encomenda(id) ON DELETE CASCADE,
-    FOREIGN KEY (codPeca)     REFERENCES Peca(id)
-);
-
--- Entradas de stock geradas ao marcar a encomenda como recebida
+-- Stocks associados à encomenda (criados em estado StockEncomendado; transitam para StockEmArmazem ao receber)
 CREATE TABLE IF NOT EXISTS Encomenda_EntradaStock (
     idEncomenda INT NOT NULL,
     ordem       INT NOT NULL,
