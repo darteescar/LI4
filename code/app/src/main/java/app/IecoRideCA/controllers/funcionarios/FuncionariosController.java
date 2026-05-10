@@ -37,7 +37,7 @@ public class FuncionariosController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
             Funcionario criado = facade.registarFuncionario(req.nome(), req.email(), req.telemovel(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
-            ctx.status(200).json(criado);
+            ctx.status(201).json(criado);
         });
 
         // Remover Funcionario
@@ -68,8 +68,8 @@ public class FuncionariosController {
         app.patch("/api/funcionario/horas_extra/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            int horas_extra = Integer.parseInt(ctx.queryParam("horas_extra"));
-            facade.registarHorasExtraFuncionario(id, horas_extra);
+            FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
+            facade.registarHorasExtraFuncionario(id, req.horas_extra());
             ctx.status(204);
         });
 

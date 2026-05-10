@@ -120,7 +120,7 @@ public class ClientesController {
             }
         });
 
-        // Editar Trotinete
+        // Apagar Trotinete
         app.delete("/api/trotinetes/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));

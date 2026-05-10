@@ -23,11 +23,7 @@ public class ReparacoesController {
         app.get("/api/reparacoes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.GestorStock, Cargo.Secretaria);
             List<Reparacao> reparacoes = facade.obterReparacoes();
-            if (reparacoes == null) {
-                ctx.status(404);
-            } else {
-                ctx.status(200).json(reparacoes);
-            }
+            ctx.status(200).json(reparacoes);
         });
 
         // Obter Reparacao por id
