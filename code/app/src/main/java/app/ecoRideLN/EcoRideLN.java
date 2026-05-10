@@ -482,6 +482,14 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias) {
+        List<Integer> stockIds = sStock.marcarEncomendaComoRecebida(id, numeros_serie, garantias).getCodStocks();
+        for (int stockId : stockIds) {
+            Stock s = sStock.obterStock(stockId);
+            if (s != null) {
+                int codPeca = s.getCodPeca();
+                sFinanceiro.registarMovimentoCompraStock(codPeca, s.calcularValorTotal(), "Compra "+sStock.obterPeca(codPeca).getNome() +"x"+ s.getQuantidade());
+            }
+        }
         return sStock.marcarEncomendaComoRecebida(id, numeros_serie, garantias);
     }
 
@@ -495,6 +503,7 @@ public class EcoRideLN implements IEcoRideLN {
     public Fornecedor registarFornecedor(String nome, String telemovel, String email) {
         return sStock.registarFornecedor(nome, telemovel, email);
     }
+    
     @Override
     public Fornecedor atualizarFornecedor(int id, String nome, String telemovel, String email){
         return sStock.atualizarFornecedor(id, nome, telemovel, email);
@@ -527,6 +536,7 @@ public class EcoRideLN implements IEcoRideLN {
     public Funcionario registarFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal) {
         return sFuncionarios.registarFuncionario(nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
     }
+    
     @Override
     public Funcionario atualizarFuncionario(int id, String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal){
         return sFuncionarios.atualizarFuncionario(id, nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
@@ -565,6 +575,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Movimentos Financeiros -------------------
+    // feito
 
     @Override
     public List<MovimentoFinanceiro> obterMovimentosFinanceiros() {

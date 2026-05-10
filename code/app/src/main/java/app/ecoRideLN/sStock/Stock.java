@@ -76,4 +76,8 @@ public class Stock {
      public void setEstado(EstadoStock estado) {
           this.estado = estado;
      }
+
+     public float calcularValorTotal() {
+          return preco_compra * quantidade;
+     }
 }
