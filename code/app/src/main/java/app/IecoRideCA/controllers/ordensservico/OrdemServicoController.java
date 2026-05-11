@@ -4,8 +4,6 @@ import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.ConsertoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.DefeitoStockComGarantiaRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.DefeitoStockRequest;
-import app.IecoRideCA.controllers.ordensservico.dto.DefeitoToDevolucaoRequest;
-import app.IecoRideCA.controllers.ordensservico.dto.DevolucaoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.DiagnosticoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.OrdemServicoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.PagamentoRequest;
@@ -147,72 +145,6 @@ public class OrdemServicoController {
             DefeitoStockComGarantiaRequest req = ctx.bodyAsClass(DefeitoStockComGarantiaRequest.class);
             int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             facade.reportarDefeitoSerializadoConsertoOS(req.idOS(), req.codStocks(), req.motivo(), idFuncionario);
-            ctx.status(204);
-        });
-
-        // Defeitos
-
-        app.get("/api/ordensservicos/defeitos", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            ctx.json(facade.obterDefeitos());
-        });
-
-        app.delete("/api/ordensservicos/defeitos/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            ctx.status(facade.removerDefeito(id) ? 204 : 404);
-        });
-
-        app.patch("/api/ordensservicos/defeitos/devolver", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
-            facade.confirmarDefeitoComDevolucao(req.idDefeito(), req.motivo(), req.data());
-            ctx.status(204);
-        });
-
-        app.patch("/api/ordensservicos/defeitos/descartar", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
-            facade.descartarDefeito(req.idDefeito());
-            ctx.status(204);
-        });
-
-        // Devoluções
-
-        app.get("/api/ordensservicos/devolucoes", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            ctx.json(facade.obterDevolucoes());
-        });
-
-         app.delete("/api/ordensservicos/devolucoes/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            ctx.status(facade.removerDevolucao(id) ? 204 : 404);
-        });
-
-        app.patch("/api/ordensservicos/devolucoes/marcarEnviada", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
-            facade.marcarDevolucaoComoEnviada(req.idDevolucao());
-            ctx.status(204);
-        });
-
-         app.patch("/api/ordensservicos/devolucoes/marcarDevolvida", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
-            facade.marcarDevolucaoComoDevolvida(req.idDevolucao());
-            ctx.status(204);
-        });
-
-        app.patch("/api/ordensservicos/devolucoes/marcarInvalida", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
-            facade.marcarDevolucaoComoInvalida(req.idDevolucao());
             ctx.status(204);
         });
     }

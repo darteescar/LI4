@@ -3,6 +3,8 @@ package app.IecoRideCA.controllers.stock;
 import java.util.List;
 
 import app.IecoRideCA.auth.GestorSessoes;
+import app.IecoRideCA.controllers.ordensservico.dto.DefeitoToDevolucaoRequest;
+import app.IecoRideCA.controllers.ordensservico.dto.DevolucaoRequest;
 import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
 import app.IecoRideCA.controllers.stock.dto.FornecedorRequest;
 import app.IecoRideCA.controllers.stock.dto.PecaRequest;
@@ -224,6 +226,72 @@ public class StockController {
             Encomenda atualizado = facade.marcarEncomendaComoRecebida(id, List.of(), List.of());
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
+        });
+
+                // Defeitos
+
+        app.get("/api/defeitos", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            ctx.json(facade.obterDefeitos());
+        });
+
+        app.delete("/api/defeitos/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            ctx.status(facade.removerDefeito(id) ? 204 : 404);
+        });
+
+        app.patch("/api/defeitos/devolver", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
+            facade.confirmarDefeitoComDevolucao(req.idDefeito(), req.motivo(), req.data());
+            ctx.status(204);
+        });
+
+        app.patch("/api/defeitos/descartar", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
+            facade.descartarDefeito(req.idDefeito());
+            ctx.status(204);
+        });
+
+        // Devoluções
+
+        app.get("/api/devolucoes", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            ctx.json(facade.obterDevolucoes());
+        });
+
+         app.delete("/api/devolucoes/{id}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            ctx.status(facade.removerDevolucao(id) ? 204 : 404);
+        });
+
+        app.patch("/api/devolucoes/marcarEnviada", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
+            facade.marcarDevolucaoComoEnviada(req.idDevolucao());
+            ctx.status(204);
+        });
+
+         app.patch("/api/devolucoes/marcarDevolvida", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
+            facade.marcarDevolucaoComoDevolvida(req.idDevolucao());
+            ctx.status(204);
+        });
+
+        app.patch("/api/devolucoes/marcarInvalida", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
+            facade.marcarDevolucaoComoInvalida(req.idDevolucao());
+            ctx.status(204);
         });
 
     }
