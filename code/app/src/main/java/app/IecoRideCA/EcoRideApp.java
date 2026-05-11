@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.auth.SessaoUtilizador;
+import app.IecoRideCA.controllers.ExtrasController;
 import app.IecoRideCA.controllers.auth.AuthController;
 import app.IecoRideCA.controllers.clientes.ClientesController;
 import app.IecoRideCA.controllers.financeiro.FinanceiroController;
@@ -76,6 +77,7 @@ public class EcoRideApp {
         new ReparacoesController(facade).register(app);
         new NotificacoesController(facade).register(app);
         new FinanceiroController(facade).register(app);
+        new ExtrasController(facade).register(app);
     }
 
     record ErroResponse(String erro) {}
