@@ -490,6 +490,11 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Defeitos -------------------
 
     @Override
+    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario) {
+        return sStock.registarDefeito(stockIds, motivo, idFuncionario);
+    }
+
+    @Override
     public Defeito obterDefeito(int id) { return sStock.obterDefeito(id); }
 
 
