@@ -572,8 +572,6 @@ public class TesteFacade {
             ln.marcarDevolucaoComoEnviada(idDevolucao);
             if (ln.obterStock(codStock).getEstado() != EstadoStock.StockEnviadoParaFornecedor)
                 throw new RuntimeException("stock no estado errado: " + ln.obterStock(codStock).getEstado());
-            // NOTA: existe um bug em marcarDevolucaoComoEnviada — define estado como 'Devolvida'
-            // em vez de 'Enviada'. Este teste vai falhar enquanto o bug não for corrigido.
             if (ln.obterDevolucao(idDevolucao).getEstado() != EstadoDevolucao.Enviada)
                 throw new RuntimeException("estado da devolução errado: "
                     + ln.obterDevolucao(idDevolucao).getEstado()

@@ -26,6 +26,29 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
+    public Utilizador atualizarUtilizador(int id, int idFuncionario, Cargo cargo, String identificador) {
+        if (!utilizadoresDAO.containsKey(id)) {
+            throw new EcoRideException("Utilizador com ID " + id + " não existe.");
+        }
+        if (utilizadoresDAO.existeIdentificador(identificador)) {
+            throw new EcoRideException("Identificador '" + identificador + "' já está em uso por outro utilizador.");
+        }
+        Utilizador u = utilizadoresDAO.get(id);
+
+        if (idFuncionario >= 0) {
+            u.setIdFuncionario(idFuncionario);
+        }
+        if (cargo != null) {
+            u.setCargo(cargo);
+        }
+        if (identificador != null && !identificador.isEmpty()) {
+            u.setIdentificador(identificador);
+        }
+        utilizadoresDAO.put(id, u);
+        return u;
+    }
+
+    @Override
     public Utilizador obterUtilizador(int id) {
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");

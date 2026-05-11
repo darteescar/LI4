@@ -74,19 +74,24 @@ public class EcoRideLN implements IEcoRideLN {
         return sAutenticacao.registarUtilizador(password, idFuncionario, cargo, identificador);
     }
 
+    @Override 
+    public Utilizador atualizarUtilizador(int id, int idFuncionario, Cargo cargo, String identificador) {
+        return sAutenticacao.atualizarUtilizador(id, idFuncionario, cargo, identificador);
+    }
+
+    @Override
+    public List<Utilizador>  obterUtilizadores() {
+        return sAutenticacao.obterUtilizadores();
+    }
+
+    @Override
+    public boolean removerUtilizador(int idUtilizador) {
+        return sAutenticacao.removerUtilizador(idUtilizador);
+    }
+
     @Override
     public boolean autenticar(int idUtilizador, String password) {
         return sAutenticacao.autenticar(idUtilizador, password);
-    }
-
-    @Override
-    public Cargo obterCargoUtilizador(int idUtilizador) {
-        return sAutenticacao.obterCargoUtilizador(idUtilizador);
-    }
-
-    @Override
-    public int obterIdFuncionario_Utilizador(int idUtilizador) {
-        return sAutenticacao.obterUtilizador(idUtilizador).getIdFuncionario();
     }
 
     @Override
@@ -95,8 +100,13 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void atualizarCargoUtilizador(int idUtilizador, Cargo novoCargo) {
-        sAutenticacao.atualizarCargoUtilizador(idUtilizador, novoCargo);
+    public Cargo             obterCargoUtilizador(int idUtilizador) {
+        return sAutenticacao.obterCargoUtilizador(idUtilizador);
+    }
+
+    @Override
+    public int               obterIdFuncionario_Utilizador(int idUtilizador) {
+        return sAutenticacao.obterUtilizador(idUtilizador).getIdFuncionario();
     }
 
     // ------------------- Notificações -------------------

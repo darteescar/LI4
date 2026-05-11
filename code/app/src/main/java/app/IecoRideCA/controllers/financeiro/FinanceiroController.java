@@ -45,7 +45,7 @@ public class FinanceiroController {
             }
 
             if (tipoStr != null) {
-                tipo = TipoMovimento.valueOf(tipoStr.toUpperCase());
+                tipo = TipoMovimento.valueOf(tipoStr);
             }
 
         } catch (Exception e) {

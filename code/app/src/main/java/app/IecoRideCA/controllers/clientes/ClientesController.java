@@ -1,7 +1,5 @@
 package app.IecoRideCA.controllers.clientes;
 
-import java.util.List;
-
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.clientes.dto.ClienteRequest;
 import app.IecoRideCA.controllers.clientes.dto.TrotineteRequest;
@@ -26,12 +24,7 @@ public class ClientesController {
         // List<Cliente>
         app.get("/api/clientes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
-            List <Cliente> clientes = facade.obterClientes();
-            if (clientes == null) {
-                ctx.status(404);
-            } else {
-                ctx.status(200).json(clientes);
-            }
+            ctx.status(200).json(facade.obterClientes());
         });
 
         // Obter Cliente por id
@@ -50,12 +43,7 @@ public class ClientesController {
         app.post("/api/clientes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             ClienteRequest req = ctx.bodyAsClass(ClienteRequest.class);
-            Cliente criado = facade.registarCliente(req.nome(), req.email(), req.telemovel(), req.nif());
-            if (criado == null) {
-                ctx.status(404);
-            } else {
-                ctx.status(201).json(criado);
-            }
+            ctx.status(201).json(facade.registarCliente(req.nome(), req.email(), req.telemovel(), req.nif()));
         });
 
         // Eliminar Cliente
@@ -88,12 +76,7 @@ public class ClientesController {
         // List<Trotinete>
         app.get("/api/trotinetes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
-            List<Trotinete> trotinetes = facade.obterTrotinetes();
-            if (trotinetes == null) {
-                ctx.status(404);
-            } else {
-                ctx.status(200).json(trotinetes);
-            }
+            ctx.status(200).json(facade.obterTrotinetes());
         });
 
         // Obter Trotinete por id
@@ -111,13 +94,9 @@ public class ClientesController {
         // Criar Trotinete
         app.post("/api/clientes/{id}/trotinetes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
+            int id = Integer.parseInt(ctx.pathParam("id"));
             TrotineteRequest req = ctx.bodyAsClass(TrotineteRequest.class);
-            Trotinete criado = facade.registarTrotinete(req.cod_cliente(), req.modelo(), req.marca(), req.num_serie(), req.motor());
-            if (criado == null) {
-                ctx.status(404);
-            } else {
-                ctx.status(201).json(criado);
-            }
+            ctx.status(201).json(facade.registarTrotinete(id, req.modelo(), req.marca(), req.num_serie(), req.motor()));
         });
 
         // Apagar Trotinete

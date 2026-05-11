@@ -42,12 +42,7 @@ public class ReparacoesController {
         app.post("/api/reparacoes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             ReparacaoRequest req = ctx.bodyAsClass(ReparacaoRequest.class);
-            Reparacao criado = facade.registarReparacao(req.nomenclatura(), req.descricao(), req.preco(), req.disponivel());
-            if (criado == null) {
-                ctx.status(400);
-            } else {
-                ctx.status(201).json(criado);
-            }
+            ctx.status(201).json(facade.registarReparacao(req.nomenclatura(), req.descricao(), req.preco(), req.disponivel()));
         });
 
         // Eliminar Reparacao

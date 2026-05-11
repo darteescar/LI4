@@ -57,7 +57,7 @@ public class FuncionariosController {
             else ctx.json(atualizado);
         });
 
-        // Apagar Funcionario
+        // Pagar Funcionario
         app.patch("/api/funcionarios/pagar/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -65,7 +65,7 @@ public class FuncionariosController {
         });
 
         // Registar Horas Extra Funcionario
-        app.patch("/api/funcionario/horas_extra/{id}", ctx -> {
+        app.patch("/api/funcionarios/horas_extra/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);

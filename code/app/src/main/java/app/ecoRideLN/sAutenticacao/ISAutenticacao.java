@@ -6,6 +6,8 @@ public interface ISAutenticacao {
 
      public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador);
 
+     public Utilizador atualizarUtilizador(int id, int idFuncionario, Cargo cargo, String identificador);
+
      public Utilizador obterUtilizador(int id);
 
      public boolean existeUtilizador(int id);

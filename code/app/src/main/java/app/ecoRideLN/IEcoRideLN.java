@@ -32,12 +32,14 @@ public interface IEcoRideLN {
      // ------------------- Autenticação -------------------
      // feito
 
-     public Utilizador   registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador);
-     public boolean      autenticar(int idUtilizador, String password);
-     public Cargo        obterCargoUtilizador(int idUtilizador);
-     public int          obterIdFuncionario_Utilizador(int idUtilizador);
-     public boolean      atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword);
-     public void         atualizarCargoUtilizador(int idUtilizador, Cargo novoCargo);
+     public Utilizador        registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador);
+     public Utilizador        atualizarUtilizador(int id, int idFuncionario, Cargo cargo, String identificador);
+     public List<Utilizador>  obterUtilizadores();
+     public boolean           removerUtilizador(int idUtilizador);
+     public boolean           autenticar(int idUtilizador, String password);
+     public boolean           atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword);
+     public Cargo             obterCargoUtilizador(int idUtilizador);
+     public int               obterIdFuncionario_Utilizador(int idUtilizador);
 
      // ------------------- Notificações -------------------
      // feito
