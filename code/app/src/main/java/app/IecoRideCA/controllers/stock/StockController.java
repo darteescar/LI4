@@ -243,7 +243,6 @@ public class StockController {
 
         app.patch("/api/defeitos/devolver", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
             facade.confirmarDefeitoComDevolucao(req.idDefeito(), req.motivo(), req.data());
             ctx.status(204);
@@ -251,7 +250,6 @@ public class StockController {
 
         app.patch("/api/defeitos/descartar", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
             facade.descartarDefeito(req.idDefeito());
             ctx.status(204);
@@ -272,7 +270,6 @@ public class StockController {
 
         app.patch("/api/devolucoes/marcarEnviada", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
             facade.marcarDevolucaoComoEnviada(req.idDevolucao());
             ctx.status(204);
@@ -280,7 +277,6 @@ public class StockController {
 
          app.patch("/api/devolucoes/marcarDevolvida", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
             facade.marcarDevolucaoComoDevolvida(req.idDevolucao());
             ctx.status(204);
@@ -288,7 +284,6 @@ public class StockController {
 
         app.patch("/api/devolucoes/marcarInvalida", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
             facade.marcarDevolucaoComoInvalida(req.idDevolucao());
             ctx.status(204);

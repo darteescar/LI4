@@ -501,6 +501,15 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Defeitos -------------------
 
     @Override
+    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario) {
+        return sStock.registarDefeito(stockIds, motivo, idFuncionario);
+    }
+
+    @Override
+    public Defeito obterDefeito(int id) { return sStock.obterDefeito(id); }
+
+
+    @Override
     public List<Defeito> obterDefeitos() { return sStock.obterDefeitos(); }
 
     @Override
@@ -515,6 +524,13 @@ public class EcoRideLN implements IEcoRideLN {
     public void descartarDefeito(int idDefeito) { sStock.descartarDefeito(idDefeito); }
 
     // ------------------- Devoluções -------------------
+
+    @Override
+    public Devolucao obterDevolucao(int id) { return sStock.obterDevolucao(id); }
+
+    @Override
+    public boolean existeDevolucao(int id) { return sStock.existeDevolucao(id); }
+
 
     @Override
     public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data) {
