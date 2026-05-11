@@ -37,6 +37,7 @@ public interface IEcoRideLN {
      public List<Utilizador>  obterUtilizadores();
      public boolean           removerUtilizador(int idUtilizador);
      public boolean           autenticar(int idUtilizador, String password);
+     public Utilizador        obterUtilizadorPorIdentificador(String identificador);
      public boolean           atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword);
      public Cargo             obterCargoUtilizador(int idUtilizador);
      public int               obterIdFuncionario_Utilizador(int idUtilizador);

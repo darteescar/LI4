@@ -23,12 +23,12 @@ interface DataTableProps<T> {
   rowActions?: (row: T) => ReactNode;
   onRowClick?: (row: T) => void;
   isRowSelected?: (row: T) => boolean;
+  isLoading?: boolean;
 }
 
-
-export function DataTable<T extends { id: string }>({
+export function DataTable<T extends { id: string | number }>({
   data, columns, searchPlaceholder = "Pesquisar…", searchKeys, searchClassName, emptyMessage = "Sem registos",
-  rowActions, onRowClick, isRowSelected,
+  rowActions, onRowClick, isRowSelected, isLoading = false,
 }: DataTableProps<T>) {
   const [query, setQuery] = useState("");
 
@@ -66,7 +66,16 @@ export function DataTable<T extends { id: string }>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length + (rowActions ? 1 : 0)}
+                  className="h-24 text-center text-sm text-muted-foreground"
+                >
+                  A carregar…
+                </TableCell>
+              </TableRow>
+            ) : filtered.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length + (rowActions ? 1 : 0)}

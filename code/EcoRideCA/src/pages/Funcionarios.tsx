@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,7 +12,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
-  DialogHeader, DialogTitle, DialogTrigger,
+  DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,55 +21,125 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
-import { funcionariosService } from "@/services/entities";
-import { funcionarioSchema, horasExtraSchema } from "@/lib/validators";
-import { ROLE_LABELS, type Funcionario, type Role } from "@/lib/types";
+import { api } from "@/services/api";
+import { ROLE_LABELS, type Role } from "@/lib/types";
 import { formatEUR } from "@/lib/format";
 
-type FormValues = z.infer<typeof funcionarioSchema>;
-type HEValues = z.infer<typeof horasExtraSchema>;
+// Campo retornado pelo backend
+interface Funcionario {
+  id: number;
+  nome: string;
+  telemovel: string;
+  email: string;
+  data_nascimento: string;
+  NISS: string;
+  NIF: string;
+  NUS: string;
+  IBAN: string;
+  salario_hora: number;
+  salario_liquido: number;
+  salario_bruto: number;
+  horas_extra: number;
+  numero_porta: string;
+  rua: string;
+  localidade: string;
+  codigo_postal: string;
+}
+
+interface Utilizador {
+  id: number;
+  idFuncionario: number;
+  cargo: string;
+  identificador: string;
+}
+
+type FuncionarioRow = Funcionario & { cargo?: Role; identificador?: string; utilizadorId?: number };
 
 const ROLES: Role[] = ["GERENTE", "GESTOR_STOCK", "SECRETARIA", "MECANICO"];
 
 const ROLE_BADGE: Record<Role, string> = {
-  GERENTE: "bg-primary-soft text-primary",
+  GERENTE:      "bg-primary-soft text-primary",
   GESTOR_STOCK: "bg-info-soft text-info",
-  SECRETARIA: "bg-warning-soft text-warning",
-  MECANICO: "bg-success-soft text-success",
+  SECRETARIA:   "bg-warning-soft text-warning",
+  MECANICO:     "bg-success-soft text-success",
 };
 
+// Mapping backend cargo name → Role
+const CARGO_MAP: Record<string, Role> = {
+  Gerente: "GERENTE", GestorStock: "GESTOR_STOCK",
+  Secretaria: "SECRETARIA", Mecanico: "MECANICO",
+};
+
+const createSchema = z.object({
+  nome:          z.string().trim().min(2, "Nome obrigatório"),
+  telemovel:     z.string().regex(/^9\d{8}$/, "Telemóvel inválido"),
+  email:         z.string().trim().email("Email inválido"),
+  data_nascimento: z.string().min(1, "Data obrigatória"),
+  NISS:          z.string().regex(/^\d{11}$/, "NISS deve ter 11 dígitos"),
+  NIF:           z.string().regex(/^\d{9}$/, "NIF deve ter 9 dígitos"),
+  NUS:           z.string().trim().min(1, "NUS obrigatório"),
+  IBAN:          z.string().regex(/^PT50\d{21}$/, "IBAN inválido"),
+  salario_hora:  z.coerce.number().min(0),
+  salario_bruto: z.coerce.number().min(0),
+  rua:           z.string().trim().min(3, "Morada obrigatória"),
+  localidade:    z.string().trim().min(1, "Localidade obrigatória"),
+  codigo_postal: z.string().regex(/^\d{4}-\d{3}$/, "Código postal inválido"),
+  // utilizador
+  cargo:         z.enum(["GERENTE", "GESTOR_STOCK", "SECRETARIA", "MECANICO"]),
+  identificador: z.string().trim().min(3, "Identificador obrigatório"),
+  password:      z.string().min(4, "Password mín. 4 caracteres"),
+});
+
+type CreateValues = z.infer<typeof createSchema>;
+
 export default function Funcionarios() {
-  const [data, setData] = useState<Funcionario[]>([]);
-  const [editing, setEditing] = useState<Funcionario | null>(null);
+  const qc = useQueryClient();
+  const [editing, setEditing] = useState<FuncionarioRow | null>(null);
   const [openForm, setOpenForm] = useState(false);
-  const [heFor, setHeFor] = useState<Funcionario | null>(null);
+  const [heFor, setHeFor] = useState<FuncionarioRow | null>(null);
 
-  const reload = () => funcionariosService.list().then(setData);
-  useEffect(() => { reload(); }, []);
+  const { data: funcionarios = [], isLoading: loadingF } = useQuery<Funcionario[]>({
+    queryKey: ["funcionarios"],
+    queryFn: () => api.get<Funcionario[]>("/funcionarios"),
+  });
 
-  const openNew = () => { setEditing(null); setOpenForm(true); };
-  const openEdit = (f: Funcionario) => { setEditing(f); setOpenForm(true); };
+  const { data: utilizadores = [] } = useQuery<Utilizador[]>({
+    queryKey: ["utilizadores"],
+    queryFn: () => api.get<Utilizador[]>("/utilizadores"),
+  });
 
-  const handleRemove = async (f: Funcionario) => {
-    await funcionariosService.remove(f.id);
-    toast.success(`${f.nome} eliminado`);
-    reload();
-  };
+  // Join funcionarios with utilizadores to get cargo and identificador
+  const rows: FuncionarioRow[] = funcionarios.map((f) => {
+    const u = utilizadores.find((ut) => ut.idFuncionario === f.id);
+    return {
+      ...f,
+      cargo: u ? (CARGO_MAP[u.cargo] ?? undefined) : undefined,
+      identificador: u?.identificador,
+      utilizadorId: u?.id,
+    };
+  });
 
-  const columns: Column<Funcionario>[] = [
-    { key: "nome", header: "Nome", cell: (f) => <span className="font-medium">{f.nome}</span> },
-    { key: "id", header: "Identificador", cell: (f) => <code className="text-xs">{f.identificador}</code> },
-    { key: "cargo", header: "Cargo", cell: (f) => (
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/funcionarios/${id}`),
+    onSuccess: () => {
+      toast.success("Funcionário eliminado");
+      qc.invalidateQueries({ queryKey: ["funcionarios"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const columns: Column<FuncionarioRow>[] = [
+    { key: "nome",   header: "Nome",        cell: (f) => <span className="font-medium">{f.nome}</span> },
+    { key: "ident",  header: "Identificador", cell: (f) => f.identificador ? <code className="text-xs">{f.identificador}</code> : <span className="text-muted-foreground">—</span> },
+    { key: "cargo",  header: "Cargo",       cell: (f) => f.cargo ? (
       <Badge variant="secondary" className={ROLE_BADGE[f.cargo]}>{ROLE_LABELS[f.cargo]}</Badge>
-    ) },
-    { key: "email", header: "Email", cell: (f) => f.email },
-    { key: "telemovel", header: "Telemóvel", cell: (f) => f.telemovel },
-    { key: "vencHora", header: "€/hora", cell: (f) => formatEUR(f.vencimentoHora) },
-    { key: "vencBruto", header: "Bruto", cell: (f) => formatEUR(f.vencimentoBruto) },
-    { key: "horasAc", header: "Horas extra acum.", cell: (f) => (
-      <Badge variant={f.horasExtraAcumuladas > 0 ? "secondary" : "outline"}>
-        {f.horasExtraAcumuladas.toFixed(1)} h
-      </Badge>
+    ) : <span className="text-muted-foreground">—</span> },
+    { key: "email",  header: "Email",       cell: (f) => f.email },
+    { key: "tel",    header: "Telemóvel",   cell: (f) => f.telemovel },
+    { key: "sh",     header: "€/hora",      cell: (f) => formatEUR(f.salario_hora) },
+    { key: "sb",     header: "Bruto",       cell: (f) => formatEUR(f.salario_bruto) },
+    { key: "he",     header: "Horas extra", cell: (f) => (
+      <Badge variant={f.horas_extra > 0 ? "secondary" : "outline"}>{f.horas_extra} h</Badge>
     ) },
   ];
 
@@ -78,38 +149,34 @@ export default function Funcionarios() {
         title="Funcionários"
         description="Gestão de colaboradores da oficina"
         actions={
-          <Button onClick={openNew}>
-            <Plus className="h-4 w-4" />
-            Novo funcionário
+          <Button onClick={() => { setEditing(null); setOpenForm(true); }}>
+            <Plus className="h-4 w-4" /> Novo funcionário
           </Button>
         }
       />
 
       <DataTable
-        data={data}
+        data={rows}
         columns={columns}
-        searchKeys={["nome", "identificador", "email", "nif"]}
-        searchPlaceholder="Pesquisar por nome, identificador, email…"
+        searchKeys={["nome", "email", "NIF"]}
+        searchPlaceholder="Pesquisar por nome, email ou NIF…"
+        isLoading={loadingF}
         rowActions={(f) => (
           <>
             <Button variant="ghost" size="icon" onClick={() => setHeFor(f)} title="Registar horas extra">
               <Clock className="h-4 w-4" />
             </Button>
             <ConfirmDialog
-              trigger={
-                <Button variant="ghost" size="icon" title="Pagar Salário">
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              }
-              title="Pagar Salário?"
-              description={`As horas extra acumuladas de ${f.nome} ficam a 0.`}
+              trigger={<Button variant="ghost" size="icon" title="Pagar salário"><RotateCcw className="h-4 w-4" /></Button>}
+              title="Pagar salário?"
+              description={`As horas extra de ${f.nome} serão liquidadas.`}
               onConfirm={async () => {
-                await funcionariosService.resetHorasExtra(f.id);
+                await api.patch(`/funcionarios/pagar/${f.id}`, {});
                 toast.success("Salário pago");
-                reload();
+                qc.invalidateQueries({ queryKey: ["funcionarios"] });
               }}
             />
-            <Button variant="ghost" size="icon" onClick={() => openEdit(f)}>
+            <Button variant="ghost" size="icon" onClick={() => { setEditing(f); setOpenForm(true); }}>
               <Pencil className="h-4 w-4" />
             </Button>
             <ConfirmDialog
@@ -117,7 +184,7 @@ export default function Funcionarios() {
               title="Eliminar funcionário?"
               description={`Esta ação remove ${f.nome} permanentemente.`}
               destructive
-              onConfirm={() => handleRemove(f)}
+              onConfirm={() => deleteMutation.mutate(f.id)}
             />
           </>
         )}
@@ -127,11 +194,15 @@ export default function Funcionarios() {
         open={openForm}
         onOpenChange={setOpenForm}
         initial={editing}
-        onSaved={reload}
+        onSaved={() => {
+          qc.invalidateQueries({ queryKey: ["funcionarios"] });
+          qc.invalidateQueries({ queryKey: ["utilizadores"] });
+        }}
       />
       <HorasExtraDialog
         funcionario={heFor}
         onClose={() => setHeFor(null)}
+        onSaved={() => qc.invalidateQueries({ queryKey: ["funcionarios"] })}
       />
     </div>
   );
@@ -140,52 +211,57 @@ export default function Funcionarios() {
 function FuncionarioForm({
   open, onOpenChange, initial, onSaved,
 }: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  initial: Funcionario | null;
-  onSaved: () => void;
+  open: boolean; onOpenChange: (o: boolean) => void;
+  initial: FuncionarioRow | null; onSaved: () => void;
 }) {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(funcionarioSchema) as any,
-    defaultValues: initial ? {
-      nome: initial.nome, identificador: initial.identificador, password: initial.password ?? "",
-      email: initial.email, telemovel: initial.telemovel, nif: initial.nif, niss: initial.niss,
-      nus: initial.nus, iban: initial.iban, morada: initial.morada, codigoPostal: initial.codigoPostal,
-      cargo: initial.cargo, vencimentoHora: initial.vencimentoHora, vencimentoBruto: initial.vencimentoBruto,
-      dataAdmissao: initial.dataAdmissao,
-    } : {
-      nome: "", identificador: "", password: "", email: "", telemovel: "", nif: "", niss: "", nus: "",
-      iban: "", morada: "", codigoPostal: "", cargo: "MECANICO",
-      vencimentoHora: 0, vencimentoBruto: 0,
-      dataAdmissao: new Date().toISOString().slice(0, 10),
-    },
+  const form = useForm<CreateValues>({
+    resolver: zodResolver(createSchema) as any,
     values: initial ? {
-      nome: initial.nome, identificador: initial.identificador, password: initial.password ?? "",
-      email: initial.email, telemovel: initial.telemovel, nif: initial.nif, niss: initial.niss,
-      nus: initial.nus, iban: initial.iban, morada: initial.morada, codigoPostal: initial.codigoPostal,
-      cargo: initial.cargo, vencimentoHora: initial.vencimentoHora, vencimentoBruto: initial.vencimentoBruto,
-      dataAdmissao: initial.dataAdmissao,
-    } : undefined,
+      nome: initial.nome, telemovel: initial.telemovel, email: initial.email,
+      data_nascimento: initial.data_nascimento, NISS: initial.NISS, NIF: initial.NIF,
+      NUS: initial.NUS, IBAN: initial.IBAN, salario_hora: initial.salario_hora,
+      salario_bruto: initial.salario_bruto, rua: initial.rua, localidade: initial.localidade,
+      codigo_postal: initial.codigo_postal,
+      cargo: initial.cargo ?? "MECANICO", identificador: initial.identificador ?? "", password: "",
+    } : {
+      nome: "", telemovel: "", email: "", data_nascimento: "", NISS: "", NIF: "", NUS: "",
+      IBAN: "", salario_hora: 0, salario_bruto: 0, rua: "", localidade: "",
+      codigo_postal: "", cargo: "MECANICO", identificador: "", password: "",
+    },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async (v: CreateValues) => {
+      const { cargo, identificador, password, ...funcData } = v;
       if (initial) {
-        // Quando o gerente edita um funcionário NÃO pode alterar a password.
-        const { password, ...rest } = values;
-        await funcionariosService.update(initial.id, rest);
-        toast.success("Funcionário atualizado");
+        // update funcionario
+        await api.patch(`/funcionarios/${initial.id}`, {
+          ...funcData, salario_liquido: funcData.salario_bruto,
+          horas_extra: initial.horas_extra, numero_porta: "",
+        });
+        // update utilizador if exists
+        if (initial.utilizadorId) {
+          await api.patch(`/utilizadores/${initial.utilizadorId}`, {
+            idFuncionario: initial.id, cargo: cargoToBackend(cargo), identificador,
+          });
+        }
       } else {
-        await funcionariosService.create({ ...values, horasExtraAcumuladas: 0 });
-        toast.success("Funcionário criado");
+        const newFunc = await api.post<Funcionario>("/funcionarios", {
+          ...funcData, salario_liquido: funcData.salario_bruto,
+          horas_extra: 0, numero_porta: "",
+        });
+        await api.post("/utilizadores", {
+          password, idFuncionario: newFunc.id, cargo: cargoToBackend(cargo), identificador,
+        });
       }
+    },
+    onSuccess: () => {
+      toast.success(initial ? "Funcionário atualizado" : "Funcionário criado");
       onOpenChange(false);
       onSaved();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro");
-    }
-  };
-
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -194,42 +270,18 @@ function FuncionarioForm({
           <DialogTitle>{initial ? "Editar funcionário" : "Novo funcionário"}</DialogTitle>
           <DialogDescription>Todos os campos são obrigatórios.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Field label="Nome" error={form.formState.errors.nome?.message}>
+        <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Field label="Nome" error={form.formState.errors.nome?.message} className="sm:col-span-2">
             <Input {...form.register("nome")} />
           </Field>
           <Field label="Identificador (login)" error={form.formState.errors.identificador?.message}>
-            <Input {...form.register("identificador")} disabled={!!initial} />
+            <Input {...form.register("identificador")} />
           </Field>
           {!initial && (
             <Field label="Password inicial" error={form.formState.errors.password?.message}>
               <Input type="password" autoComplete="new-password" {...form.register("password")} />
             </Field>
           )}
-          <Field label="Email" error={form.formState.errors.email?.message}>
-            <Input type="email" {...form.register("email")} />
-          </Field>
-          <Field label="Telemóvel" error={form.formState.errors.telemovel?.message}>
-            <Input {...form.register("telemovel")} placeholder="9XXXXXXXX" />
-          </Field>
-          <Field label="NIF" error={form.formState.errors.nif?.message}>
-            <Input {...form.register("nif")} maxLength={9} />
-          </Field>
-          <Field label="NISS" error={form.formState.errors.niss?.message}>
-            <Input {...form.register("niss")} maxLength={11} />
-          </Field>
-          <Field label="NUS" error={form.formState.errors.nus?.message}>
-            <Input {...form.register("nus")} />
-          </Field>
-          <Field label="IBAN" error={form.formState.errors.iban?.message}>
-            <Input {...form.register("iban")} placeholder="PT50…" />
-          </Field>
-          <Field label="Morada" error={form.formState.errors.morada?.message} className="sm:col-span-2">
-            <Input {...form.register("morada")} />
-          </Field>
-          <Field label="Código postal" error={form.formState.errors.codigoPostal?.message}>
-            <Input {...form.register("codigoPostal")} placeholder="1234-567" />
-          </Field>
           <Field label="Cargo" error={form.formState.errors.cargo?.message}>
             <Select
               value={form.watch("cargo")}
@@ -237,26 +289,50 @@ function FuncionarioForm({
             >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {ROLES.map((r) => (
-                  <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>
-                ))}
+                {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Vencimento por hora (€/h)" error={form.formState.errors.vencimentoHora?.message}>
-            <Input type="number" step="0.01" {...form.register("vencimentoHora")} />
+          <Field label="Email" error={form.formState.errors.email?.message}>
+            <Input type="email" {...form.register("email")} />
           </Field>
-          <Field label="Vencimento bruto (€)" error={form.formState.errors.vencimentoBruto?.message}>
-            <Input type="number" step="0.01" {...form.register("vencimentoBruto")} />
+          <Field label="Telemóvel" error={form.formState.errors.telemovel?.message}>
+            <Input {...form.register("telemovel")} />
           </Field>
-          <Field label="Data de admissão" error={form.formState.errors.dataAdmissao?.message}>
-            <Input type="date" {...form.register("dataAdmissao")} />
+          <Field label="NIF" error={form.formState.errors.NIF?.message}>
+            <Input {...form.register("NIF")} maxLength={9} />
           </Field>
-
+          <Field label="NISS" error={form.formState.errors.NISS?.message}>
+            <Input {...form.register("NISS")} maxLength={11} />
+          </Field>
+          <Field label="NUS" error={form.formState.errors.NUS?.message}>
+            <Input {...form.register("NUS")} />
+          </Field>
+          <Field label="IBAN" error={form.formState.errors.IBAN?.message}>
+            <Input {...form.register("IBAN")} placeholder="PT50…" />
+          </Field>
+          <Field label="Data de nascimento" error={form.formState.errors.data_nascimento?.message}>
+            <Input type="date" {...form.register("data_nascimento")} />
+          </Field>
+          <Field label="Morada (rua)" error={form.formState.errors.rua?.message} className="sm:col-span-2">
+            <Input {...form.register("rua")} />
+          </Field>
+          <Field label="Localidade" error={form.formState.errors.localidade?.message}>
+            <Input {...form.register("localidade")} />
+          </Field>
+          <Field label="Código postal" error={form.formState.errors.codigo_postal?.message}>
+            <Input {...form.register("codigo_postal")} placeholder="1234-567" />
+          </Field>
+          <Field label="Vencimento por hora (€/h)" error={form.formState.errors.salario_hora?.message}>
+            <Input type="number" step="0.01" {...form.register("salario_hora")} />
+          </Field>
+          <Field label="Vencimento bruto (€)" error={form.formState.errors.salario_bruto?.message}>
+            <Input type="number" step="0.01" {...form.register("salario_bruto")} />
+          </Field>
           <DialogFooter className="sm:col-span-2 mt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {initial ? "Guardar" : "Criar"}
+            <Button type="submit" disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? "A guardar…" : initial ? "Guardar" : "Criar"}
             </Button>
           </DialogFooter>
         </form>
@@ -266,52 +342,44 @@ function FuncionarioForm({
 }
 
 function HorasExtraDialog({
-  funcionario, onClose,
-}: { funcionario: Funcionario | null; onClose: () => void }) {
-  const open = !!funcionario;
-  const form = useForm<HEValues>({
-    resolver: zodResolver(horasExtraSchema) as any,
-    defaultValues: {
-      funcionarioId: funcionario?.id ?? "",
-      data: new Date().toISOString().slice(0, 10),
-      horas: 1,
-    },
-    values: funcionario ? {
-      funcionarioId: funcionario.id,
-      data: new Date().toISOString().slice(0, 10),
-      horas: 1,
-    } : undefined,
-  });
+  funcionario, onClose, onSaved,
+}: { funcionario: FuncionarioRow | null; onClose: () => void; onSaved: () => void }) {
+  const [horas, setHoras] = useState("1");
+  const [pending, setPending] = useState(false);
 
-  const onSubmit = async (v: HEValues) => {
+  const submit = async () => {
+    if (!funcionario) return;
+    const n = Math.round(Number(horas));
+    if (!n || n <= 0) { toast.error("Horas inválidas"); return; }
+    setPending(true);
     try {
-      await funcionariosService.addHorasExtra(v);
+      await api.patch(`/funcionarios/horas_extra/${funcionario.id}`, { horas_extra: n });
       toast.success("Horas extra registadas");
       onClose();
-      form.reset();
+      onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro");
+    } finally {
+      setPending(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={!!funcionario} onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Horas extra — {funcionario?.nome}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-          <Field label="Data" error={form.formState.errors.data?.message}>
-            <Input type="date" {...form.register("data")} />
-          </Field>
-          <Field label="Nº de horas" error={form.formState.errors.horas?.message}>
-            <Input type="number" step="0.5" min="0.5" {...form.register("horas")} />
-          </Field>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button type="submit">Registar</Button>
-          </DialogFooter>
-        </form>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label>Nº de horas</Label>
+            <Input type="number" min="1" value={horas} onChange={(e) => setHoras(e.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={submit} disabled={pending}>Registar</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -327,4 +395,12 @@ function Field({
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
+}
+
+function cargoToBackend(role: Role): string {
+  const map: Record<Role, string> = {
+    GERENTE: "Gerente", GESTOR_STOCK: "GestorStock",
+    SECRETARIA: "Secretaria", MECANICO: "Mecanico",
+  };
+  return map[role];
 }

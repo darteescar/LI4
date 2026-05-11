@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,32 +20,44 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-import { reparacoesService } from "@/services/entities";
+import { api } from "@/services/api";
 import { reparacaoSchema } from "@/lib/validators";
-import type { Reparacao } from "@/lib/types";
 import { formatEUR } from "@/lib/format";
+
+interface Reparacao {
+  id: number;
+  nomenclatura: string;
+  descricao: string;
+  preco: number;
+  disponivel: boolean;
+}
 
 type FormValues = z.infer<typeof reparacaoSchema>;
 
 export default function Reparacoes() {
-  const [data, setData] = useState<Reparacao[]>([]);
+  const qc = useQueryClient();
   const [editing, setEditing] = useState<Reparacao | null>(null);
   const [open, setOpen] = useState(false);
 
-  const reload = () => reparacoesService.list().then(setData);
-  useEffect(() => { reload(); }, []);
+  const { data = [], isLoading } = useQuery<Reparacao[]>({
+    queryKey: ["reparacoes"],
+    queryFn: () => api.get<Reparacao[]>("/reparacoes"),
+  });
 
-  const handleRemove = async (r: Reparacao) => {
-    await reparacoesService.remove(r.id);
-    toast.success("Reparação eliminada");
-    reload();
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/reparacoes/${id}`),
+    onSuccess: () => {
+      toast.success("Reparação eliminada");
+      qc.invalidateQueries({ queryKey: ["reparacoes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const columns: Column<Reparacao>[] = [
     { key: "nomenclatura", header: "Nomenclatura", cell: (r) => <span className="font-medium">{r.nomenclatura}</span> },
-    { key: "descricao", header: "Descrição", cell: (r) => <span className="text-muted-foreground">{r.descricao}</span> },
-    { key: "preco", header: "Preço (mão de obra)", cell: (r) => formatEUR(r.preco), className: "text-right" },
-    { key: "disponivel", header: "Disponibilidade", cell: (r) => (
+    { key: "descricao",    header: "Descrição",    cell: (r) => <span className="text-muted-foreground">{r.descricao}</span> },
+    { key: "preco",        header: "Preço (mão de obra)", cell: (r) => formatEUR(r.preco), className: "text-right" },
+    { key: "disponivel",   header: "Disponibilidade", cell: (r) => (
       r.disponivel
         ? <span className="inline-flex items-center rounded-md bg-success-soft px-2 py-1 text-xs font-medium text-success">Disponível</span>
         : <span className="inline-flex items-center rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive">Não disponível</span>
@@ -66,6 +79,7 @@ export default function Reparacoes() {
         data={data}
         columns={columns}
         searchKeys={["nomenclatura", "descricao"]}
+        isLoading={isLoading}
         rowActions={(r) => (
           <>
             <Button variant="ghost" size="icon" onClick={() => { setEditing(r); setOpen(true); }}>
@@ -75,12 +89,17 @@ export default function Reparacoes() {
               trigger={<Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
               title="Eliminar reparação?"
               destructive
-              onConfirm={() => handleRemove(r)}
+              onConfirm={() => deleteMutation.mutate(r.id)}
             />
           </>
         )}
       />
-      <ReparacaoForm open={open} onOpenChange={setOpen} initial={editing} onSaved={reload} />
+      <ReparacaoForm
+        open={open}
+        onOpenChange={setOpen}
+        initial={editing}
+        onSaved={() => qc.invalidateQueries({ queryKey: ["reparacoes"] })}
+      />
     </div>
   );
 }
@@ -93,20 +112,21 @@ function ReparacaoForm({
 }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(reparacaoSchema) as any,
-    defaultValues: initial ?? { nomenclatura: "", descricao: "", preco: 0, disponivel: true },
-    values: initial ?? undefined,
+    values: initial ?? { nomenclatura: "", descricao: "", preco: 0, disponivel: true },
   });
 
-  const onSubmit = async (v: FormValues) => {
-    try {
-      if (initial) await reparacoesService.update(initial.id, v);
-      else await reparacoesService.create(v);
+  const saveMutation = useMutation({
+    mutationFn: (v: FormValues) =>
+      initial
+        ? api.patch<Reparacao>(`/reparacoes/${initial.id}`, v)
+        : api.post<Reparacao>("/reparacoes", v),
+    onSuccess: () => {
       toast.success(initial ? "Reparação atualizada" : "Reparação criada");
-      onOpenChange(false); onSaved();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro");
-    }
-  };
+      onOpenChange(false);
+      onSaved();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,7 +134,7 @@ function ReparacaoForm({
         <DialogHeader>
           <DialogTitle>{initial ? "Editar reparação" : "Nova reparação"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+        <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="space-y-3">
           <F label="Nomenclatura" e={form.formState.errors.nomenclatura?.message}>
             <Input {...form.register("nomenclatura")} />
           </F>
@@ -129,9 +149,7 @@ function ReparacaoForm({
               value={form.watch("disponivel") ? "true" : "false"}
               onValueChange={(v) => form.setValue("disponivel", v === "true", { shouldValidate: true })}
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="true">
                   <span className="inline-flex items-center rounded-md bg-success-soft px-2 py-0.5 text-xs font-medium text-success">Disponível</span>
@@ -144,7 +162,9 @@ function ReparacaoForm({
           </F>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit">{initial ? "Guardar" : "Criar"}</Button>
+            <Button type="submit" disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? "A guardar…" : initial ? "Guardar" : "Criar"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

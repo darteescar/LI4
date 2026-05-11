@@ -1,59 +1,82 @@
-// Mock auth — passwords agora ficam guardadas em cada Funcionário (campo `password`).
-// O gerente define a password inicial ao criar o funcionário. Cada funcionário pode
-// depois alterar a sua própria password (mas tem de fornecer a password atual).
-import { getDB, persist } from "@/lib/mock-db";
-import type { Funcionario } from "@/lib/types";
+import type { Role } from "@/lib/types";
 
-const SESSION_KEY = "oficina-session-v1";
+const TOKEN_KEY = "ecoride-token";
+const USER_KEY  = "ecoride-user";
 
-export interface Session {
-  userId: string;
+const CARGO_TO_ROLE: Record<string, Role> = {
+  Gerente:    "GERENTE",
+  GestorStock: "GESTOR_STOCK",
+  Secretaria: "SECRETARIA",
+  Mecanico:   "MECANICO",
+};
+
+export interface AuthUser {
+  id: number;
+  idUtilizador: number;
+  nome: string;
+  cargo: Role;
 }
 
-export async function login(identificador: string, password: string): Promise<Funcionario> {
-  await new Promise((r) => setTimeout(r, 200));
-  const id = identificador.trim().toLowerCase();
-  const user = getDB().funcionarios.find(
-    (f) => f.identificador.toLowerCase() === id && f.ativo,
-  );
-  if (!user) throw new Error("Credenciais inválidas");
-  if (!user.password || user.password !== password) throw new Error("Credenciais inválidas");
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: user.id } satisfies Session));
+export async function login(identificador: string, password: string): Promise<AuthUser> {
+  const res = await fetch("/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identificador, password }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Credenciais inválidas");
+  }
+  const { token, cargo, idFuncionario, idUtilizador } = await res.json() as {
+    token: string; cargo: string; idFuncionario: number; idUtilizador: number;
+  };
+
+  localStorage.setItem(TOKEN_KEY, token);
+
+  const role = CARGO_TO_ROLE[cargo] ?? "MECANICO";
+
+  const funcRes = await fetch(`/api/funcionarios/${idFuncionario}`, {
+    headers: { "Authorization": token },
+  });
+  const nome: string = funcRes.ok
+    ? ((await funcRes.json()) as { nome: string }).nome
+    : identificador;
+
+  const user: AuthUser = { id: idFuncionario, idUtilizador, nome, cargo: role };
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
   return user;
 }
 
-/**
- * Permite ao próprio funcionário alterar a sua password. Tem de indicar a password
- * atual correta. O gerente NÃO pode alterar a password de outros funcionários.
- */
+export function logout() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
 export async function changePassword(
-  userId: string,
+  idUtilizador: number,
   currentPassword: string,
   newPassword: string,
-  confirm: string,
 ): Promise<void> {
-  await new Promise((r) => setTimeout(r, 200));
-  if (newPassword !== confirm) throw new Error("As passwords não coincidem");
-  if (newPassword.length < 4) throw new Error("Nova password tem de ter pelo menos 4 caracteres");
-  const db = getDB();
-  const i = db.funcionarios.findIndex((f) => f.id === userId);
-  if (i < 0) throw new Error("Utilizador não encontrado");
-  const user = db.funcionarios[i];
-  if (user.password !== currentPassword) throw new Error("Password atual incorreta");
-  db.funcionarios[i] = { ...user, password: newPassword };
-  persist();
+  const token = localStorage.getItem(TOKEN_KEY);
+  const res = await fetch(`/api/utilizadores/${idUtilizador}/password`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: token } : {}),
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Erro a alterar password");
+  }
 }
 
-export function logout() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-export function getCurrentUser(): Funcionario | null {
+export function getCurrentUser(): AuthUser | null {
   try {
-    const raw = localStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(USER_KEY);
     if (!raw) return null;
-    const session = JSON.parse(raw) as Session;
-    return getDB().funcionarios.find((f) => f.id === session.userId) ?? null;
+    return JSON.parse(raw) as AuthUser;
   } catch {
     return null;
   }

@@ -1,38 +1,33 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check, X, Upload, Image as ImageIcon, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { DataTable, type Column } from "@/components/data-table";
+import { DataTable } from "@/components/data-table";
 
-import { clientesService, trotinetesService } from "@/services/entities";
-import { osService } from "@/services/os";
-import { useAuth } from "@/context/AuthContext";
-import type { Cliente, Trotinete } from "@/lib/types";
+import { api } from "@/services/api";
 
 const MAX_FOTO_BYTES = 5 * 1024 * 1024;
 const FOTO_TYPES = ["image/png", "image/jpeg"];
 
+interface Cliente { id: number; nome: string; NIF: string; telemovel: string; email: string; }
+interface Trotinete { id: number; marca: string; modelo: string; num_serie: string; tipo_motor: string; cod_cliente: number; }
+interface OrdemServico { id: number; }
+
 export default function NewOS() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [step, setStep] = useState(1);
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [trotinetes, setTrotinetes] = useState<Trotinete[]>([]);
-
-  const [clienteId, setClienteId] = useState("");
-  const [trotineteId, setTrotineteId] = useState("");
+  const [clienteId, setClienteId] = useState<number | null>(null);
+  const [trotineteId, setTrotineteId] = useState<number | null>(null);
   const [acessorios, setAcessorios] = useState<string[]>([]);
   const [novoAcessorio, setNovoAcessorio] = useState("");
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -40,15 +35,18 @@ export default function NewOS() {
   const [descricao, setDescricao] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    Promise.all([clientesService.list(), trotinetesService.list()]).then(([c, t]) => {
-      setClientes(c);
-      setTrotinetes(t);
-    });
-  }, []);
+  const { data: clientes = [], isLoading: loadingClientes } = useQuery<Cliente[]>({
+    queryKey: ["clientes"],
+    queryFn: () => api.get<Cliente[]>("/clientes"),
+  });
+
+  const { data: trotinetes = [], isLoading: loadingTrotinetes } = useQuery<Trotinete[]>({
+    queryKey: ["trotinetes"],
+    queryFn: () => api.get<Trotinete[]>("/trotinetes"),
+  });
 
   const trotinetesCliente = useMemo(
-    () => trotinetes.filter((t) => t.clienteId === clienteId),
+    () => trotinetes.filter((t) => t.cod_cliente === clienteId),
     [trotinetes, clienteId],
   );
 
@@ -69,35 +67,19 @@ export default function NewOS() {
   const removeAcessorio = (i: number) => {
     const removed = acessorios[i];
     setAcessorios((prev) => prev.filter((_, idx) => idx !== i));
-    if (editIndex === i) {
-      setEditIndex(null);
-      setNovoAcessorio("");
-    }
+    if (editIndex === i) { setEditIndex(null); setNovoAcessorio(""); }
     toast.message(`Acessório removido: ${removed}`);
   };
 
-  const editAcessorio = (i: number) => {
-    setEditIndex(i);
-    setNovoAcessorio(acessorios[i]);
-  };
-
-  const cancelEdit = () => {
-    setEditIndex(null);
-    setNovoAcessorio("");
-  };
+  const editAcessorio = (i: number) => { setEditIndex(i); setNovoAcessorio(acessorios[i]); };
+  const cancelEdit = () => { setEditIndex(null); setNovoAcessorio(""); };
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return;
     const novos: string[] = [];
     for (const file of Array.from(files)) {
-      if (!FOTO_TYPES.includes(file.type)) {
-        toast.error(`${file.name}: formato inválido (apenas PNG/JPEG)`);
-        continue;
-      }
-      if (file.size > MAX_FOTO_BYTES) {
-        toast.error(`${file.name}: excede 5MB`);
-        continue;
-      }
+      if (!FOTO_TYPES.includes(file.type)) { toast.error(`${file.name}: formato inválido (apenas PNG/JPEG)`); continue; }
+      if (file.size > MAX_FOTO_BYTES) { toast.error(`${file.name}: excede 5MB`); continue; }
       const dataUrl = await new Promise<string>((res, rej) => {
         const r = new FileReader();
         r.onload = () => res(r.result as string);
@@ -109,31 +91,32 @@ export default function NewOS() {
     setFotos((prev) => [...prev, ...novos]);
   };
 
-  const removeFoto = (i: number) =>
-    setFotos((prev) => prev.filter((_, idx) => idx !== i));
+  const removeFoto = (i: number) => setFotos((prev) => prev.filter((_, idx) => idx !== i));
 
   const canNext = () => {
-    if (step === 1) return !!clienteId;
-    if (step === 2) return !!trotineteId;
+    if (step === 1) return clienteId !== null;
+    if (step === 2) return trotineteId !== null;
     if (step === 3) return true;
     if (step === 4) return descricao.trim().length >= 5;
     return false;
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (clienteId === null || trotineteId === null) return;
     if (descricao.trim().length < 5) {
       toast.error("Descrição do problema é obrigatória (mín. 5 caracteres)");
       return;
     }
     setSubmitting(true);
     try {
-      const os = await osService.create({
-        clienteId, trotineteId, acessorios, fotos,
-        descricaoProblema: descricao.trim(),
-        criadaPor: user.id,
+      const os = await api.post<OrdemServico>("/ordensservicos", {
+        id_cliente: clienteId,
+        id_trotinete: trotineteId,
+        descricao: descricao.trim(),
+        acessorios,
+        fotografias: [],
       });
-      toast.success(`OS ${os.numero} registada`);
+      toast.success(`OS-${os.id} criada`);
       navigate(`/os/${os.id}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar OS");
@@ -184,18 +167,20 @@ export default function NewOS() {
           {step === 1 && (
             <div className="space-y-3">
               <Label>Cliente</Label>
-              {clientes.length === 0 ? (
+              {loadingClientes ? (
+                <p className="text-xs text-muted-foreground">A carregar…</p>
+              ) : clientes.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
                   Não existem clientes. Cria um cliente em <strong>Clientes</strong> primeiro.
                 </p>
               ) : (
                 <DataTable<Cliente>
                   data={clientes}
-                  onRowClick={(c) => { setClienteId(c.id); setTrotineteId(""); }}
+                  onRowClick={(c) => { setClienteId(c.id); setTrotineteId(null); }}
                   isRowSelected={(c) => clienteId === c.id}
                   columns={[
                     { key: "nome", header: "Nome", cell: (c) => <span className="font-medium">{c.nome}</span> },
-                    { key: "nif", header: "NIF", cell: (c) => c.nif },
+                    { key: "NIF", header: "NIF", cell: (c) => c.NIF },
                     { key: "telemovel", header: "Telemóvel", cell: (c) => c.telemovel },
                     { key: "email", header: "Email", cell: (c) => c.email },
                     { key: "selecionado", header: "", className: "w-[1%]", cell: (c) => (
@@ -204,7 +189,7 @@ export default function NewOS() {
                         : null
                     ) },
                   ]}
-                  searchKeys={["nome", "email", "nif", "telemovel"]}
+                  searchKeys={["nome", "email", "NIF", "telemovel"]}
                   searchPlaceholder="Pesquisar por nome, email, NIF ou telemóvel"
                   searchClassName="max-w-md"
                 />
@@ -215,7 +200,9 @@ export default function NewOS() {
           {step === 2 && (
             <div className="space-y-3">
               <Label>Trotinete</Label>
-              {trotinetesCliente.length === 0 ? (
+              {loadingTrotinetes ? (
+                <p className="text-xs text-muted-foreground">A carregar…</p>
+              ) : trotinetesCliente.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
                   Este cliente ainda não tem trotinetes registadas. Adiciona em <strong>Trotinetes</strong>.
                 </p>
@@ -225,21 +212,21 @@ export default function NewOS() {
                   onRowClick={(t) => setTrotineteId(t.id)}
                   isRowSelected={(t) => trotineteId === t.id}
                   columns={[
-                    { key: "marca", header: "Marca / Modelo", cell: (t) => (
+                    { key: "marcaModelo", header: "Marca / Modelo", cell: (t) => (
                       <div>
                         <div className="font-medium">{t.marca} {t.modelo}</div>
-                        <div className="text-xs text-muted-foreground">{t.motor}</div>
+                        <div className="text-xs text-muted-foreground">{t.tipo_motor}</div>
                       </div>
                     ) },
-                    { key: "ns", header: "Nº de série", cell: (t) => <code className="text-xs">{t.numeroSerie}</code> },
-                    { key: "motor", header: "Motor", cell: (t) => t.motor },
+                    { key: "num_serie", header: "Nº de série", cell: (t) => <code className="text-xs">{t.num_serie}</code> },
+                    { key: "motor", header: "Motor", cell: (t) => t.tipo_motor },
                     { key: "selecionado", header: "", className: "w-[1%]", cell: (t) => (
                       trotineteId === t.id
                         ? <Badge className="gap-1"><Check className="h-3 w-3" />Selecionada</Badge>
                         : null
                     ) },
                   ]}
-                  searchKeys={["marca", "modelo", "numeroSerie", "motor"]}
+                  searchKeys={["marca", "modelo", "num_serie", "tipo_motor"]}
                   searchPlaceholder="Pesquisar por marca, modelo, nº de série ou motor"
                   searchClassName="max-w-lg"
                 />
@@ -262,44 +249,24 @@ export default function NewOS() {
                     {editIndex !== null ? "Guardar" : "Adicionar"}
                   </Button>
                   {editIndex !== null && (
-                    <Button type="button" variant="outline" onClick={cancelEdit}>
-                      Cancelar
-                    </Button>
+                    <Button type="button" variant="outline" onClick={cancelEdit}>Cancelar</Button>
                   )}
                 </div>
-
                 {acessorios.length === 0 ? (
                   <p className="text-xs text-muted-foreground">Nenhum acessório adicionado</p>
                 ) : (
                   <ul className="divide-y rounded-md border">
                     {acessorios.map((a, i) => (
-                      <li
-                        key={i}
-                        className={`flex items-center justify-between gap-2 px-3 py-2 text-sm ${
-                          editIndex === i ? "bg-muted/60" : ""
-                        }`}
-                      >
+                      <li key={i} className={`flex items-center justify-between gap-2 px-3 py-2 text-sm ${editIndex === i ? "bg-muted/60" : ""}`}>
                         <span className="truncate">
                           <span className="mr-2 text-xs text-muted-foreground">#{i + 1}</span>
                           {a}
                         </span>
                         <div className="flex gap-1">
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => editAcessorio(i)}
-                            aria-label="Editar"
-                          >
+                          <Button type="button" size="icon" variant="ghost" onClick={() => editAcessorio(i)} aria-label="Editar">
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => removeAcessorio(i)}
-                            aria-label="Remover"
-                          >
+                          <Button type="button" size="icon" variant="ghost" onClick={() => removeAcessorio(i)} aria-label="Remover">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -314,13 +281,7 @@ export default function NewOS() {
                 <label className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed bg-muted/40 px-3 py-6 text-sm text-muted-foreground hover:bg-muted">
                   <Upload className="h-4 w-4" />
                   Carregar imagens
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => handleFiles(e.target.files)}
-                  />
+                  <input type="file" accept="image/png,image/jpeg" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
                 </label>
                 {fotos.length > 0 && (
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
@@ -362,11 +323,7 @@ export default function NewOS() {
           )}
 
           <div className="mt-6 flex justify-between">
-            <Button
-              variant="outline"
-              disabled={step === 1}
-              onClick={() => setStep((s) => s - 1)}
-            >
+            <Button variant="outline" disabled={step === 1} onClick={() => setStep((s) => s - 1)}>
               <ArrowLeft className="h-4 w-4" /> Anterior
             </Button>
             {step < 4 ? (

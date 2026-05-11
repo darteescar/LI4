@@ -95,6 +95,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public Utilizador obterUtilizadorPorIdentificador(String identificador) {
+        return sAutenticacao.obterUtilizadorPorIdentificador(identificador);
+    }
+
+    @Override
     public boolean atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword) {
         return sAutenticacao.atualizarPalavraPasseUtilizador(idUtilizador, passwordvelha, novaPassword);
     }

@@ -1,66 +1,65 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Bell, CheckCheck, Trash2, ArrowRight, RefreshCw, CheckCircle2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Bell, CheckCheck, Trash2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 
-import { alertasService, TIPO_ALERTA_LABELS } from "@/services/alertas";
+import { api } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
 import { formatDateTime } from "@/lib/format";
-import type { Alerta, TipoAlerta } from "@/lib/types";
 
-const TIPO_VARIANT: Record<TipoAlerta, string> = {
-  ORCAMENTO_APROVAR: "bg-warning-soft text-warning",
-  OS_PAGAMENTO: "bg-info-soft text-info",
-  PECA_FALTA: "bg-warning-soft text-warning",
-  DEFEITO_REPORTADO: "bg-destructive/10 text-destructive",
-  STOCK_BAIXO: "bg-destructive/10 text-destructive",
-};
+interface Notificacao {
+  id: number;
+  descricao: string;
+  data_emissao: string;
+  id_remetente: number;
+  id_destinatario: number;
+  estado: "NAOLIDA" | "LIDA" | "TRATADA";
+  data_horaTratada: string | null;
+}
 
 export default function Alertas() {
-  const { role } = useAuth();
-  const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const { user } = useAuth();
+  const qc = useQueryClient();
   const [filtro, setFiltro] = useState<"TODAS" | "NAO_LIDAS">("NAO_LIDAS");
 
-  const reload = async () => {
-    const list = await alertasService.listForRole(role, {
-      apenasNaoLidas: filtro === "NAO_LIDAS",
-    });
-    setAlertas(list);
-  };
+  const { data: todas = [], isLoading } = useQuery<Notificacao[]>({
+    queryKey: ["notificacoes", user?.id],
+    queryFn: () => api.get<Notificacao[]>(`/notificacoes/destinatario/${user!.id}`),
+    enabled: !!user,
+  });
 
-  useEffect(() => { reload(); /* eslint-disable-next-line */ }, [role, filtro]);
+  const alertas = filtro === "NAO_LIDAS" ? todas.filter((n) => n.estado === "NAOLIDA") : todas;
+  const naoLidasCount = todas.filter((n) => n.estado === "NAOLIDA").length;
 
-  const verificarStock = async () => {
-    const n = await alertasService.gerarAlertasStockBaixo();
-    if (n > 0) toast.success(`${n} novo(s) alerta(s) de stock baixo`);
-    else toast.info("Nenhum novo alerta de stock");
-    reload();
-  };
+  const marcarLida = useMutation({
+    mutationFn: (id: number) => api.patch(`/notificacoes/lida/${id}`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notificacoes", user?.id] }),
+  });
 
-  const marcarLida = async (id: string) => {
-    await alertasService.marcarLida(id);
-    reload();
-  };
+  const marcarTratada = useMutation({
+    mutationFn: (id: number) => api.patch(`/notificacoes/tratada/${id}`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notificacoes", user?.id] }),
+  });
+
+  const remover = useMutation({
+    mutationFn: (id: number) => api.delete(`/notificacoes/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notificacoes", user?.id] }),
+  });
 
   const marcarTodas = async () => {
-    await alertasService.marcarTodasLidas(role);
+    await Promise.all(
+      todas.filter((n) => n.estado === "NAOLIDA").map((n) => api.patch(`/notificacoes/lida/${n.id}`, {}))
+    );
     toast.success("Todos os alertas marcados como lidos");
-    reload();
+    qc.invalidateQueries({ queryKey: ["notificacoes", user?.id] });
   };
-
-  const remover = async (id: string) => {
-    await alertasService.remover(id);
-    reload();
-  };
-
-  const naoLidasCount = alertas.filter((a) => !a.lida).length;
 
   return (
     <div>
@@ -68,18 +67,13 @@ export default function Alertas() {
         title="Centro de Alertas"
         description="Notificações relevantes para a tua função"
         actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" onClick={verificarStock}>
-              <RefreshCw className="h-4 w-4" /> Verificar stock
-            </Button>
-            <Button variant="outline" onClick={marcarTodas} disabled={naoLidasCount === 0}>
-              <CheckCheck className="h-4 w-4" /> Marcar todas como lidas
-            </Button>
-          </div>
+          <Button variant="outline" onClick={marcarTodas} disabled={naoLidasCount === 0}>
+            <CheckCheck className="h-4 w-4" /> Marcar todas como lidas
+          </Button>
         }
       />
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4">
         <Tabs value={filtro} onValueChange={(v) => setFiltro(v as typeof filtro)}>
           <TabsList>
             <TabsTrigger value="NAO_LIDAS">
@@ -92,71 +86,54 @@ export default function Alertas() {
         </Tabs>
       </div>
 
-      {alertas.length === 0 ? (
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">A carregar…</p>
+      ) : alertas.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-2 py-16 text-center">
             <Bell className="h-10 w-10 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {filtro === "NAO_LIDAS"
-                ? "Não tens alertas por ler. Tudo em dia!"
-                : "Sem alertas registados."}
+              {filtro === "NAO_LIDAS" ? "Não tens alertas por ler. Tudo em dia!" : "Sem alertas registados."}
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-2">
           {alertas.map((a) => (
-            <Card key={a.id} className={a.lida ? "opacity-70" : ""}>
+            <Card key={a.id} className={a.estado !== "NAOLIDA" ? "opacity-70" : ""}>
               <CardContent className="flex items-start gap-3 p-4">
-                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${TIPO_VARIANT[a.tipo]}`}>
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
+                  a.estado === "NAOLIDA" ? "bg-warning-soft text-warning" : "bg-muted text-muted-foreground"
+                }`}>
                   <Bell className="h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {TIPO_ALERTA_LABELS[a.tipo]}
-                    </Badge>
-                    {!a.lida && (
+                    {a.estado === "NAOLIDA" && (
                       <Badge className="bg-primary text-primary-foreground text-xs">Novo</Badge>
                     )}
+                    {a.estado === "TRATADA" && (
+                      <Badge variant="secondary" className="bg-success-soft text-success text-xs">Tratada</Badge>
+                    )}
+                    {a.estado === "LIDA" && (
+                      <Badge variant="secondary" className="bg-info-soft text-info text-xs">Lida</Badge>
+                    )}
                     <span className="text-xs text-muted-foreground">
-                      {formatDateTime(a.dataISO)}
+                      {formatDateTime(a.data_emissao)}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm">{a.mensagem}</p>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {a.tratada ? (
-                      <Badge variant="secondary" className="bg-success-soft text-success text-[10px]">
-                        Tratada
-                      </Badge>
-                    ) : a.lida ? (
-                      <Badge variant="secondary" className="bg-info-soft text-info text-[10px]">
-                        Lida
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="bg-warning-soft text-warning text-[10px]">
-                        Não lida
-                      </Badge>
-                    )}
-                  </div>
+                  <p className="mt-1 text-sm">{a.descricao}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                  {a.rota && (
-                    <Button variant="ghost" size="sm" asChild onClick={() => marcarLida(a.id)}>
-                      <Link to={a.rota}>
-                        Abrir <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    </Button>
-                  )}
-                  {!a.tratada && (
+                  {a.estado !== "TRATADA" && (
                     <Button variant="ghost" size="icon" title="Marcar como tratado"
-                      onClick={async () => { await alertasService.marcarTratada(a.id); reload(); }}>
+                      onClick={() => marcarTratada.mutate(a.id)}>
                       <CheckCircle2 className="h-4 w-4 text-success" />
                     </Button>
                   )}
-                  {!a.lida && (
+                  {a.estado === "NAOLIDA" && (
                     <Button variant="ghost" size="icon" title="Marcar como lida"
-                      onClick={() => marcarLida(a.id)}>
+                      onClick={() => marcarLida.mutate(a.id)}>
                       <CheckCheck className="h-4 w-4" />
                     </Button>
                   )}
@@ -168,7 +145,7 @@ export default function Alertas() {
                     }
                     title="Remover este alerta?"
                     destructive
-                    onConfirm={() => remover(a.id)}
+                    onConfirm={() => remover.mutate(a.id)}
                   />
                 </div>
               </CardContent>

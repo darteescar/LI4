@@ -23,12 +23,13 @@ public class AuthController {
 
         app.post("/auth/login", ctx -> {
             LoginRequest req = ctx.bodyAsClass(LoginRequest.class);
-            if (!facade.autenticar(req.id(), req.password()))
+            var utilizador = facade.obterUtilizadorPorIdentificador(req.identificador());
+            if (utilizador == null || !facade.autenticar(utilizador.getId(), req.password()))
                 throw new UnauthorizedResponse("Credenciais inválidas");
-            Cargo cargo       = facade.obterCargoUtilizador(req.id());
-            int idFuncionario = facade.obterIdFuncionario_Utilizador(req.id());
-            String token      = gestorSessoes.criarSessao(new SessaoUtilizador(req.id(), idFuncionario, cargo));
-            ctx.status(200).json(new LoginResponse(token, cargo.name()));
+            Cargo cargo       = utilizador.getCargo();
+            int idFuncionario = utilizador.getIdFuncionario();
+            String token      = gestorSessoes.criarSessao(new SessaoUtilizador(utilizador.getId(), idFuncionario, cargo));
+            ctx.status(200).json(new LoginResponse(token, cargo.name(), idFuncionario, utilizador.getId()));
         });
 
         app.post("/api/auth/logout", ctx -> {

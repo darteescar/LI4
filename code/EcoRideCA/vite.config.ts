@@ -10,6 +10,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     hmr: {
       overlay: false,
+    },  
+    proxy: {
+      '/api':  'http://localhost:7000',
+      '/auth': 'http://localhost:7000',
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),

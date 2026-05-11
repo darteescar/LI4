@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Eye, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,115 +17,137 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
-import { osService } from "@/services/os";
-import { clientesService, trotinetesService, funcionariosService } from "@/services/entities";
+import { api } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
 import { formatDateTime } from "@/lib/format";
-import type { OS, Cliente, Trotinete, Funcionario, EstadoOS } from "@/lib/types";
-import { ESTADO_OS_LABELS } from "@/lib/types";
 
-const ESTADOS_TODOS: EstadoOS[] = [
-  "REGISTADA", "EM_DIAGNOSTICO", "AGUARDA_APROVACAO", "APROVADA",
-  "EM_REPARACAO", "AGUARDA_PECAS", "CONCLUIDA", "AGUARDA_PAGAMENTO",
-  "PAGA", "CANCELADA",
-];
+type EstadoOS =
+  | "PendenteDiagnostico"
+  | "PendenteAprovacaoOrcamento"
+  | "OrcamentoNaoAprovado"
+  | "PendenteReparacao"
+  | "AguardarPecas"
+  | "ClienteNotificado"
+  | "PendentePagamento"
+  | "Paga"
+  | "Eliminada";
 
-// Mecânicos não vêem AGUARDA_PAGAMENTO nem PAGA
-const ESTADOS_MEC: EstadoOS[] = ESTADOS_TODOS.filter(
-  (e) => e !== "AGUARDA_PAGAMENTO" && e !== "PAGA",
-);
+const ESTADO_LABELS: Record<EstadoOS, string> = {
+  PendenteDiagnostico:       "Pendente diagnóstico",
+  PendenteAprovacaoOrcamento: "Aguarda aprovação",
+  OrcamentoNaoAprovado:      "Orçamento rejeitado",
+  PendenteReparacao:         "Em reparação",
+  AguardarPecas:             "Aguarda peças",
+  ClienteNotificado:         "Cliente notificado",
+  PendentePagamento:         "Aguarda pagamento",
+  Paga:                      "Paga",
+  Eliminada:                 "Eliminada",
+};
+
+const TODOS_ESTADOS = Object.keys(ESTADO_LABELS) as EstadoOS[];
+const ESTADOS_MEC = TODOS_ESTADOS.filter((e) => e !== "PendentePagamento" && e !== "Paga");
+const TERMINAL = ["Paga", "Eliminada"] as EstadoOS[];
+
+interface OrdemServico {
+  id: number;
+  descricao: string;
+  dataCriacao: string;
+  codTrotinete: number;
+  codCliente: number;
+  codCriador: number;
+  codMecanico: number | null;
+  estado: EstadoOS;
+  acessorios: string[];
+}
+
+interface Cliente { id: number; nome: string; }
+interface Trotinete { id: number; modelo: string; marca: string; }
+interface Funcionario { id: number; nome: string; }
 
 export default function OSList() {
   const { user, role } = useAuth();
+  const qc = useQueryClient();
   const [params] = useSearchParams();
   const meu = params.get("meu") === "true";
 
-  const [ordens, setOrdens] = useState<OS[]>([]);
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [trotinetes, setTrotinetes] = useState<Trotinete[]>([]);
-  const [mecanicos, setMecanicos] = useState<Funcionario[]>([]);
+  const [estado, setEstado] = useState("ALL");
+  const [clienteFiltro, setClienteFiltro] = useState("ALL");
+  const [mecanicoFiltro, setMecanicoFiltro] = useState("ALL");
+  const [dataDesde, setDataDesde] = useState("");
+  const [dataAte, setDataAte] = useState("");
 
-  // Filtros
-  const [estado, setEstado] = useState<string>("ALL");
-  const [clienteFiltro, setClienteFiltro] = useState<string>("ALL");
-  const [mecanicoFiltro, setMecanicoFiltro] = useState<string>("ALL");
-  const [dataDesde, setDataDesde] = useState<string>("");
-  const [dataAte, setDataAte] = useState<string>("");
+  const { data: ordens = [], isLoading } = useQuery<OrdemServico[]>({
+    queryKey: ["ordensservicos"],
+    queryFn: () => api.get<OrdemServico[]>("/ordensservicos"),
+  });
 
-  const reload = async () => {
-    const [o, c, t, fs] = await Promise.all([
-      osService.list(),
-      clientesService.list(),
-      trotinetesService.list(),
-      funcionariosService.list(),
-    ]);
-    setOrdens(o);
-    setClientes(c);
-    setTrotinetes(t);
-    setMecanicos(fs.filter((f) => f.cargo === "MECANICO"));
-  };
-  useEffect(() => { reload(); }, []);
+  const { data: clientes = [] } = useQuery<Cliente[]>({
+    queryKey: ["clientes"],
+    queryFn: () => api.get<Cliente[]>("/clientes"),
+    enabled: role === "GERENTE" || role === "SECRETARIA",
+  });
 
-  const clienteName = (id: string) => clientes.find((c) => c.id === id)?.nome ?? "—";
-  const trotineteLabel = (id: string) => {
+  const { data: trotinetes = [] } = useQuery<Trotinete[]>({
+    queryKey: ["trotinetes"],
+    queryFn: () => api.get<Trotinete[]>("/trotinetes"),
+  });
+
+  const { data: funcionarios = [] } = useQuery<Funcionario[]>({
+    queryKey: ["funcionarios"],
+    queryFn: () => api.get<Funcionario[]>("/funcionarios"),
+    enabled: role === "GERENTE",
+  });
+
+  const mecanicos = funcionarios;
+
+  const clienteNome = (id: number) => clientes.find((c) => c.id === id)?.nome ?? "—";
+  const trotineteLabel = (id: number) => {
     const t = trotinetes.find((x) => x.id === id);
     return t ? `${t.marca} ${t.modelo}` : "—";
   };
-  const mecanicoNome = (id?: string) =>
-    id ? mecanicos.find((m) => m.id === id)?.nome ?? "—" : "—";
+  const mecanicoNome = (id: number | null) =>
+    id ? (mecanicos.find((m) => m.id === id)?.nome ?? "—") : "—";
 
   const isMec = role === "MECANICO";
-  const estadosDisponiveis = isMec ? ESTADOS_MEC : ESTADOS_TODOS;
+  const estadosDisponiveis = isMec ? ESTADOS_MEC : TODOS_ESTADOS;
 
   const filtered = useMemo(() => {
     let r = ordens;
 
-    // Mecânico: esconder OS pagas/aguarda pagamento e aplicar regra "minhas/disponíveis"
     if (isMec && user) {
-      r = r.filter((o) => o.estado !== "PAGA" && o.estado !== "AGUARDA_PAGAMENTO");
+      r = r.filter((o) => o.estado !== "Paga" && o.estado !== "PendentePagamento");
       if (meu) {
-        r = r.filter((o) => o.mecanicoId === user.id);
+        r = r.filter((o) => o.codMecanico === user.id);
       } else {
-        r = r.filter(
-          (o) =>
-            o.mecanicoId === user.id ||
-            (!o.mecanicoId && o.estado === "REGISTADA"),
+        r = r.filter((o) =>
+          o.codMecanico === user.id || (!o.codMecanico && o.estado === "PendenteDiagnostico")
         );
       }
     }
 
     if (estado !== "ALL") r = r.filter((o) => o.estado === estado);
 
-    // Filtros gerente/secretária
     if (!isMec) {
-      if (clienteFiltro !== "ALL") r = r.filter((o) => o.clienteId === clienteFiltro);
+      if (clienteFiltro !== "ALL") r = r.filter((o) => o.codCliente === Number(clienteFiltro));
       if (mecanicoFiltro !== "ALL") {
-        if (mecanicoFiltro === "SEM_MEC") {
-          r = r.filter((o) => !o.mecanicoId);
-        } else {
-          r = r.filter((o) => o.mecanicoId === mecanicoFiltro);
-        }
+        if (mecanicoFiltro === "SEM_MEC") r = r.filter((o) => !o.codMecanico);
+        else r = r.filter((o) => o.codMecanico === Number(mecanicoFiltro));
       }
-      if (dataDesde) r = r.filter((o) => o.criadaEm >= dataDesde);
-      if (dataAte) r = r.filter((o) => o.criadaEm <= `${dataAte}T23:59:59`);
+      if (dataDesde) r = r.filter((o) => o.dataCriacao >= dataDesde);
+      if (dataAte) r = r.filter((o) => o.dataCriacao <= `${dataAte}T23:59:59`);
     }
 
     return r;
   }, [ordens, estado, clienteFiltro, mecanicoFiltro, dataDesde, dataAte, meu, isMec, user]);
 
-  const handleRemove = async (o: OS) => {
-    await osService.remove(o.id);
-    toast.success("OS eliminada");
-    reload();
-  };
-
-  const limparFiltros = () => {
-    setEstado("ALL");
-    setClienteFiltro("ALL");
-    setMecanicoFiltro("ALL");
-    setDataDesde("");
-    setDataAte("");
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/ordensservicos/${id}`),
+    onSuccess: () => {
+      toast.success("OS eliminada");
+      qc.invalidateQueries({ queryKey: ["ordensservicos"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const canCreate = role === "GERENTE" || role === "SECRETARIA";
   const canDelete = role === "GERENTE" || role === "SECRETARIA";
@@ -143,7 +166,6 @@ export default function OSList() {
         }
       />
 
-      {/* Filtros */}
       <div className="mb-4 grid gap-3 rounded-lg border bg-card p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1">
           <Label className="text-xs">Estado</Label>
@@ -152,7 +174,7 @@ export default function OSList() {
             <SelectContent>
               <SelectItem value="ALL">Todos os estados</SelectItem>
               {estadosDisponiveis.map((e) => (
-                <SelectItem key={e} value={e}>{ESTADO_OS_LABELS[e]}</SelectItem>
+                <SelectItem key={e} value={e}>{ESTADO_LABELS[e]}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -166,9 +188,7 @@ export default function OSList() {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">Todos</SelectItem>
-                  {clientes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                  ))}
+                  {clientes.map((c) => <SelectItem key={c.id} value={String(c.id)}>{c.nome}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -179,9 +199,7 @@ export default function OSList() {
                 <SelectContent>
                   <SelectItem value="ALL">Todos</SelectItem>
                   <SelectItem value="SEM_MEC">Sem mecânico atribuído</SelectItem>
-                  {mecanicos.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>
-                  ))}
+                  {mecanicos.map((m) => <SelectItem key={m.id} value={String(m.id)}>{m.nome}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -194,7 +212,9 @@ export default function OSList() {
               <Input type="date" value={dataAte} onChange={(e) => setDataAte(e.target.value)} />
             </div>
             <div className="flex items-end justify-end sm:col-span-2 lg:col-span-4">
-              <Button variant="outline" size="sm" onClick={limparFiltros}>Limpar filtros</Button>
+              <Button variant="outline" size="sm" onClick={() => { setEstado("ALL"); setClienteFiltro("ALL"); setMecanicoFiltro("ALL"); setDataDesde(""); setDataAte(""); }}>
+                Limpar filtros
+              </Button>
             </div>
           </>
         )}
@@ -228,7 +248,13 @@ export default function OSList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={isMec ? 6 : 7} className="h-24 text-center text-sm text-muted-foreground">
+                  A carregar…
+                </TableCell>
+              </TableRow>
+            ) : filtered.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={isMec ? 6 : 7} className="h-24 text-center text-sm text-muted-foreground">
                   Sem ordens de serviço
@@ -236,30 +262,28 @@ export default function OSList() {
               </TableRow>
             ) : filtered.map((o) => (
               <TableRow key={o.id}>
-                <TableCell><span className="font-mono text-xs">{o.numero}</span></TableCell>
-                <TableCell><span className="font-medium">{clienteName(o.clienteId)}</span></TableCell>
-                <TableCell>{trotineteLabel(o.trotineteId)}</TableCell>
+                <TableCell><span className="font-mono text-xs">OS-{o.id}</span></TableCell>
+                <TableCell><span className="font-medium">{clienteNome(o.codCliente)}</span></TableCell>
+                <TableCell>{trotineteLabel(o.codTrotinete)}</TableCell>
                 {!isMec && (
                   <TableCell className="text-sm">
-                    {o.mecanicoId
-                      ? mecanicoNome(o.mecanicoId)
-                      : <span className="text-xs text-muted-foreground">—</span>}
+                    {o.codMecanico ? mecanicoNome(o.codMecanico) : <span className="text-xs text-muted-foreground">—</span>}
                   </TableCell>
                 )}
                 <TableCell><StateBadge state={o.estado} /></TableCell>
-                <TableCell><span className="text-xs text-muted-foreground">{formatDateTime(o.criadaEm)}</span></TableCell>
+                <TableCell><span className="text-xs text-muted-foreground">{formatDateTime(o.dataCriacao)}</span></TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
                     <Button asChild variant="ghost" size="icon">
                       <Link to={`/os/${o.id}`}><Eye className="h-4 w-4" /></Link>
                     </Button>
-                    {canDelete && o.estado !== "PAGA" && (
+                    {canDelete && !TERMINAL.includes(o.estado) && (
                       <ConfirmDialog
                         trigger={<Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
                         title="Eliminar OS?"
-                        description={`A OS ${o.numero} será removida.`}
+                        description={`A OS OS-${o.id} será removida.`}
                         destructive
-                        onConfirm={() => handleRemove(o)}
+                        onConfirm={() => deleteMutation.mutate(o.id)}
                       />
                     )}
                   </div>

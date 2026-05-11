@@ -1,186 +1,200 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { PackageX, Send, Trash2, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Trash2, Undo2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { StockTabs } from "@/components/layout/StockTabs";
-import { DataTable, type Column } from "@/components/data-table";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
 
-import { pecasDefeituosasService } from "@/services/stock";
-import { pecasService, fornecedoresService, funcionariosService } from "@/services/entities";
-import { osService } from "@/services/os";
+import { api } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
-import { formatDateTime } from "@/lib/format";
-import type { PecaDefeituosa, Peca, Fornecedor, Funcionario, OS } from "@/lib/types";
+
+interface Defeito {
+  id: number; codStock: number; motivo: string; idFuncionario: number;
+  estadoAnterior: string;
+}
+
+interface StockEntry { id: number; codPeca: number; quantidade: number; nr_serie?: string; }
+interface Peca { id: number; referencia: string; nome: string; }
 
 export default function StockDefeitos() {
   const { role } = useAuth();
-  const [defeitos, setDefeitos] = useState<PecaDefeituosa[]>([]);
-  const [pecas, setPecas] = useState<Peca[]>([]);
-  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
-  const [ordens, setOrdens] = useState<OS[]>([]);
-  const [openDev, setOpenDev] = useState<PecaDefeituosa | null>(null);
-  const [fornecedorEscolhido, setFornecedorEscolhido] = useState("");
-
-  const reload = async () => {
-    const [d, p, f, fn, o] = await Promise.all([
-      pecasDefeituosasService.list(),
-      pecasService.list(),
-      fornecedoresService.list(),
-      funcionariosService.list(),
-      osService.list(),
-    ]);
-    setDefeitos(d); setPecas(p); setFornecedores(f); setFuncionarios(fn); setOrdens(o);
-  };
-  useEffect(() => { reload(); }, []);
+  const qc = useQueryClient();
+  const [devolverDefeito, setDevolverDefeito] = useState<Defeito | null>(null);
 
   const canEdit = role === "GERENTE" || role === "GESTOR_STOCK";
 
-  const pecaById = (id: string) => pecas.find((x) => x.id === id);
-  const funcionarioNome = (id: string) => funcionarios.find((x) => x.id === id)?.nome ?? "—";
-  const osNumero = (id: string) => ordens.find((x) => x.id === id)?.numero ?? "—";
+  const { data: defeitos = [], isLoading } = useQuery<Defeito[]>({
+    queryKey: ["defeitos"],
+    queryFn: () => api.get<Defeito[]>("/defeitos"),
+  });
 
-  const abrirDevolucao = (d: PecaDefeituosa) => {
-    const peca = pecaById(d.pecaId);
-    setFornecedorEscolhido(peca?.fornecedorId ?? "");
-    setOpenDev(d);
-  };
+  const { data: stocks = [] } = useQuery<StockEntry[]>({
+    queryKey: ["stocks"],
+    queryFn: () => api.get<StockEntry[]>("/stocks"),
+  });
 
-  const submeterDevolucao = async () => {
-    if (!openDev) return;
-    if (!fornecedorEscolhido) { toast.error("Escolhe o fornecedor"); return; }
-    try {
-      await pecasDefeituosasService.submeterDevolucao(openDev.id, fornecedorEscolhido);
-      toast.success("Devolução criada — disponível em 'Devoluções'");
-      setOpenDev(null);
-      reload();
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
-  };
+  const { data: pecas = [] } = useQuery<Peca[]>({
+    queryKey: ["pecas"],
+    queryFn: () => api.get<Peca[]>("/pecas"),
+  });
 
-  const remover = async (d: PecaDefeituosa) => {
-    await pecasDefeituosasService.remove(d.id);
-    toast.success("Registo removido");
-    reload();
-  };
-
-  const columns: Column<PecaDefeituosa>[] = [
-    { key: "data", header: "Reportado em", cell: (d) => <span className="text-xs">{formatDateTime(d.data)}</span> },
-    {
-      key: "peca", header: "Peça",
-      cell: (d) => {
-        const p = pecaById(d.pecaId);
-        return (
-          <div>
-            <div className="font-medium">{p ? `${p.referencia} — ${p.nome}` : d.pecaId}</div>
-            {d.numeroSerie && (
-              <div className="text-[10px] font-mono text-muted-foreground">S/N {d.numeroSerie}</div>
-            )}
-          </div>
-        );
-      },
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/defeitos/${id}`),
+    onSuccess: () => {
+      toast.success("Defeito removido");
+      qc.invalidateQueries({ queryKey: ["defeitos"] });
     },
-    { key: "qtd", header: "Qtd", cell: (d) => d.quantidade },
-    { key: "motivo", header: "Motivo", cell: (d) => <span className="text-xs">{d.motivo}</span> },
-    {
-      key: "os", header: "OS",
-      cell: (d) => (
-        <Link to={`/os/${d.osId}`} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
-          {osNumero(d.osId)} <ExternalLink className="h-3 w-3" />
-        </Link>
-      ),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const descartarMutation = useMutation({
+    mutationFn: (id: number) => api.patch(`/defeitos/${id}/descartar`, {}),
+    onSuccess: () => {
+      toast.success("Defeito descartado");
+      qc.invalidateQueries({ queryKey: ["defeitos"] });
     },
-    { key: "rep", header: "Mecânico", cell: (d) => <span className="text-xs">{funcionarioNome(d.reportadaPor)}</span> },
-    {
-      key: "estado", header: "Estado",
-      cell: (d) => d.estado === "POR_TRATAR"
-        ? <Badge variant="destructive">Por tratar</Badge>
-        : <Badge variant="secondary">Enviada para devolução</Badge>,
-    },
-  ];
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const stockLabel = (codStock: number) => {
+    const s = stocks.find((x) => x.id === codStock);
+    if (!s) return `Stock #${codStock}`;
+    const p = pecas.find((x) => x.id === s.codPeca);
+    const pLabel = p ? `${p.referencia} · ${p.nome}` : `Peça #${s.codPeca}`;
+    return s.nr_serie ? `${pLabel} (${s.nr_serie})` : pLabel;
+  };
 
   return (
     <div>
       <PageHeader
         title="Stock"
-        description="Peças reportadas como defeituosas pelos mecânicos durante reparações"
+        description="Catálogo de peças, entradas, devoluções e encomendas"
       />
       <StockTabs />
 
-      <DataTable
-        data={defeitos}
-        columns={columns}
-        emptyMessage="Sem peças defeituosas reportadas"
-        searchPlaceholder="Pesquisar…"
-        rowActions={(d) => (
-          <>
-            {canEdit && d.estado === "POR_TRATAR" && (
-              <Button variant="ghost" size="sm" onClick={() => abrirDevolucao(d)}>
-                <Send className="h-4 w-4" /> Devolver
-              </Button>
-            )}
-            {canEdit && (
-              <ConfirmDialog
-                trigger={<Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
-                title="Remover registo?"
-                description="O registo de defeito será apagado. O stock já não é alterado."
-                destructive
-                onConfirm={() => remover(d)}
-              />
-            )}
-          </>
-        )}
-      />
+      <div className="rounded-lg border bg-card shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nº</TableHead>
+              <TableHead>Stock / Peça</TableHead>
+              <TableHead>Motivo</TableHead>
+              <TableHead>Estado anterior</TableHead>
+              {canEdit && <TableHead className="w-[1%] text-right">Ações</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow><TableCell colSpan={canEdit ? 5 : 4} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
+            ) : defeitos.length === 0 ? (
+              <TableRow><TableCell colSpan={canEdit ? 5 : 4} className="h-24 text-center text-sm text-muted-foreground">Sem defeitos registados</TableCell></TableRow>
+            ) : defeitos.map((d) => (
+              <TableRow key={d.id}>
+                <TableCell className="font-mono text-xs">DEF-{d.id}</TableCell>
+                <TableCell className="font-medium">{stockLabel(d.codStock)}</TableCell>
+                <TableCell className="max-w-[240px] truncate text-sm" title={d.motivo}>{d.motivo}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="text-xs">{d.estadoAnterior}</Badge>
+                </TableCell>
+                {canEdit && (
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" title="Devolver ao fornecedor"
+                        onClick={() => setDevolverDefeito(d)}>
+                        <Undo2 className="h-4 w-4" />
+                      </Button>
+                      <ConfirmDialog
+                        trigger={<Button variant="ghost" size="icon" title="Descartar"><X className="h-4 w-4 text-warning" /></Button>}
+                        title="Descartar defeito?"
+                        description="O item defeituoso será marcado como descartado."
+                        destructive
+                        onConfirm={() => descartarMutation.mutate(d.id)}
+                      />
+                      <ConfirmDialog
+                        trigger={<Button variant="ghost" size="icon" title="Remover"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
+                        title="Remover registo de defeito?"
+                        destructive
+                        onConfirm={() => deleteMutation.mutate(d.id)}
+                      />
+                    </div>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="mt-2 text-xs text-muted-foreground">{defeitos.length} defeitos</div>
 
-      <Dialog open={!!openDev} onOpenChange={(v) => !v && setOpenDev(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <PackageX className="h-4 w-4" /> Submeter para devolução
-            </DialogTitle>
-          </DialogHeader>
-          {openDev && (
-            <div className="space-y-3 text-sm">
-              <p>
-                <strong>{pecaById(openDev.pecaId)?.nome ?? openDev.pecaId}</strong>
-                {" · "}{openDev.quantidade}× unidade(s)
-                {openDev.numeroSerie && <> · S/N <code>{openDev.numeroSerie}</code></>}
-              </p>
-              <div className="space-y-1">
-                <Label className="text-xs">Fornecedor</Label>
-                <Select value={fornecedorEscolhido} onValueChange={setFornecedorEscolhido}>
-                  <SelectTrigger><SelectValue placeholder="Escolher fornecedor…" /></SelectTrigger>
-                  <SelectContent>
-                    {fornecedores.map((f) => (
-                      <SelectItem key={f.id} value={f.id}>{f.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                A devolução será criada no estado <em>Pendente</em>. O stock não é alterado de novo (já saiu quando o defeito foi reportado).
-              </p>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenDev(null)}>Cancelar</Button>
-            <Button onClick={submeterDevolucao}>Criar devolução</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DevolverDialog
+        defeito={devolverDefeito}
+        onClose={() => setDevolverDefeito(null)}
+        onSaved={() => {
+          setDevolverDefeito(null);
+          qc.invalidateQueries({ queryKey: ["defeitos"] });
+          qc.invalidateQueries({ queryKey: ["devolucoes"] });
+        }}
+      />
     </div>
+  );
+}
+
+function DevolverDialog({
+  defeito, onClose, onSaved,
+}: {
+  defeito: Defeito | null; onClose: () => void; onSaved: () => void;
+}) {
+  const [motivo, setMotivo] = useState("");
+  const [data, setData] = useState(new Date().toISOString().slice(0, 10));
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    if (!defeito) return;
+    if (!motivo.trim()) { toast.error("Indica o motivo da devolução"); return; }
+    setSaving(true);
+    try {
+      await api.patch(`/defeitos/${defeito.id}/devolver`, { motivo: motivo.trim(), data });
+      toast.success("Devolução criada");
+      onSaved();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={!!defeito} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Devolver ao fornecedor</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Data de devolução</Label>
+            <Input type="date" value={data} onChange={(e) => setData(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Motivo</Label>
+            <Textarea rows={3} value={motivo} onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Descreve o motivo da devolução…" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={submit} disabled={saving}>
+            {saving ? "A criar…" : "Criar devolução"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

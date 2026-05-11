@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   ClipboardList, Package, AlertTriangle, Users, Wrench, ArrowRight,
 } from "lucide-react";
@@ -8,24 +8,39 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useAuth } from "@/context/AuthContext";
 import { ROLE_LABELS } from "@/lib/types";
-import { getDB } from "@/lib/mock-db";
 import { canAccess } from "@/lib/permissions";
+import { api } from "@/services/api";
 
 export default function Dashboard() {
   const { user, role } = useAuth();
-  const [stats, setStats] = useState({
-    osAbertas: 0, alertas: 0, pecasBaixoStock: 0, totalClientes: 0,
+
+  const { data: ordens = [] } = useQuery<{ estado: string }[]>({
+    queryKey: ["ordensservicos"],
+    queryFn: () => api.get<{ estado: string }[]>("/ordensservicos"),
+    enabled: canAccess(role, "os"),
   });
 
-  useEffect(() => {
-    const db = getDB();
-    setStats({
-      osAbertas: db.ordens.filter((o) => !["PAGA", "CANCELADA"].includes(o.estado)).length,
-      alertas: db.alertas.filter((a) => !a.lida).length,
-      pecasBaixoStock: db.pecas.filter((p) => p.stockAtual < p.stockMinimo).length,
-      totalClientes: db.clientes.length,
-    });
-  }, []);
+  const { data: notificacoes = [] } = useQuery<{ estado: string }[]>({
+    queryKey: ["notificacoes", user?.id],
+    queryFn: () => api.get<{ estado: string }[]>(`/notificacoes/destinatario/${user!.id}`),
+    enabled: !!user,
+  });
+
+  const { data: clientes = [] } = useQuery<unknown[]>({
+    queryKey: ["clientes"],
+    queryFn: () => api.get<unknown[]>("/clientes"),
+    enabled: canAccess(role, "clientes"),
+  });
+
+  const TERMINAL = ["Paga", "Eliminada"];
+  const osAbertas = ordens.filter((o) => !TERMINAL.includes(o.estado)).length;
+  const alertas   = notificacoes.filter((n) => n.estado === "NAOLIDA").length;
+
+  const cards = [
+    { label: "OS abertas", value: osAbertas, icon: ClipboardList, color: "text-info bg-info-soft", area: "os" as const },
+    { label: "Alertas pendentes", value: alertas, icon: AlertTriangle, color: "text-warning bg-warning-soft", area: "alertas" as const },
+    { label: "Clientes registados", value: clientes.length, icon: Users, color: "text-primary bg-primary-soft", area: "clientes" as const },
+  ].filter((c) => canAccess(role, c.area));
 
   const quickActions = [
     { label: "Nova ordem de serviço", to: "/os/nova", icon: ClipboardList, area: "os" as const, roles: ["GERENTE", "SECRETARIA"] as const },
@@ -33,13 +48,6 @@ export default function Dashboard() {
     { label: "Gerir stock", to: "/stock", icon: Package, area: "stock" as const },
     { label: "Catálogo de reparações", to: "/reparacoes", icon: Wrench, area: "reparacoes" as const },
   ].filter((a) => canAccess(role, a.area) && (!("roles" in a) || (role && (a.roles as readonly string[]).includes(role))));
-
-  const cards = [
-    { label: "OS abertas", value: stats.osAbertas, icon: ClipboardList, color: "text-info bg-info-soft", area: "os" as const },
-    { label: "Alertas pendentes", value: stats.alertas, icon: AlertTriangle, color: "text-warning bg-warning-soft", area: "alertas" as const },
-    { label: "Peças abaixo do mínimo", value: stats.pecasBaixoStock, icon: Package, color: "text-destructive bg-destructive/10", area: "stock" as const },
-    { label: "Clientes registados", value: stats.totalClientes, icon: Users, color: "text-primary bg-primary-soft", area: "clientes" as const },
-  ].filter((c) => canAccess(role, c.area));
 
   return (
     <div>

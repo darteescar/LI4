@@ -4,7 +4,17 @@ import type { EstadoOS, EstadoDevolucao, EstadoEncomenda } from "@/lib/types";
 type AnyState = EstadoOS | EstadoDevolucao | EstadoEncomenda | string;
 
 const VARIANTS: Record<string, string> = {
-  // OS
+  // OS (backend estados)
+  PendenteDiagnostico: "bg-muted text-muted-foreground",
+  PendenteAprovacaoOrcamento: "bg-warning-soft text-warning",
+  OrcamentoNaoAprovado: "bg-destructive/10 text-destructive",
+  PendenteReparacao: "bg-info-soft text-info",
+  AguardarPecas: "bg-warning-soft text-warning",
+  ClienteNotificado: "bg-info-soft text-info",
+  PendentePagamento: "bg-warning-soft text-warning",
+  Paga: "bg-success-soft text-success",
+  Eliminada: "bg-destructive/10 text-destructive",
+  // OS (mock estados — mantidos para compatibilidade)
   REGISTADA: "bg-muted text-muted-foreground",
   EM_DIAGNOSTICO: "bg-info-soft text-info",
   AGUARDA_APROVACAO: "bg-warning-soft text-warning",
@@ -26,6 +36,17 @@ const VARIANTS: Record<string, string> = {
 };
 
 const LABELS: Record<string, string> = {
+  // OS (backend estados)
+  PendenteDiagnostico: "Pendente diagnóstico",
+  PendenteAprovacaoOrcamento: "Aguarda aprovação",
+  OrcamentoNaoAprovado: "Orçamento rejeitado",
+  PendenteReparacao: "Em reparação",
+  AguardarPecas: "Aguarda peças",
+  ClienteNotificado: "Cliente notificado",
+  PendentePagamento: "Aguarda pagamento",
+  Paga: "Paga",
+  Eliminada: "Eliminada",
+  // OS (mock)
   REGISTADA: "Registada",
   EM_DIAGNOSTICO: "Em diagnóstico",
   AGUARDA_APROVACAO: "Aguarda aprovação",

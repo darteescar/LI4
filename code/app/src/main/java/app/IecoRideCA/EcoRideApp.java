@@ -31,9 +31,9 @@ public class EcoRideApp {
                 m.registerModule(new JavaTimeModule())
             ));
             config.bundledPlugins.enableCors(cors ->
-                cors.addRule(it -> it.allowHost("http://localhost:5173"))
+                cors.addRule(it -> it.allowHost("http://localhost:8080"))
             );
-        }).start(8080);
+        }).start(7000);
 
         // Middleware — todas as rotas /api/* exigem sessão válida
         app.before("/api/*", ctx -> {

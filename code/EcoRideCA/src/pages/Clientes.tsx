@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,49 +10,61 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTable, type Column } from "@/components/data-table";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { Badge } from "@/components/ui/badge";
+import { api } from "@/services/api";
 
-import { clientesService, trotinetesService } from "@/services/entities";
-import { clienteSchema } from "@/lib/validators";
-import type { Cliente } from "@/lib/types";
+// campos devolvidos pelo backend
+interface Cliente {
+  id: number;
+  nome: string;
+  email: string;
+  telemovel: string;
+  NIF: string;
+  codsTrotinetes: number[];
+}
+
+const clienteSchema = z.object({
+  nome:      z.string().trim().min(2, "Nome obrigatório"),
+  nif:       z.string().regex(/^\d{9}$/, "NIF deve ter 9 dígitos"),
+  telemovel: z.string().regex(/^9\d{8}$/, "Telemóvel inválido"),
+  email:     z.string().trim().email("Email inválido"),
+});
 
 type FormValues = z.infer<typeof clienteSchema>;
 
 export default function Clientes() {
-  const [data, setData] = useState<Cliente[]>([]);
-  const [counts, setCounts] = useState<Record<string, number>>({});
+  const qc = useQueryClient();
   const [editing, setEditing] = useState<Cliente | null>(null);
   const [open, setOpen] = useState(false);
 
-  const reload = async () => {
-    const [c, t] = await Promise.all([clientesService.list(), trotinetesService.list()]);
-    setData(c);
-    const map: Record<string, number> = {};
-    t.forEach((x) => { map[x.clienteId] = (map[x.clienteId] ?? 0) + 1; });
-    setCounts(map);
-  };
-  useEffect(() => { reload(); }, []);
+  const { data = [], isLoading } = useQuery<Cliente[]>({
+    queryKey: ["clientes"],
+    queryFn: () => api.get<Cliente[]>("/clientes"),
+  });
 
-  const handleRemove = async (c: Cliente) => {
-    await clientesService.remove(c.id);
-    toast.success("Cliente eliminado");
-    reload();
-  };
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/clientes/${id}`),
+    onSuccess: () => {
+      toast.success("Cliente eliminado");
+      qc.invalidateQueries({ queryKey: ["clientes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const columns: Column<Cliente>[] = [
-    { key: "nome", header: "Nome", cell: (c) => <span className="font-medium">{c.nome}</span> },
-    { key: "nif", header: "NIF", cell: (c) => c.nif },
-    { key: "telemovel", header: "Telemóvel", cell: (c) => c.telemovel },
-    { key: "email", header: "Email", cell: (c) => c.email },
-    { key: "trotinetes", header: "Trotinetes", cell: (c) => (
+    { key: "nome",     header: "Nome",      cell: (c) => <span className="font-medium">{c.nome}</span> },
+    { key: "NIF",      header: "NIF",       cell: (c) => c.NIF },
+    { key: "tel",      header: "Telemóvel", cell: (c) => c.telemovel },
+    { key: "email",    header: "Email",     cell: (c) => c.email },
+    { key: "trots",    header: "Trotinetes", cell: (c) => (
       <Badge variant="secondary" className="gap-1">
-        <Bike className="h-3 w-3" />{counts[c.id] ?? 0}
+        <Bike className="h-3 w-3" />{c.codsTrotinetes.length}
       </Badge>
     ) },
   ];
@@ -70,8 +83,9 @@ export default function Clientes() {
       <DataTable
         data={data}
         columns={columns}
-        searchKeys={["nome", "nif", "email", "telemovel"]}
-        searchPlaceholder="Pesquisar por nome, email, NIF ou telemóvel"
+        searchKeys={["nome", "email", "telemovel"]}
+        searchPlaceholder="Pesquisar por nome, email ou telemóvel"
+        isLoading={isLoading}
         rowActions={(c) => (
           <>
             <Button variant="ghost" size="icon" onClick={() => { setEditing(c); setOpen(true); }}>
@@ -82,12 +96,17 @@ export default function Clientes() {
               title="Eliminar cliente?"
               description={`Esta ação remove ${c.nome} e as suas trotinetes.`}
               destructive
-              onConfirm={() => handleRemove(c)}
+              onConfirm={() => deleteMutation.mutate(c.id)}
             />
           </>
         )}
       />
-      <ClienteForm open={open} onOpenChange={setOpen} initial={editing} onSaved={reload} />
+      <ClienteForm
+        open={open}
+        onOpenChange={setOpen}
+        initial={editing}
+        onSaved={() => qc.invalidateQueries({ queryKey: ["clientes"] })}
+      />
     </div>
   );
 }
@@ -100,26 +119,23 @@ function ClienteForm({
 }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(clienteSchema),
-    defaultValues: initial ?? {
-      nome: "", nif: "", telemovel: "", email: "", morada: "", codigoPostal: "",
-    },
-    values: initial ? {
-      nome: initial.nome, nif: initial.nif, telemovel: initial.telemovel,
-      email: initial.email, morada: initial.morada, codigoPostal: initial.codigoPostal,
-    } : undefined,
+    values: initial
+      ? { nome: initial.nome, nif: initial.NIF, telemovel: initial.telemovel, email: initial.email }
+      : { nome: "", nif: "", telemovel: "", email: "" },
   });
 
-  const onSubmit = async (v: FormValues) => {
-    try {
-      if (initial) await clientesService.update(initial.id, v);
-      else await clientesService.create(v);
+  const saveMutation = useMutation({
+    mutationFn: (v: FormValues) =>
+      initial
+        ? api.patch<Cliente>(`/clientes/${initial.id}`, v)
+        : api.post<Cliente>("/clientes", v),
+    onSuccess: () => {
       toast.success(initial ? "Cliente atualizado" : "Cliente criado");
       onOpenChange(false);
       onSaved();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro");
-    }
-  };
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -127,7 +143,7 @@ function ClienteForm({
         <DialogHeader>
           <DialogTitle>{initial ? "Editar cliente" : "Novo cliente"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <F label="Nome" e={form.formState.errors.nome?.message} className="sm:col-span-2">
             <Input {...form.register("nome")} />
           </F>
@@ -140,15 +156,11 @@ function ClienteForm({
           <F label="Email" e={form.formState.errors.email?.message} className="sm:col-span-2">
             <Input type="email" {...form.register("email")} />
           </F>
-          <F label="Morada" e={form.formState.errors.morada?.message} className="sm:col-span-2">
-            <Input {...form.register("morada")} />
-          </F>
-          <F label="Código postal" e={form.formState.errors.codigoPostal?.message}>
-            <Input {...form.register("codigoPostal")} placeholder="1234-567" />
-          </F>
           <DialogFooter className="sm:col-span-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit">{initial ? "Guardar" : "Criar"}</Button>
+            <Button type="submit" disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? "A guardar…" : initial ? "Guardar" : "Criar"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

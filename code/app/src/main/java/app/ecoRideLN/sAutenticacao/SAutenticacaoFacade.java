@@ -116,6 +116,11 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
+    public Utilizador obterUtilizadorPorIdentificador(String identificador) {
+        return utilizadoresDAO.getByIdentificador(identificador);
+    }
+
+    @Override
     public void atualizarCargoUtilizador(int id, Cargo novoCargo) {
         Utilizador u = utilizadoresDAO.get(id);
         if (u == null) throw new EcoRideException("Utilizador com ID " + id + " não existe.");

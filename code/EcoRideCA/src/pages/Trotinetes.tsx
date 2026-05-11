@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,47 +15,81 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-import { trotinetesService, clientesService } from "@/services/entities";
-import { trotineteSchema } from "@/lib/validators";
-import type { Cliente, Trotinete } from "@/lib/types";
+import { api } from "@/services/api";
+
+interface Trotinete {
+  id: number;
+  modelo: string;
+  marca: string;
+  num_serie: string;
+  tipo_motor: string;
+  cod_cliente: number;
+}
+
+interface Cliente {
+  id: number;
+  nome: string;
+  NIF: string;
+}
+
+const trotineteSchema = z.object({
+  cod_cliente: z.number().min(1, "Cliente obrigatório"),
+  marca:       z.string().trim().min(1, "Marca obrigatória"),
+  modelo:      z.string().trim().min(1, "Modelo obrigatório"),
+  num_serie:   z.string().trim().min(1, "Nº de série obrigatório"),
+  motor:       z.string().trim().min(1, "Motor obrigatório"),
+});
 
 type FormValues = z.infer<typeof trotineteSchema>;
 
+// DataTable requires id: string | number — extend Trotinete with clienteNome for search
+type TrotineteRow = Trotinete & { clienteNome: string };
+
 export default function Trotinetes() {
-  const [data, setData] = useState<Trotinete[]>([]);
-  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const qc = useQueryClient();
   const [editing, setEditing] = useState<Trotinete | null>(null);
   const [open, setOpen] = useState(false);
 
-  const reload = async () => {
-    const [t, c] = await Promise.all([trotinetesService.list(), clientesService.list()]);
-    setData(t); setClientes(c);
-  };
-  useEffect(() => { reload(); }, []);
+  const { data: trotinetes = [], isLoading } = useQuery<Trotinete[]>({
+    queryKey: ["trotinetes"],
+    queryFn: () => api.get<Trotinete[]>("/trotinetes"),
+  });
+
+  const { data: clientes = [] } = useQuery<Cliente[]>({
+    queryKey: ["clientes"],
+    queryFn: () => api.get<Cliente[]>("/clientes"),
+  });
 
   const clienteMap = useMemo(() => new Map(clientes.map((c) => [c.id, c.nome])), [clientes]);
 
-  const handleRemove = async (t: Trotinete) => {
-    await trotinetesService.remove(t.id);
-    toast.success("Trotinete eliminada");
-    reload();
-  };
+  const rows: TrotineteRow[] = useMemo(
+    () => trotinetes.map((t) => ({ ...t, clienteNome: clienteMap.get(t.cod_cliente) ?? "" })),
+    [trotinetes, clienteMap],
+  );
 
-  const columns: Column<Trotinete>[] = [
-    { key: "marca", header: "Marca / Modelo", cell: (t) => (
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/trotinetes/${id}`),
+    onSuccess: () => {
+      toast.success("Trotinete eliminada");
+      qc.invalidateQueries({ queryKey: ["trotinetes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const columns: Column<TrotineteRow>[] = [
+    { key: "marcaModelo", header: "Marca / Modelo", cell: (t) => (
       <div>
         <div className="font-medium">{t.marca} {t.modelo}</div>
-        <div className="text-xs text-muted-foreground">{t.motor}</div>
+        <div className="text-xs text-muted-foreground">{t.tipo_motor}</div>
       </div>
     ) },
-    { key: "ns", header: "Nº de série", cell: (t) => <code className="text-xs">{t.numeroSerie}</code> },
-    { key: "cliente", header: "Cliente", cell: (t) => clienteMap.get(t.clienteId) ?? "—" },
-    { key: "motor", header: "Motor", cell: (t) => t.motor },
+    { key: "num_serie",   header: "Nº de série", cell: (t) => <code className="text-xs">{t.num_serie}</code> },
+    { key: "cliente",     header: "Cliente",     cell: (t) => t.clienteNome || "—" },
+    { key: "tipo_motor",  header: "Motor",       cell: (t) => t.tipo_motor },
   ];
 
   return (
@@ -69,11 +104,12 @@ export default function Trotinetes() {
         }
       />
       <DataTable
-        data={data.map((t) => ({ ...t, clienteNome: clienteMap.get(t.clienteId) ?? "" }))}
-        columns={columns as any}
-        searchKeys={["marca", "modelo", "numeroSerie", "motor", "clienteNome"] as any}
+        data={rows}
+        columns={columns}
+        searchKeys={["marca", "modelo", "num_serie", "tipo_motor", "clienteNome"]}
         searchPlaceholder="Pesquisar por marca, modelo, nº de série, cliente ou motor"
         searchClassName="max-w-lg"
+        isLoading={isLoading}
         rowActions={(t) => (
           <>
             <Button variant="ghost" size="icon" onClick={() => { setEditing(t); setOpen(true); }}>
@@ -83,7 +119,7 @@ export default function Trotinetes() {
               trigger={<Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>}
               title="Eliminar trotinete?"
               destructive
-              onConfirm={() => handleRemove(t)}
+              onConfirm={() => deleteMutation.mutate(t.id)}
             />
           </>
         )}
@@ -93,7 +129,10 @@ export default function Trotinetes() {
         onOpenChange={setOpen}
         initial={editing}
         clientes={clientes}
-        onSaved={reload}
+        onSaved={() => {
+          qc.invalidateQueries({ queryKey: ["trotinetes"] });
+          qc.invalidateQueries({ queryKey: ["clientes"] });
+        }}
       />
     </div>
   );
@@ -107,26 +146,23 @@ function TrotineteForm({
 }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(trotineteSchema),
-    defaultValues: initial ?? {
-      clienteId: clientes[0]?.id ?? "", marca: "", modelo: "", numeroSerie: "",
-      motor: "",
-    },
-    values: initial ? {
-      clienteId: initial.clienteId, marca: initial.marca, modelo: initial.modelo,
-      numeroSerie: initial.numeroSerie, motor: initial.motor,
-    } : undefined,
+    values: initial
+      ? { cod_cliente: initial.cod_cliente, marca: initial.marca, modelo: initial.modelo, num_serie: initial.num_serie, motor: initial.tipo_motor }
+      : { cod_cliente: clientes[0]?.id ?? 0, marca: "", modelo: "", num_serie: "", motor: "" },
   });
 
-  const onSubmit = async (v: FormValues) => {
-    try {
-      if (initial) await trotinetesService.update(initial.id, v);
-      else await trotinetesService.create(v);
+  const saveMutation = useMutation({
+    mutationFn: (v: FormValues) =>
+      initial
+        ? api.patch<Trotinete>(`/trotinetes/${initial.id}`, v)
+        : api.post<Trotinete>(`/clientes/${v.cod_cliente}/trotinetes`, v),
+    onSuccess: () => {
       toast.success(initial ? "Trotinete atualizada" : "Trotinete criada");
-      onOpenChange(false); onSaved();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro");
-    }
-  };
+      onOpenChange(false);
+      onSaved();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -134,16 +170,16 @@ function TrotineteForm({
         <DialogHeader>
           <DialogTitle>{initial ? "Editar trotinete" : "Nova trotinete"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <F label="Cliente" e={form.formState.errors.clienteId?.message} className="sm:col-span-2">
+        <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <F label="Cliente" e={form.formState.errors.cod_cliente?.message} className="sm:col-span-2">
             <Select
-              value={form.watch("clienteId")}
-              onValueChange={(v) => form.setValue("clienteId", v, { shouldValidate: true })}
+              value={String(form.watch("cod_cliente"))}
+              onValueChange={(v) => form.setValue("cod_cliente", Number(v), { shouldValidate: true })}
             >
               <SelectTrigger><SelectValue placeholder="Selecionar cliente" /></SelectTrigger>
               <SelectContent>
                 {clientes.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.nome} — {c.nif}</SelectItem>
+                  <SelectItem key={c.id} value={String(c.id)}>{c.nome} — {c.NIF}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -154,15 +190,17 @@ function TrotineteForm({
           <F label="Modelo" e={form.formState.errors.modelo?.message}>
             <Input {...form.register("modelo")} />
           </F>
-          <F label="Nº de série" e={form.formState.errors.numeroSerie?.message}>
-            <Input {...form.register("numeroSerie")} />
+          <F label="Nº de série" e={form.formState.errors.num_serie?.message}>
+            <Input {...form.register("num_serie")} />
           </F>
           <F label="Motor" e={form.formState.errors.motor?.message}>
             <Input {...form.register("motor")} />
           </F>
           <DialogFooter className="sm:col-span-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit">{initial ? "Guardar" : "Criar"}</Button>
+            <Button type="submit" disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? "A guardar…" : initial ? "Guardar" : "Criar"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

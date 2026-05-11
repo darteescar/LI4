@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { TrendingUp, TrendingDown, Wallet, Plus } from "lucide-react";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -19,51 +19,87 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 
-import {
-  financeiroService, TIPO_LABELS, TIPO_SINAL,
-} from "@/services/financeiro";
-import { funcionariosService } from "@/services/entities";
+import { api } from "@/services/api";
 import { formatEUR, formatDateTime } from "@/lib/format";
-import type { MovimentoFinanceiro, TipoMovimento, Funcionario } from "@/lib/types";
 
-const TIPOS: TipoMovimento[] = ["LUCRO_MAO_OBRA", "LUCRO_PECA", "SALARIO", "GASTO_PECA"];
+// Backend TipoMovimento enum names
+type TipoMovimento = "Salario" | "GastoPecas" | "LucroMaoObra" | "LucroVendaPecas";
+
+const TIPO_LABELS: Record<TipoMovimento, string> = {
+  LucroMaoObra:    "Mão de obra",
+  LucroVendaPecas: "Venda de peças",
+  Salario:         "Salário",
+  GastoPecas:      "Compra de peças",
+};
+
+const TIPO_SINAL: Record<TipoMovimento, "+" | "-"> = {
+  LucroMaoObra:    "+",
+  LucroVendaPecas: "+",
+  Salario:         "-",
+  GastoPecas:      "-",
+};
+
+const TIPOS: TipoMovimento[] = ["LucroMaoObra", "LucroVendaPecas", "Salario", "GastoPecas"];
+
+interface MovimentoFinanceiro {
+  id: number;
+  valor: number;
+  data: string;
+  descricao: string;
+  tipo: TipoMovimento;
+}
+
+interface AnaliseFinanceira {
+  receitas: number;
+  despesas: number;
+  saldo: number;
+  movimentos: number;
+}
+
+interface ApiResponse {
+  movimentos: MovimentoFinanceiro[];
+  analise: AnaliseFinanceira;
+}
+
+interface Funcionario {
+  id: number;
+  nome: string;
+  salario_bruto: number;
+}
 
 export default function Financeiro() {
-  const [movimentos, setMovimentos] = useState<MovimentoFinanceiro[]>([]);
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
-  const [desde, setDesde] = useState<string>("");
-  const [ate, setAte] = useState<string>("");
+  const qc = useQueryClient();
+  const [desde, setDesde] = useState("");
+  const [ate, setAte] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState<TipoMovimento | "TODOS">("TODOS");
   const [salarioOpen, setSalarioOpen] = useState(false);
 
-  const reload = async () => {
-    const [m, f] = await Promise.all([
-      financeiroService.list({
-        desde: desde || undefined,
-        ate: ate || undefined,
-        tipos: tipoFiltro === "TODOS" ? undefined : [tipoFiltro],
-      }),
-      funcionariosService.list(),
-    ]);
-    setMovimentos(m);
-    setFuncionarios(f.filter((x) => x.ativo));
-  };
+  const queryParams = useMemo(() => {
+    const p = new URLSearchParams();
+    if (desde) p.set("desde", desde);
+    if (ate) p.set("ate", ate);
+    if (tipoFiltro !== "TODOS") p.set("tipo", tipoFiltro);
+    return p.toString();
+  }, [desde, ate, tipoFiltro]);
 
-  useEffect(() => { reload(); /* eslint-disable-next-line */ }, [desde, ate, tipoFiltro]);
+  const { data } = useQuery<ApiResponse>({
+    queryKey: ["movimentosfinanceiros", queryParams],
+    queryFn: () => api.get<ApiResponse>(`/movimentosfinanceiros${queryParams ? `?${queryParams}` : ""}`),
+  });
 
-  const resumo = useMemo(() => {
-    const porTipo: Record<TipoMovimento, number> = {
-      LUCRO_MAO_OBRA: 0, LUCRO_PECA: 0, SALARIO: 0, GASTO_PECA: 0,
-    };
-    movimentos.forEach((m) => { porTipo[m.tipo] += m.valor; });
-    const receitas = porTipo.LUCRO_MAO_OBRA + porTipo.LUCRO_PECA;
-    const despesas = porTipo.SALARIO + porTipo.GASTO_PECA;
-    return { receitas, despesas, saldo: receitas - despesas, porTipo };
+  const { data: funcionarios = [] } = useQuery<Funcionario[]>({
+    queryKey: ["funcionarios"],
+    queryFn: () => api.get<Funcionario[]>("/funcionarios"),
+  });
+
+  const movimentos = data?.movimentos ?? [];
+  const analise = data?.analise;
+
+  const porTipo = useMemo(() => {
+    const acc: Record<TipoMovimento, number> = { LucroMaoObra: 0, LucroVendaPecas: 0, Salario: 0, GastoPecas: 0 };
+    movimentos.forEach((m) => { acc[m.tipo] = (acc[m.tipo] ?? 0) + m.valor; });
+    return acc;
   }, [movimentos]);
-
-  const limparFiltros = () => {
-    setDesde(""); setAte(""); setTipoFiltro("TODOS");
-  };
 
   return (
     <div>
@@ -73,36 +109,23 @@ export default function Financeiro() {
         actions={
           <Dialog open={salarioOpen} onOpenChange={setSalarioOpen}>
             <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4" /> Registar salário</Button>
+              <Button>Registar salário</Button>
             </DialogTrigger>
             <SalarioDialog
               funcionarios={funcionarios}
-              onSaved={() => { setSalarioOpen(false); reload(); }}
+              onSaved={() => {
+                setSalarioOpen(false);
+                qc.invalidateQueries({ queryKey: ["movimentosfinanceiros"] });
+              }}
             />
           </Dialog>
         }
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Receitas"
-          value={resumo.receitas}
-          icon={TrendingUp}
-          variant="success"
-        />
-        <StatCard
-          label="Despesas"
-          value={resumo.despesas}
-          icon={TrendingDown}
-          variant="destructive"
-        />
-        <StatCard
-          label="Saldo"
-          value={resumo.saldo}
-          icon={Wallet}
-          variant={resumo.saldo >= 0 ? "primary" : "destructive"}
-          highlight
-        />
+        <StatCard label="Receitas"  value={analise?.receitas ?? 0}  icon={TrendingUp}  variant="success" />
+        <StatCard label="Despesas"  value={analise?.despesas ?? 0}  icon={TrendingDown} variant="destructive" />
+        <StatCard label="Saldo"     value={analise?.saldo ?? 0}     icon={Wallet}       variant={(analise?.saldo ?? 0) >= 0 ? "primary" : "destructive"} highlight />
         <Card className="shadow-sm">
           <CardContent className="space-y-1 p-4">
             <div className="text-xs font-medium text-muted-foreground">Movimentos no período</div>
@@ -125,7 +148,7 @@ export default function Financeiro() {
                   {TIPO_LABELS[t]}
                 </span>
                 <span className={`font-medium ${TIPO_SINAL[t] === "+" ? "text-success" : "text-destructive"}`}>
-                  {TIPO_SINAL[t]}{formatEUR(resumo.porTipo[t])}
+                  {TIPO_SINAL[t]}{formatEUR(porTipo[t])}
                 </span>
               </div>
             ))}
@@ -133,9 +156,7 @@ export default function Financeiro() {
         </Card>
 
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base">Movimentos</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle className="text-base">Movimentos</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div className="grid gap-2 sm:grid-cols-4">
               <div className="space-y-1">
@@ -152,14 +173,12 @@ export default function Financeiro() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="TODOS">Todos</SelectItem>
-                    {TIPOS.map((t) => (
-                      <SelectItem key={t} value={t}>{TIPO_LABELS[t]}</SelectItem>
-                    ))}
+                    {TIPOS.map((t) => <SelectItem key={t} value={t}>{TIPO_LABELS[t]}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-end">
-                <Button variant="outline" className="w-full" onClick={limparFiltros}>
+                <Button variant="outline" className="w-full" onClick={() => { setDesde(""); setAte(""); setTipoFiltro("TODOS"); }}>
                   Limpar filtros
                 </Button>
               </div>
@@ -183,7 +202,7 @@ export default function Financeiro() {
                   </TableRow>
                 )}
                 {movimentos.map((m) => {
-                  const sinal = TIPO_SINAL[m.tipo];
+                  const sinal = TIPO_SINAL[m.tipo] ?? "+";
                   return (
                     <TableRow key={m.id}>
                       <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
@@ -191,20 +210,10 @@ export default function Financeiro() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={sinal === "+" ? "secondary" : "outline"}>
-                          {TIPO_LABELS[m.tipo]}
+                          {TIPO_LABELS[m.tipo] ?? m.tipo}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {m.descricao}
-                        {m.refId && m.tipo !== "SALARIO" && m.descricao.includes("OS-") && (
-                          <Link
-                            to={`/os/${m.refId}`}
-                            className="ml-2 text-xs text-primary hover:underline"
-                          >
-                            ver OS
-                          </Link>
-                        )}
-                      </TableCell>
+                      <TableCell className="text-sm">{m.descricao}</TableCell>
                       <TableCell className={`text-right font-medium ${sinal === "+" ? "text-success" : "text-destructive"}`}>
                         {sinal}{formatEUR(m.valor)}
                       </TableCell>
@@ -220,13 +229,9 @@ export default function Financeiro() {
   );
 }
 
-function StatCard({
-  label, value, icon: Icon, variant, highlight,
-}: {
-  label: string; value: number;
-  icon: typeof TrendingUp;
-  variant: "success" | "destructive" | "primary";
-  highlight?: boolean;
+function StatCard({ label, value, icon: Icon, variant, highlight }: {
+  label: string; value: number; icon: typeof TrendingUp;
+  variant: "success" | "destructive" | "primary"; highlight?: boolean;
 }) {
   const colors = {
     success: "text-success bg-success-soft",
@@ -250,34 +255,22 @@ function StatCard({
 
 function SalarioDialog({
   funcionarios, onSaved,
-}: {
-  funcionarios: Funcionario[];
-  onSaved: () => void;
-}) {
-  const [funcId, setFuncId] = useState<string>(funcionarios[0]?.id ?? "");
-  const [valor, setValor] = useState<string>("");
-  const [mes, setMes] = useState<string>(new Date().toISOString().slice(0, 7));
-
-  // Quando muda funcionário, preencher valor com o vencimento bruto
-  useEffect(() => {
-    const f = funcionarios.find((x) => x.id === funcId);
-    if (f) setValor(String(f.vencimentoBruto));
-  }, [funcId, funcionarios]);
+}: { funcionarios: Funcionario[]; onSaved: () => void }) {
+  const [funcId, setFuncId] = useState<string>(String(funcionarios[0]?.id ?? ""));
+  const [pending, setPending] = useState(false);
 
   const submit = async () => {
-    const f = funcionarios.find((x) => x.id === funcId);
-    if (!f) { toast.error("Escolhe o funcionário"); return; }
-    const v = Number(valor);
-    if (!Number.isFinite(v) || v <= 0) { toast.error("Valor inválido"); return; }
-    if (!/^\d{4}-\d{2}$/.test(mes)) { toast.error("Mês inválido (formato AAAA-MM)"); return; }
-    await financeiroService.registarSalario({
-      funcionarioId: f.id,
-      funcionarioNome: f.nome,
-      valor: v,
-      mesReferencia: mes,
-    });
-    toast.success("Salário registado");
-    onSaved();
+    if (!funcId) { toast.error("Escolhe o funcionário"); return; }
+    setPending(true);
+    try {
+      await api.patch(`/funcionarios/pagar/${funcId}`, {});
+      toast.success("Salário pago");
+      onSaved();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro");
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
@@ -292,27 +285,18 @@ function SalarioDialog({
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               {funcionarios.map((f) => (
-                <SelectItem key={f.id} value={f.id}>
-                  {f.nome} — {f.cargo}
+                <SelectItem key={f.id} value={String(f.id)}>
+                  {f.nome} — {formatEUR(f.salario_bruto)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label className="text-xs">Valor (€)</Label>
-            <Input type="number" min={0} step="0.01" value={valor}
-              onChange={(e) => setValor(e.target.value)} />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Mês de referência</Label>
-            <Input type="month" value={mes} onChange={(e) => setMes(e.target.value)} />
-          </div>
-        </div>
       </div>
       <DialogFooter>
-        <Button onClick={submit}>Registar</Button>
+        <Button onClick={submit} disabled={pending || !funcId}>
+          {pending ? "A processar…" : "Pagar salário"}
+        </Button>
       </DialogFooter>
     </DialogContent>
   );

@@ -1,9 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Funcionario, Role } from "@/lib/types";
-import { getCurrentUser, login as doLogin, logout as doLogout } from "@/services/auth";
+import type { Role } from "@/lib/types";
+import { type AuthUser, getCurrentUser, login as doLogin, logout as doLogout } from "@/services/auth";
+
+export type { AuthUser };
 
 interface AuthContextValue {
-  user: Funcionario | null;
+  user: AuthUser | null;
   role: Role | undefined;
   loading: boolean;
   login: (identificador: string, password: string) => Promise<void>;
@@ -13,7 +15,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<Funcionario | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

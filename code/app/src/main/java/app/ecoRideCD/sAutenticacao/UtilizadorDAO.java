@@ -209,6 +209,26 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
         }
     }
 
+    public Utilizador getByIdentificador(String identificador) {
+        String sql = "SELECT id, password, idFuncionario, cargo, identificador FROM Utilizador WHERE identificador = ?";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, identificador);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                return new Utilizador(
+                        rs.getInt("id"),
+                        rs.getString("password"),
+                        rs.getInt("idFuncionario"),
+                        Cargo.valueOf(rs.getString("cargo")),
+                        rs.getString("identificador")
+                );
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter utilizador por identificador", e);
+        }
+    }
+
     public void updatePassword(int id, String novaPassword) {
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement("UPDATE Utilizador SET password = ? WHERE id = ?")) {

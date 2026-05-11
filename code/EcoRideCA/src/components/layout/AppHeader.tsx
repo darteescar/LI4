@@ -82,14 +82,14 @@ export function AppHeader() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ChangePasswordDialog open={pwdOpen} onOpenChange={setPwdOpen} userId={user?.id} />
+      <ChangePasswordDialog open={pwdOpen} onOpenChange={setPwdOpen} userId={user?.idUtilizador} />
     </header>
   );
 }
 
 function ChangePasswordDialog({
   open, onOpenChange, userId,
-}: { open: boolean; onOpenChange: (o: boolean) => void; userId?: string }) {
+}: { open: boolean; onOpenChange: (o: boolean) => void; userId?: number }) {
   const [error, setError] = useState<string | null>(null);
   const form = useForm<ChangePwdForm>({
     resolver: zodResolver(changePasswordSchema),
@@ -100,7 +100,7 @@ function ChangePasswordDialog({
     setError(null);
     if (!userId) return;
     try {
-      await changePassword(userId, data.currentPassword, data.newPassword, data.confirm);
+      await changePassword(userId, data.currentPassword, data.newPassword);
       toast.success("Password alterada com sucesso");
       form.reset();
       onOpenChange(false);
