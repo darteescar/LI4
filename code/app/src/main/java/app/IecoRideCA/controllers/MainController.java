@@ -15,7 +15,6 @@ public class MainController {
 
                // get dados necessarios para dashboard
 
-
                ctx.status(200).result("Bem-vindo ao IecoRideCA API!");
           });
      }

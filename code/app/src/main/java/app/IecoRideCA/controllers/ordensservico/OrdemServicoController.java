@@ -27,6 +27,20 @@ public class OrdemServicoController {
             ctx.json(facade.obterOSs());
         });
 
+        // List<OrdemServico> por cliente
+        app.get("/api/ordensservicos/cliente/{id_cliente}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
+            int id_cliente = Integer.parseInt(ctx.pathParam("id_cliente"));
+            ctx.json(facade.obterOSs_Cliente(id_cliente));
+        });
+
+        // List<OrdemServico> por trotinete
+        app.get("/api/ordensservicos/trotinete/{id_trotinete}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
+            int id_trotinete = Integer.parseInt(ctx.pathParam("id_trotinete"));
+            ctx.json(facade.obterOSs_Trotinete(id_trotinete));
+        });
+
         // Obter OrdemServico por id
         app.get("/api/ordensservicos/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
@@ -114,9 +128,9 @@ public class OrdemServicoController {
             int id = Integer.parseInt(ctx.pathParam("id"));
             PagamentoRequest req = ctx.bodyAsClass(PagamentoRequest.class);
             facade.registarPagamentoOS(id, req.metodo_pagamento());
-            // TODO
             ctx.status(204);
         });
+        
 
     }
 }

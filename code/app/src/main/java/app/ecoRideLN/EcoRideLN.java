@@ -240,11 +240,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public Map<Integer, Integer> obterStocksUsadosConsertoOS(int idOS) {
-        return sOrdensServico.obterStocksUsadosConsertoOS(idOS);
-    }
-
-    @Override
     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
         sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
         List<Integer> reparacoes = sOrdensServico.obterOS(id_OS).getConserto().getCod_reparacoes();
