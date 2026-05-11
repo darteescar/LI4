@@ -1,9 +1,12 @@
 
 
+import java.sql.Connection;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import app.ecoRideCD.DAOconfig.ConnectionFactory;
 import app.ecoRideLN.EcoRideLN;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
@@ -40,6 +43,7 @@ public class TesteFacade {
         System.out.println("  EcoRide Facade - Testes de Integração");
         System.out.println("========================================\n");
 
+        limparBD();
         testarFuncionariosEUtilizadores();
         testarClientesETrotinetes();
         testarFornecedoresPecasEStock();
@@ -71,6 +75,44 @@ public class TesteFacade {
 
     static void secao(String titulo) {
         System.out.println("\n--- " + titulo + " ---");
+    }
+
+    static void limparBD() {
+        String[] tabelas = {
+            "Notificacao",
+            "Conserto_PecaUsada",
+            "Conserto_Reparacao",
+            "Conserto",
+            "Diagnostico_PecaOrcamento",
+            "Diagnostico_Reparacao",
+            "Diagnostico",
+            "Fotografia",
+            "OrdemServico_Acessorio",
+            "OrdemServico",
+            "Defeito",
+            "Encomenda_EntradaStock",
+            "Encomenda",
+            "Devolucao",
+            "Stock",
+            "MovimentoFinanceiro",
+            "Peca",
+            "Fornecedor",
+            "Utilizador",
+            "Trotinete",
+            "Cliente",
+            "Funcionario",
+            "Reparacao"
+        };
+        try (Connection conn = ConnectionFactory.get(); Statement st = conn.createStatement()) {
+            st.execute("SET FOREIGN_KEY_CHECKS = 0");
+            for (String tabela : tabelas) {
+                st.execute("DELETE FROM " + tabela);
+            }
+            st.execute("SET FOREIGN_KEY_CHECKS = 1");
+            System.out.println("[limparBD] Base de dados limpa.\n");
+        } catch (Exception e) {
+            System.out.println("[limparBD] ERRO ao limpar BD: " + e.getMessage());
+        }
     }
 
     // ---- IDs globais usados entre testes ----
