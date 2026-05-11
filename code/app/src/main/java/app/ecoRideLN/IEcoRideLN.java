@@ -13,8 +13,6 @@ import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
 import app.ecoRideLN.sFinanceiro.TipoMovimento;
 import app.ecoRideLN.sFuncionarios.Funcionario;
 import app.ecoRideLN.sNotificacoes.Notificacao;
-import app.ecoRideLN.sNotificacoes.NotificacaoOS;
-import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Diagnostico;
@@ -43,8 +41,6 @@ public interface IEcoRideLN {
      // ------------------- Notificações -------------------
      // feito
 
-     public NotificacaoOS     registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
-     public NotificacaoStock  registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
      public boolean           removerNotificacao(int id);
      public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
      public boolean           sinalizarNotificacao_comoTratada(int id);

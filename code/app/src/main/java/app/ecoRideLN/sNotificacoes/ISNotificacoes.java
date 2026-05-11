@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface ISNotificacoes {
 
-     public NotificacaoOS registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
+     public void registarNotificacaoOS(String descricao, int id_remetente, List<Integer> ids_destinatarios, int id_os);
 
-     public NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
+     public void registarNotificacaoStock(String descricao, int id_remetente, List<Integer> ids_destinatarios, int id_peca);
 
      public Notificacao obterNotificacao(int id);
 

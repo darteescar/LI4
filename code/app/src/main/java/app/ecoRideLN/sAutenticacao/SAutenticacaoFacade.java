@@ -52,9 +52,10 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     // Utilitários
 
     @Override
-    public List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo) {
+    public List<Integer> obterUtilizadoresPorCargo(Cargo ... cargo) {
         return utilizadoresDAO.values().stream()
-                .filter(u -> u.getCargo() == cargo)
+                .filter(u -> java.util.Arrays.asList(cargo).contains(u.getCargo()))
+                .map(Utilizador::getId)
                 .toList();
     }
 

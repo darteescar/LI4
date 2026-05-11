@@ -57,7 +57,7 @@ public class FuncionariosController {
             else ctx.json(atualizado);
         });
 
-        // Pagar Funcionario
+        // Apagar Funcionario
         app.patch("/api/funcionarios/pagar/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));

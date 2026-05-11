@@ -23,8 +23,6 @@ import app.ecoRideLN.sFuncionarios.ISFuncionarios;
 import app.ecoRideLN.sFuncionarios.SFuncionariosFacade;
 import app.ecoRideLN.sNotificacoes.ISNotificacoes;
 import app.ecoRideLN.sNotificacoes.Notificacao;
-import app.ecoRideLN.sNotificacoes.NotificacaoOS;
-import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
 import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sOrdensServico.Conserto;
@@ -100,16 +98,6 @@ public class EcoRideLN implements IEcoRideLN {
     // feito
 
     @Override
-    public NotificacaoOS registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
-        return sNotificacoes.registarNotificacaoOS(descricao, id_remetente, id_destinatario, id_os);
-    }
-
-    @Override
-    public NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
-        return sNotificacoes.registarNotificacaoStock(descricao, id_remetente, id_destinatario, id_peca);
-    }
-
-    @Override
     public boolean removerNotificacao(int id) {
         return sNotificacoes.removerNotificacao(id);
     }
@@ -165,6 +153,8 @@ public class EcoRideLN implements IEcoRideLN {
             Peca p = sStock.obterPeca(e.getKey());
             if (p != null) orcamento += e.getValue() * p.getPreco_venda();
         }
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
+        sNotificacoes.registarNotificacaoOS("Orcamento da OS" + idOS + "aguarda aprovação do cliente", id_funcionario, destinatarios, idOS);
         return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, codReps, orcamento, descricao, id_funcionario);
     }
 
@@ -187,6 +177,8 @@ public class EcoRideLN implements IEcoRideLN {
 
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
+        sNotificacoes.registarNotificacaoOS("Execução da OS" + id_OS + "feita", id_funcionario, destinatarios, id_OS);
         return sOrdensServico.registarConsertoOS(id_OS, stocksUsados, codReps, orcamento, id_funcionario);
     }
 
@@ -202,16 +194,22 @@ public class EcoRideLN implements IEcoRideLN {
 
         if (stocksDaPeca.isEmpty())
             throw new EcoRideException("Nenhum stock fungível da peça " + codPeca + " na OS " + idOS);
-
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
+        String nome = sStock.obterPeca(codPeca) != null ? sStock.obterPeca(codPeca).getNome() : String.valueOf(codPeca);
+        sNotificacoes.registarNotificacaoStock("Possível defeito nas Pecas " + nome + " da OS " + idOS, idFuncionario, destinatarios, codPeca);
         return sStock.registarDefeito(stocksDaPeca, motivo, idFuncionario);
     }
 
     @Override
     public List<Defeito> reportarDefeitoSerializadoConsertoOS(int idOS, List<Integer> codStocks, String motivo, int idFuncionario) {
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
         List<Integer> stocksDaOS = new java.util.ArrayList<>(sOrdensServico.obterStocksUsadosConsertoOS(idOS).keySet());
         for (int id : codStocks) {
             if (!stocksDaOS.contains(id))
                 throw new EcoRideException("Stock " + id + " não pertence à OS " + idOS);
+            int codPeca = sStock.obterStock(id).getCodPeca();
+            String nomePeca = sStock.obterPeca(codPeca) != null ? sStock.obterPeca(codPeca).getNome() : String.valueOf(codPeca);
+            sNotificacoes.registarNotificacaoStock("Possível defeito no Stock " + nomePeca + " da OS " + idOS, idFuncionario, destinatarios, codPeca);
         }
         return sStock.registarDefeito(codStocks, motivo, idFuncionario);
     }

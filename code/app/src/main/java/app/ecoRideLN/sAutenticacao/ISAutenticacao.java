@@ -16,7 +16,7 @@ public interface ISAutenticacao {
 
      // Utilitários
 
-     public List<Utilizador> obterUtilizadoresPorCargo(Cargo cargo);
+     public List<Integer> obterUtilizadoresPorCargo(Cargo ... cargo);
 
      public boolean autenticar(int id, String password);
 

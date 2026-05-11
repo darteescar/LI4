@@ -9,19 +9,21 @@ public class SNotificacoesFacade implements ISNotificacoes {
      private final NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
 
      @Override
-     public NotificacaoOS registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os) {
-          int id = notificacaoDAO.generateNewId();
-          NotificacaoOS notificacao = new NotificacaoOS(id, descricao, id_remetente, id_destinatario, id_os);
-          notificacaoDAO.put(id, notificacao);
-          return notificacao;
+     public void registarNotificacaoOS(String descricao, int id_remetente,List<Integer> ids_destinatarios, int id_os) {
+          for (int iddest : ids_destinatarios) {
+               int id = notificacaoDAO.generateNewId();
+               NotificacaoOS notificacao = new NotificacaoOS(id, descricao, id_remetente, iddest, id_os);
+               notificacaoDAO.put(id, notificacao);
+          }
      }
 
      @Override
-     public NotificacaoStock registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca) {
-          int id = notificacaoDAO.generateNewId();
-          NotificacaoStock notificacao = new NotificacaoStock(id, descricao, id_remetente, id_destinatario, id_peca);
-          notificacaoDAO.put(id, notificacao);
-          return notificacao;
+     public void registarNotificacaoStock(String descricao, int id_remetente, List<Integer> ids_destinatarios, int id_peca) {
+          for (int iddest : ids_destinatarios) {
+               int id = notificacaoDAO.generateNewId();
+               NotificacaoStock notificacao = new NotificacaoStock(id, descricao, id_remetente, iddest, id_peca);
+               notificacaoDAO.put(id, notificacao);
+          }
      }
 
      @Override
