@@ -125,7 +125,10 @@ public class StockDAO implements Map<Integer, Stock> {
             ps.setInt(1, key);
             ps.setFloat(2, value.getPreco_compra());
             ps.setInt(3, value.getCodPeca());
-            ps.setDate(4, Date.valueOf(value.getData_chegada()));
+            if (value.getData_chegada() != null)
+                ps.setDate(4, Date.valueOf(value.getData_chegada()));
+            else
+                ps.setNull(4, Types.DATE);
             ps.setInt(5, value.getQuantidade());
             if (value instanceof StockComGarantia g) {
                 ps.setString(6, g.getNr_serie());
