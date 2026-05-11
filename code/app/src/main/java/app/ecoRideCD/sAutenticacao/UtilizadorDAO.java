@@ -199,6 +199,16 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
         }
     }
 
+    public boolean existeIdentificador(String identificador) {
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Utilizador WHERE identificador = ?")) {
+            ps.setString(1, identificador);
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a verificar identificador", e);
+        }
+    }
+
     public void updatePassword(int id, String novaPassword) {
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement("UPDATE Utilizador SET password = ? WHERE id = ?")) {
