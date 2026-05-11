@@ -1,19 +1,33 @@
-package app;
 
-import app.ecoRideLN.EcoRideLN;
-import app.ecoRideLN.IEcoRideLN;
-import app.ecoRideLN.sAutenticacao.Cargo;
-import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
-import app.ecoRideLN.sFinanceiro.TipoMovimento;
-import app.ecoRideLN.sOrdensServico.*;
-import app.ecoRideLN.sStock.*;
-import app.ecoRideLN.sClientes.*;
-import app.ecoRideLN.sFuncionarios.Funcionario;
-import app.ecoRideLN.sReparacoes.Reparacao;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import app.ecoRideLN.EcoRideLN;
+import app.ecoRideLN.IEcoRideLN;
+import app.ecoRideLN.sAutenticacao.Cargo;
+import app.ecoRideLN.sClientes.Cliente;
+import app.ecoRideLN.sClientes.Trotinete;
+import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
+import app.ecoRideLN.sFinanceiro.TipoMovimento;
+import app.ecoRideLN.sFuncionarios.Funcionario;
+import app.ecoRideLN.sOrdensServico.CheckList;
+import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.Diagnostico;
+import app.ecoRideLN.sOrdensServico.EstadoOS;
+import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
+import app.ecoRideLN.sOrdensServico.OrdemServico;
+import app.ecoRideLN.sReparacoes.Reparacao;
+import app.ecoRideLN.sStock.Defeito;
+import app.ecoRideLN.sStock.Devolucao;
+import app.ecoRideLN.sStock.Encomenda;
+import app.ecoRideLN.sStock.EstadoDevolucao;
+import app.ecoRideLN.sStock.EstadoEncomenda;
+import app.ecoRideLN.sStock.EstadoStock;
+import app.ecoRideLN.sStock.Fornecedor;
+import app.ecoRideLN.sStock.Peca;
+import app.ecoRideLN.sStock.Stock;
 
 public class TesteFacade {
 
