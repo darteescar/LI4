@@ -26,3 +26,5 @@ API:
 feito - financeiro, clientes, reparacoes, notificacoes, funcionarios, stock (peças, encomendas, stock e fornecedores)
 
 Verificar com o Claude a lógica de respostas (codigos e metodos usados) e verificar se alterações no stock, devoluções e encomendas estão a ser feitas corretamente nos dados
+
+Retirar cena que diz que o cliente so pode pagar a mais antiga.

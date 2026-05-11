@@ -37,6 +37,7 @@ public interface IEcoRideLN {
      public Cargo        obterCargoUtilizador(int idUtilizador);
      public int          obterIdFuncionario_Utilizador(int idUtilizador);
      public boolean      atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword);
+     public void         atualizarCargoUtilizador(int idUtilizador, Cargo novoCargo);
 
      // ------------------- Notificações -------------------
      // feito

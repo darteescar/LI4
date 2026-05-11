@@ -94,6 +94,11 @@ public class EcoRideLN implements IEcoRideLN {
         return sAutenticacao.atualizarPalavraPasseUtilizador(idUtilizador, passwordvelha, novaPassword);
     }
 
+    @Override
+    public void atualizarCargoUtilizador(int idUtilizador, Cargo novoCargo) {
+        sAutenticacao.atualizarCargoUtilizador(idUtilizador, novoCargo);
+    }
+
     // ------------------- Notificações -------------------
     // feito
 
@@ -221,28 +226,22 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
-        long count = sOrdensServico.obterOSs().stream()
-            .filter(os -> os.getCodCliente() == id_OS && os.getEstado() == app.ecoRideLN.sOrdensServico.EstadoOS.PendentePagamento)
-            .count();
-        if (count <= 1) {
-            sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
-            List<Integer> reparacoes = sOrdensServico.obterOS(id_OS).getConserto().getCod_reparacoes();
-            List<Integer> stocks = sOrdensServico.obterOS(id_OS).getConserto().getCodStocks();
-            for (int codRep : reparacoes) {
-                Reparacao r = sReparacoes.obterReparacao(codRep);
-                if (r != null) sFinanceiro.registarMovimentoReparacaoOS(codRep, r.getPreco(), "Pagamento reparação " + r.getNomenclatura() + " OS#" + id_OS);
-            }
-            for (int codStock : stocks) {
-                Stock s = sStock.obterStock(codStock);
-                if (s != null) {
-                    Peca p = sStock.obterPeca(s.getCodPeca());
-                    String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
-                    sFinanceiro.registarMovimentoVendaPeca(codStock, s.calcularValorTotal(), "Pagamento peça " + nome + " OS#" + id_OS);
-                }
-            }
-            return true;
+        sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
+        List<Integer> reparacoes = sOrdensServico.obterOS(id_OS).getConserto().getCod_reparacoes();
+        List<Integer> stocks = sOrdensServico.obterOS(id_OS).getConserto().getCodStocks();
+        for (int codRep : reparacoes) {
+            Reparacao r = sReparacoes.obterReparacao(codRep);
+            if (r != null) sFinanceiro.registarMovimentoReparacaoOS(codRep, r.getPreco(), "Pagamento reparação " + r.getNomenclatura() + " OS#" + id_OS);
         }
-        return false;
+        for (int codStock : stocks) {
+            Stock s = sStock.obterStock(codStock);
+            if (s != null) {
+                Peca p = sStock.obterPeca(s.getCodPeca());
+                String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
+                sFinanceiro.registarMovimentoVendaPeca(codStock, s.calcularValorTotal(), "Pagamento peça " + nome + " OS#" + id_OS);
+            }
+        }
+        return true;
     }
 
     @Override
@@ -260,13 +259,33 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean aprovarOrcamentoOS(int id){
-        return sOrdensServico.aprovarOrcamentoOS(id);
+    public boolean aprovarOrcamentoOS(int id) {
+        boolean resultado = sOrdensServico.aprovarOrcamentoOS(id);
+        if (resultado) {
+            OrdemServico os = sOrdensServico.obterOS(id);
+            List<Integer> destinatarios = sAutenticacao.obterUtilizadores().stream()
+                .filter(u -> u.getIdFuncionario() == os.getCodMecanico())
+                .map(Utilizador::getId)
+                .collect(java.util.stream.Collectors.toList());
+            if (!destinatarios.isEmpty())
+                sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + id + " aprovado. Pode avançar com o conserto.", 0, destinatarios, id);
+        }
+        return resultado;
     }
 
     @Override
-    public boolean rejeitarOrcamentoOS(int id){
-        return sOrdensServico.rejeitarOrcamentoOS(id);
+    public boolean rejeitarOrcamentoOS(int id) {
+        boolean resultado = sOrdensServico.rejeitarOrcamentoOS(id);
+        if (resultado) {
+            OrdemServico os = sOrdensServico.obterOS(id);
+            List<Integer> destinatarios = sAutenticacao.obterUtilizadores().stream()
+                .filter(u -> u.getIdFuncionario() == os.getCodMecanico())
+                .map(Utilizador::getId)
+                .collect(java.util.stream.Collectors.toList());
+            if (!destinatarios.isEmpty())
+                sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + id + " rejeitado pelo cliente.", 0, destinatarios, id);
+        }
+        return resultado;
     }
 
     @Override
