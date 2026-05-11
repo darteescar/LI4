@@ -176,6 +176,7 @@ public class SStockFacade implements ISStock {
             int consumir = Math.min(s.getQuantidade(), restante);
             resultado.put(s.getId(), consumir);
             s.setQuantidade(s.getQuantidade() - consumir);
+            if (s.getQuantidade() == 0) s.setEstado(EstadoStock.StockUsadoConserto);
             stockDAO.put(s.getId(), s);
             restante -= consumir;
         }

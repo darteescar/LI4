@@ -55,7 +55,8 @@ public interface IEcoRideLN {
      public List<OrdemServico> obterOSs();
      public void               cancelarOS(int id);
      public void               registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario);
-     public void               registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
+     public void                    registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
+     public Map<Integer, Integer>   obterStocksUsadosConsertoOS(int idOS);
 
      public List<Defeito> reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
      public List<Defeito> reportarDefeitoSerializadoConsertoOS(int idOS, List<Integer> codStocks, String motivo, int idFuncionario);

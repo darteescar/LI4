@@ -216,6 +216,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public Map<Integer, Integer> obterStocksUsadosConsertoOS(int idOS) {
+        return sOrdensServico.obterStocksUsadosConsertoOS(idOS);
+    }
+
+    @Override
     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
         long count = sOrdensServico.obterOSs().stream()
             .filter(os -> os.getCodCliente() == id_OS && os.getEstado() == app.ecoRideLN.sOrdensServico.EstadoOS.PendentePagamento)
