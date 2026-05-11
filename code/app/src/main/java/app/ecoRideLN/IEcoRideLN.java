@@ -118,8 +118,6 @@ public interface IEcoRideLN {
 
      // ------------------- Defeitos -------------------
 
-     public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario);
-     public Defeito       obterDefeito(int id);
      public List<Defeito> obterDefeitos();
      public boolean       removerDefeito(int id);
      public Devolucao     confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data);
@@ -128,8 +126,7 @@ public interface IEcoRideLN {
      // ------------------- Devoluções -------------------
 
      public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data);
-     public Devolucao       obterDevolucao(int id);
-     public boolean         existeDevolucao(int id);
+     public List<Devolucao> obterDevolucoes();
      public boolean         removerDevolucao(int id);
      public void            marcarDevolucaoComoEnviada(int id);
      public void            marcarDevolucaoComoDevolvida(int id);
