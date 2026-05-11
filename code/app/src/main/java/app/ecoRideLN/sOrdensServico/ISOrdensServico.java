@@ -2,6 +2,7 @@ package app.ecoRideLN.sOrdensServico;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface ISOrdensServico {
 
@@ -39,7 +40,9 @@ public interface ISOrdensServico {
 
      public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario);
 
-     public void registarConsertoOS(int id_OS, List<Integer> codStocks, List<Integer> reparacoes, float orcamento, int id_funcionario);
+     public void registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float orcamento, int id_funcionario);
+
+     public Map<Integer, Integer> obterStocksUsadosConsertoOS(int id_OS);
 
      public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
 

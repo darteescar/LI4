@@ -2,6 +2,7 @@ package app.ecoRideLN.sStock;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -166,6 +167,24 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
+    public Map<Integer, Integer> atribuirStocksFIFO(int codPeca, int quantidade) {
+        Map<Integer, Integer> resultado = new LinkedHashMap<>();
+        int restante = quantidade;
+        for (Stock s : stockDAO.getByPecaId(codPeca)) {
+            if (restante <= 0) break;
+            if (s.getEstado() != EstadoStock.StockEmArmazem || s.getQuantidade() <= 0) continue;
+            int consumir = Math.min(s.getQuantidade(), restante);
+            resultado.put(s.getId(), consumir);
+            s.setQuantidade(s.getQuantidade() - consumir);
+            stockDAO.put(s.getId(), s);
+            restante -= consumir;
+        }
+        if (restante > 0)
+            throw new EcoRideException("Stock insuficiente para a peça " + codPeca + ". Faltam " + restante + " unidades.");
+        return resultado;
+    }
+
+    @Override
     public int obter_quantidade_Stock_Peca_id(int id) {
         int total = 0;
         for (Stock s : stockDAO.getByPecaId(id)) total += s.getQuantidade();
@@ -181,12 +200,13 @@ public class SStockFacade implements ISStock {
             Stock s = stockDAO.get(stockId);
             if (s == null)
                 throw new EcoRideException("Stock " + stockId + " não encontrado.");
-            if (s.getEstado() != EstadoStock.StockEmArmazem)
-                throw new EcoRideException("Stock " + stockId + " não está disponível (estado: " + s.getEstado() + ").");
+            EstadoStock estadoAtual = s.getEstado();
+            if (estadoAtual != EstadoStock.StockEmArmazem && estadoAtual != EstadoStock.StockUsadoConserto)
+                throw new EcoRideException("Stock " + stockId + " não pode ser sinalizado com defeito (estado: " + estadoAtual + ").");
             s.setEstado(EstadoStock.StockComPossivelDefeito);
             stockDAO.put(stockId, s);
             int id = defeitoDAO.generateNewId();
-            Defeito novo = new Defeito(id, stockId, motivo, idFuncionario);
+            Defeito novo = new Defeito(id, stockId, motivo, idFuncionario, estadoAtual);
             defeitoDAO.put(id, novo);
             resultado.add(novo);
         }
@@ -224,7 +244,7 @@ public class SStockFacade implements ISStock {
         if (d == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
         Stock s = stockDAO.get(d.getCodStock());
         if (s != null) {
-            s.setEstado(EstadoStock.StockEmArmazem);
+            s.setEstado(d.getEstadoAnterior());
             stockDAO.put(s.getId(), s);
         }
         defeitoDAO.remove(idDefeito);

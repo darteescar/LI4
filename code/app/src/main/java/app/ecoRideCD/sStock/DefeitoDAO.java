@@ -15,6 +15,7 @@ import java.util.Set;
 import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
 import app.ecoRideLN.sStock.Defeito;
+import app.ecoRideLN.sStock.EstadoStock;
 
 public class DefeitoDAO implements Map<Integer, Defeito> {
 
@@ -32,7 +33,8 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
                 rs.getInt("id"),
                 rs.getInt("codStock"),
                 rs.getString("motivo"),
-                rs.getInt("idFuncionario"));
+                rs.getInt("idFuncionario"),
+                EstadoStock.valueOf(rs.getString("estado_anterior")));
     }
 
     @Override
@@ -71,7 +73,7 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
         if (!(key instanceof Integer id)) return null;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(
-                     "SELECT id, codStock, motivo, idFuncionario FROM Defeito WHERE id = ?")) {
+                     "SELECT id, codStock, motivo, idFuncionario, estado_anterior FROM Defeito WHERE id = ?")) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? buildFromRow(rs) : null;
@@ -85,11 +87,11 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
     public Defeito put(Integer key, Defeito value) {
         Defeito prev = get(key);
         String sql = """
-                INSERT INTO Defeito (id, codStock, motivo, idFuncionario)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO Defeito (id, codStock, motivo, idFuncionario, estado_anterior)
+                VALUES (?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     codStock = VALUES(codStock), motivo = VALUES(motivo),
-                    idFuncionario = VALUES(idFuncionario)
+                    idFuncionario = VALUES(idFuncionario), estado_anterior = VALUES(estado_anterior)
                 """;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -97,6 +99,7 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
             ps.setInt(2, value.getCodStock());
             ps.setString(3, value.getMotivo());
             ps.setInt(4, value.getIdFuncionario());
+            ps.setString(5, value.getEstadoAnterior().name());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar defeito " + key, e);
@@ -148,7 +151,7 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
         Set<Defeito> out = new LinkedHashSet<>();
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT id, codStock, motivo, idFuncionario FROM Defeito")) {
+             ResultSet rs = s.executeQuery("SELECT id, codStock, motivo, idFuncionario, estado_anterior FROM Defeito")) {
             while (rs.next()) out.add(buildFromRow(rs));
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter defeitos", e);

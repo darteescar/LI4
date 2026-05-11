@@ -3,6 +3,7 @@ package app.ecoRideLN.sOrdensServico;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
@@ -123,17 +124,24 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
     // ------------------- Conserto -------------------
     @Override
-    public void registarConsertoOS(int id_OS, List<Integer> codStocks, List<Integer> reparacoes, float orcamento, int id_funcionario) {
+    public void registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float orcamento, int id_funcionario) {
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
             if (os.getCodMecanico() != id_funcionario) {
                 throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
             }
-            Conserto con = new Conserto(codStocks, reparacoes, orcamento);
+            Conserto con = new Conserto(stocksUsados, reparacoes, orcamento);
             os.setConserto(con);
             alterarEstadoOS(id_OS, EstadoOS.PendentePagamento);
             ordemServicoDAO.put(id_OS, os);
         }
+    }
+
+    @Override
+    public Map<Integer, Integer> obterStocksUsadosConsertoOS(int id_OS) {
+        OrdemServico os = ordemServicoDAO.get(id_OS);
+        if (os == null || os.getConserto() == null) return Map.of();
+        return os.getConserto().getStocksUsados();
     }
 
     // ------------------- Pagamento -------------------

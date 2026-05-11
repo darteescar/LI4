@@ -41,6 +41,8 @@ public interface ISStock {
 
     public Stock atualizaEstadoStock(int id, EstadoStock estado);
 
+    public Map<Integer, Integer> atribuirStocksFIFO(int codPeca, int quantidade);
+
     // ------------------- Defeito -------------------
 
     public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario);

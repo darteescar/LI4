@@ -22,6 +22,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -135,15 +136,15 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 while (rs.next()) reps.add(rs.getInt(1));
             }
         }
-        List<Integer> codStocks = new ArrayList<>();
+        Map<Integer, Integer> stocksUsados = new LinkedHashMap<>();
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT codStock FROM Conserto_PecaUsada WHERE idOS = ?")) {
+                "SELECT codStock, quantidade FROM Conserto_PecaUsada WHERE idOS = ?")) {
             ps.setInt(1, idOS);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) codStocks.add(rs.getInt("codStock"));
+                while (rs.next()) stocksUsados.put(rs.getInt("codStock"), rs.getInt("quantidade"));
             }
         }
-        Conserto con = new Conserto(codStocks, reps, preco);
+        Conserto con = new Conserto(stocksUsados, reps, preco);
         con.setCheckList(chk);
         return con;
     }
@@ -314,12 +315,13 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 ps.executeBatch();
             }
         }
-        if (!con.getCodStocks().isEmpty()) {
+        if (!con.getStocksUsados().isEmpty()) {
             try (PreparedStatement ps = c.prepareStatement(
-                    "INSERT INTO Conserto_PecaUsada (idOS, codStock) VALUES (?, ?)")) {
-                for (int codStock : con.getCodStocks()) {
+                    "INSERT INTO Conserto_PecaUsada (idOS, codStock, quantidade) VALUES (?, ?, ?)")) {
+                for (Map.Entry<Integer, Integer> e : con.getStocksUsados().entrySet()) {
                     ps.setInt(1, idOS);
-                    ps.setInt(2, codStock);
+                    ps.setInt(2, e.getKey());
+                    ps.setInt(3, e.getValue());
                     ps.addBatch();
                 }
                 ps.executeBatch();

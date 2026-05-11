@@ -39,12 +39,12 @@ import app.ecoRideLN.sReparacoes.SReparacoesFacade;
 import app.ecoRideLN.sStock.Defeito;
 import app.ecoRideLN.sStock.Devolucao;
 import app.ecoRideLN.sStock.Encomenda;
-import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.Fornecedor;
 import app.ecoRideLN.sStock.ISStock;
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.SStockFacade;
 import app.ecoRideLN.sStock.Stock;
+import app.ecoRideLN.sStock.StockComGarantia;
 
 public class EcoRideLN implements IEcoRideLN {
 
@@ -168,22 +168,51 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void registarConsertoOS(int id_OS, List<Integer> stockIds, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
-        if (!checklist.isCheckListComplete()) {
+    public void registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
+        if (!checklist.isCheckListComplete())
             throw new EcoRideException("Checklist incompleta. Conserto não pode ser registado.");
-        }
+
+        // FIFO: para cada peça, atribui stocks por ordem de chegada e decrementa quantidade
+        Map<Integer, Integer> stocksUsados = new java.util.LinkedHashMap<>();
         float orcamento = 0;
-        for (int stockId : stockIds) {
-            Stock s = sStock.obterStock(stockId);
-            if (s != null) {
-                Peca p = sStock.obterPeca(s.getCodPeca());
-                if (p != null) orcamento += s.getQuantidade() * p.getPreco_venda();
-                sStock.atualizaEstadoStock(stockId, EstadoStock.StockUsadoConserto);
-            }
+        for (Map.Entry<Integer, Integer> entry : pecaQuantidades.entrySet()) {
+            int codPeca = entry.getKey();
+            int qtd     = entry.getValue();
+            Map<Integer, Integer> atribuidos = sStock.atribuirStocksFIFO(codPeca, qtd);
+            stocksUsados.putAll(atribuidos);
+            Peca p = sStock.obterPeca(codPeca);
+            if (p != null) orcamento += qtd * p.getPreco_venda();
         }
+
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
-        sOrdensServico.registarConsertoOS(id_OS, stockIds, codReps, orcamento, id_funcionario);
+        sOrdensServico.registarConsertoOS(id_OS, stocksUsados, codReps, orcamento, id_funcionario);
+    }
+
+    @Override
+    public List<Defeito> reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario) {
+        List<Integer> stocksDaPeca = sOrdensServico.obterStocksUsadosConsertoOS(idOS).entrySet().stream()
+            .filter(e -> {
+                Stock s = sStock.obterStock(e.getKey());
+                return s != null && !(s instanceof StockComGarantia) && s.getCodPeca() == codPeca;
+            })
+            .map(Map.Entry::getKey)
+            .collect(java.util.stream.Collectors.toList());
+
+        if (stocksDaPeca.isEmpty())
+            throw new EcoRideException("Nenhum stock fungível da peça " + codPeca + " na OS " + idOS);
+
+        return sStock.registarDefeito(stocksDaPeca, motivo, idFuncionario);
+    }
+
+    @Override
+    public List<Defeito> reportarDefeitoSerializadoConsertoOS(int idOS, List<Integer> codStocks, String motivo, int idFuncionario) {
+        List<Integer> stocksDaOS = new java.util.ArrayList<>(sOrdensServico.obterStocksUsadosConsertoOS(idOS).keySet());
+        for (int id : codStocks) {
+            if (!stocksDaOS.contains(id))
+                throw new EcoRideException("Stock " + id + " não pertence à OS " + idOS);
+        }
+        return sStock.registarDefeito(codStocks, motivo, idFuncionario);
     }
 
     @Override

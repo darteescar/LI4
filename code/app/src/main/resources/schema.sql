@@ -135,10 +135,11 @@ CREATE TABLE IF NOT EXISTS Stock (
 );
 
 CREATE TABLE IF NOT EXISTS Defeito (
-    id            INT          NOT NULL,
-    codStock      INT          NOT NULL,
-    motivo        VARCHAR(255) NOT NULL,
-    idFuncionario INT          NOT NULL,
+    id              INT          NOT NULL,
+    codStock        INT          NOT NULL,
+    motivo          VARCHAR(255) NOT NULL,
+    idFuncionario   INT          NOT NULL,
+    estado_anterior ENUM('StockEmArmazem','StockUsadoConserto') NOT NULL DEFAULT 'StockEmArmazem',
     PRIMARY KEY (id),
     FOREIGN KEY (codStock)      REFERENCES Stock(id),
     FOREIGN KEY (idFuncionario) REFERENCES Funcionario(id)
@@ -309,8 +310,9 @@ CREATE TABLE IF NOT EXISTS Conserto (
 );
 
 CREATE TABLE IF NOT EXISTS Conserto_PecaUsada (
-    idOS     INT NOT NULL,
-    codStock INT NOT NULL,
+    idOS       INT NOT NULL,
+    codStock   INT NOT NULL,
+    quantidade INT NOT NULL DEFAULT 1,
     PRIMARY KEY (idOS, codStock),
     FOREIGN KEY (idOS)     REFERENCES Conserto(idOS) ON DELETE CASCADE,
     FOREIGN KEY (codStock) REFERENCES Stock(id)

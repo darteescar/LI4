@@ -237,15 +237,11 @@ public class StockDAO implements Map<Integer, Stock> {
 
     public List<Stock> getByPecaId(int id_peca) {
         List<Stock> out = new ArrayList<>();
-        String sql = """
-                SELECT * FROM Stock WHERE codPeca = ?
-                """;
+        String sql = "SELECT * FROM Stock WHERE codPeca = ? ORDER BY data_chegada ASC, id ASC";
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id_peca);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    out.add(buildFromRow(rs));
-                }
+                while (rs.next()) out.add(buildFromRow(rs));
             }
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter stocks da peça " + id_peca, e);
