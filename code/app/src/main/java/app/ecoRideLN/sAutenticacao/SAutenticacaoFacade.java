@@ -64,7 +64,8 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
-        return utilizadoresDAO.authenticate(id, password);
+        Utilizador u = utilizadoresDAO.get(id);
+        return u.getPassword().equals(password);
     }
 
     @Override
@@ -80,7 +81,8 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
-        if (!utilizadoresDAO.authenticate(id, passwordvelha)) {
+        Utilizador u = utilizadoresDAO.get(id);
+        if (!u.getPassword().equals(passwordvelha)) {
             throw new EcoRideException("Password antiga incorreta para o utilizador com ID " + id + ".");
         }
         utilizadoresDAO.updatePassword(id, novaPassword);

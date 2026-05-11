@@ -199,11 +199,6 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
         }
     }
 
-    public boolean authenticate(int id, String password) {
-        Utilizador u = get(id);
-        return u != null && u.getPassword().equals(password);
-    }
-
     public void updatePassword(int id, String novaPassword) {
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement("UPDATE Utilizador SET password = ? WHERE id = ?")) {

@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS Utilizador (
     password      VARCHAR(255) NOT NULL,
     idFuncionario INT          NOT NULL,
     cargo         ENUM('Gerente', 'GestorStock', 'Secretaria', 'Mecanico') NOT NULL,
+    identificador VARCHAR(100) NOT NULL,
     PRIMARY KEY (id)
 );
 

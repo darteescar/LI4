@@ -183,7 +183,8 @@ public class StockController {
         app.get("/api/encomendas/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            Encomenda c = facade.obterEncomenda(id);
+            Encomenda c = facade.obterEncomendas().stream()
+                .filter(e -> e.getId() == id).findFirst().orElse(null);
             if (c == null) ctx.status(404);
             else ctx.json(c);
         });
@@ -192,10 +193,10 @@ public class StockController {
         app.post("/api/encomendas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             EncomendaRequest req = ctx.bodyAsClass(EncomendaRequest.class);
-            List<Integer> stockIds = new java.util.ArrayList<>();
-            for (EncomendaRequest.ItemEncomendaRequest i : req.itens())
-                stockIds.add(facade.registarStock_Encomenda(i.codPeca(), i.preco_compra(), i.quantidade()).getId());
-            Encomenda criado = facade.registarEncomenda(stockIds, req.cod_fornecedor());
+            List<Integer> codPecas    = req.itens().stream().map(EncomendaRequest.ItemEncomendaRequest::codPeca).collect(java.util.stream.Collectors.toList());
+            List<Float>   precos      = req.itens().stream().map(EncomendaRequest.ItemEncomendaRequest::preco_compra).collect(java.util.stream.Collectors.toList());
+            List<Integer> quantidades = req.itens().stream().map(EncomendaRequest.ItemEncomendaRequest::quantidade).collect(java.util.stream.Collectors.toList());
+            Encomenda criado = facade.registarEncomenda(codPecas, precos, quantidades, req.cod_fornecedor());
             ctx.status(201).json(criado);
         });
 
@@ -220,7 +221,7 @@ public class StockController {
         app.patch("/api/encomendasRecebida/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            Encomenda atualizado = facade.marcarEncomendaComoRecebida(id);
+            Encomenda atualizado = facade.marcarEncomendaComoRecebida(id, List.of(), List.of());
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
         });

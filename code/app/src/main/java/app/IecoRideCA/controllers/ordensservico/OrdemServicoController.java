@@ -73,8 +73,8 @@ public class OrdemServicoController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             DiagnosticoRequest req = ctx.bodyAsClass(DiagnosticoRequest.class);
-            facade.registarDiagnosticoOS(id, req.listPecas(), req.reparacoes(), req.descricao());
-            // TODO
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            facade.registarDiagnosticoOS(id, req.pecasQuantidades(), req.reparacoes(), req.descricao(), idFuncionario);
             ctx.status(204);
         });
 
@@ -83,8 +83,8 @@ public class OrdemServicoController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ConsertoRequest req = ctx.bodyAsClass(ConsertoRequest.class);
-            facade.registarConsertoOS(id, req.pecas(), req.reparacoes());
-            // TODO
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            facade.registarConsertoOS(id, req.pecasQuantidades(), req.reparacoes(), idFuncionario, req.checklist());
             ctx.status(204);
         });
 
