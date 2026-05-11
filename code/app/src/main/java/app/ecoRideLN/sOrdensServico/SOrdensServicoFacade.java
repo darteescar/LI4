@@ -56,55 +56,55 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     // ------------------- Máquina de estados -------------------
 
     @Override
-    public void alterarEstadoOS(int id, EstadoOS novoEstado) {
+    public boolean alterarEstadoOS(int id, EstadoOS novoEstado) {
         OrdemServico os = ordemServicoDAO.get(id);
-        if (os == null) {
-            throw new EcoRideException("OS " + id + " não encontrada.");
-        }
-        if (!os.getEstado().podeTransicionar(novoEstado)) {
-            throw new EcoRideException("Transição inválida: " + os.getEstado() + " → " + novoEstado);
+        if (os == null || !os.getEstado().podeTransicionar(novoEstado)) {
+            return false;
         }
         os.setEstado(novoEstado);
         ordemServicoDAO.put(id, os);
+        return true;
     }
 
     @Override
-    public void aprovarOrcamentoOS(int id) {
-        alterarEstadoOS(id, EstadoOS.PendenteReparacao);
+    public boolean aprovarOrcamentoOS(int id) {
+        return alterarEstadoOS(id, EstadoOS.PendenteReparacao);
     }
 
     @Override
-    public void rejeitarOrcamentoOS(int id) {
-        alterarEstadoOS(id, EstadoOS.OrcamentoNaoAprovado);
+    public boolean rejeitarOrcamentoOS(int id) {
+        return alterarEstadoOS(id, EstadoOS.OrcamentoNaoAprovado);
     }
 
     @Override
-    public void marcarAguardarPecasOS(int id) {
-        alterarEstadoOS(id, EstadoOS.AguardarPecas);
+    public boolean marcarAguardarPecasOS(int id) {
+        return alterarEstadoOS(id, EstadoOS.AguardarPecas);
     }
 
     @Override
-    public void pecasRecebidasOS(int id) {
-        alterarEstadoOS(id, EstadoOS.PendenteReparacao);
+    public boolean pecasRecebidasOS(int id) {
+        return alterarEstadoOS(id, EstadoOS.PendenteReparacao);
     }
 
     @Override
-    public void eliminarOS(int id) {
-        alterarEstadoOS(id, EstadoOS.Eliminada);
+    public boolean eliminarOS(int id) {
+        return alterarEstadoOS(id, EstadoOS.Eliminada);
     }
 
     @Override
-    public void atribuirOS(int id, int id_mecanico) {
+    public boolean atribuirOS(int id, int id_mecanico) {
         OrdemServico os = ordemServicoDAO.get(id);
         if (os != null) {
             os.setCodMecanico(id_mecanico);
             ordemServicoDAO.put(id, os);
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void registarNotificacaoPagamentoOS(int id_OS) {
-        alterarEstadoOS(id_OS, EstadoOS.ClienteNotificado);
+    public boolean registarNotificacaoPagamentoOS(int id_OS) {
+        return alterarEstadoOS(id_OS, EstadoOS.ClienteNotificado);
     }
 
     // ------------------- Diagnóstico -------------------
@@ -147,14 +147,13 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     // ------------------- Pagamento -------------------
 
     @Override
-    public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
+    public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os == null) {
             throw new EcoRideException("OS " + id_OS + " não encontrada.");
         }
-        alterarEstadoOS(id_OS, EstadoOS.Paga);
         os.setMetodo_pagamento(metodo_pagamento);
-        alterarEstadoOS(id_OS, EstadoOS.Paga);
+        return alterarEstadoOS(id_OS, EstadoOS.Paga);
     }
 
     // ------------------- Utilitários -------------------

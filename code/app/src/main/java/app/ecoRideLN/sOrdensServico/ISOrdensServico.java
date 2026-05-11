@@ -22,21 +22,21 @@ public interface ISOrdensServico {
 
      // ------------------- Máquina de estados -------------------
 
-     public void alterarEstadoOS(int id, EstadoOS estado);
+     public boolean alterarEstadoOS(int id, EstadoOS estado);
 
-     public void aprovarOrcamentoOS(int id);
+     public boolean aprovarOrcamentoOS(int id);
 
-     public void rejeitarOrcamentoOS(int id);
+     public boolean rejeitarOrcamentoOS(int id);
 
-     public void marcarAguardarPecasOS(int id);
+     public boolean marcarAguardarPecasOS(int id);
 
-     public void pecasRecebidasOS(int id);
+     public boolean pecasRecebidasOS(int id);
 
-     public void eliminarOS(int id);
+     public boolean eliminarOS(int id);
 
-     public void atribuirOS(int id, int id_funcionario);
+     public boolean atribuirOS(int id, int id_funcionario);
 
-     public void registarNotificacaoPagamentoOS(int id_OS);
+     public boolean registarNotificacaoPagamentoOS(int id_OS);
 
      public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario);
 
@@ -44,7 +44,7 @@ public interface ISOrdensServico {
 
      public Map<Integer, Integer> obterStocksUsadosConsertoOS(int id_OS);
 
-     public void registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
+     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
 
      // ------------------- Utilitários -------------------
 

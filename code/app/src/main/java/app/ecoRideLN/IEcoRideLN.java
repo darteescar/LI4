@@ -31,14 +31,16 @@ import app.ecoRideLN.sStock.Stock;
 public interface IEcoRideLN {
 
      // ------------------- Autenticação -------------------
+     // feito
 
-     public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador);
-     public boolean autenticar(int idUtilizador, String password);
-     public Cargo   obterCargoUtilizador(int idUtilizador);
-     public int     obterIdFuncionario_Utilizador(int idUtilizador);
-     public boolean atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword);
+     public Utilizador   registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador);
+     public boolean      autenticar(int idUtilizador, String password);
+     public Cargo        obterCargoUtilizador(int idUtilizador);
+     public int          obterIdFuncionario_Utilizador(int idUtilizador);
+     public boolean      atualizarPalavraPasseUtilizador(int idUtilizador, String passwordvelha, String novaPassword);
 
      // ------------------- Notificações -------------------
+     // feito
 
      public NotificacaoOS     registarNotificacaoOS(String descricao, int id_remetente, int id_destinatario, int id_os);
      public NotificacaoStock  registarNotificacaoStock(String descricao, int id_remetente, int id_destinatario, int id_peca);
@@ -49,24 +51,24 @@ public interface IEcoRideLN {
 
      // ------------------- Ordens de Serviço -------------------
 
-     public OrdemServico       registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
-     public OrdemServico       obterOS(int id);
-     public boolean            removerOS(int id);
-     public List<OrdemServico> obterOSs();
-     public void               cancelarOS(int id);
-     public void               registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario);
+     public OrdemServico            registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
+     public OrdemServico            obterOS(int id);
+     public boolean                 removerOS(int id);
+     public List<OrdemServico>      obterOSs();
+     public void                    cancelarOS(int id);
+     public void                    registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario);
      public void                    registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
      public Map<Integer, Integer>   obterStocksUsadosConsertoOS(int idOS);
 
-     public List<Defeito> reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
-     public List<Defeito> reportarDefeitoSerializadoConsertoOS(int idOS, List<Integer> codStocks, String motivo, int idFuncionario);
+     public List<Defeito>      reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
+     public List<Defeito>      reportarDefeitoSerializadoConsertoOS(int idOS, List<Integer> codStocks, String motivo, int idFuncionario);
      public boolean            registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
-     public List<OrdemServico> obterOS_Trotinete(int id_trotinete);
-     public void               aprovarOrcamentoOS(int id);
-     public void               rejeitarOrcamentoOS(int id);
-     public void               atribuirOS(int id, int id_funcionario);
-     public void               registarNotificacaoPagamentoOS(int id_OS);
+     public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
+     public boolean            aprovarOrcamentoOS(int id);
+     public boolean            rejeitarOrcamentoOS(int id);
+     public boolean            atribuirOS(int id, int id_funcionario);
+     public boolean            registarNotificacaoPagamentoOS(int id_OS);
 
      // ------------------- Clientes -------------------
      // feito
@@ -135,6 +137,7 @@ public interface IEcoRideLN {
      public void            marcarDevolucaoComoInvalida(int id);
 
      // ------------------- Encomendas -------------------
+     // feito
 
      public Encomenda                   registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor);
      public boolean                     removerEncomenda(int id);
@@ -167,6 +170,6 @@ public interface IEcoRideLN {
      // feito
      public List<MovimentoFinanceiro> obterMovimentosFinanceiros();
      public List<MovimentoFinanceiro> obterMovimentosFinanceirosFiltrados(LocalDate desde, LocalDate ate, TipoMovimento tipo);
-     public AnaliseFinanceira calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos);
+     public AnaliseFinanceira         calcularAnaliseFinanceira(List<MovimentoFinanceiro> movimentos);
 
 }

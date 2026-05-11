@@ -254,30 +254,30 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public List<OrdemServico> obterOS_Trotinete(int id_trotinete) {
+    public List<OrdemServico> obterOSs_Trotinete(int id_trotinete) {
         return sOrdensServico.obterOSs().stream()
             .filter(os -> os.getCodTrotinete() == id_trotinete)
             .collect(java.util.stream.Collectors.toList());
     }
 
     @Override
-    public void aprovarOrcamentoOS(int id){
-        sOrdensServico.aprovarOrcamentoOS(id);
+    public boolean aprovarOrcamentoOS(int id){
+        return sOrdensServico.aprovarOrcamentoOS(id);
     }
 
     @Override
-    public void rejeitarOrcamentoOS(int id){
-        sOrdensServico.rejeitarOrcamentoOS(id);
+    public boolean rejeitarOrcamentoOS(int id){
+        return sOrdensServico.rejeitarOrcamentoOS(id);
     }
 
     @Override
-    public void atribuirOS(int id, int id_funcionario){
-        sOrdensServico.atribuirOS(id, id_funcionario);
+    public boolean atribuirOS(int id, int id_funcionario){
+        return sOrdensServico.atribuirOS(id, id_funcionario);
     }
 
     @Override
-    public void registarNotificacaoPagamentoOS(int id_OS){
-        sOrdensServico.registarNotificacaoPagamentoOS(id_OS);
+    public boolean registarNotificacaoPagamentoOS(int id_OS){
+        return sOrdensServico.registarNotificacaoPagamentoOS(id_OS);
     }
 
     // ------------------- Clientes -------------------
