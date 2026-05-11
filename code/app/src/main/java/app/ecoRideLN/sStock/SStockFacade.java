@@ -289,7 +289,7 @@ public class SStockFacade implements ISStock {
         Devolucao d = devolucaoDAO.get(id);
         if (d != null) {
             atualizaEstadoStock(d.getCodStock(), EstadoStock.StockEnviadoParaFornecedor);
-            d.setEstado(EstadoDevolucao.Devolvida);
+            d.setEstado(EstadoDevolucao.Enviada);
             devolucaoDAO.put(id, d);
         }
     }
