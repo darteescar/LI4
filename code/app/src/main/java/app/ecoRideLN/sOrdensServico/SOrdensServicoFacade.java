@@ -109,7 +109,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
     // ------------------- Diagnóstico -------------------
     @Override
-    public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario) {
+    public Diagnostico registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario) {
         OrdemServico os = ordemServicoDAO.get(idOS);
         if (os != null) {
             if (os.getCodMecanico() != id_funcionario) {
@@ -119,12 +119,14 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             os.setDiagnostico(diag);
             alterarEstadoOS(idOS, EstadoOS.PendenteAprovacaoOrcamento);
             ordemServicoDAO.put(idOS, os);
+            return diag;
         }
+        throw new EcoRideException("OS " + idOS + " não encontrada.");
     }
 
     // ------------------- Conserto -------------------
     @Override
-    public void registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float orcamento, int id_funcionario) {
+    public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float orcamento, int id_funcionario) {
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
             if (os.getCodMecanico() != id_funcionario) {
@@ -134,7 +136,9 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             os.setConserto(con);
             alterarEstadoOS(id_OS, EstadoOS.PendentePagamento);
             ordemServicoDAO.put(id_OS, os);
+            return con;
         }
+        throw new EcoRideException("OS " + id_OS + " não encontrada.");
     }
 
     @Override

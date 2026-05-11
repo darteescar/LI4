@@ -27,6 +27,8 @@ import app.ecoRideLN.sNotificacoes.NotificacaoOS;
 import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
 import app.ecoRideLN.sOrdensServico.CheckList;
+import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.Diagnostico;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
@@ -156,7 +158,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public void registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario) {
+    public Diagnostico registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario) {
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         float orcamento = 0;
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
@@ -164,11 +166,11 @@ public class EcoRideLN implements IEcoRideLN {
             Peca p = sStock.obterPeca(po.getCodPeca());
             if (p != null) orcamento += po.getQuantidade() * p.getPreco_venda();
         }
-        sOrdensServico.registarDiagnosticoOS(idOS, listPecas, codReps, orcamento, descricao, id_funcionario);
+        return sOrdensServico.registarDiagnosticoOS(idOS, listPecas, codReps, orcamento, descricao, id_funcionario);
     }
 
     @Override
-    public void registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
+    public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
         if (!checklist.isCheckListComplete())
             throw new EcoRideException("Checklist incompleta. Conserto não pode ser registado.");
 
@@ -186,7 +188,7 @@ public class EcoRideLN implements IEcoRideLN {
 
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
-        sOrdensServico.registarConsertoOS(id_OS, stocksUsados, codReps, orcamento, id_funcionario);
+        return sOrdensServico.registarConsertoOS(id_OS, stocksUsados, codReps, orcamento, id_funcionario);
     }
 
     @Override

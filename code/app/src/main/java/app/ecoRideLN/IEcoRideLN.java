@@ -16,6 +16,8 @@ import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sNotificacoes.NotificacaoOS;
 import app.ecoRideLN.sNotificacoes.NotificacaoStock;
 import app.ecoRideLN.sOrdensServico.CheckList;
+import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.Diagnostico;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
@@ -56,8 +58,8 @@ public interface IEcoRideLN {
      public boolean                 removerOS(int id);
      public List<OrdemServico>      obterOSs();
      public void                    cancelarOS(int id);
-     public void                    registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario);
-     public void                    registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
+     public Diagnostico             registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario);
+     public Conserto                registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
      public Map<Integer, Integer>   obterStocksUsadosConsertoOS(int idOS);
 
      public List<Defeito>      reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
