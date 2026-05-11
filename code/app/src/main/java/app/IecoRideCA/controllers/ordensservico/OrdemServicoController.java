@@ -52,11 +52,12 @@ public class OrdemServicoController {
             else ctx.json(c);
         });
 
-        // Registar OrdemServico
+        // Registar OrdemServico — codCriador vem da sessão
         app.post("/api/ordensservicos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             OrdemServicoRequest req = ctx.bodyAsClass(OrdemServicoRequest.class);
-            OrdemServico criado = facade.registarOS(req.id_cliente(), req.id_trotinete(), req.descricao(), req.acessorios(), req.fotografias(), req.codCriador());
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            OrdemServico criado = facade.registarOS(req.id_cliente(), req.id_trotinete(), req.descricao(), req.acessorios(), req.fotografias(), idFuncionario);
             ctx.status(201).json(criado);
         });
 
@@ -68,7 +69,7 @@ public class OrdemServicoController {
         });
 
         // Atribuir OrdemServico a Funcionario
-        app.patch("/api/ordensservicos/pegarNaOs/{id}", ctx -> {
+        app.patch("/api/ordensservicos/{id}/atribuir", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PegarOSRequest req = ctx.bodyAsClass(PegarOSRequest.class);
@@ -77,7 +78,7 @@ public class OrdemServicoController {
         });
 
         // Cancelar OrdemServico
-        app.patch("/api/ordensservicos/cancelarOS/{id}", ctx -> {
+        app.patch("/api/ordensservicos/{id}/cancelar", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.cancelarOS(id);
@@ -85,7 +86,7 @@ public class OrdemServicoController {
         });
 
         // Adicionar Diagnostico a OrdemServico
-        app.patch("/api/ordensservicos/addDiagnostico/{id}", ctx -> {
+        app.patch("/api/ordensservicos/{id}/diagnostico", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             DiagnosticoRequest req = ctx.bodyAsClass(DiagnosticoRequest.class);
@@ -95,7 +96,7 @@ public class OrdemServicoController {
         });
 
         // Adicionar Conserto a OrdemServico
-        app.patch("/api/ordensservicos/addConserto/{id}", ctx -> {
+        app.patch("/api/ordensservicos/{id}/conserto", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ConsertoRequest req = ctx.bodyAsClass(ConsertoRequest.class);
@@ -104,28 +105,32 @@ public class OrdemServicoController {
             ctx.status(204);
         });
 
-        app.patch("/api/ordensservicos/aprovarOrcamento/{id}", ctx -> {
+        // Aprovar orçamento
+        app.patch("/api/ordensservicos/{id}/aprovarOrcamento", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.aprovarOrcamentoOS(id);
             ctx.status(204);
         });
 
-        app.patch("/api/ordensservicos/rejeitarOrcamento/{id}", ctx -> {
+        // Rejeitar orçamento
+        app.patch("/api/ordensservicos/{id}/rejeitarOrcamento", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.rejeitarOrcamentoOS(id);
             ctx.status(204);
         });
 
-        app.patch("/api/ordensservicos/clienteNotificado/{id}", ctx -> {
+        // Registar notificação de pagamento ao cliente
+        app.patch("/api/ordensservicos/{id}/notificarCliente", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.registarNotificacaoPagamentoOS(id);
             ctx.status(204);
         });
 
-        app.patch("/api/ordensservicos/pagarOS/{id}", ctx -> {
+        // Registar pagamento da OS
+        app.patch("/api/ordensservicos/{id}/pagar", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PagamentoRequest req = ctx.bodyAsClass(PagamentoRequest.class);
@@ -133,19 +138,22 @@ public class OrdemServicoController {
             ctx.status(204);
         });
 
-        app.put("/api/ordensservicos/defeitoEmStock", ctx -> {
+        // Reportar defeito em peça fungível do conserto
+        app.post("/api/ordensservicos/{id}/defeitos/fungivel", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
             DefeitoStockRequest req = ctx.bodyAsClass(DefeitoStockRequest.class);
-            facade.reportarDefeitoFungivelConsertoOS(req.idOS(), req.codPeca(), req.motivo(), req.idFuncionario() );
-            ctx.status(204);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            ctx.status(201).json(facade.reportarDefeitoFungivelConsertoOS(id, req.codPeca(), req.motivo(), idFuncionario));
         });
 
-        app.put("/api/ordensservicos/defeitoEmStockComGarantia", ctx -> {
+        // Reportar defeito em peça serializada (com garantia) do conserto
+        app.post("/api/ordensservicos/{id}/defeitos/serializado", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
             DefeitoStockComGarantiaRequest req = ctx.bodyAsClass(DefeitoStockComGarantiaRequest.class);
             int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            facade.reportarDefeitoSerializadoConsertoOS(req.idOS(), req.codStocks(), req.motivo(), idFuncionario);
-            ctx.status(204);
+            ctx.status(201).json(facade.reportarDefeitoSerializadoConsertoOS(id, req.codStocks(), req.motivo(), idFuncionario));
         });
     }
 }

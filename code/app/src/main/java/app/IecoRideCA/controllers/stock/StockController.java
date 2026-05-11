@@ -4,7 +4,7 @@ import java.util.List;
 
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.DefeitoToDevolucaoRequest;
-import app.IecoRideCA.controllers.ordensservico.dto.DevolucaoRequest;
+import app.IecoRideCA.controllers.stock.dto.EncomendaRecebidaRequest;
 import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
 import app.IecoRideCA.controllers.stock.dto.FornecedorRequest;
 import app.IecoRideCA.controllers.stock.dto.PecaRequest;
@@ -30,13 +30,11 @@ public class StockController {
 
         // Fornecedor
 
-        // List<Fornecedor> 
         app.get("/api/fornecedores", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             ctx.status(200).json(facade.obterFornecedores());
         });
 
-        // Obter Fornecedor por id
         app.get("/api/fornecedores/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -45,22 +43,18 @@ public class StockController {
             else ctx.status(200).json(c);
         });
 
-        // Registar Fornecedor
         app.post("/api/fornecedores", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             FornecedorRequest req = ctx.bodyAsClass(FornecedorRequest.class);
-            Fornecedor criado = facade.registarFornecedor(req.nome(), req.telemovel(), req.email());
-            ctx.status(201).json(criado);
+            ctx.status(201).json(facade.registarFornecedor(req.nome(), req.telemovel(), req.email()));
         });
 
-        // Remover Fornecedor
         app.delete("/api/fornecedores/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerFornecedor(id) ? 204 : 404);
         });
 
-        // Atualizar Fornecedor
         app.patch("/api/fornecedores/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -72,13 +66,11 @@ public class StockController {
 
         // Peça
 
-        // List<Peca>
         app.get("/api/pecas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             ctx.status(200).json(facade.obterPecas());
         });
 
-        // Obter Peça por id
         app.get("/api/pecas/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -87,22 +79,18 @@ public class StockController {
             else ctx.status(200).json(c);
         });
 
-        // Registar Peça
         app.post("/api/pecas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             PecaRequest req = ctx.bodyAsClass(PecaRequest.class);
-            Peca criado = facade.registarPeca(req.referencia(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor());
-            ctx.status(201).json(criado);
+            ctx.status(201).json(facade.registarPeca(req.referencia(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor()));
         });
 
-        // Remover Peça
         app.delete("/api/pecas/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerPeca(id) ? 204 : 404);
         });
 
-        // Atualizar Peça
         app.patch("/api/pecas/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -114,13 +102,11 @@ public class StockController {
 
         // Stock
 
-        // List<Stock>
         app.get("/api/stocks", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico);
             ctx.status(200).json(facade.obterStocks());
         });
 
-        // Obter Stock por id
         app.get("/api/stocks/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -129,31 +115,24 @@ public class StockController {
             else ctx.status(200).json(c);
         });
 
-        // Criar Stock (Peça Normal)
         app.post("/api/stocks", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             StockRequest req = ctx.bodyAsClass(StockRequest.class);
-            Stock criado = facade.registarStock_PecaNormal(req.codPeca(), req.preco(),  req.dataChegada(), req.quantidade());
-            ctx.status(201).json(criado);
+            ctx.status(201).json(facade.registarStock_PecaNormal(req.codPeca(), req.preco(), req.dataChegada(), req.quantidade()));
         });
 
-        // Criar Stock (Peça com Garantia)
-        app.post("/api/stockGarantia", ctx -> {
+        app.post("/api/stocks/garantia", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             StockComGarantiaRequest req = ctx.bodyAsClass(StockComGarantiaRequest.class);
-            Stock atualizado = facade.registarStockComGarantia(req.codPeca(), req.preco(), req.dataChegada(), req.garantia(), req.nr_serie());
-            if (atualizado == null) ctx.status(404);
-            else ctx.status(200).json(atualizado);
+            ctx.status(201).json(facade.registarStockComGarantia(req.codPeca(), req.preco(), req.dataChegada(), req.garantia(), req.nr_serie()));
         });
 
-        // Remover Stock
         app.delete("/api/stocks/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerStock(id) ? 204 : 404);
         });
 
-        // Atualizar Stock Normal
         app.patch("/api/stocks/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -163,8 +142,7 @@ public class StockController {
             else ctx.status(200).json(atualizado);
         });
 
-        // Atualizar Stock com Garantia
-        app.patch("/api/stockGarantia/{id}", ctx -> {
+        app.patch("/api/stocks/{id}/garantia", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             StockComGarantiaRequest req = ctx.bodyAsClass(StockComGarantiaRequest.class);
@@ -175,13 +153,11 @@ public class StockController {
 
         // Encomenda
 
-        // List<Encomenda>
         app.get("/api/encomendas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             ctx.json(facade.obterEncomendas());
         });
 
-        // Obter Encomenda por id
         app.get("/api/encomendas/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -191,27 +167,22 @@ public class StockController {
             else ctx.json(c);
         });
 
-        // Registar Encomenda
         app.post("/api/encomendas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             EncomendaRequest req = ctx.bodyAsClass(EncomendaRequest.class);
             List<Integer> codPecas    = req.itens().stream().map(EncomendaRequest.ItemEncomendaRequest::codPeca).collect(java.util.stream.Collectors.toList());
             List<Float>   precos      = req.itens().stream().map(EncomendaRequest.ItemEncomendaRequest::preco_compra).collect(java.util.stream.Collectors.toList());
             List<Integer> quantidades = req.itens().stream().map(EncomendaRequest.ItemEncomendaRequest::quantidade).collect(java.util.stream.Collectors.toList());
-            Encomenda criado = facade.registarEncomenda(codPecas, precos, quantidades, req.cod_fornecedor());
-            ctx.status(201).json(criado);
+            ctx.status(201).json(facade.registarEncomenda(codPecas, precos, quantidades, req.cod_fornecedor()));
         });
 
-        // Remover Encomenda
         app.delete("/api/encomendas/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            boolean removed = facade.removerEncomenda(id);
-            ctx.status(removed ? 204 : 404);
+            ctx.status(facade.removerEncomenda(id) ? 204 : 404);
         });
 
-        // Marcar Encomenda como enviada
-        app.patch("/api/encomendasEnviada/{id}", ctx -> {
+        app.patch("/api/encomendas/{id}/enviada", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Encomenda atualizado = facade.marcarEncomendaComoEnviada(id);
@@ -219,16 +190,16 @@ public class StockController {
             else ctx.status(200).json(atualizado);
         });
 
-        // Marcar Encomenda como recebida
-        app.patch("/api/encomendasRecebida/{id}", ctx -> {
+        app.patch("/api/encomendas/{id}/recebida", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            Encomenda atualizado = facade.marcarEncomendaComoRecebida(id, List.of(), List.of());
+            EncomendaRecebidaRequest req = ctx.bodyAsClass(EncomendaRecebidaRequest.class);
+            Encomenda atualizado = facade.marcarEncomendaComoRecebida(id, req.numeros_serie(), req.garantias());
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
         });
 
-                // Defeitos
+        // Defeitos
 
         app.get("/api/defeitos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
@@ -241,17 +212,18 @@ public class StockController {
             ctx.status(facade.removerDefeito(id) ? 204 : 404);
         });
 
-        app.patch("/api/defeitos/devolver", ctx -> {
+        app.patch("/api/defeitos/{id}/devolver", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int id = Integer.parseInt(ctx.pathParam("id"));
             DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
-            facade.confirmarDefeitoComDevolucao(req.idDefeito(), req.motivo(), req.data());
+            facade.confirmarDefeitoComDevolucao(id, req.motivo(), req.data());
             ctx.status(204);
         });
 
-        app.patch("/api/defeitos/descartar", ctx -> {
+        app.patch("/api/defeitos/{id}/descartar", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            DefeitoToDevolucaoRequest req = ctx.bodyAsClass(DefeitoToDevolucaoRequest.class);
-            facade.descartarDefeito(req.idDefeito());
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.descartarDefeito(id);
             ctx.status(204);
         });
 
@@ -262,32 +234,31 @@ public class StockController {
             ctx.json(facade.obterDevolucoes());
         });
 
-         app.delete("/api/devolucoes/{id}", ctx -> {
+        app.delete("/api/devolucoes/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerDevolucao(id) ? 204 : 404);
         });
 
-        app.patch("/api/devolucoes/marcarEnviada", ctx -> {
+        app.patch("/api/devolucoes/{id}/enviada", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
-            facade.marcarDevolucaoComoEnviada(req.idDevolucao());
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.marcarDevolucaoComoEnviada(id);
             ctx.status(204);
         });
 
-         app.patch("/api/devolucoes/marcarDevolvida", ctx -> {
+        app.patch("/api/devolucoes/{id}/devolvida", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
-            facade.marcarDevolucaoComoDevolvida(req.idDevolucao());
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.marcarDevolucaoComoDevolvida(id);
             ctx.status(204);
         });
 
-        app.patch("/api/devolucoes/marcarInvalida", ctx -> {
+        app.patch("/api/devolucoes/{id}/invalida", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            DevolucaoRequest req = ctx.bodyAsClass(DevolucaoRequest.class);
-            facade.marcarDevolucaoComoInvalida(req.idDevolucao());
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            facade.marcarDevolucaoComoInvalida(id);
             ctx.status(204);
         });
-
     }
 }

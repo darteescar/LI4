@@ -6,7 +6,6 @@ import java.util.Map;
 import app.ecoRideLN.sReparacoes.Reparacao;
 
 public record DiagnosticoRequest(
-     int idOS,
      Map<Integer, Integer> pecasQuantidades,
      List<Reparacao> reparacoes,
      String descricao
