@@ -159,7 +159,8 @@ public class EcoRideLN implements IEcoRideLN {
             if (p != null) orcamento += e.getValue() * p.getPreco_venda();
         }
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
-        sNotificacoes.registarNotificacaoOS("Orcamento da OS" + idOS + "aguarda aprovação do cliente", id_funcionario, destinatarios, idOS);
+        int idUtilRemetente = obterIdUtilizadorPorFuncionario(id_funcionario);
+        sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente", idUtilRemetente, destinatarios, idOS);
         return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, codReps, orcamento, descricao, id_funcionario);
     }
 
@@ -183,8 +184,17 @@ public class EcoRideLN implements IEcoRideLN {
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
-        sNotificacoes.registarNotificacaoOS("Execução da OS" + id_OS + "feita", id_funcionario, destinatarios, id_OS);
+        int idUtilRemetente = obterIdUtilizadorPorFuncionario(id_funcionario);
+        sNotificacoes.registarNotificacaoOS("Execução da OS#" + id_OS + " concluída", idUtilRemetente, destinatarios, id_OS);
         return sOrdensServico.registarConsertoOS(id_OS, stocksUsados, codReps, orcamento, id_funcionario);
+    }
+
+    private int obterIdUtilizadorPorFuncionario(int idFuncionario) {
+        return sAutenticacao.obterUtilizadores().stream()
+            .filter(u -> u.getIdFuncionario() == idFuncionario)
+            .map(Utilizador::getId)
+            .findFirst()
+            .orElse(0); // 0 → gravado como NULL no DAO (sem remetente)
     }
 
     @Override

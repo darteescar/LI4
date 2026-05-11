@@ -51,7 +51,7 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
         int id             = rs.getInt("id");
         String descricao   = rs.getString("descricao");
         LocalDateTime data = rs.getTimestamp("data_emissao").toLocalDateTime();
-        int idRem          = rs.getInt("id_remetente");
+        int idRem          = rs.getInt("id_remetente"); if (rs.wasNull()) idRem = 0;
         int idDest         = rs.getInt("id_destinatario");
         EstadoNotificacao estado = EstadoNotificacao.valueOf(rs.getString("estado"));
 
@@ -132,7 +132,10 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
                 ps.setInt(1, key);
                 ps.setString(2, value.getDescricao());
                 ps.setTimestamp(3, Timestamp.valueOf(value.getData_emissao()));
-                ps.setInt(4, value.getId_remetente());
+                if (value.getId_remetente() == 0)
+                    ps.setNull(4, java.sql.Types.INTEGER);
+                else
+                    ps.setInt(4, value.getId_remetente());
                 ps.setInt(5, value.getId_destinatario());
                 ps.setString(6, value.getEstado().name());
                 if (value.getData_horaTratada() == null)

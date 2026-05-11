@@ -115,9 +115,11 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             if (os.getCodMecanico() != id_funcionario) {
                 throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
             }
+            if (!os.getEstado().podeTransicionar(EstadoOS.PendenteAprovacaoOrcamento))
+                throw new EcoRideException("Transição de estado inválida para a OS " + idOS);
             Diagnostico diag = new Diagnostico(descricao, reparacoes, pecasQuantidades, orcamento);
             os.setDiagnostico(diag);
-            alterarEstadoOS(idOS, EstadoOS.PendenteAprovacaoOrcamento);
+            os.setEstado(EstadoOS.PendenteAprovacaoOrcamento);
             ordemServicoDAO.put(idOS, os);
             return diag;
         }
@@ -132,9 +134,11 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             if (os.getCodMecanico() != id_funcionario) {
                 throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
             }
+            if (!os.getEstado().podeTransicionar(EstadoOS.PendentePagamento))
+                throw new EcoRideException("Transição de estado inválida para a OS " + id_OS);
             Conserto con = new Conserto(stocksUsados, reparacoes, orcamento);
             os.setConserto(con);
-            alterarEstadoOS(id_OS, EstadoOS.PendentePagamento);
+            os.setEstado(EstadoOS.PendentePagamento);
             ordemServicoDAO.put(id_OS, os);
             return con;
         }

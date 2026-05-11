@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS Notificacao (
     id               INT      NOT NULL,
     descricao        TEXT,
     data_emissao     DATETIME NOT NULL,
-    id_remetente     INT      NOT NULL,
+    id_remetente     INT      NULL,
     id_destinatario  INT      NOT NULL,
     estado           ENUM('NAOLIDA', 'LIDA', 'TRATADA') NOT NULL DEFAULT 'NAOLIDA',
     data_horaTratada DATETIME NULL,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS Devolucao (
     id       INT          NOT NULL,
     data     DATE         NOT NULL,
     motivo   VARCHAR(255),
-    estado   ENUM('PendenteDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
+    estado   ENUM('StockPendenteDeDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
     codStock INT          NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codStock) REFERENCES Stock(id)
