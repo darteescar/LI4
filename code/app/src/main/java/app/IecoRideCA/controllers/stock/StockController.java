@@ -190,6 +190,11 @@ public class StockController {
             else ctx.status(200).json(atualizado);
         });
 
+        app.post("/api/encomendas/automatica", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            ctx.status(201).json(facade.gerarListaAutomatica());
+        });
+
         app.patch("/api/encomendas/{id}/recebida", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));

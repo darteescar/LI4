@@ -30,9 +30,10 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
     }
 
     private Devolucao buildFromRow(ResultSet rs) throws SQLException {
+        var dataRaw = rs.getDate("data");
         return new Devolucao(
                 rs.getInt("id"),
-                rs.getDate("data").toLocalDate(),
+                dataRaw != null ? dataRaw.toLocalDate() : null,
                 rs.getString("motivo"),
                 EstadoDevolucao.valueOf(rs.getString("estado")),
                 rs.getInt("codStock"));

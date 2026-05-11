@@ -331,6 +331,7 @@ public class SStockFacade implements ISStock {
         List<Integer> stockIds = new ArrayList<>();
         for (int i = 0; i < id_peca.size(); i++) {
             Peca p = pecaDAO.get(id_peca.get(i));
+            if (p == null) throw new EcoRideException("Peça " + id_peca.get(i) + " não encontrada.");
             if (p.getPreco_venda() >= 70) {
                 StockComGarantia s = new StockComGarantia(stockDAO.generateNewId(), preco_compra.get(i), id_peca.get(i), null, "N/A", 24);
                 stockDAO.put(s.getId(), s);
@@ -382,6 +383,7 @@ public class SStockFacade implements ISStock {
     @Override
     public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias) {
         Encomenda e = encomendaDAO.get(id);
+        if (e == null) throw new EcoRideException("Encomenda " + id + " não encontrada.");
         if (numeros_serie.size() != garantias.size())
             throw new EcoRideException("A lista de números de série e garantias deve ter o mesmo tamanho.");
         if (numeros_serie.size() > e.getCodStocks().size() || garantias.size() > e.getCodStocks().size())
@@ -392,7 +394,7 @@ public class SStockFacade implements ISStock {
                 Stock s = stockDAO.get(stockId);
                 if (s != null) {
                     Peca p = pecaDAO.get(s.getCodPeca());
-                    if (p.getPreco_venda() >= 70) {
+                    if (p != null && p.getPreco_venda() >= 70) {
                         if (s instanceof StockComGarantia scg) {
                             scg.setNr_serie(numeros_serie.get(contador));
                             scg.setGarantia(garantias.get(contador));

@@ -49,7 +49,9 @@ public class StockDAO implements Map<Integer, Stock> {
         EstadoStock estado = rs.getString("estado") != null ? EstadoStock.valueOf(rs.getString("estado")) : null;
 
         if (nrSerie != null) {
-            return new StockComGarantia(id, preco, codPeca, dataChegada, nrSerie, garantia );
+            StockComGarantia scg = new StockComGarantia(id, preco, codPeca, dataChegada, nrSerie, garantia);
+            if (estado != null) scg.setEstado(estado);
+            return scg;
         }
         return new Stock(id, preco, codPeca, dataChegada, qtd, estado);
     }

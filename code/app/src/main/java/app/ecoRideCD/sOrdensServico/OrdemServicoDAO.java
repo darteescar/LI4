@@ -492,6 +492,21 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         return out;
     }
 
+    public List<OrdemServico> getOSDoTrotinete(int idTrotinete) {
+        List<OrdemServico> out = new ArrayList<>();
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(
+                     SELECT_BASE + " WHERE codTrotinete = ? ORDER BY id")) {
+            ps.setInt(1, idTrotinete);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(c, rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter OSs da trotinete " + idTrotinete, e);
+        }
+        return out;
+    }
+
     // Filtra por qualquer combinação dos critérios; passar null ignora o critério.
     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate,
                                          Integer idCliente, Integer idFuncionario) {

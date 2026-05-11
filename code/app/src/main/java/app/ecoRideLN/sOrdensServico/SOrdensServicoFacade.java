@@ -92,14 +92,19 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
+    public List<OrdemServico> obterOSs_Trotinete(int id_trotinete) {
+        return ordemServicoDAO.getOSDoTrotinete(id_trotinete);
+    }
+
+    @Override
     public boolean atribuirOS(int id, int id_mecanico) {
         OrdemServico os = ordemServicoDAO.get(id);
-        if (os != null) {
-            os.setCodMecanico(id_mecanico);
-            ordemServicoDAO.put(id, os);
-            return true;
-        }
-        return false;
+        if (os == null) return false;
+        if (os.getEstado() == EstadoOS.Paga || os.getEstado() == EstadoOS.Eliminada)
+            throw new EcoRideException("Não é possível atribuir uma OS no estado " + os.getEstado() + ".");
+        os.setCodMecanico(id_mecanico);
+        ordemServicoDAO.put(id, os);
+        return true;
     }
 
     @Override

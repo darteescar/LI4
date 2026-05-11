@@ -1,7 +1,5 @@
 package app.IecoRideCA.controllers.reparacoes;
 
-import java.util.List;
-
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.reparacoes.dto.ReparacaoRequest;
 import app.ecoRideLN.IEcoRideLN;
@@ -19,11 +17,11 @@ public class ReparacoesController {
 
     public void register(Javalin app) {
 
-        // List<Reparacao>
+        // List<Reparacao> — ?disponiveis=true para filtrar apenas as disponíveis
         app.get("/api/reparacoes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.GestorStock, Cargo.Secretaria);
-            List<Reparacao> reparacoes = facade.obterReparacoes();
-            ctx.status(200).json(reparacoes);
+            boolean apenasDisponiveis = "true".equalsIgnoreCase(ctx.queryParam("disponiveis"));
+            ctx.status(200).json(apenasDisponiveis ? facade.obterReparacoesDisponiveis() : facade.obterReparacoes());
         });
 
         // Obter Reparacao por id

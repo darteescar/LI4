@@ -241,9 +241,10 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
+        OrdemServico os = sOrdensServico.obterOS(id_OS);
         sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
-        List<Integer> reparacoes = sOrdensServico.obterOS(id_OS).getConserto().getCod_reparacoes();
-        List<Integer> stocks = sOrdensServico.obterOS(id_OS).getConserto().getCodStocks();
+        List<Integer> reparacoes = os.getConserto().getCod_reparacoes();
+        List<Integer> stocks = os.getConserto().getCodStocks();
         for (int codRep : reparacoes) {
             Reparacao r = sReparacoes.obterReparacao(codRep);
             if (r != null) sFinanceiro.registarMovimentoReparacaoOS(codRep, r.getPreco(), "Pagamento reparação " + r.getNomenclatura() + " OS#" + id_OS);
@@ -261,16 +262,12 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<OrdemServico> obterOSs_Cliente(int id) {
-        return sOrdensServico.obterOSs().stream()
-            .filter(os -> os.getCodCliente() == id)
-            .collect(java.util.stream.Collectors.toList());
+        return sOrdensServico.filtrarOSs(null, null, null, id, null);
     }
 
     @Override
     public List<OrdemServico> obterOSs_Trotinete(int id_trotinete) {
-        return sOrdensServico.obterOSs().stream()
-            .filter(os -> os.getCodTrotinete() == id_trotinete)
-            .collect(java.util.stream.Collectors.toList());
+        return sOrdensServico.obterOSs_Trotinete(id_trotinete);
     }
 
     @Override
@@ -331,10 +328,6 @@ public class EcoRideLN implements IEcoRideLN {
         return sClientes.obterCliente(id);
     }
 
-    public boolean existeCliente(int id) {
-        return sClientes.existeCliente(id);
-    }
-
     @Override
     public boolean removerCliente(int id) {
         return sClientes.removerCliente(id);
@@ -361,10 +354,6 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public Trotinete obterTrotinete(int id) {
         return sClientes.obterTrotinete(id);
-    }
-
-    public boolean existeTrotinete(int id) {
-        return sClientes.existeTrotinete(id);
     }
 
     @Override
@@ -499,11 +488,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     // ------------------- Defeitos -------------------
-
-    @Override
-    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario) {
-        return sStock.registarDefeito(stockIds, motivo, idFuncionario);
-    }
 
     @Override
     public Defeito obterDefeito(int id) { return sStock.obterDefeito(id); }
