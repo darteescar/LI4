@@ -109,13 +109,13 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
     // ------------------- Diagnóstico -------------------
     @Override
-    public Diagnostico registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario) {
+    public Diagnostico registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario) {
         OrdemServico os = ordemServicoDAO.get(idOS);
         if (os != null) {
             if (os.getCodMecanico() != id_funcionario) {
                 throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
             }
-            Diagnostico diag = new Diagnostico(descricao, reparacoes, listPecas, orcamento);
+            Diagnostico diag = new Diagnostico(descricao, reparacoes, pecasQuantidades, orcamento);
             os.setDiagnostico(diag);
             alterarEstadoOS(idOS, EstadoOS.PendenteAprovacaoOrcamento);
             ordemServicoDAO.put(idOS, os);

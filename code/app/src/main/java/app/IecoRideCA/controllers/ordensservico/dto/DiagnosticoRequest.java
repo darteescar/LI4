@@ -1,13 +1,13 @@
 package app.IecoRideCA.controllers.ordensservico.dto;
 
 import java.util.List;
+import java.util.Map;
 
-import app.ecoRideLN.sOrdensServico.PecasOrcamento;
 import app.ecoRideLN.sReparacoes.Reparacao;
 
 public record DiagnosticoRequest(
-     int idOS, 
-     List<PecasOrcamento> listPecas, 
-     List<Reparacao> reparacoes, 
+     int idOS,
+     Map<Integer, Integer> pecasQuantidades,
+     List<Reparacao> reparacoes,
      String descricao
 ) {}

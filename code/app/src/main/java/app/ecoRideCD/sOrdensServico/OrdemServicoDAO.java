@@ -9,7 +9,6 @@ import app.ecoRideLN.sOrdensServico.EstadoOS;
 import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
-import app.ecoRideLN.sOrdensServico.PecasOrcamento;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -94,14 +93,12 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 while (rs.next()) reps.add(rs.getInt(1));
             }
         }
-        List<PecasOrcamento> pecas = new ArrayList<>();
+        Map<Integer, Integer> pecas = new LinkedHashMap<>();
         try (PreparedStatement ps = c.prepareStatement(
                 "SELECT codPeca, quantidade FROM Diagnostico_PecaOrcamento WHERE idOS = ?")) {
             ps.setInt(1, idOS);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    pecas.add(new PecasOrcamento(rs.getInt("quantidade"), rs.getInt("codPeca")));
-                }
+                while (rs.next()) pecas.put(rs.getInt("codPeca"), rs.getInt("quantidade"));
             }
         }
         return new Diagnostico(desc, reps, pecas, orc);
@@ -275,10 +272,10 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                     INSERT INTO Diagnostico_PecaOrcamento (idOS, codPeca, quantidade)
                     VALUES (?, ?, ?)
                     """)) {
-                for (PecasOrcamento p : d.getPecasOrcamento()) {
+                for (Map.Entry<Integer, Integer> e : d.getPecasOrcamento().entrySet()) {
                     ps.setInt(1, idOS);
-                    ps.setInt(2, p.getCodPeca());
-                    ps.setInt(3, p.getQuantidade());
+                    ps.setInt(2, e.getKey());
+                    ps.setInt(3, e.getValue());
                     ps.addBatch();
                 }
                 ps.executeBatch();

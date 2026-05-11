@@ -33,7 +33,6 @@ import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
-import app.ecoRideLN.sOrdensServico.PecasOrcamento;
 import app.ecoRideLN.sOrdensServico.SOrdensServicoFacade;
 import app.ecoRideLN.sReparacoes.ISReparacoes;
 import app.ecoRideLN.sReparacoes.Reparacao;
@@ -158,15 +157,15 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public Diagnostico registarDiagnosticoOS(int idOS, List<PecasOrcamento> listPecas, List<Reparacao> reparacoes, String descricao, int id_funcionario) {
+    public Diagnostico registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Reparacao> reparacoes, String descricao, int id_funcionario) {
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         float orcamento = 0;
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
-        for (PecasOrcamento po : listPecas) {
-            Peca p = sStock.obterPeca(po.getCodPeca());
-            if (p != null) orcamento += po.getQuantidade() * p.getPreco_venda();
+        for (Map.Entry<Integer, Integer> e : pecasQuantidades.entrySet()) {
+            Peca p = sStock.obterPeca(e.getKey());
+            if (p != null) orcamento += e.getValue() * p.getPreco_venda();
         }
-        return sOrdensServico.registarDiagnosticoOS(idOS, listPecas, codReps, orcamento, descricao, id_funcionario);
+        return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, codReps, orcamento, descricao, id_funcionario);
     }
 
     @Override
