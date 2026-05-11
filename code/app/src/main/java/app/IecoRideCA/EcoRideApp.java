@@ -1,7 +1,5 @@
 package app.IecoRideCA;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import app.IecoRideCA.auth.GestorSessoes;
@@ -15,11 +13,9 @@ import app.IecoRideCA.controllers.notificacoes.NotificacoesController;
 import app.IecoRideCA.controllers.ordensservico.OrdemServicoController;
 import app.IecoRideCA.controllers.reparacoes.ReparacoesController;
 import app.IecoRideCA.controllers.stock.StockController;
-import app.common.EcoRideException;
 import app.ecoRideLN.EcoRideLN;
 import app.ecoRideLN.IEcoRideLN;
 import io.javalin.Javalin;
-import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
 
@@ -46,27 +42,7 @@ public class EcoRideApp {
             ctx.attribute("sessao", sessao);
         });
 
-        // Tratamento global de erros de negócio
-        app.exception(EcoRideException.class, (e, ctx) ->
-            ctx.status(400).json(new ErroResponse(e.getMessage()))
-        );
-        app.exception(NumberFormatException.class, (e, ctx) ->
-            ctx.status(400).json(new ErroResponse("ID inválido"))
-        );
-        app.exception(ForbiddenResponse.class, (e, ctx) -> {
-            ctx.status(403).json(Map.of(
-                "status", 403,
-                "erro", "Forbidden",
-                "mensagem", e.getMessage()
-            ));
-        });
-        app.exception(UnauthorizedResponse.class, (e, ctx) -> {
-            ctx.status(401).json(Map.of(
-                "status", 401,
-                "erro", "Unauthorized",
-                "mensagem", e.getMessage()
-            ));
-        });
+        GlobalExceptionHandler.register(app);
 
         // Registo de controllers
         new AuthController(facade, gestorSessoes).register(app);
@@ -80,5 +56,4 @@ public class EcoRideApp {
         new ExtrasController(facade).register(app);
     }
 
-    record ErroResponse(String erro) {}
 }
