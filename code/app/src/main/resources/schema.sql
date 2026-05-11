@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS Stock (
     quantidade   INT          NOT NULL,
     nr_serie     VARCHAR(100) NULL,
     garantia     INT          NULL,
-    estado       ENUM('StockEncomendado','StockEmArmazem','StockComPossivelDefeito','StockPendenteDeDevolucao','StockEnviadoParaFornecedor','Devolvida','Invalida','UsadaEmConserto') NULL,
+    estado       ENUM('StockEncomendado','StockEmArmazem','StockComPossivelDefeito','StockPendenteDeDevolucao','StockEnviadoParaFornecedor','StockDevolvidoFornecedor','StockinvalidoParaDevolucao','StockUsadoConserto') NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codPeca) REFERENCES Peca(id)
 );
