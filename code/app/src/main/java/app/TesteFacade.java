@@ -3,12 +3,13 @@ package app;
 import app.ecoRideLN.EcoRideLN;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
+import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
+import app.ecoRideLN.sFinanceiro.TipoMovimento;
 import app.ecoRideLN.sOrdensServico.*;
 import app.ecoRideLN.sStock.*;
 import app.ecoRideLN.sClientes.*;
 import app.ecoRideLN.sFuncionarios.Funcionario;
 import app.ecoRideLN.sReparacoes.Reparacao;
-import app.ecoRideLN.sFinanceiro.MovimentoFinanceiro;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,6 +32,10 @@ public class TesteFacade {
         testarReparacoes();
         testarFluxoOS();
         testarDefeitos();
+        testarFluxoEncomenda();
+        testarDefeitosAvancados();
+        testarFluxoDevolucao();
+        testarPagamentoFuncionario();
         testarMovimentosFinanceiros();
 
         System.out.println("\n========================================");
@@ -61,6 +66,10 @@ public class TesteFacade {
     static int idFornecedor, idPeca, idStock;
     static int idReparacao;
     static int idOS;
+    static int idDevolucao;             // criado em testarDefeitos, usado em testarFluxoDevolucao
+    static int idDevolucaoInvalida;     // criado em testarDefeitosAvancados, marcado inválida
+    static int idEncomenda;
+    static int idStockEncomendado;      // primeiro stock da encomenda
 
     // =========================================================
 
@@ -100,16 +109,29 @@ public class TesteFacade {
         } catch (Exception e) { fail("Registar Gestor de Stock", e); }
 
         try {
-            boolean auth = ln.autenticar(idUtilMecanico, "pass123");
-            if (!auth) throw new RuntimeException("autenticação falhou");
-            ok("Autenticar utilizador");
-        } catch (Exception e) { fail("Autenticar utilizador", e); }
+            if (!ln.autenticar(idUtilMecanico, "pass123"))   throw new RuntimeException("mecânico falhou");
+            if (!ln.autenticar(idUtilSecretaria, "pass123")) throw new RuntimeException("secretária falhou");
+            if (!ln.autenticar(idUtilGestorStock, "pass123"))throw new RuntimeException("gestor stock falhou");
+            ok("Autenticar mecânico, secretária e gestor de stock");
+        } catch (Exception e) { fail("Autenticar utilizadores", e); }
 
         try {
             Cargo c = ln.obterCargoUtilizador(idUtilGerente);
             if (c != Cargo.Gerente) throw new RuntimeException("cargo errado: " + c);
-            ok("Obter cargo utilizador");
+            if (ln.obterCargoUtilizador(idUtilSecretaria) != Cargo.Secretaria)
+                throw new RuntimeException("cargo da secretária errado");
+            if (ln.obterCargoUtilizador(idUtilGestorStock) != Cargo.GestorStock)
+                throw new RuntimeException("cargo do gestor de stock errado");
+            ok("Obter cargo dos utilizadores");
         } catch (Exception e) { fail("Obter cargo utilizador", e); }
+
+        // Identificador duplicado deve ser rejeitado
+        try {
+            ln.registarUtilizador("outrapass", idFuncGerente, Cargo.Gerente, "ana");
+            fail("Identificador duplicado deve lançar exceção", new RuntimeException("nenhuma exceção lançada"));
+        } catch (app.common.EcoRideException e) {
+            ok("Identificador duplicado rejeitado");
+        } catch (Exception e) { fail("Identificador duplicado rejeitado", e); }
     }
 
     static void testarClientesETrotinetes() {
@@ -285,54 +307,407 @@ public class TesteFacade {
     static void testarDefeitos() {
         secao("Defeitos");
 
-        // Registar mais stock para poder reportar defeito
         int idStockDefeito;
         try {
             Stock s = ln.registarStock_PecaNormal(idPeca, 12.50f, LocalDate.now(), 5);
             idStockDefeito = s.getId();
-            ok("Registar stock adicional para defeito");
+            ok("Registar stock adicional para defeito (5 unidades)");
         } catch (Exception e) { fail("Registar stock adicional", e); return; }
 
-        final int idStockDefeito2 = idStockDefeito;
+        final int idStockRef = idStockDefeito;
 
         try {
-            List<Defeito> defeitos = ln.registarDefeito(List.of(idStockDefeito2), "Peça rachada", idFuncGestorStock);
+            List<Defeito> defeitos = ln.registarDefeito(List.of(idStockRef), "Peça rachada", idFuncGestorStock);
             if (defeitos.isEmpty()) throw new RuntimeException("lista vazia");
-            Stock s = ln.obterStock(idStockDefeito2);
+            Stock s = ln.obterStock(idStockRef);
             if (s.getEstado() != EstadoStock.StockComPossivelDefeito)
                 throw new RuntimeException("estado errado: " + s.getEstado());
-            ok("Reportar defeito (stock passa a StockComPossivelDefeito)");
+            ok("Reportar defeito (stock → StockComPossivelDefeito)");
         } catch (Exception e) { fail("Reportar defeito", e); }
 
         try {
             List<Defeito> defeitos = ln.obterDefeitos();
             Defeito d = defeitos.stream()
-                .filter(x -> x.getCodStock() == idStockDefeito2)
+                .filter(x -> x.getCodStock() == idStockRef)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("defeito não encontrado"));
 
             Devolucao dev = ln.confirmarDefeitoComDevolucao(d.getId(), "Defeito confirmado", LocalDate.now());
             if (dev == null) throw new RuntimeException("devolução nula");
-            Stock s = ln.obterStock(idStockDefeito2);
+            idDevolucao = dev.getId(); // guardar para testarFluxoDevolucao
+            Stock s = ln.obterStock(idStockRef);
             if (s.getEstado() != EstadoStock.StockPendenteDeDevolucao)
                 throw new RuntimeException("estado errado: " + s.getEstado());
-            ok("Confirmar defeito com devolução (stock: StockPendenteDeDevolucao)");
+            ok("Confirmar defeito com devolução (stock → StockPendenteDeDevolucao)");
         } catch (Exception e) { fail("Confirmar defeito com devolução", e); }
     }
 
+    // =========================================================
+    // Encomenda
+    // =========================================================
+
+    static void testarFluxoEncomenda() {
+        secao("Fluxo de Encomenda");
+
+        // 1. Criar encomenda em RASCUNHO (5 unidades de idPeca a 8€)
+        try {
+            Encomenda e = ln.registarEncomenda(
+                List.of(idPeca),
+                List.of(8.0f),
+                List.of(5),
+                idFornecedor
+            );
+            idEncomenda = e.getId();
+            if (e.getEstado() != EstadoEncomenda.RASCUNHO)
+                throw new RuntimeException("estado inicial errado: " + e.getEstado());
+            if (e.getCodStocks().isEmpty())
+                throw new RuntimeException("sem stocks associados");
+            idStockEncomendado = e.getCodStocks().get(0);
+            ok("Criar encomenda (estado: RASCUNHO)");
+        } catch (Exception e) { fail("Criar encomenda", e); return; }
+
+        // 2. Verificar que o stock está em StockEncomendado
+        try {
+            Stock s = ln.obterStock(idStockEncomendado);
+            if (s.getEstado() != EstadoStock.StockEncomendado)
+                throw new RuntimeException("estado esperado StockEncomendado, obtido: " + s.getEstado());
+            ok("Stock da encomenda em StockEncomendado");
+        } catch (Exception e) { fail("Stock da encomenda em StockEncomendado", e); }
+
+        // 3. Marcar como enviada
+        try {
+            Encomenda e = ln.marcarEncomendaComoEnviada(idEncomenda);
+            if (e.getEstado() != EstadoEncomenda.ENVIADA)
+                throw new RuntimeException("estado errado: " + e.getEstado());
+            if (e.getData_envio() == null)
+                throw new RuntimeException("data_envio nula");
+            ok("Marcar encomenda como enviada (estado: ENVIADA)");
+        } catch (Exception e) { fail("Marcar encomenda como enviada", e); }
+
+        // 4. Segunda chamada a marcarComoEnviada deve ser ignorada (só transita de RASCUNHO)
+        try {
+            Encomenda e = ln.marcarEncomendaComoEnviada(idEncomenda);
+            if (e.getEstado() != EstadoEncomenda.ENVIADA)
+                throw new RuntimeException("estado mudou indevidamente: " + e.getEstado());
+            ok("Segunda tentativa de envio é ignorada (idempotente)");
+        } catch (Exception e) { fail("Segunda tentativa de envio", e); }
+
+        // 5. Registar quantos movimentos existem antes de receber
+        int movimentosAntes = ln.obterMovimentosFinanceiros().size();
+
+        // 6. Marcar como recebida (peça com preco_venda < 70 → listas vazias)
+        try {
+            Encomenda e = ln.marcarEncomendaComoRecebida(idEncomenda, List.of(), List.of());
+            if (e.getEstado() != EstadoEncomenda.RECEBIDA)
+                throw new RuntimeException("estado errado: " + e.getEstado());
+            if (e.getData_rececao() == null)
+                throw new RuntimeException("data_rececao nula");
+            ok("Marcar encomenda como recebida (estado: RECEBIDA)");
+        } catch (Exception e) { fail("Marcar encomenda como recebida", e); return; }
+
+        // 7. Verificar que o stock transitou para StockEmArmazem
+        try {
+            Stock s = ln.obterStock(idStockEncomendado);
+            if (s.getEstado() != EstadoStock.StockEmArmazem)
+                throw new RuntimeException("estado esperado StockEmArmazem, obtido: " + s.getEstado());
+            ok("Stock da encomenda transitou para StockEmArmazem");
+        } catch (Exception e) { fail("Stock da encomenda em StockEmArmazem", e); }
+
+        // 8. Verificar que foi criado um movimento financeiro GastoPecas
+        try {
+            int movimentosDepois = ln.obterMovimentosFinanceiros().size();
+            if (movimentosDepois <= movimentosAntes)
+                throw new RuntimeException("nenhum movimento criado ao receber encomenda");
+            boolean temGasto = ln.obterMovimentosFinanceiros().stream()
+                .skip(movimentosAntes)
+                .anyMatch(m -> m.getTipo() == TipoMovimento.GastoPecas && m.getValor() > 0);
+            if (!temGasto)
+                throw new RuntimeException("movimento GastoPecas positivo não encontrado");
+            ok("Movimento GastoPecas criado ao receber encomenda");
+        } catch (Exception e) { fail("Movimento financeiro da encomenda", e); }
+
+        // 9. Tentar marcar como recebida uma encomenda já recebida — deve lançar exceção
+        try {
+            ln.marcarEncomendaComoRecebida(idEncomenda, List.of(), List.of());
+            fail("Receber encomenda já recebida deve lançar exceção", new RuntimeException("nenhuma exceção lançada"));
+        } catch (app.common.EcoRideException ex) {
+            ok("Receber encomenda já recebida lança EcoRideException");
+        } catch (Exception e) { fail("Receber encomenda já recebida", e); }
+    }
+
+    // =========================================================
+    // Defeitos avançados
+    // =========================================================
+
+    static void testarDefeitosAvancados() {
+        secao("Defeitos Avançados");
+
+        // Cenário A: defeito reportado e depois descartado (stock volta ao estado original)
+        int idStockA;
+        try {
+            Stock s = ln.registarStock_PecaNormal(idPeca, 10.0f, LocalDate.now(), 3);
+            idStockA = s.getId();
+            ok("Cenário A: registar stock (3 unidades) para defeito a descartar");
+        } catch (Exception e) { fail("Cenário A: registar stock", e); return; }
+
+        final int idStockARef = idStockA;
+
+        try {
+            List<Defeito> defeitos = ln.registarDefeito(List.of(idStockARef), "Suspeita de defeito", idFuncGestorStock);
+            if (defeitos.isEmpty()) throw new RuntimeException("lista vazia");
+            if (ln.obterStock(idStockARef).getEstado() != EstadoStock.StockComPossivelDefeito)
+                throw new RuntimeException("estado errado: " + ln.obterStock(idStockARef).getEstado());
+            ok("Cenário A: defeito reportado (stock → StockComPossivelDefeito)");
+        } catch (Exception e) { fail("Cenário A: reportar defeito", e); }
+
+        try {
+            Defeito d = ln.obterDefeitos().stream()
+                .filter(x -> x.getCodStock() == idStockARef)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("defeito não encontrado"));
+            EstadoStock estadoOriginal = d.getEstadoAnterior();
+
+            ln.descartarDefeito(d.getId());
+
+            if (ln.obterStock(idStockARef).getEstado() != estadoOriginal)
+                throw new RuntimeException("stock não voltou ao estado original: " + ln.obterStock(idStockARef).getEstado());
+            boolean defeitoRemovido = ln.obterDefeitos().stream().noneMatch(x -> x.getCodStock() == idStockARef);
+            if (!defeitoRemovido) throw new RuntimeException("defeito não foi removido após descartar");
+            ok("Cenário A: defeito descartado (stock voltou a " + estadoOriginal + ")");
+        } catch (Exception e) { fail("Cenário A: descartar defeito", e); }
+
+        // Cenário B: múltiplos stocks com defeito em simultâneo
+        int idStockB1, idStockB2;
+        try {
+            idStockB1 = ln.registarStock_PecaNormal(idPeca, 10.0f, LocalDate.now(), 2).getId();
+            idStockB2 = ln.registarStock_PecaNormal(idPeca, 10.0f, LocalDate.now(), 4).getId();
+            ok("Cenário B: registar dois stocks para defeito simultâneo");
+        } catch (Exception e) { fail("Cenário B: registar stocks", e); return; }
+
+        final int idStockB1Ref = idStockB1;
+        final int idStockB2Ref = idStockB2;
+
+        try {
+            List<Defeito> defeitos = ln.registarDefeito(
+                List.of(idStockB1Ref, idStockB2Ref), "Lote com possível defeito", idFuncGestorStock);
+            if (defeitos.size() != 2)
+                throw new RuntimeException("esperados 2 defeitos, obtidos " + defeitos.size());
+            if (ln.obterStock(idStockB1Ref).getEstado() != EstadoStock.StockComPossivelDefeito)
+                throw new RuntimeException("stock B1 no estado errado");
+            if (ln.obterStock(idStockB2Ref).getEstado() != EstadoStock.StockComPossivelDefeito)
+                throw new RuntimeException("stock B2 no estado errado");
+            ok("Cenário B: dois stocks com defeito simultâneo");
+        } catch (Exception e) { fail("Cenário B: defeito simultâneo", e); }
+
+        // Confirmar B1 com devolução (guardada para testarFluxoDevolucao como caminho "Invalida")
+        try {
+            Defeito d = ln.obterDefeitos().stream()
+                .filter(x -> x.getCodStock() == idStockB1Ref)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("defeito B1 não encontrado"));
+            Devolucao dev = ln.confirmarDefeitoComDevolucao(d.getId(), "Confirmado no lote", LocalDate.now());
+            idDevolucaoInvalida = dev.getId();
+            ok("Cenário B: defeito B1 confirmado com devolução (id=" + idDevolucaoInvalida + ")");
+        } catch (Exception e) { fail("Cenário B: confirmar defeito B1", e); }
+
+        // Descartar B2
+        try {
+            Defeito d = ln.obterDefeitos().stream()
+                .filter(x -> x.getCodStock() == idStockB2Ref)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("defeito B2 não encontrado"));
+            ln.descartarDefeito(d.getId());
+            if (ln.obterStock(idStockB2Ref).getEstado() != EstadoStock.StockEmArmazem)
+                throw new RuntimeException("stock B2 não voltou ao armazém");
+            ok("Cenário B: defeito B2 descartado (stock B2 → StockEmArmazem)");
+        } catch (Exception e) { fail("Cenário B: descartar defeito B2", e); }
+
+        // Cenário C: tentar reportar defeito num stock em estado inválido (StockPendenteDeDevolucao)
+        try {
+            ln.registarDefeito(List.of(idStockB1Ref), "Defeito em stock pendente", idFuncGestorStock);
+            fail("Cenário C: defeito em estado inválido deve lançar exceção",
+                new RuntimeException("nenhuma exceção lançada"));
+        } catch (app.common.EcoRideException ex) {
+            ok("Cenário C: defeito em StockPendenteDeDevolucao lança EcoRideException");
+        } catch (Exception e) { fail("Cenário C: defeito em estado inválido", e); }
+    }
+
+    // =========================================================
+    // Fluxo de Devolução
+    // =========================================================
+
+    static void testarFluxoDevolucao() {
+        secao("Fluxo de Devolução");
+
+        if (idDevolucao == 0) {
+            System.out.println("  [SKIP] idDevolucao não disponível (testarDefeitos falhou)");
+            return;
+        }
+
+        // Caminho A: StockPendenteDeDevolucao → Enviada → Devolvida (com reembolso financeiro)
+
+        try {
+            Devolucao dev = ln.obterDevolucao(idDevolucao);
+            if (dev.getEstado() != EstadoDevolucao.StockPendenteDeDevolucao)
+                throw new RuntimeException("estado inicial errado: " + dev.getEstado());
+            ok("Devolução A em StockPendenteDeDevolucao");
+        } catch (Exception e) { fail("Estado inicial devolução A", e); }
+
+        try {
+            int codStock = ln.obterDevolucao(idDevolucao).getCodStock();
+            ln.marcarDevolucaoComoEnviada(idDevolucao);
+            if (ln.obterStock(codStock).getEstado() != EstadoStock.StockEnviadoParaFornecedor)
+                throw new RuntimeException("stock no estado errado: " + ln.obterStock(codStock).getEstado());
+            // NOTA: existe um bug em marcarDevolucaoComoEnviada — define estado como 'Devolvida'
+            // em vez de 'Enviada'. Este teste vai falhar enquanto o bug não for corrigido.
+            if (ln.obterDevolucao(idDevolucao).getEstado() != EstadoDevolucao.Enviada)
+                throw new RuntimeException("estado da devolução errado: "
+                    + ln.obterDevolucao(idDevolucao).getEstado()
+                    + " (esperado: Enviada)");
+            ok("Devolução A enviada (stock → StockEnviadoParaFornecedor, devolução → Enviada)");
+        } catch (Exception e) { fail("Marcar devolução A como enviada", e); }
+
+        int movimentosAntes = ln.obterMovimentosFinanceiros().size();
+
+        try {
+            int codStock = ln.obterDevolucao(idDevolucao).getCodStock();
+            ln.marcarDevolucaoComoDevolvida(idDevolucao);
+            if (ln.obterStock(codStock).getEstado() != EstadoStock.StockDevolvidoFornecedor)
+                throw new RuntimeException("stock no estado errado: " + ln.obterStock(codStock).getEstado());
+            if (ln.obterDevolucao(idDevolucao).getEstado() != EstadoDevolucao.Devolvida)
+                throw new RuntimeException("estado da devolução errado: " + ln.obterDevolucao(idDevolucao).getEstado());
+            ok("Devolução A devolvida (stock → StockDevolvidoFornecedor, devolução → Devolvida)");
+        } catch (Exception e) { fail("Marcar devolução A como devolvida", e); }
+
+        try {
+            List<MovimentoFinanceiro> movimentos = ln.obterMovimentosFinanceiros();
+            if (movimentos.size() <= movimentosAntes)
+                throw new RuntimeException("nenhum movimento criado ao devolver");
+            MovimentoFinanceiro reembolso = movimentos.stream()
+                .filter(m -> m.getTipo() == TipoMovimento.GastoPecas && m.getValor() < 0)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("movimento de reembolso (GastoPecas negativo) não encontrado"));
+            ok("Reembolso criado (GastoPecas negativo: " + reembolso.getValor() + "€)");
+        } catch (Exception e) { fail("Movimento de reembolso", e); }
+
+        // Caminho B: StockPendenteDeDevolucao → Inválida (stock volta a StockEmArmazem)
+
+        if (idDevolucaoInvalida == 0) {
+            System.out.println("  [SKIP] idDevolucaoInvalida não disponível (testarDefeitosAvancados falhou)");
+            return;
+        }
+
+        try {
+            if (ln.obterDevolucao(idDevolucaoInvalida).getEstado() != EstadoDevolucao.StockPendenteDeDevolucao)
+                throw new RuntimeException("estado inicial errado: " + ln.obterDevolucao(idDevolucaoInvalida).getEstado());
+            ok("Devolução B em StockPendenteDeDevolucao");
+        } catch (Exception e) { fail("Estado inicial devolução B", e); }
+
+        try {
+            int codStock = ln.obterDevolucao(idDevolucaoInvalida).getCodStock();
+            ln.marcarDevolucaoComoInvalida(idDevolucaoInvalida);
+            if (ln.obterStock(codStock).getEstado() != EstadoStock.StockEmArmazem)
+                throw new RuntimeException("stock no estado errado: " + ln.obterStock(codStock).getEstado());
+            if (ln.obterDevolucao(idDevolucaoInvalida).getEstado() != EstadoDevolucao.Invalida)
+                throw new RuntimeException("estado da devolução errado: " + ln.obterDevolucao(idDevolucaoInvalida).getEstado());
+            ok("Devolução B inválida (stock → StockEmArmazem, devolução → Invalida)");
+        } catch (Exception e) { fail("Marcar devolução B como inválida", e); }
+    }
+
+    // =========================================================
+    // Pagamento de funcionário
+    // =========================================================
+
+    static void testarPagamentoFuncionario() {
+        secao("Pagamento de Funcionário");
+
+        int movimentosAntes = ln.obterMovimentosFinanceiros().size();
+
+        try {
+            boolean r = ln.registarPagamentoFuncionario(idFuncMecanico);
+            if (!r) throw new RuntimeException("retornou false");
+            ok("Registar pagamento ao mecânico");
+        } catch (Exception e) { fail("Registar pagamento ao mecânico", e); return; }
+
+        try {
+            boolean temSalario = ln.obterMovimentosFinanceiros().stream()
+                .skip(movimentosAntes)
+                .anyMatch(m -> m.getTipo() == TipoMovimento.Salario && m.getValor() > 0);
+            if (!temSalario) throw new RuntimeException("movimento Salario positivo não encontrado");
+            ok("Movimento Salario criado após pagamento");
+        } catch (Exception e) { fail("Movimento Salario", e); }
+
+        try {
+            List<MovimentoFinanceiro> salarios = ln.obterMovimentosFinanceirosFiltrados(
+                LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), TipoMovimento.Salario);
+            if (salarios.isEmpty()) throw new RuntimeException("filtro retornou lista vazia");
+            ok("Filtro por tipo Salario retorna " + salarios.size() + " resultado(s)");
+        } catch (Exception e) { fail("Filtro por tipo Salario", e); }
+    }
+
+    // =========================================================
+    // Movimentos Financeiros — verificação final
+    // =========================================================
+
     static void testarMovimentosFinanceiros() {
-        secao("Movimentos Financeiros");
+        secao("Movimentos Financeiros — Verificação Final");
 
+        List<MovimentoFinanceiro> todos;
         try {
-            List<MovimentoFinanceiro> movs = ln.obterMovimentosFinanceiros();
-            if (movs.isEmpty()) throw new RuntimeException("nenhum movimento registado");
-            ok("Existem movimentos financeiros registados (" + movs.size() + " no total)");
-        } catch (Exception e) { fail("Obter movimentos financeiros", e); }
+            todos = ln.obterMovimentosFinanceiros();
+            if (todos.isEmpty()) throw new RuntimeException("nenhum movimento registado");
+            ok("Total de movimentos registados: " + todos.size());
+        } catch (Exception e) { fail("Obter movimentos financeiros", e); return; }
 
+        // Verificar existência de cada tipo
+        for (TipoMovimento tipo : TipoMovimento.values()) {
+            try {
+                long count = todos.stream().filter(m -> m.getTipo() == tipo).count();
+                if (count == 0) throw new RuntimeException("nenhum movimento do tipo " + tipo);
+                ok("Tipo " + tipo + ": " + count + " movimento(s)");
+            } catch (Exception e) { fail("Tipo " + tipo, e); }
+        }
+
+        // GastoPecas deve ter positivos (compras) e negativos (reembolsos)
         try {
-            var analise = ln.calcularAnaliseFinanceira(ln.obterMovimentosFinanceiros());
+            boolean temPositivo = todos.stream()
+                .anyMatch(m -> m.getTipo() == TipoMovimento.GastoPecas && m.getValor() > 0);
+            boolean temNegativo = todos.stream()
+                .anyMatch(m -> m.getTipo() == TipoMovimento.GastoPecas && m.getValor() < 0);
+            if (!temPositivo) throw new RuntimeException("sem GastoPecas positivo (compras)");
+            if (!temNegativo) throw new RuntimeException("sem GastoPecas negativo (reembolsos)");
+            ok("GastoPecas tem compras (positivo) e reembolsos (negativo)");
+        } catch (Exception e) { fail("GastoPecas positivo e negativo", e); }
+
+        // Análise financeira
+        try {
+            var analise = ln.calcularAnaliseFinanceira(todos);
             if (analise == null) throw new RuntimeException("análise nula");
             ok("Calcular análise financeira");
         } catch (Exception e) { fail("Calcular análise financeira", e); }
+
+        // Filtro por intervalo de datas
+        try {
+            List<MovimentoFinanceiro> filtrados = ln.obterMovimentosFinanceirosFiltrados(
+                LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), null);
+            if (filtrados.isEmpty()) throw new RuntimeException("filtro por data retornou lista vazia");
+            ok("Filtro por intervalo de datas retorna " + filtrados.size() + " movimento(s)");
+        } catch (Exception e) { fail("Filtro por intervalo de datas", e); }
+
+        // Filtro por tipo GastoPecas
+        try {
+            List<MovimentoFinanceiro> gastos = ln.obterMovimentosFinanceirosFiltrados(
+                LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), TipoMovimento.GastoPecas);
+            if (gastos.isEmpty()) throw new RuntimeException("nenhum GastoPecas encontrado");
+            ok("Filtro GastoPecas retorna " + gastos.size() + " movimento(s)");
+        } catch (Exception e) { fail("Filtro GastoPecas", e); }
+
+        // Filtro por tipo LucroMaoObra
+        try {
+            List<MovimentoFinanceiro> lucros = ln.obterMovimentosFinanceirosFiltrados(
+                LocalDate.now().minusDays(1), LocalDate.now().plusDays(1), TipoMovimento.LucroMaoObra);
+            if (lucros.isEmpty()) throw new RuntimeException("nenhum LucroMaoObra encontrado");
+            ok("Filtro LucroMaoObra retorna " + lucros.size() + " movimento(s)");
+        } catch (Exception e) { fail("Filtro LucroMaoObra", e); }
     }
 }
