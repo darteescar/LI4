@@ -1,14 +1,14 @@
 package app.ecoRideCD.DAOconfig;
 
-import app.common.EcoRideException;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import app.common.EcoRideException;
+
 public final class ConnectionFactory {
-    public static final String USERNAME = "me";
-    public static final String PASSWORD = "Mypass12345678!";
+    public static final String USERNAME = "ecoride";
+    public static final String PASSWORD = "EcoRide123!";
     public static final String DATABASE = "EcoRide";
     private static final String DRIVER  = "jdbc:mysql";
     public static final String URL = DRIVER + "://localhost:3306/" + DATABASE

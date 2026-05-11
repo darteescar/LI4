@@ -1,0 +1,7 @@
+sudo mysql
+
+CREATE USER 'ecoride'@'localhost' IDENTIFIED BY 'EcoRide123!';
+CREATE DATABASE IF NOT EXISTS EcoRide;
+GRANT ALL PRIVILEGES ON EcoRide.* TO 'ecoride'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
