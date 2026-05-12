@@ -21,10 +21,6 @@ Verificar se é a segunda vez que se coloca um diagnostico
 Verificar se quando se coloca o conserto, o diagnostico já existe, o orçamento foi aprovado e as peças usadas estão em stock e são as mesmas do orçamento (diagnostico)
 Verificar quando se regista pagamento se o cliente ja foi notificado
 
-
-API:
-feito - financeiro, clientes, reparacoes, notificacoes, funcionarios, stock (peças, encomendas, stock e fornecedores)
-
 Verificar com o Claude a lógica de respostas (codigos e metodos usados) e verificar se alterações no stock, devoluções e encomendas estão a ser feitas corretamente nos dados
 
 Retirar cena que diz que o cliente so pode pagar a mais antiga.
