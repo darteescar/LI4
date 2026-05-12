@@ -25,7 +25,7 @@ interface Cliente {
   nome: string;
   email: string;
   telemovel: string;
-  NIF: string;
+  nif: string;
   codsTrotinetes: number[];
 }
 
@@ -59,7 +59,7 @@ export default function Clientes() {
 
   const columns: Column<Cliente>[] = [
     { key: "nome",     header: "Nome",      cell: (c) => <span className="font-medium">{c.nome}</span> },
-    { key: "NIF",      header: "NIF",       cell: (c) => c.NIF },
+    { key: "NIF",      header: "NIF",       cell: (c) => c.nif },
     { key: "tel",      header: "Telemóvel", cell: (c) => c.telemovel },
     { key: "email",    header: "Email",     cell: (c) => c.email },
     { key: "trots",    header: "Trotinetes", cell: (c) => (
@@ -102,6 +102,7 @@ export default function Clientes() {
         )}
       />
       <ClienteForm
+        key={editing?.id ?? "new"}
         open={open}
         onOpenChange={setOpen}
         initial={editing}
@@ -120,7 +121,7 @@ function ClienteForm({
   const form = useForm<FormValues>({
     resolver: zodResolver(clienteSchema),
     values: initial
-      ? { nome: initial.nome, nif: initial.NIF, telemovel: initial.telemovel, email: initial.email }
+      ? { nome: initial.nome, nif: initial.nif, telemovel: initial.telemovel, email: initial.email }
       : { nome: "", nif: "", telemovel: "", email: "" },
   });
 
