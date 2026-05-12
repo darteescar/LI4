@@ -178,12 +178,12 @@ function EntradaDialog({
 
   const normalForm = useForm<NormalForm>({
     resolver: zodResolver(entradaNormalSchema),
-    defaultValues: { pecaId: 0, quantidade: 1, preco: 0, dataChegada: today() },
+    defaultValues: { pecaId: 0, quantidade: "" as unknown as number, preco: "" as unknown as number, dataChegada: today() },
   });
 
   const garantiaForm = useForm<GarantiaForm>({
     resolver: zodResolver(entradaGarantiaSchema),
-    defaultValues: { pecaId: 0, preco: 0, dataChegada: today(), unidades: [{ nr_serie: "", garantia: 12 }] },
+    defaultValues: { pecaId: 0, preco: "" as unknown as number, dataChegada: today(), unidades: [{ nr_serie: "", garantia: 12 }] },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -193,8 +193,8 @@ function EntradaDialog({
 
   useEffect(() => {
     if (!open) {
-      normalForm.reset({ pecaId: 0, quantidade: 1, preco: 0, dataChegada: today() });
-      garantiaForm.reset({ pecaId: 0, preco: 0, dataChegada: today(), unidades: [{ nr_serie: "", garantia: 12 }] });
+      normalForm.reset({ pecaId: 0, quantidade: "" as unknown as number, preco: "" as unknown as number, dataChegada: today() });
+      garantiaForm.reset({ pecaId: 0, preco: "" as unknown as number, dataChegada: today(), unidades: [{ nr_serie: "", garantia: 12 }] });
       setComGarantia(false);
     }
   }, [open]);
@@ -286,12 +286,12 @@ function EntradaDialog({
 
           {!comGarantia && (
             <F label="Quantidade" error={normalForm.formState.errors.quantidade?.message}>
-              <Input type="number" min={1} {...normalForm.register("quantidade")} />
+              <Input type="number" min={1} placeholder="1" {...normalForm.register("quantidade")} />
             </F>
           )}
 
           <F label="Preço de compra (€)" error={precoErr}>
-            <Input type="number" step="0.01" min={0}
+            <Input type="number" step="0.01" min={0} placeholder="0.00"
               value={preco}
               onChange={(e) => setPreco(Number(e.target.value))}
             />

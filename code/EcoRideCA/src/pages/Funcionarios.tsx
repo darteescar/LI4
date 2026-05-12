@@ -227,7 +227,7 @@ function FuncionarioForm({
       cargo: initial.cargo ?? "MECANICO", identificador: initial.identificador ?? "", password: "",
     } : {
       nome: "", telemovel: "", email: "", data_nascimento: "", NISS: "", NIF: "", NUS: "",
-      IBAN: "", salario_hora: 0, salario_bruto: 0, numero_porta: "", rua: "", localidade: "",
+      IBAN: "", salario_hora: "" as unknown as number, salario_bruto: "" as unknown as number, numero_porta: "", rua: "", localidade: "",
       codigo_postal: "", cargo: "MECANICO", identificador: "", password: "",
     },
   });
@@ -340,10 +340,10 @@ function FuncionarioForm({
             <Input {...form.register("codigo_postal")} placeholder="1234-567" />
           </Field>
           <Field label="Vencimento por hora (€/h)" error={form.formState.errors.salario_hora?.message}>
-            <Input type="number" step="0.01" {...form.register("salario_hora")} />
+            <Input type="number" step="0.01" placeholder="0" {...form.register("salario_hora")} />
           </Field>
           <Field label="Vencimento bruto (€)" error={form.formState.errors.salario_bruto?.message}>
-            <Input type="number" step="0.01" {...form.register("salario_bruto")} />
+            <Input type="number" step="0.01" placeholder="0" {...form.register("salario_bruto")} />
           </Field>
           <DialogFooter className="sm:col-span-2 mt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>

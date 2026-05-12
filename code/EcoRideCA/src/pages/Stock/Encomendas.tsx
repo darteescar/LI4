@@ -209,13 +209,13 @@ function NovaEncomendaDialog({
   const [codFornecedor, setCodFornecedor] = useState("");
   const [itens, setItens] = useState<ItemEncomenda[]>([]);
   const [pecaId, setPecaId] = useState("");
-  const [qty, setQty] = useState(1);
-  const [preco, setPreco] = useState(0);
+  const [qty, setQty] = useState<number | "">("");
+  const [preco, setPreco] = useState<number | "">("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setCodFornecedor(""); setItens([]); setPecaId(""); setQty(1); setPreco(0);
+      setCodFornecedor(""); setItens([]); setPecaId(""); setQty(""); setPreco("");
     }
   }, [open]);
 
@@ -224,7 +224,7 @@ function NovaEncomendaDialog({
     if (qty < 1) { toast.error("Quantidade ≥ 1"); return; }
     if (itens.some((i) => i.codPeca === Number(pecaId))) { toast.error("Peça já adicionada"); return; }
     setItens((p) => [...p, { codPeca: Number(pecaId), quantidade: qty, preco_compra: preco }]);
-    setPecaId(""); setQty(1); setPreco(0);
+    setPecaId(""); setQty(""); setPreco("");
   };
 
   const pecasDisponiveis = useMemo(
@@ -285,11 +285,11 @@ function NovaEncomendaDialog({
               </div>
               <div className="space-y-1">
                 <Label className="text-xs">Qtd</Label>
-                <Input type="number" min={1} value={qty} onChange={(e) => setQty(Number(e.target.value))} />
+                <Input type="number" min={1} placeholder="1" value={qty} onChange={(e) => setQty(e.target.value === "" ? "" : Number(e.target.value))} />
               </div>
               <div className="space-y-1">
                 <Label className="text-xs">Preço (€)</Label>
-                <Input type="number" step="0.01" min={0} value={preco} onChange={(e) => setPreco(Number(e.target.value))} />
+                <Input type="number" step="0.01" min={0} placeholder="0.00" value={preco} onChange={(e) => setPreco(e.target.value === "" ? "" : Number(e.target.value))} />
               </div>
             </div>
             <Button type="button" size="sm" onClick={addItem} disabled={!pecaId}>

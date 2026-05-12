@@ -228,7 +228,7 @@ function PecaDialog({
           codFornecedor: editing.codFornecedor, preco_venda: editing.preco_venda,
           stock_minimo: editing.stock_minimo, ativa: editing.ativa,
         }
-      : { referencia: "", nome: "", descricao: "", codFornecedor: fornecedores[0]?.id ?? 0, preco_venda: 0, stock_minimo: 0, ativa: true },
+      : { referencia: "", nome: "", descricao: "", codFornecedor: fornecedores[0]?.id ?? 0, preco_venda: "" as unknown as number, stock_minimo: "" as unknown as number, ativa: true },
   });
 
   const saveMutation = useMutation({
@@ -275,10 +275,10 @@ function PecaDialog({
             </Select>
           </Field>
           <Field label="Preço de venda (€)" error={form.formState.errors.preco_venda?.message}>
-            <Input type="number" step="0.01" min={0} {...form.register("preco_venda")} />
+            <Input type="number" step="0.01" min={0} placeholder="0" {...form.register("preco_venda")} />
           </Field>
           <Field label="Stock mínimo" error={form.formState.errors.stock_minimo?.message}>
-            <Input type="number" min={0} {...form.register("stock_minimo")} />
+            <Input type="number" min={0} placeholder="0" {...form.register("stock_minimo")} />
           </Field>
           <Field label="Estado" error={form.formState.errors.ativa?.message}>
             <Select
