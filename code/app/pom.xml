@@ -14,7 +14,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <exec.mainClass>app.ecoRideUI.EcoRideApp</exec.mainClass>
+        <exec.mainClass>app.IecoRideCA.EcoRideAPI</exec.mainClass>
     </properties>
 
     <dependencies>

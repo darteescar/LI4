@@ -12,6 +12,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
 
+  if (res.status === 401) {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem("ecoride-user");
+    window.location.replace("/login");
+    throw new Error("Sessão expirada. Faz login novamente.");
+  }
+
   if (!res.ok) {
     const text = await res.text();
     let msg = text || `Erro ${res.status}`;

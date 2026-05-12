@@ -20,7 +20,7 @@ import io.javalin.Javalin;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
 
-public class EcoRideApp {
+public class EcoRideAPI {
 
     public static void main(String[] args) {
         IEcoRideLN    facade        = new EcoRideLN();
