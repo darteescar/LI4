@@ -24,3 +24,4 @@ Verificar quando se regista pagamento se o cliente ja foi notificado
 Verificar com o Claude a lógica de respostas (codigos e metodos usados) e verificar se alterações no stock, devoluções e encomendas estão a ser feitas corretamente nos dados
 
 Retirar cena que diz que o cliente so pode pagar a mais antiga.
+Adicionar marca à peça nos Use cases e requisitos.
