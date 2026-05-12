@@ -19,8 +19,6 @@ public interface ISFuncionarios {
 
      // Utilitários
 
-     public float calcularPagamentoFuncionario(int id);
-
      public void adicionarHorasExtra(int id, int horas_extra);
 
      public float registarPagamentoFuncionario(int id);

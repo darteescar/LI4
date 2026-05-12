@@ -73,7 +73,7 @@ export default function Clientes() {
     <div>
       <PageHeader
         title="Clientes"
-        description="Base de dados de clientes da oficina"
+        description="Clientes da oficina"
         actions={
           <Button onClick={() => { setEditing(null); setOpen(true); }}>
             <Plus className="h-4 w-4" /> Novo cliente

@@ -106,20 +106,6 @@ export default function Financeiro() {
       <PageHeader
         title="Financeiro"
         description="Receitas, despesas e movimentos da oficina"
-        actions={
-          <Dialog open={salarioOpen} onOpenChange={setSalarioOpen}>
-            <DialogTrigger asChild>
-              <Button>Registar salário</Button>
-            </DialogTrigger>
-            <SalarioDialog
-              funcionarios={funcionarios}
-              onSaved={() => {
-                setSalarioOpen(false);
-                qc.invalidateQueries({ queryKey: ["movimentosfinanceiros"] });
-              }}
-            />
-          </Dialog>
-        }
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -250,54 +236,5 @@ function StatCard({ label, value, icon: Icon, variant, highlight }: {
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function SalarioDialog({
-  funcionarios, onSaved,
-}: { funcionarios: Funcionario[]; onSaved: () => void }) {
-  const [funcId, setFuncId] = useState<string>(String(funcionarios[0]?.id ?? ""));
-  const [pending, setPending] = useState(false);
-
-  const submit = async () => {
-    if (!funcId) { toast.error("Escolhe o funcionário"); return; }
-    setPending(true);
-    try {
-      await api.patch(`/funcionarios/pagar/${funcId}`, {});
-      toast.success("Salário pago");
-      onSaved();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro");
-    } finally {
-      setPending(false);
-    }
-  };
-
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Registar pagamento de salário</DialogTitle>
-      </DialogHeader>
-      <div className="space-y-3">
-        <div className="space-y-1">
-          <Label className="text-xs">Funcionário</Label>
-          <Select value={funcId} onValueChange={setFuncId}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {funcionarios.map((f) => (
-                <SelectItem key={f.id} value={String(f.id)}>
-                  {f.nome} — {formatEUR(f.salario_bruto)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <DialogFooter>
-        <Button onClick={submit} disabled={pending || !funcId}>
-          {pending ? "A processar…" : "Pagar salário"}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
   );
 }

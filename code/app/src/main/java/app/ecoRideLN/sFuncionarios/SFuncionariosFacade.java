@@ -59,13 +59,12 @@ public class SFuncionariosFacade implements ISFuncionarios {
 
      // Utilitários
 
-     @Override
-     public float calcularPagamentoFuncionario(int id) {
+     private float calcularPagamentoFuncionario(int id) {
           Funcionario funcionario = funcionarioDAO.get(id);
           if (funcionario == null) {
                throw new EcoRideException("Funcionário com ID " + id + " não existe.");
           }
-          return funcionario.getSalario_liquido() + (funcionario.getHoras_extra() * funcionario.getSalario_hora());
+          return funcionario.getSalario_bruto() + (funcionario.getHoras_extra() * funcionario.getSalario_hora());
      }
 
      @Override
@@ -89,9 +88,10 @@ public class SFuncionariosFacade implements ISFuncionarios {
           if (funcionario == null) {
                throw new EcoRideException("Funcionário com ID " + id + " não existe.");
           }
+          float pagamento = calcularPagamentoFuncionario(id);
           funcionario.setHoras_extra(0);
           funcionarioDAO.put(id, funcionario);
-          return calcularPagamentoFuncionario(id);
+          return pagamento;
      }
 
      private void validaDadosFuncionario(String nome, String telemovel, String email, LocalDate data_nascimento, String NISS, String NIF, String NUS, String IBAN, float salario_hora, float salario_liquido, float salario_bruto, int horas_extra, String numero_porta, String rua, String localidade, String codigo_postal) {

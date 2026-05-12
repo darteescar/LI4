@@ -109,7 +109,7 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         }
         Utilizador u = utilizadoresDAO.get(id);
         if (!u.getPassword().equals(passwordvelha)) {
-            throw new EcoRideException("Password antiga incorreta para o utilizador com ID " + id + ".");
+            throw new EcoRideException("Password antiga incorreta.");
         }
         utilizadoresDAO.updatePassword(id, novaPassword);
         return true;

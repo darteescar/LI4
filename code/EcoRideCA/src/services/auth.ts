@@ -17,6 +17,17 @@ export interface AuthUser {
   cargo: Role;
 }
 
+async function extractMessage(res: Response, fallback: string): Promise<string> {
+  const text = await res.text();
+  if (!text) return fallback;
+  try {
+    const json = JSON.parse(text) as { mensagem?: string; message?: string };
+    return json.mensagem ?? json.message ?? text;
+  } catch {
+    return text;
+  }
+}
+
 export async function login(identificador: string, password: string): Promise<AuthUser> {
   const res = await fetch("/auth/login", {
     method: "POST",
@@ -24,8 +35,7 @@ export async function login(identificador: string, password: string): Promise<Au
     body: JSON.stringify({ identificador, password }),
   });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Credenciais inválidas");
+    throw new Error(await extractMessage(res, "Credenciais inválidas"));
   }
   const { token, cargo, idFuncionario, idUtilizador } = await res.json() as {
     token: string; cargo: string; idFuncionario: number; idUtilizador: number;
@@ -67,8 +77,7 @@ export async function changePassword(
     body: JSON.stringify({ currentPassword, newPassword }),
   });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Erro a alterar password");
+    throw new Error(await extractMessage(res, "Erro a alterar password"));
   }
 }
 

@@ -105,12 +105,12 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public Cargo             obterCargoUtilizador(int idUtilizador) {
+    public Cargo obterCargoUtilizador(int idUtilizador) {
         return sAutenticacao.obterCargoUtilizador(idUtilizador);
     }
 
     @Override
-    public int               obterIdFuncionario_Utilizador(int idUtilizador) {
+    public int obterIdFuncionario_Utilizador(int idUtilizador) {
         return sAutenticacao.obterUtilizador(idUtilizador).getIdFuncionario();
     }
 

@@ -192,6 +192,7 @@ export default function Funcionarios() {
       />
 
       <FuncionarioForm
+        key={editing?.id ?? "new"}
         open={openForm}
         onOpenChange={setOpenForm}
         initial={editing}
