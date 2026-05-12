@@ -37,10 +37,10 @@ interface Cliente {
 }
 
 const TIPOS_MOTOR = [
-  "Hub Motor",
+  "CC c/ escovas",
+  "CC s/ escovas",
+  "Hub",
   "Mid-Drive",
-  "Belt Drive",
-  "Chain Drive",
 ] as const;
 
 type TipoMotor = typeof TIPOS_MOTOR[number];
