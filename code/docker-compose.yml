@@ -56,5 +56,26 @@ services:
     depends_on:
       - backend
 
+  # ── Info ───────────────────────────────────────────────────────────────────
+  # Serviço de curta duração que imprime os links no terminal após o arranque.
+  info:
+    image: alpine
+    restart: "no"
+    depends_on:
+      - frontend
+      - swagger
+    command: >
+      sh -c "
+        echo '' &&
+        echo '┌─────────────────────────────────────────┐' &&
+        echo '│           EcoRide — a correr            │' &&
+        echo '├─────────────────────────────────────────┤' &&
+        echo '│  Interface    →  http://localhost       │' &&
+        echo '│  API directa  →  http://localhost:7000  │' &&
+        echo '│  Swagger UI   →  http://localhost:8081  │' &&
+        echo '└─────────────────────────────────────────┘' &&
+        echo ''
+      "
+
 volumes:
   mysql_data:

@@ -67,8 +67,7 @@ export default function Login() {
               <Label htmlFor="identificador">Identificador</Label>
               <Input
                 id="identificador"
-                autoComplete="username"
-                placeholder="ex: ana"
+                placeholder="João Martins"
                 {...form.register("identificador")}
               />
               {form.formState.errors.identificador && (
@@ -80,7 +79,6 @@ export default function Login() {
               <Input
                 id="password"
                 type="password"
-                autoComplete="current-password"
                 placeholder="••••"
                 {...form.register("password")}
               />
@@ -99,25 +97,6 @@ export default function Login() {
               {form.formState.isSubmitting ? "A entrar…" : "Entrar"}
             </Button>
           </form>
-
-          <div className="mt-6 rounded-md border bg-muted/40 p-3">
-            <p className="mb-2 text-xs font-medium text-muted-foreground">
-              Utilizadores de demonstração (password: <code className="font-mono">1234</code>)
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_USERS.map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => fillDemo(u.id)}
-                  className="rounded border bg-card px-2 py-1.5 text-left text-xs hover:bg-accent transition-colors"
-                >
-                  <div className="font-medium">{u.id}</div>
-                  <div className="text-muted-foreground">{u.role}</div>
-                </button>
-              ))}
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

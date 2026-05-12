@@ -27,6 +27,7 @@ public class EcoRideAPI {
         GestorSessoes gestorSessoes = new GestorSessoes();
 
         Javalin app = Javalin.create(config -> {
+            config.showJavalinBanner = false;
             config.jsonMapper(new JavalinJackson().updateMapper(m ->
                 m.registerModule(new JavaTimeModule())
             ));
