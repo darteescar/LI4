@@ -649,6 +649,9 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean removerFuncionario(int id) {
+        sAutenticacao.obterUtilizadores().stream()
+                .filter(u -> u.getIdFuncionario() == id)
+                .forEach(u -> sAutenticacao.removerUtilizador(u.getId()));
         return sFuncionarios.removerFuncionario(id);
     }
 

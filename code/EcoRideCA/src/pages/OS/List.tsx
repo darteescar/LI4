@@ -156,7 +156,7 @@ export default function OSList() {
     <div>
       <PageHeader
         title={meu ? "Minhas Ordens de Serviço" : "Ordens de Serviço"}
-        description="Lista de OS — diagnóstico, reparação e pagamento"
+        description="Lista de Ordens de Serviço"
         actions={
           canCreate ? (
             <Button asChild>
