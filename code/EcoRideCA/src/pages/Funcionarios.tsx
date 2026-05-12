@@ -58,10 +58,10 @@ type FuncionarioRow = Funcionario & { cargo?: Role; identificador?: string; util
 const ROLES: Role[] = ["GERENTE", "GESTOR_STOCK", "SECRETARIA", "MECANICO"];
 
 const ROLE_BADGE: Record<Role, string> = {
-  GERENTE:      "bg-primary-soft text-primary",
-  GESTOR_STOCK: "bg-info-soft text-info",
-  SECRETARIA:   "bg-warning-soft text-warning",
-  MECANICO:     "bg-success-soft text-success",
+  GERENTE:      "bg-purple-100 text-purple-700",
+  GESTOR_STOCK: "bg-blue-100 text-blue-700",
+  SECRETARIA:   "bg-pink-100 text-pink-700",
+  MECANICO:     "bg-orange-100 text-orange-700",
 };
 
 // Mapping backend cargo name → Role
@@ -78,9 +78,10 @@ const createSchema = z.object({
   NISS:          z.string().regex(/^\d{11}$/, "NISS deve ter 11 dígitos"),
   NIF:           z.string().regex(/^\d{9}$/, "NIF deve ter 9 dígitos"),
   NUS:           z.string().trim().min(1, "NUS obrigatório"),
-  IBAN:          z.string().regex(/^PT50\d{21}$/, "IBAN inválido"),
+  IBAN:          z.string().regex(/^\d{21}$/, "IBAN deve ter 21 dígitos após PT50-"),
   salario_hora:  z.coerce.number().min(0),
   salario_bruto: z.coerce.number().min(0),
+  numero_porta:  z.string().regex(/^\d{1,4}[A-Za-z]?$/, "Número de porta inválido"),
   rua:           z.string().trim().min(3, "Morada obrigatória"),
   localidade:    z.string().trim().min(1, "Localidade obrigatória"),
   codigo_postal: z.string().regex(/^\d{4}-\d{3}$/, "Código postal inválido"),
@@ -219,13 +220,13 @@ function FuncionarioForm({
     values: initial ? {
       nome: initial.nome, telemovel: initial.telemovel, email: initial.email,
       data_nascimento: initial.data_nascimento, NISS: initial.NISS, NIF: initial.NIF,
-      NUS: initial.NUS, IBAN: initial.IBAN, salario_hora: initial.salario_hora,
-      salario_bruto: initial.salario_bruto, rua: initial.rua, localidade: initial.localidade,
-      codigo_postal: initial.codigo_postal,
+      NUS: initial.NUS, IBAN: (initial.IBAN ?? "").replace(/^PT50/, ""), salario_hora: initial.salario_hora,
+      salario_bruto: initial.salario_bruto, numero_porta: initial.numero_porta, rua: initial.rua,
+      localidade: initial.localidade, codigo_postal: initial.codigo_postal,
       cargo: initial.cargo ?? "MECANICO", identificador: initial.identificador ?? "", password: "",
     } : {
       nome: "", telemovel: "", email: "", data_nascimento: "", NISS: "", NIF: "", NUS: "",
-      IBAN: "", salario_hora: 0, salario_bruto: 0, rua: "", localidade: "",
+      IBAN: "", salario_hora: 0, salario_bruto: 0, numero_porta: "", rua: "", localidade: "",
       codigo_postal: "", cargo: "MECANICO", identificador: "", password: "",
     },
   });
@@ -236,8 +237,9 @@ function FuncionarioForm({
       if (initial) {
         // update funcionario
         await api.patch(`/funcionarios/${initial.id}`, {
-          ...funcData, salario_liquido: funcData.salario_bruto,
-          horas_extra: initial.horas_extra, numero_porta: "",
+          ...funcData, IBAN: "PT50" + funcData.IBAN,
+          salario_liquido: funcData.salario_bruto,
+          horas_extra: initial.horas_extra,
         });
         // update utilizador if exists
         if (initial.utilizadorId) {
@@ -247,8 +249,9 @@ function FuncionarioForm({
         }
       } else {
         const newFunc = await api.post<Funcionario>("/funcionarios", {
-          ...funcData, salario_liquido: funcData.salario_bruto,
-          horas_extra: 0, numero_porta: "",
+          ...funcData, IBAN: "PT50" + funcData.IBAN,
+          salario_liquido: funcData.salario_bruto,
+          horas_extra: 0,
         });
         await api.post("/utilizadores", {
           password, idFuncionario: newFunc.id, cargo: cargoToBackend(cargo), identificador,
@@ -309,12 +312,24 @@ function FuncionarioForm({
             <Input {...form.register("NUS")} />
           </Field>
           <Field label="IBAN" error={form.formState.errors.IBAN?.message}>
-            <Input {...form.register("IBAN")} placeholder="PT50…" />
+            <div className="flex h-10 rounded-md border border-input overflow-hidden ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+              <span className="flex items-center bg-muted px-3 text-sm text-muted-foreground select-none border-r border-input">
+                PT50-
+              </span>
+              <input
+                {...form.register("IBAN")}
+                maxLength={21}
+                className="flex-1 bg-background px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
           </Field>
           <Field label="Data de nascimento" error={form.formState.errors.data_nascimento?.message}>
             <Input type="date" {...form.register("data_nascimento")} />
           </Field>
-          <Field label="Morada (rua)" error={form.formState.errors.rua?.message} className="sm:col-span-2">
+          <Field label="Número de porta" error={form.formState.errors.numero_porta?.message}>
+            <Input {...form.register("numero_porta")} maxLength={5} />
+          </Field>
+          <Field label="Rua" error={form.formState.errors.rua?.message}>
             <Input {...form.register("rua")} />
           </Field>
           <Field label="Localidade" error={form.formState.errors.localidade?.message}>

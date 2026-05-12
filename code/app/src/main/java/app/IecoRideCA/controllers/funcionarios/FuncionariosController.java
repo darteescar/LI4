@@ -36,7 +36,7 @@ public class FuncionariosController {
         app.post("/api/funcionarios", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
-            Funcionario criado = facade.registarFuncionario(req.nome(), req.email(), req.telemovel(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
+            Funcionario criado = facade.registarFuncionario(req.nome(), req.telemovel(), req.email(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
             ctx.status(201).json(criado);
         });
 
@@ -52,7 +52,7 @@ public class FuncionariosController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
             int id = Integer.parseInt(ctx.pathParam("id"));
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
-            Funcionario atualizado = facade.atualizarFuncionario(id, req.nome(), req.email(), req.telemovel(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
+            Funcionario atualizado = facade.atualizarFuncionario(id, req.nome(), req.telemovel(), req.email(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
             if (atualizado == null) ctx.status(404);
             else ctx.json(atualizado);
         });
