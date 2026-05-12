@@ -48,11 +48,14 @@ const ESTADO_VARIANT: Record<EstadoEncomenda, "outline" | "secondary"> = {
 };
 
 interface ItemEncomenda { codPeca: number; quantidade: number; preco_compra: number; }
+interface StockEntry { id: number; codPeca: number; quantidade: number; estado: string; }
+
 
 export default function StockEncomendas() {
   const qc = useQueryClient();
   const { role: userRole } = useAuth();
   const [openNew, setOpenNew] = useState(false);
+  const [openAuto, setOpenAuto] = useState(false);
   const [openReceber, setOpenReceber] = useState<Encomenda | null>(null);
 
   const canEdit = userRole === "GERENTE" || userRole === "GESTOR_STOCK";
@@ -86,12 +89,6 @@ export default function StockEncomendas() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const autoMutation = useMutation({
-    mutationFn: () => api.post<Encomenda>("/encomendas/automatica", {}),
-    onSuccess: () => { toast.success("Lista automática gerada"); invalidate(); },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   const fornecedorNome = (id: number) => fornecedores.find((f) => f.id === id)?.nome ?? "—";
 
   return (
@@ -102,9 +99,8 @@ export default function StockEncomendas() {
         actions={
           canEdit ? (
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => autoMutation.mutate()} disabled={autoMutation.isPending}>
-                <Sparkles className="h-4 w-4" />
-                {autoMutation.isPending ? "A gerar…" : "Lista automática"}
+              <Button variant="outline" onClick={() => setOpenAuto(true)}>
+                <Sparkles className="h-4 w-4" /> Lista automática
               </Button>
               <Button onClick={() => setOpenNew(true)}>
                 <Plus className="h-4 w-4" /> Nova encomenda
@@ -189,6 +185,13 @@ export default function StockEncomendas() {
             fornecedores={fornecedores}
             onSaved={() => { setOpenNew(false); invalidate(); }}
           />
+          <ListaAutomaticaDialog
+            open={openAuto}
+            onOpenChange={setOpenAuto}
+            pecas={pecas}
+            fornecedores={fornecedores}
+            onSaved={() => { setOpenAuto(false); invalidate(); }}
+          />
           <ReceberEncomendaDialog
             encomenda={openReceber}
             onClose={() => setOpenReceber(null)}
@@ -197,6 +200,207 @@ export default function StockEncomendas() {
         </>
       )}
     </div>
+  );
+}
+
+function ListaAutomaticaDialog({
+  open, onOpenChange, pecas, fornecedores, onSaved,
+}: {
+  open: boolean; onOpenChange: (v: boolean) => void;
+  pecas: Peca[]; fornecedores: Fornecedor[]; onSaved: () => void;
+}) {
+  const [autoResult, setAutoResult] = useState<Record<string, Encomenda> | null>(null);
+  const [freshStocks, setFreshStocks] = useState<StockEntry[]>([]);
+  const [generating, setGenerating] = useState(false);
+  const [selectedFornId, setSelectedFornId] = useState<number | null>(null);
+  const [itens, setItens] = useState<ItemEncomenda[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const hasResult = autoResult !== null;
+
+  const reset = () => {
+    setAutoResult(null);
+    setFreshStocks([]);
+    setSelectedFornId(null);
+    setItens([]);
+  };
+
+  useEffect(() => { if (!open) { reset(); setSaving(false); } }, [open]);
+
+  const generate = async () => {
+    setGenerating(true);
+    try {
+      const result = await api.post<Record<string, Encomenda>>("/encomendas/automatica", {});
+      const stocks = await api.get<StockEntry[]>("/stocks");
+      setAutoResult(result);
+      setFreshStocks(stocks);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const deleteAutoEncomendas = () => {
+    if (!autoResult) return Promise.resolve();
+    return Promise.all(
+      Object.values(autoResult).map((e) => api.delete(`/encomendas/${e.id}`).catch(() => {}))
+    );
+  };
+
+  const handleClose = () => {
+    if (hasResult) deleteAutoEncomendas();
+    reset();
+    onOpenChange(false);
+  };
+
+  const pickFornecedor = (id: number) => {
+    setSelectedFornId(id);
+    if (!autoResult) return;
+    const enc = autoResult[String(id)];
+    if (!enc) return;
+    setItens(
+      enc.codStocks.flatMap((sId) => {
+        const s = freshStocks.find((x) => x.id === sId);
+        return s ? [{ codPeca: s.codPeca, quantidade: s.quantidade, preco_compra: 0 }] : [];
+      })
+    );
+  };
+
+  const updateQty = (i: number, v: number) =>
+    setItens((prev) => prev.map((x, j) => j === i ? { ...x, quantidade: Math.max(1, v) } : x));
+
+  const updatePreco = (i: number, v: string) =>
+    setItens((prev) => prev.map((x, j) => j === i ? { ...x, preco_compra: v === "" ? 0 : Number(v) } : x));
+
+  const removeItem = (i: number) => setItens((prev) => prev.filter((_, j) => j !== i));
+
+  const pecaLabel = (codPeca: number) => {
+    const p = pecas.find((x) => x.id === codPeca);
+    return p ? `${p.referencia} · ${p.nome}` : `#${codPeca}`;
+  };
+
+  const submit = async () => {
+    if (!selectedFornId || itens.length === 0) return;
+    setSaving(true);
+    try {
+      await deleteAutoEncomendas();
+      await api.post("/encomendas", {
+        cod_fornecedor: selectedFornId,
+        itens: itens.map((i) => ({ codPeca: i.codPeca, quantidade: i.quantidade, preco_compra: i.preco_compra })),
+      });
+      toast.success("Encomenda criada");
+      onSaved();
+    } catch (e) {
+      toast.error((e as Error).message);
+      setSaving(false);
+    }
+  };
+
+  const fornIds = hasResult ? Object.keys(autoResult).map(Number) : [];
+  const fornComEncomendas = fornecedores.filter((f) => fornIds.includes(f.id));
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader><DialogTitle>Lista de encomenda automática</DialogTitle></DialogHeader>
+
+        {!hasResult ? (
+          <div className="space-y-3 py-4">
+            <p className="text-sm text-muted-foreground">
+              Gera automaticamente encomendas para todas as peças abaixo do stock mínimo,
+              agrupadas por fornecedor. Depois escolhes o fornecedor e ajustas as quantidades.
+            </p>
+            <Button onClick={generate} disabled={generating}>
+              <Sparkles className="h-4 w-4" /> {generating ? "A gerar…" : "Gerar lista"}
+            </Button>
+          </div>
+        ) : fornComEncomendas.length === 0 ? (
+          <div className="rounded-md border border-success/30 bg-success-soft p-4 text-sm text-success">
+            Todas as peças estão acima do stock mínimo. Não há sugestões de encomenda.
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">1. Seleciona o fornecedor</Label>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {fornComEncomendas.map((f) => {
+                  const enc = autoResult[String(f.id)];
+                  const nItems = enc?.codStocks.length ?? 0;
+                  const isSelected = selectedFornId === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => pickFornecedor(f.id)}
+                      className={`rounded-lg border p-3 text-left transition-colors ${
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary"
+                          : "border-border hover:border-primary/40"
+                      }`}
+                    >
+                      <div className="font-medium text-sm">{f.nome}</div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        {nItems} peça{nItems !== 1 ? "s" : ""} a encomendar
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {selectedFornId !== null && itens.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">2. Revê e ajusta os itens</Label>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Peça</TableHead>
+                        <TableHead className="w-28">Quantidade</TableHead>
+                        <TableHead className="w-36">Preço unit. (€)</TableHead>
+                        <TableHead className="w-8" />
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {itens.map((item, i) => (
+                        <TableRow key={item.codPeca}>
+                          <TableCell className="font-medium text-sm">{pecaLabel(item.codPeca)}</TableCell>
+                          <TableCell>
+                            <Input type="number" min={1} className="h-8"
+                              value={item.quantidade}
+                              onChange={(e) => updateQty(i, Number(e.target.value))} />
+                          </TableCell>
+                          <TableCell>
+                            <Input type="number" step="0.01" min={0} className="h-8"
+                              placeholder="0.00"
+                              value={item.preco_compra || ""}
+                              onChange={(e) => updatePreco(i, e.target.value)} />
+                          </TableCell>
+                          <TableCell>
+                            <Button variant="ghost" size="icon" onClick={() => removeItem(i)}
+                              disabled={itens.length === 1}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleClose} disabled={saving}>Cancelar</Button>
+          <Button onClick={submit} disabled={saving || !selectedFornId || itens.length === 0}>
+            {saving ? "A criar…" : "Criar encomenda"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

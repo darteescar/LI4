@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Trash2, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, CheckCircle2, ShieldCheck, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -88,6 +88,7 @@ interface Peca { id: number; referencia: string; nome: string; preco_venda: numb
 interface Funcionario { id: number; nome: string; }
 interface Cliente { id: number; nome: string; NIF: string; telemovel: string; email: string; }
 interface Trotinete { id: number; marca: string; modelo: string; num_serie: string; tipo_motor: string; cod_cliente: number; }
+interface StockEntry { id: number; codPeca: number; quantidade: number; estado: string; nr_serie?: string; }
 
 export default function OSDetail() {
   const { id } = useParams<{ id: string }>();
@@ -305,6 +306,7 @@ export default function OSDetail() {
             reparacoes={reparacoes}
             pecas={pecas}
             canEdit={canMecOps && (os.estado === "PendenteReparacao" || os.estado === "AguardarPecas")}
+            canReportDefeito={canMecOps}
             onChanged={reload}
           />
         </TabsContent>
@@ -626,11 +628,17 @@ function DiagnosticoTab({
 
 // ---------- Conserto ----------
 function ConsertoTab({
-  os, reparacoes, pecas, canEdit, onChanged,
+  os, reparacoes, pecas, canEdit, canReportDefeito, onChanged,
 }: {
   os: OrdemServico; reparacoes: Reparacao[]; pecas: Peca[];
-  canEdit: boolean; onChanged: () => void;
+  canEdit: boolean; canReportDefeito: boolean; onChanged: () => void;
 }) {
+  const { data: stocks = [] } = useQuery<StockEntry[]>({
+    queryKey: ["stocks"],
+    queryFn: () => api.get<StockEntry[]>("/stocks"),
+    enabled: canReportDefeito && !!os.conserto,
+  });
+  const [defeitoOpen, setDefeitoOpen] = useState(false);
   const diag = os.diagnostico;
   const existing = os.conserto;
 
@@ -702,6 +710,7 @@ function ConsertoTab({
   }
 
   return (
+    <>
     <div className="grid gap-4 lg:grid-cols-3">
       <Card className="lg:col-span-2">
         <CardHeader><CardTitle className="text-base">Execução do conserto</CardTitle></CardHeader>
@@ -828,9 +837,29 @@ function ConsertoTab({
           {!allChecked && canEdit && (
             <p className="text-xs text-muted-foreground">Completa o checklist para poder concluir.</p>
           )}
+          {canReportDefeito && existing && (
+            <>
+              <hr />
+              <Button variant="outline" className="w-full text-destructive" onClick={() => setDefeitoOpen(true)}>
+                <AlertTriangle className="h-4 w-4" /> Reportar peça com defeito
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
+
+    {canReportDefeito && existing && (
+      <DefeitoDialog
+        open={defeitoOpen}
+        onOpenChange={setDefeitoOpen}
+        osId={os.id}
+        pecas={pecas}
+        stocks={stocks}
+        onSaved={() => { setDefeitoOpen(false); onChanged(); }}
+      />
+    )}
+    </>
   );
 }
 
@@ -928,6 +957,126 @@ function PagamentoTab({
         )}
       </CardContent>
     </Card>
+  );
+}
+
+// ---------- Defeito Dialog ----------
+function DefeitoDialog({
+  open, onOpenChange, osId, pecas, stocks, onSaved,
+}: {
+  open: boolean; onOpenChange: (v: boolean) => void;
+  osId: number; pecas: Peca[]; stocks: StockEntry[]; onSaved: () => void;
+}) {
+  const [pecaId, setPecaId] = useState<number>(0);
+  const [motivo, setMotivo] = useState("");
+  const [selectedStocks, setSelectedStocks] = useState<number[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const pecaAtiva = pecas.filter((p) => p.ativa);
+
+  const stocksDaPeca = useMemo(
+    () => stocks.filter((s) => s.codPeca === pecaId && s.nr_serie),
+    [stocks, pecaId],
+  );
+
+  const isSerialized = stocksDaPeca.length > 0;
+
+  const reset = () => {
+    setPecaId(0); setMotivo(""); setSelectedStocks([]); setSaving(false);
+  };
+
+  const toggleStock = (id: number) =>
+    setSelectedStocks((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+
+  const submit = async () => {
+    if (!pecaId) { return; }
+    if (!motivo.trim()) { return; }
+    if (isSerialized && selectedStocks.length === 0) { return; }
+    setSaving(true);
+    try {
+      if (isSerialized) {
+        await api.post(`/ordensservicos/${osId}/defeitos/serializado`, {
+          codStocks: selectedStocks,
+          motivo: motivo.trim(),
+        });
+      } else {
+        await api.post(`/ordensservicos/${osId}/defeitos/fungivel`, {
+          codPeca: pecaId,
+          motivo: motivo.trim(),
+        });
+      }
+      reset();
+      onSaved();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle>Reportar peça com defeito</DialogTitle></DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <Label className="text-xs">Peça</Label>
+            <Select value={String(pecaId)} onValueChange={(v) => { setPecaId(Number(v)); setSelectedStocks([]); }}>
+              <SelectTrigger><SelectValue placeholder="Selecionar peça…" /></SelectTrigger>
+              <SelectContent>
+                {pecaAtiva.map((p) => (
+                  <SelectItem key={p.id} value={String(p.id)}>{p.referencia} — {p.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {pecaId > 0 && isSerialized && (
+            <div className="space-y-2">
+              <Label className="text-xs">Unidades com defeito (nº de série)</Label>
+              <div className="max-h-40 overflow-y-auto rounded border p-2 space-y-1">
+                {stocksDaPeca.map((s) => (
+                  <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <Checkbox
+                      checked={selectedStocks.includes(s.id)}
+                      onCheckedChange={() => toggleStock(s.id)}
+                    />
+                    <span className="font-mono">{s.nr_serie}</span>
+                  </label>
+                ))}
+              </div>
+              {selectedStocks.length === 0 && (
+                <p className="text-xs text-destructive">Seleciona pelo menos uma unidade</p>
+              )}
+            </div>
+          )}
+
+          {pecaId > 0 && !isSerialized && (
+            <p className="text-xs text-muted-foreground">
+              Peça fungível — todas as unidades desta peça usadas no conserto serão marcadas com possível defeito.
+            </p>
+          )}
+
+          <div className="space-y-1">
+            <Label className="text-xs">Motivo</Label>
+            <Textarea
+              rows={3}
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Descreve o defeito observado…"
+            />
+            {!motivo.trim() && <p className="text-xs text-destructive">Motivo obrigatório</p>}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => { reset(); onOpenChange(false); }}>Cancelar</Button>
+          <Button
+            type="button"
+            disabled={saving || !pecaId || !motivo.trim() || (isSerialized && selectedStocks.length === 0)}
+            onClick={submit}
+          >
+            {saving ? "A reportar…" : "Reportar defeito"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

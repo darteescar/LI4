@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trash2, Undo2, X } from "lucide-react";
+import { Trash2, Undo2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -123,10 +123,9 @@ export default function StockDefeitos() {
                         <Undo2 className="h-4 w-4" />
                       </Button>
                       <ConfirmDialog
-                        trigger={<Button variant="ghost" size="icon" title="Descartar"><X className="h-4 w-4 text-warning" /></Button>}
-                        title="Descartar defeito?"
-                        description="O item defeituoso será marcado como descartado."
-                        destructive
+                        trigger={<Button variant="ghost" size="icon" title="Devolver ao stock"><RotateCcw className="h-4 w-4 text-success" /></Button>}
+                        title="Devolver ao stock?"
+                        description="O item é considerado sem defeito e será reposto no estado anterior."
                         onConfirm={() => descartarMutation.mutate(d.id)}
                       />
                       <ConfirmDialog
