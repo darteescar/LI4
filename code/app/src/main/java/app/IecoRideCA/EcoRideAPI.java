@@ -14,6 +14,7 @@ import app.IecoRideCA.controllers.ordensservico.OrdemServicoController;
 import app.IecoRideCA.controllers.reparacoes.ReparacoesController;
 import app.IecoRideCA.controllers.stock.StockController;
 import app.IecoRideCA.controllers.users.UsersController;
+import app.ecoRideCD.DAOconfig.DBInitializer;
 import app.ecoRideLN.EcoRideLN;
 import app.ecoRideLN.IEcoRideLN;
 import io.javalin.Javalin;
@@ -23,6 +24,8 @@ import io.javalin.json.JavalinJackson;
 public class EcoRideAPI {
 
     public static void main(String[] args) {
+        DBInitializer.run();
+
         IEcoRideLN    facade        = new EcoRideLN();
         GestorSessoes gestorSessoes = new GestorSessoes();
 
