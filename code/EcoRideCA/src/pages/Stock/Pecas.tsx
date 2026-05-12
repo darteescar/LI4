@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +27,9 @@ import {
 import { api } from "@/services/api";
 import { formatEUR } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
+import { pecaSchema } from "@/lib/validators";
+
+type PecaForm = z.infer<typeof pecaSchema>;
 
 interface Peca {
   id: number; referencia: string; nome: string; descricao: string;
@@ -37,15 +43,6 @@ interface StockEntry {
   preco_compra: number; data_chegada: string;
 }
 
-interface PecaForm {
-  referencia: string; nome: string; descricao: string;
-  codFornecedor: number; preco_venda: number; stock_minimo: number; ativa: boolean;
-}
-
-const EMPTY: PecaForm = {
-  referencia: "", nome: "", descricao: "",
-  codFornecedor: 0, preco_venda: 0, stock_minimo: 0, ativa: true,
-};
 
 export default function StockPecas() {
   const { role } = useAuth();
@@ -223,49 +220,28 @@ function PecaDialog({
   open: boolean; onOpenChange: (v: boolean) => void;
   editing: Peca | null; fornecedores: Fornecedor[]; onSaved: () => void;
 }) {
-  const [form, setForm] = useState<PecaForm>(EMPTY);
-  const [saving, setSaving] = useState(false);
+  const form = useForm<PecaForm>({
+    resolver: zodResolver(pecaSchema),
+    values: editing
+      ? {
+          referencia: editing.referencia, nome: editing.nome, descricao: editing.descricao,
+          codFornecedor: editing.codFornecedor, preco_venda: editing.preco_venda,
+          stock_minimo: editing.stock_minimo, ativa: editing.ativa,
+        }
+      : { referencia: "", nome: "", descricao: "", codFornecedor: fornecedores[0]?.id ?? 0, preco_venda: 0, stock_minimo: 0, ativa: true },
+  });
 
-  useEffect(() => {
-    if (open) {
-      setForm(editing
-        ? {
-            referencia: editing.referencia, nome: editing.nome, descricao: editing.descricao,
-            codFornecedor: editing.codFornecedor, preco_venda: editing.preco_venda,
-            stock_minimo: editing.stock_minimo, ativa: editing.ativa,
-          }
-        : { ...EMPTY, codFornecedor: fornecedores[0]?.id ?? 0 });
-    }
-  }, [open, editing, fornecedores]);
-
-  const set = <K extends keyof PecaForm>(k: K, v: PecaForm[K]) =>
-    setForm((f) => ({ ...f, [k]: v }));
-
-  const submit = async () => {
-    if (!form.referencia.trim()) { toast.error("Referência obrigatória"); return; }
-    if (!form.nome.trim()) { toast.error("Nome obrigatório"); return; }
-    if (!form.codFornecedor) { toast.error("Fornecedor obrigatório"); return; }
-    setSaving(true);
-    try {
-      if (editing) {
-        await api.patch(`/pecas/${editing.id}`, {
-          referencia: form.referencia, nome: form.nome, descricao: form.descricao,
-          stock_minimo: form.stock_minimo, preco_venda: form.preco_venda,
-          codFornecedor: form.codFornecedor, ativa: form.ativa,
-        });
-        toast.success("Peça atualizada");
-      } else {
-        await api.post("/pecas", {
-          referencia: form.referencia, nome: form.nome, descricao: form.descricao,
-          stock_minimo: form.stock_minimo, preco_venda: form.preco_venda,
-          codFornecedor: form.codFornecedor, ativa: form.ativa,
-        });
-        toast.success("Peça criada");
-      }
+  const saveMutation = useMutation({
+    mutationFn: (v: PecaForm) =>
+      editing
+        ? api.patch(`/pecas/${editing.id}`, v)
+        : api.post("/pecas", v),
+    onSuccess: () => {
+      toast.success(editing ? "Peça atualizada" : "Peça criada");
       onSaved();
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setSaving(false); }
-  };
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -273,20 +249,23 @@ function PecaDialog({
         <DialogHeader>
           <DialogTitle>{editing ? "Editar peça" : "Nova peça"}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Referência">
-            <Input value={form.referencia} onChange={(e) => set("referencia", e.target.value)} />
+        <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="grid gap-3 sm:grid-cols-2">
+          <Field label="Referência" error={form.formState.errors.referencia?.message}>
+            <Input {...form.register("referencia")} />
           </Field>
-          <Field label="Nome">
-            <Input value={form.nome} onChange={(e) => set("nome", e.target.value)} />
+          <Field label="Nome" error={form.formState.errors.nome?.message}>
+            <Input {...form.register("nome")} />
           </Field>
           <div className="sm:col-span-2">
-            <Field label="Descrição">
-              <Textarea rows={2} value={form.descricao} onChange={(e) => set("descricao", e.target.value)} />
+            <Field label="Descrição" error={form.formState.errors.descricao?.message}>
+              <Textarea rows={2} {...form.register("descricao")} />
             </Field>
           </div>
-          <Field label="Fornecedor">
-            <Select value={String(form.codFornecedor)} onValueChange={(v) => set("codFornecedor", Number(v))}>
+          <Field label="Fornecedor" error={form.formState.errors.codFornecedor?.message}>
+            <Select
+              value={String(form.watch("codFornecedor"))}
+              onValueChange={(v) => form.setValue("codFornecedor", Number(v), { shouldValidate: true })}
+            >
               <SelectTrigger><SelectValue placeholder="Escolher fornecedor…" /></SelectTrigger>
               <SelectContent>
                 {fornecedores.map((f) => (
@@ -295,17 +274,17 @@ function PecaDialog({
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Preço de venda (€)">
-            <Input type="number" step="0.01" min={0} value={form.preco_venda}
-              onChange={(e) => set("preco_venda", Number(e.target.value))} />
+          <Field label="Preço de venda (€)" error={form.formState.errors.preco_venda?.message}>
+            <Input type="number" step="0.01" min={0} {...form.register("preco_venda")} />
           </Field>
-          <Field label="Stock mínimo">
-            <Input type="number" min={0} value={form.stock_minimo}
-              onChange={(e) => set("stock_minimo", Number(e.target.value))} />
+          <Field label="Stock mínimo" error={form.formState.errors.stock_minimo?.message}>
+            <Input type="number" min={0} {...form.register("stock_minimo")} />
           </Field>
-          <Field label="Estado">
-            <Select value={form.ativa ? "true" : "false"}
-              onValueChange={(v) => set("ativa", v === "true")}>
+          <Field label="Estado" error={form.formState.errors.ativa?.message}>
+            <Select
+              value={form.watch("ativa") ? "true" : "false"}
+              onValueChange={(v) => form.setValue("ativa", v === "true", { shouldValidate: true })}
+            >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="true">Ativa</SelectItem>
@@ -313,23 +292,24 @@ function PecaDialog({
               </SelectContent>
             </Select>
           </Field>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={submit} disabled={saving}>
-            {saving ? "A guardar…" : editing ? "Guardar" : "Criar"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="sm:col-span-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+            <Button type="submit" disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? "A guardar…" : editing ? "Guardar" : "Criar"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
       <Label className="text-xs">{label}</Label>
       {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }

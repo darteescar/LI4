@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2, Undo2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -20,6 +23,9 @@ import {
 
 import { api } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
+import { devolverDefeitoSchema } from "@/lib/validators";
+
+type DevolverForm = z.infer<typeof devolverDefeitoSchema>;
 
 interface Defeito {
   id: number; codStock: number; motivo: string; idFuncionario: number;
@@ -157,43 +163,47 @@ function DevolverDialog({
 }: {
   defeito: Defeito | null; onClose: () => void; onSaved: () => void;
 }) {
-  const [motivo, setMotivo] = useState("");
-  const [data, setData] = useState(new Date().toISOString().slice(0, 10));
-  const [saving, setSaving] = useState(false);
+  const form = useForm<DevolverForm>({
+    resolver: zodResolver(devolverDefeitoSchema),
+    defaultValues: { data: new Date().toISOString().slice(0, 10), motivo: "" },
+  });
 
-  const submit = async () => {
+  const onSubmit = async (v: DevolverForm) => {
     if (!defeito) return;
-    if (!motivo.trim()) { toast.error("Indica o motivo da devolução"); return; }
-    setSaving(true);
     try {
-      await api.patch(`/defeitos/${defeito.id}/devolver`, { motivo: motivo.trim(), data });
+      await api.patch(`/defeitos/${defeito.id}/devolver`, { motivo: v.motivo, data: v.data });
       toast.success("Devolução criada");
+      form.reset();
       onSaved();
     } catch (e) { toast.error((e as Error).message); }
-    finally { setSaving(false); }
   };
 
   return (
-    <Dialog open={!!defeito} onOpenChange={(v) => !v && onClose()}>
+    <Dialog open={!!defeito} onOpenChange={(v) => { if (!v) { form.reset(); onClose(); } }}>
       <DialogContent>
         <DialogHeader><DialogTitle>Devolver ao fornecedor</DialogTitle></DialogHeader>
-        <div className="space-y-3">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           <div className="space-y-1">
             <Label className="text-xs">Data de devolução</Label>
-            <Input type="date" value={data} onChange={(e) => setData(e.target.value)} />
+            <Input type="date" {...form.register("data")} />
+            {form.formState.errors.data && (
+              <p className="text-xs text-destructive">{form.formState.errors.data.message}</p>
+            )}
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Motivo</Label>
-            <Textarea rows={3} value={motivo} onChange={(e) => setMotivo(e.target.value)}
-              placeholder="Descreve o motivo da devolução…" />
+            <Textarea rows={3} placeholder="Descreve o motivo da devolução…" {...form.register("motivo")} />
+            {form.formState.errors.motivo && (
+              <p className="text-xs text-destructive">{form.formState.errors.motivo.message}</p>
+            )}
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={submit} disabled={saving}>
-            {saving ? "A criar…" : "Criar devolução"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => { form.reset(); onClose(); }}>Cancelar</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "A criar…" : "Criar devolução"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

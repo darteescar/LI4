@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -23,6 +26,7 @@ import {
 import { api } from "@/services/api";
 import { formatEUR } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
+import { entradaNormalSchema, entradaGarantiaSchema } from "@/lib/validators";
 
 interface Peca { id: number; referencia: string; nome: string; preco_venda: number; codFornecedor: number; }
 interface StockEntry {
@@ -41,6 +45,11 @@ const ESTADO_LABELS: Record<string, string> = {
   StockinvalidoParaDevolucao: "Inválido devolução",
   StockUsadoConserto: "Usado em conserto",
 };
+
+type NormalForm = z.infer<typeof entradaNormalSchema>;
+type GarantiaForm = z.infer<typeof entradaGarantiaSchema>;
+
+function today() { return new Date().toISOString().slice(0, 10); }
 
 export default function StockEntradas() {
   const { role } = useAuth();
@@ -159,71 +168,101 @@ export default function StockEntradas() {
   );
 }
 
-interface UnidadeSerie { nr_serie: string; garantia: number; }
-
 function EntradaDialog({
   open, onOpenChange, pecas, onSaved,
 }: {
   open: boolean; onOpenChange: (v: boolean) => void;
   pecas: Peca[]; onSaved: () => void;
 }) {
-  const [pecaId, setPecaId] = useState("");
-  const [quantidade, setQuantidade] = useState(1);
-  const [preco, setPreco] = useState(0);
-  const [dataChegada, setDataChegada] = useState(new Date().toISOString().slice(0, 10));
   const [comGarantia, setComGarantia] = useState(false);
-  const [unidades, setUnidades] = useState<UnidadeSerie[]>([]);
-  const [saving, setSaving] = useState(false);
+
+  const normalForm = useForm<NormalForm>({
+    resolver: zodResolver(entradaNormalSchema),
+    defaultValues: { pecaId: 0, quantidade: 1, preco: 0, dataChegada: today() },
+  });
+
+  const garantiaForm = useForm<GarantiaForm>({
+    resolver: zodResolver(entradaGarantiaSchema),
+    defaultValues: { pecaId: 0, preco: 0, dataChegada: today(), unidades: [{ nr_serie: "", garantia: 12 }] },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: garantiaForm.control,
+    name: "unidades",
+  });
 
   useEffect(() => {
-    if (open) {
-      setPecaId(""); setQuantidade(1); setPreco(0);
-      setDataChegada(new Date().toISOString().slice(0, 10));
-      setComGarantia(false); setUnidades([]);
+    if (!open) {
+      normalForm.reset({ pecaId: 0, quantidade: 1, preco: 0, dataChegada: today() });
+      garantiaForm.reset({ pecaId: 0, preco: 0, dataChegada: today(), unidades: [{ nr_serie: "", garantia: 12 }] });
+      setComGarantia(false);
     }
   }, [open]);
 
-  useEffect(() => {
-    if (!comGarantia) { setUnidades([]); return; }
-    setUnidades((cur) => {
-      const next = [...cur];
-      while (next.length < quantidade) next.push({ nr_serie: "", garantia: 12 });
-      while (next.length > quantidade) next.pop();
-      return next;
-    });
-  }, [quantidade, comGarantia]);
+  const pecaId = comGarantia ? garantiaForm.watch("pecaId") : normalForm.watch("pecaId");
+  const setPecaId = (n: number) => {
+    normalForm.setValue("pecaId", n, { shouldValidate: true });
+    garantiaForm.setValue("pecaId", n, { shouldValidate: true });
+  };
 
-  const submit = async () => {
-    if (!pecaId) { toast.error("Escolhe uma peça"); return; }
-    if (quantidade < 1) { toast.error("Quantidade ≥ 1"); return; }
-    setSaving(true);
+  const preco = comGarantia ? garantiaForm.watch("preco") : normalForm.watch("preco");
+  const setPreco = (n: number) => {
+    normalForm.setValue("preco", n, { shouldValidate: true });
+    garantiaForm.setValue("preco", n, { shouldValidate: true });
+  };
+
+  const dataChegada = comGarantia ? garantiaForm.watch("dataChegada") : normalForm.watch("dataChegada");
+  const setDataChegada = (s: string) => {
+    normalForm.setValue("dataChegada", s, { shouldValidate: true });
+    garantiaForm.setValue("dataChegada", s, { shouldValidate: true });
+  };
+
+  const submitNormal = normalForm.handleSubmit(async (v) => {
     try {
-      if (comGarantia) {
-        for (const u of unidades) {
-          if (!u.nr_serie.trim()) { toast.error("Preenche todos os nºs de série"); setSaving(false); return; }
-          await api.post("/stocks/garantia", {
-            codPeca: Number(pecaId), preco, dataChegada, garantia: u.garantia, nr_serie: u.nr_serie.trim(),
-          });
-        }
-      } else {
-        await api.post("/stocks", {
-          codPeca: Number(pecaId), preco, quantidade, dataChegada,
+      await api.post("/stocks", { codPeca: v.pecaId, preco: v.preco, quantidade: v.quantidade, dataChegada: v.dataChegada });
+      toast.success("Entrada registada");
+      onSaved();
+    } catch (e) { toast.error((e as Error).message); }
+  });
+
+  const submitGarantia = garantiaForm.handleSubmit(async (v) => {
+    try {
+      for (const u of v.unidades) {
+        await api.post("/stocks/garantia", {
+          codPeca: v.pecaId, preco: v.preco, dataChegada: v.dataChegada,
+          garantia: u.garantia, nr_serie: u.nr_serie.trim(),
         });
       }
       toast.success("Entrada registada");
       onSaved();
     } catch (e) { toast.error((e as Error).message); }
-    finally { setSaving(false); }
-  };
+  });
+
+  const isPending = comGarantia
+    ? garantiaForm.formState.isSubmitting
+    : normalForm.formState.isSubmitting;
+
+  const pecaErr = comGarantia
+    ? garantiaForm.formState.errors.pecaId?.message
+    : normalForm.formState.errors.pecaId?.message;
+
+  const precoErr = comGarantia
+    ? garantiaForm.formState.errors.preco?.message
+    : normalForm.formState.errors.preco?.message;
+
+  const dataErr = comGarantia
+    ? garantiaForm.formState.errors.dataChegada?.message
+    : normalForm.formState.errors.dataChegada?.message;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl">
         <DialogHeader><DialogTitle>Nova entrada de stock</DialogTitle></DialogHeader>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <form onSubmit={comGarantia ? submitGarantia : submitNormal} className="grid gap-3 sm:grid-cols-2">
+
           <div className="sm:col-span-2 space-y-1">
             <Label className="text-xs">Peça</Label>
-            <Select value={pecaId} onValueChange={setPecaId}>
+            <Select value={String(pecaId)} onValueChange={(v) => setPecaId(Number(v))}>
               <SelectTrigger><SelectValue placeholder="Escolher peça…" /></SelectTrigger>
               <SelectContent>
                 {pecas.map((p) => (
@@ -231,7 +270,9 @@ function EntradaDialog({
                 ))}
               </SelectContent>
             </Select>
+            {pecaErr && <p className="text-xs text-destructive">{pecaErr}</p>}
           </div>
+
           <div className="space-y-1">
             <Label className="text-xs">Tipo</Label>
             <Select value={comGarantia ? "garantia" : "normal"} onValueChange={(v) => setComGarantia(v === "garantia")}>
@@ -242,30 +283,30 @@ function EntradaDialog({
               </SelectContent>
             </Select>
           </div>
-          {!comGarantia && (
-            <div className="space-y-1">
-              <Label className="text-xs">Quantidade</Label>
-              <Input type="number" min={1} value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} />
-            </div>
-          )}
-          {comGarantia && (
-            <div className="space-y-1">
-              <Label className="text-xs">Nº de unidades</Label>
-              <Input type="number" min={1} value={quantidade} onChange={(e) => setQuantidade(Number(e.target.value))} />
-            </div>
-          )}
-          <div className="space-y-1">
-            <Label className="text-xs">Preço de compra (€)</Label>
-            <Input type="number" step="0.01" min={0} value={preco} onChange={(e) => setPreco(Number(e.target.value))} />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Data de chegada</Label>
-            <Input type="date" value={dataChegada} onChange={(e) => setDataChegada(e.target.value)} />
-          </div>
 
-          {comGarantia && unidades.length > 0 && (
-            <div className="sm:col-span-2 rounded-md border border-warning/30 bg-warning-soft/40 p-3">
-              <div className="mb-2 flex items-center gap-2 text-sm text-warning">
+          {!comGarantia && (
+            <F label="Quantidade" error={normalForm.formState.errors.quantidade?.message}>
+              <Input type="number" min={1} {...normalForm.register("quantidade")} />
+            </F>
+          )}
+
+          <F label="Preço de compra (€)" error={precoErr}>
+            <Input type="number" step="0.01" min={0}
+              value={preco}
+              onChange={(e) => setPreco(Number(e.target.value))}
+            />
+          </F>
+
+          <F label="Data de chegada" error={dataErr}>
+            <Input type="date"
+              value={dataChegada}
+              onChange={(e) => setDataChegada(e.target.value)}
+            />
+          </F>
+
+          {comGarantia && (
+            <div className="sm:col-span-2 rounded-md border border-warning/30 bg-warning-soft/40 p-3 space-y-2">
+              <div className="flex items-center gap-2 text-sm text-warning">
                 <AlertTriangle className="h-4 w-4" />
                 Preenche o nº de série e garantia para cada unidade.
               </div>
@@ -274,38 +315,66 @@ function EntradaDialog({
                   <TableRow>
                     <TableHead className="w-10">#</TableHead>
                     <TableHead>Nº de série</TableHead>
-                    <TableHead className="w-32">Garantia (meses)</TableHead>
+                    <TableHead className="w-36">Garantia (meses)</TableHead>
+                    <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {unidades.map((u, i) => (
-                    <TableRow key={i}>
+                  {fields.map((field, i) => (
+                    <TableRow key={field.id}>
                       <TableCell>{i + 1}</TableCell>
                       <TableCell>
-                        <Input value={u.nr_serie} className="h-8"
-                          onChange={(e) => setUnidades((arr) =>
-                            arr.map((x, j) => j === i ? { ...x, nr_serie: e.target.value } : x))}
-                          placeholder="Nº de série" />
+                        <Input className="h-8" placeholder="Nº de série"
+                          {...garantiaForm.register(`unidades.${i}.nr_serie`)} />
+                        {garantiaForm.formState.errors.unidades?.[i]?.nr_serie && (
+                          <p className="text-xs text-destructive mt-0.5">
+                            {garantiaForm.formState.errors.unidades[i]!.nr_serie!.message}
+                          </p>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <Input type="number" min={0} max={120} value={u.garantia} className="h-8"
-                          onChange={(e) => setUnidades((arr) =>
-                            arr.map((x, j) => j === i ? { ...x, garantia: Number(e.target.value) } : x))} />
+                        <Input type="number" min={1} max={120} className="h-8"
+                          {...garantiaForm.register(`unidades.${i}.garantia`)} />
+                        {garantiaForm.formState.errors.unidades?.[i]?.garantia && (
+                          <p className="text-xs text-destructive mt-0.5">
+                            {garantiaForm.formState.errors.unidades[i]!.garantia!.message}
+                          </p>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Button type="button" variant="ghost" size="icon"
+                          onClick={() => remove(i)} disabled={fields.length === 1}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+              <Button type="button" variant="outline" size="sm" onClick={() => append({ nr_serie: "", garantia: 12 })}>
+                <Plus className="h-3.5 w-3.5" /> Adicionar unidade
+              </Button>
             </div>
           )}
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={submit} disabled={saving}>
-            {saving ? "A registar…" : "Registar entrada"}
-          </Button>
-        </DialogFooter>
+
+          <DialogFooter className="sm:col-span-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "A registar…" : "Registar entrada"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function F({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-xs">{label}</Label>
+      {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
   );
 }

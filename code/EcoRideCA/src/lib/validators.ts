@@ -42,21 +42,49 @@ export const trotineteSchema = z.object({
   motor: z.string().trim().min(1, "Motor obrigatório").max(50),
 });
 
-export const fornecedorSchema = z.object({
-  nome: z.string().trim().min(2, "Nome obrigatório").max(100),
-  telemovel: z.string().regex(/^[29]\d{8}$/, "Telefone inválido"),
-  email: z.string().trim().email("Email inválido").max(120),
-});
+export const fornecedorSchema = z
+  .object({
+    nome:      z.string().trim().min(2, "Nome obrigatório").max(100),
+    telemovel: z.string().refine((v) => !v || /^[29]\d{8}$/.test(v), "Telefone inválido (9 dígitos)").optional().default(""),
+    email:     z.string().refine((v) => !v || /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v), "Email inválido").optional().default(""),
+  })
+  .refine(
+    (d) => !!(d.telemovel || d.email),
+    { message: "Indica pelo menos um contacto (telefone ou email)", path: ["telemovel"] },
+  );
 
 export const pecaSchema = z.object({
-  referencia: z.string().trim().min(1, "Referência obrigatória").max(40),
-  nome: z.string().trim().min(2, "Nome obrigatório").max(80),
-  descricao: z.string().max(300).optional().or(z.literal("")),
-  fornecedorId: z.string().min(1, "Fornecedor obrigatório"),
-  tipo: z.string().trim().min(1, "Tipo obrigatório").max(40),
-  precoVenda: z.coerce.number().min(0, "Preço inválido"),
-  stockMinimo: z.coerce.number().int().min(0, "Stock mínimo inválido"),
-  disponivel: z.boolean().default(true),
+  referencia:    z.string().trim().min(1, "Referência obrigatória").max(40),
+  nome:          z.string().trim().min(1, "Nome obrigatório").max(80),
+  descricao:     z.string().max(300).default(""),
+  codFornecedor: z.number({ invalid_type_error: "Fornecedor obrigatório" }).min(1, "Fornecedor obrigatório"),
+  preco_venda:   z.coerce.number().min(0, "Preço inválido"),
+  stock_minimo:  z.coerce.number().int().min(0, "Stock mínimo inválido"),
+  ativa:         z.boolean().default(true),
+});
+
+export const devolverDefeitoSchema = z.object({
+  data:   z.string().min(1, "Data obrigatória"),
+  motivo: z.string().trim().min(1, "Motivo obrigatório").max(500),
+});
+
+export const entradaNormalSchema = z.object({
+  pecaId:      z.number({ invalid_type_error: "Peça obrigatória" }).min(1, "Peça obrigatória"),
+  quantidade:  z.coerce.number().int().min(1, "Quantidade ≥ 1"),
+  preco:       z.coerce.number().min(0, "Preço inválido"),
+  dataChegada: z.string().min(1, "Data obrigatória"),
+});
+
+export const unidadeGarantiaSchema = z.object({
+  nr_serie: z.string().trim().min(1, "Nº de série obrigatório"),
+  garantia: z.coerce.number().int().min(1, "Garantia ≥ 1 mês").max(120),
+});
+
+export const entradaGarantiaSchema = z.object({
+  pecaId:      z.number({ invalid_type_error: "Peça obrigatória" }).min(1, "Peça obrigatória"),
+  preco:       z.coerce.number().min(0, "Preço inválido"),
+  dataChegada: z.string().min(1, "Data obrigatória"),
+  unidades:    z.array(unidadeGarantiaSchema).min(1, "Adiciona pelo menos uma unidade"),
 });
 
 export const reparacaoSchema = z.object({

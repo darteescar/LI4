@@ -14,7 +14,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(text || `Erro ${res.status}`);
+    let msg = text || `Erro ${res.status}`;
+    try {
+      const json = JSON.parse(text) as { mensagem?: string; message?: string };
+      msg = json.mensagem ?? json.message ?? msg;
+    } catch { /* resposta não é JSON — usa texto cru */ }
+    throw new Error(msg);
   }
 
   if (res.status === 204) return undefined as T;

@@ -36,6 +36,15 @@ interface Cliente {
   NIF: string;
 }
 
+const TIPOS_MOTOR = [
+  "Hub Motor",
+  "Mid-Drive",
+  "Belt Drive",
+  "Chain Drive",
+] as const;
+
+type TipoMotor = typeof TIPOS_MOTOR[number];
+
 const trotineteSchema = z.object({
   cod_cliente: z.number().min(1, "Cliente obrigatório"),
   marca:       z.string().trim().min(1, "Marca obrigatória"),
@@ -193,8 +202,18 @@ function TrotineteForm({
           <F label="Nº de série" e={form.formState.errors.num_serie?.message}>
             <Input {...form.register("num_serie")} />
           </F>
-          <F label="Motor" e={form.formState.errors.motor?.message}>
-            <Input {...form.register("motor")} />
+          <F label="Tipo de motor" e={form.formState.errors.motor?.message}>
+            <Select
+              value={form.watch("motor")}
+              onValueChange={(v) => form.setValue("motor", v, { shouldValidate: true })}
+            >
+              <SelectTrigger><SelectValue placeholder="Selecionar tipo…" /></SelectTrigger>
+              <SelectContent>
+                {TIPOS_MOTOR.map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </F>
           <DialogFooter className="sm:col-span-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
