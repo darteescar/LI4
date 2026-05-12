@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import app.common.EcoRideException;
+import app.common.Validacoes;
 import app.ecoRideCD.sStock.DefeitoDAO;
 import app.ecoRideCD.sStock.DevolucaoDAO;
 import app.ecoRideCD.sStock.EncomendaDAO;
@@ -27,6 +28,12 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Fornecedor registarFornecedor(String nome, String telemovel, String email) {
+        Validacoes.naoVazio(nome, "Nome do fornecedor");
+        // contacto pode ser telefone ou email — valida o que estiver preenchido
+        if (telemovel != null && !telemovel.isBlank()) Validacoes.telefone(telemovel);
+        if (email != null && !email.isBlank()) Validacoes.emailValido(email);
+        if ((telemovel == null || telemovel.isBlank()) && (email == null || email.isBlank()))
+            throw new EcoRideException("O fornecedor deve ter pelo menos um contacto (telefone ou email).");
         int id = fornecedorDAO.generateNewId();
         Fornecedor novo = new Fornecedor(id, nome, telemovel, email);
         fornecedorDAO.put(id, novo);
@@ -36,12 +43,16 @@ public class SStockFacade implements ISStock {
     @Override
     public Fornecedor atualizarFornecedor(int id, String nome, String telemovel, String email) {
         Fornecedor f = fornecedorDAO.get(id);
-        if (f != null) {
-            if (nome != null && !nome.isEmpty())           f.setNome(nome);
-            if (telemovel != null && !telemovel.isEmpty()) f.setTelemovel(telemovel);
-            if (email != null && !email.isEmpty())         f.setEmail(email);
-            fornecedorDAO.put(id, f);
-        }
+        if (f == null) throw new EcoRideException("Fornecedor " + id + " não encontrado.");
+        Validacoes.naoVazio(nome, "Nome do fornecedor");
+        if (telemovel != null && !telemovel.isBlank()) Validacoes.telefone(telemovel);
+        if (email != null && !email.isBlank()) Validacoes.emailValido(email);
+        if ((telemovel == null || telemovel.isBlank()) && (email == null || email.isBlank()))
+            throw new EcoRideException("O fornecedor deve ter pelo menos um contacto (telefone ou email).");
+        f.setNome(nome);
+        f.setTelemovel(telemovel);
+        f.setEmail(email);
+        fornecedorDAO.put(id, f);
         return f;
     }
 
@@ -61,6 +72,12 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
+        Validacoes.naoVazio(ref, "Referência");
+        Validacoes.naoVazio(nome, "Nome da peça");
+        Validacoes.naoVazio(descricao, "Descrição");
+        Validacoes.inteiroNaoNegativo(stock_minimo, "Stock mínimo");
+        Validacoes.valorMonetario(preco_venda, "Preço de venda");
+        if (!fornecedorDAO.containsKey(id_fornecedor)) throw new EcoRideException("Fornecedor " + id_fornecedor + " não encontrado.");
         int id = pecaDAO.generateNewId();
         Peca nova = new Peca(id, ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor, true);
         pecaDAO.put(id, nova);
@@ -70,16 +87,21 @@ public class SStockFacade implements ISStock {
     @Override
     public Peca atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
         Peca p = pecaDAO.get(id);
-        if (p != null) {
-            if (referencia != null && !referencia.isEmpty()) p.setReferencia(referencia);
-            if (nome != null)        p.setNome(nome);
-            if (descricao != null)   p.setDescricao(descricao);
-            if (stock_minimo >= 0)   p.setStock_minimo(stock_minimo);
-            if (preco_venda >= 0)    p.setPreco_venda(preco_venda);
-            if (id_fornecedor >= 0)  p.setCodFornecedor(id_fornecedor);
-            p.setAtiva(ativa);
-            pecaDAO.put(id, p);
-        }
+        if (p == null) throw new EcoRideException("Peça " + id + " não encontrada.");
+        Validacoes.naoVazio(referencia, "Referência");
+        Validacoes.naoVazio(nome, "Nome da peça");
+        Validacoes.naoVazio(descricao, "Descrição");
+        Validacoes.inteiroNaoNegativo(stock_minimo, "Stock mínimo");
+        Validacoes.valorMonetario(preco_venda, "Preço de venda");
+        if (!fornecedorDAO.containsKey(id_fornecedor)) throw new EcoRideException("Fornecedor " + id_fornecedor + " não encontrado.");
+        p.setReferencia(referencia);
+        p.setNome(nome);
+        p.setDescricao(descricao);
+        p.setStock_minimo(stock_minimo);
+        p.setPreco_venda(preco_venda);
+        p.setCodFornecedor(id_fornecedor);
+        p.setAtiva(ativa);
+        pecaDAO.put(id, p);
         return p;
     }
 
@@ -102,6 +124,10 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
+        Validacoes.valorMonetario(preco_compra, "Preço de compra");
+        Validacoes.naoNulo(data, "Data de receção");
+        Validacoes.inteiroPositivo(garantia, "Garantia (meses)");
+        Validacoes.naoVazio(nr_serie, "Número de série");
         int id = stockDAO.generateNewId();
         Stock novo = new StockComGarantia(id, preco_compra, id_peca, data, nr_serie, garantia);
         stockDAO.put(id, novo);
@@ -110,6 +136,9 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
+        Validacoes.valorMonetario(preco_compra, "Preço de compra");
+        Validacoes.naoNulo(data, "Data de receção");
+        Validacoes.inteiroPositivo(quantidade, "Quantidade");
         int id = stockDAO.generateNewId();
         Stock novo = new Stock(id, preco_compra, id_peca, data, quantidade);
         stockDAO.put(id, novo);
@@ -119,11 +148,11 @@ public class SStockFacade implements ISStock {
     @Override
     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade) {
         Stock s = stockDAO.get(id_stock);
-        if (s != null) {
-            if (preco_compra >= 0)    s.setPreco_compra(preco_compra);
-            if (cod_Peca >= 0)        s.setCodPeca(cod_Peca);
-            if (data_rececao != null) s.setData_chegada(data_rececao);
-            if (quantidade >= 0)      s.setQuantidade(quantidade);
+        if (s != null && !(s instanceof StockComGarantia) && preco_compra >= 0 && cod_Peca >= 0 && data_rececao != null && quantidade >= 0) {
+            s.setPreco_compra(preco_compra);
+            s.setCodPeca(cod_Peca);
+            s.setData_chegada(data_rececao);
+            s.setQuantidade(quantidade);
             stockDAO.put(id_stock, s);
         }
         return s;
@@ -132,13 +161,13 @@ public class SStockFacade implements ISStock {
     @Override
     public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie) {
         Stock s = stockDAO.get(id_stock);
-        if (s instanceof StockComGarantia g) {
-            if (preco_compra >= 0)                       g.setPreco_compra(preco_compra);
-            if (cod_Peca >= 0)                           g.setCodPeca(cod_Peca);
-            if (data_rececao != null)                    g.setData_chegada(data_rececao);
-            if (quantidade >= 0)                         g.setQuantidade(quantidade);
-            if (garantia != 0)                           g.setGarantia(garantia);
-            if (nr_serie != null && !nr_serie.isEmpty()) g.setNr_serie(nr_serie);
+        if (s instanceof StockComGarantia g && preco_compra >= 0 && cod_Peca >= 0 && data_rececao != null && quantidade >= 0 && garantia != 0 && nr_serie != null && !nr_serie.isBlank()) {
+            g.setPreco_compra(preco_compra);
+            g.setCodPeca(cod_Peca);
+            g.setData_chegada(data_rececao);
+            g.setQuantidade(quantidade);
+            g.setGarantia(garantia);
+            g.setNr_serie(nr_serie);
             stockDAO.put(id_stock, g);
         }
         return s;
@@ -196,6 +225,8 @@ public class SStockFacade implements ISStock {
 
     @Override
     public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario) {
+        if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
+        if (idFuncionario < 0) throw new EcoRideException("ID do funcionário não pode ser negativo.");
         List<Defeito> resultado = new ArrayList<>();
         for (int stockId : stockIds) {
             Stock s = stockDAO.get(stockId);
@@ -255,6 +286,8 @@ public class SStockFacade implements ISStock {
 
     @Override
     public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data) {
+        if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
+        if (data == null) throw new EcoRideException("Data não pode ser nula.");
         List<Devolucao> resultado = new ArrayList<>();
         for (int stockId : stockIds) {
             Stock s = stockDAO.get(stockId);
@@ -320,6 +353,8 @@ public class SStockFacade implements ISStock {
     @Override
     public Stock registarStock_Encomenda(int id_peca, float preco_compra, int quantidade) {
         int id = stockDAO.generateNewId();
+        if (preco_compra < 0) throw new EcoRideException("Preço de compra não pode ser negativo.");
+        if (quantidade < 0) throw new EcoRideException("Quantidade não pode ser negativa.");
         Stock novo = new Stock(id, preco_compra, id_peca, null, quantidade, EstadoStock.StockEncomendado);
         stockDAO.put(id, novo);
         return novo;
@@ -350,11 +385,11 @@ public class SStockFacade implements ISStock {
     @Override
     public Encomenda atualizarEncomenda(int id, List<Integer> stockIds, LocalDate data_pedido, LocalDate data_chegada, EstadoEncomenda estado) {
         Encomenda e = encomendaDAO.get(id);
-        if (e != null) {
-            if (stockIds != null && !stockIds.isEmpty()) e.setCodStocks(stockIds);
-            if (data_pedido != null)  e.setData_criacao(data_pedido);
-            if (data_chegada != null) e.setData_rececao(data_chegada);
-            if (estado != null)       e.setEstado(estado);
+        if (e != null && stockIds != null && !stockIds.isEmpty() && data_pedido != null && data_chegada != null && estado != null) {
+            e.setCodStocks(stockIds);
+            e.setData_criacao(data_pedido);
+            e.setData_rececao(data_chegada);
+            e.setEstado(estado);
             encomendaDAO.put(id, e);
         }
         return e;

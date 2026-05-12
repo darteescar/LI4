@@ -1,7 +1,6 @@
 package app.ecoRideLN.sFinanceiro;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ISFinanceiro {
@@ -24,10 +23,6 @@ public interface ISFinanceiro {
      public boolean existeMovimentoFinanceiro(int id);
 
      public boolean removerMovimentoFinanceiro(int id);
-
-     // ------------------- Atualização -------------------
-
-     public void atualizarMovimentoFinanceiro(int id, TipoMovimento tipo, float valor, String descricao, LocalDateTime data);
 
      // ------------------- Cálculos -------------------
 

@@ -11,6 +11,9 @@ public class SReparacoesFacade implements ISReparacoes {
      @Override
      public Reparacao registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel) {
           int id = reparacaoDAO.generateNewId();
+          if (nomenclatura == null || nomenclatura.isBlank()) throw new EcoRideException("Nomenclatura não pode ser vazia.");
+          if (descricao == null || descricao.isBlank()) throw new EcoRideException("Descrição não pode ser vazia.");
+          if (preco < 0) throw new EcoRideException("Preço não pode ser negativo.");
           Reparacao reparacao = new Reparacao(id, nomenclatura, descricao, preco, disponivel);
           reparacaoDAO.put(id, reparacao);
           return reparacao;
@@ -19,10 +22,10 @@ public class SReparacoesFacade implements ISReparacoes {
      @Override
      public Reparacao atualizarReparacao(int id, String novaNomenclatura, String novaDescricao, float novoPreco, boolean novaDisponibilidade) {
           Reparacao reparacao = reparacaoDAO.get(id);
-          if (reparacao != null) {
-               if (novaNomenclatura != null && !novaNomenclatura.isEmpty()) reparacao.setNomenclatura(novaNomenclatura);
-               if (novaDescricao != null && !novaDescricao.isEmpty())       reparacao.setDescricao(novaDescricao);
-               if (novoPreco >= 0)                                           reparacao.setPreco(novoPreco);
+          if (reparacao != null && novaNomenclatura != null && !novaNomenclatura.isBlank() && novaDescricao != null && !novaDescricao.isBlank() && novoPreco >= 0) {
+               reparacao.setNomenclatura(novaNomenclatura);
+               reparacao.setDescricao(novaDescricao);
+               reparacao.setPreco(novoPreco);
                reparacao.setDisponivel(novaDisponibilidade);
                reparacaoDAO.put(id, reparacao);
                return reparacao;

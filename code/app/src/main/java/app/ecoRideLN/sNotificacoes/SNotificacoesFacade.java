@@ -10,6 +10,11 @@ public class SNotificacoesFacade implements ISNotificacoes {
 
      @Override
      public void registarNotificacaoOS(String descricao, int id_remetente,List<Integer> ids_destinatarios, int id_os) {
+
+          if (descricao == null || descricao.isEmpty() || ids_destinatarios == null || ids_destinatarios.isEmpty()) {
+               throw new IllegalArgumentException("Descrição e destinatários são obrigatórios.");
+          }
+
           for (int iddest : ids_destinatarios) {
                int id = notificacaoDAO.generateNewId();
                NotificacaoOS notificacao = new NotificacaoOS(id, descricao, id_remetente, iddest, id_os);
@@ -19,6 +24,9 @@ public class SNotificacoesFacade implements ISNotificacoes {
 
      @Override
      public void registarNotificacaoStock(String descricao, int id_remetente, List<Integer> ids_destinatarios, int id_peca) {
+          if (descricao == null || descricao.isEmpty() || ids_destinatarios == null || ids_destinatarios.isEmpty()) {
+               throw new IllegalArgumentException("Descrição e destinatários são obrigatórios.");
+          }
           for (int iddest : ids_destinatarios) {
                int id = notificacaoDAO.generateNewId();
                NotificacaoStock notificacao = new NotificacaoStock(id, descricao, id_remetente, iddest, id_peca);

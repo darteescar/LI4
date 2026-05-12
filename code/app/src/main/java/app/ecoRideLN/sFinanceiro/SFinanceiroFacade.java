@@ -16,6 +16,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
      @Override
      public MovimentoFinanceiro registarMovimentoCompraStock(int codStock, float valor, String descricao) {
+
+          validaMovimentoFinanceiro(descricao, valor);
+
           int id = movimentoFinanceiroDAO.generateNewId();
           MovimentoFinanceiro movimento = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), TipoMovimento.GastoPecas, codStock);
           return movimentoFinanceiroDAO.put(id, movimento);
@@ -23,6 +26,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
      @Override
      public MovimentoFinanceiro registarMovimentoVendaPeca(int codStock, float valor, String descricao){
+
+          validaMovimentoFinanceiro(descricao, valor);
+
           int id = movimentoFinanceiroDAO.generateNewId();
           MovimentoFinanceiro movimento = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroVendaPecas, codStock);
           return movimentoFinanceiroDAO.put(id, movimento);
@@ -30,6 +36,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
      @Override
      public MovimentoFinanceiro registarMovimentoPagamentoFuncionario(int idFuncionario, float valor, String descricao){
+
+          validaMovimentoFinanceiro(descricao, valor);
+
           int id = movimentoFinanceiroDAO.generateNewId();
           MovimentoFinanceiro movimento = new MovimentoFuncionario(id, descricao, valor, LocalDateTime.now(), TipoMovimento.Salario, idFuncionario);
           return movimentoFinanceiroDAO.put(id, movimento);
@@ -37,6 +46,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
      @Override
      public MovimentoFinanceiro registarMovimentoReparacaoOS(int idReparacao, float valor, String descricao){
+
+          validaMovimentoFinanceiro(descricao, valor);
+
           int id = movimentoFinanceiroDAO.generateNewId();
           MovimentoFinanceiro movimento = new MovimentoReparacao(id, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroMaoObra, idReparacao);
           return movimentoFinanceiroDAO.put(id, movimento);
@@ -77,22 +89,6 @@ public class SFinanceiroFacade implements ISFinanceiro {
           return movimentoFinanceiroDAO.remove(id) != null;
      }
 
-     // ------------------- Atualização -------------------
-
-     @Override
-     public void atualizarMovimentoFinanceiro(int id, TipoMovimento tipo, float valor, String descricao, LocalDateTime data) {
-          MovimentoFinanceiro movimento = movimentoFinanceiroDAO.get(id);
-          if (movimento != null) {
-               if (tipo != null)        movimento.setTipo(tipo);
-               if (valor >= 0)          movimento.setValor(valor);
-               if (descricao != null)   movimento.setDescricao(descricao);
-               if (data != null)        movimento.setData(data);
-               movimentoFinanceiroDAO.put(id, movimento);
-          } else {
-               throw new EcoRideException("Movimento Financeiro com ID " + id + " não existe.");
-          }
-     }
-
      // ------------------- Cálculos -------------------
 
      @Override
@@ -117,6 +113,17 @@ public class SFinanceiroFacade implements ISFinanceiro {
           ));
 
           return analise;
+     }
+
+     // Utilitários
+
+     private void validaMovimentoFinanceiro(String descricao, float valor) {
+          if (descricao == null || descricao.isBlank()) {
+               throw new EcoRideException("A descrição do movimento financeiro não pode ser vazia.");
+          }
+          if (valor < 0) {
+               throw new EcoRideException("O valor do movimento financeiro não pode ser negativo.");
+          }
      }
 
 }

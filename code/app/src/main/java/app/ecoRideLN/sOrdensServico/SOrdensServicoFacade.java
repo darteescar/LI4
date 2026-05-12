@@ -15,6 +15,8 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     @Override
     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador) {
         int id = ordemServicoDAO.generateNewId();
+        if (id_cliente <= 0 || id_trotinete <= 0) throw new EcoRideException("ID de cliente e trotinete devem ser positivos.");
+        if (descricao == null || descricao.isBlank()) throw new EcoRideException("Descrição não pode ser vazia.");
         OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, fotografias, acessorios);
         ordemServicoDAO.put(id, os);
         return os;
@@ -23,12 +25,12 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     @Override
     public void atualizarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete) {
         OrdemServico os = ordemServicoDAO.get(id);
-        if (os != null) {
-            if (descricao != null) os.setDescricao(descricao);
-            if (acessorios != null) os.setAcessorios(acessorios);
-            if (fotografias != null) os.setFotografias(fotografias);
-            if (id_cliente != 0) os.setCodCliente(id_cliente);
-            if (id_trotinete != 0) os.setCodTrotinete(id_trotinete);
+        if (os != null && descricao != null && !descricao.isBlank() && (id_cliente > 0 || id_cliente == 0) && (id_trotinete > 0 || id_trotinete == 0)) {
+            os.setDescricao(descricao);
+            os.setAcessorios(acessorios);
+            os.setFotografias(fotografias);
+            os.setCodCliente(id_cliente);
+            os.setCodTrotinete(id_trotinete);
             ordemServicoDAO.put(id, os);
         }
     }
@@ -115,6 +117,11 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     // ------------------- Diagnóstico -------------------
     @Override
     public Diagnostico registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario) {
+
+        if (pecasQuantidades == null || reparacoes == null || descricao == null || descricao.isBlank()) {
+            throw new EcoRideException("Dados de diagnóstico incompletos ou inválidos.");
+        }
+
         OrdemServico os = ordemServicoDAO.get(idOS);
         if (os != null) {
             if (os.getCodMecanico() != id_funcionario) {
@@ -134,6 +141,11 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     // ------------------- Conserto -------------------
     @Override
     public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float orcamento, int id_funcionario) {
+
+        if (stocksUsados == null || reparacoes == null) {
+            throw new EcoRideException("Dados de conserto incompletos ou inválidos.");
+        }
+
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
             if (os.getCodMecanico() != id_funcionario) {

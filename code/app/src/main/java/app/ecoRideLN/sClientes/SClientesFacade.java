@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.common.EcoRideException;
+import app.common.Validacoes;
 import app.ecoRideCD.sClientes.ClienteDAO;
 import app.ecoRideCD.sClientes.TrotineteDAO;
 
@@ -17,6 +18,7 @@ public class SClientesFacade implements ISClientes {
 
      @Override
      public Cliente registarCliente(String nome, String email, String telemovel, String nif) {
+          validaDadosCliente(nome, email, telemovel, nif);
           int id = clientesDAO.generateNewId();
           Cliente cliente = new Cliente(id, nome, email, telemovel, nif);
           clientesDAO.put(id, cliente);
@@ -27,10 +29,11 @@ public class SClientesFacade implements ISClientes {
      public Cliente atualizarCliente(int id_cliente, String novo_nome, String novo_email, String novo_telemovel, String novo_nif) {
           Cliente cliente = clientesDAO.get(id_cliente);
           if (cliente != null) {
-               if (novo_nome != null)      cliente.setNome(novo_nome);
-               if (novo_email != null)     cliente.setEmail(novo_email);
-               if (novo_telemovel != null) cliente.setTelemovel(novo_telemovel);
-               if (novo_nif != null)       cliente.setNIF(novo_nif);
+               validaDadosCliente(novo_nome, novo_email, novo_telemovel, novo_nif);
+               cliente.setNome(novo_nome);
+               cliente.setEmail(novo_email);
+               cliente.setTelemovel(novo_telemovel);
+               cliente.setNIF(novo_nif);
                clientesDAO.put(id_cliente, cliente);
                return cliente;
           } else {
@@ -62,6 +65,7 @@ public class SClientesFacade implements ISClientes {
 
      @Override
      public Trotinete registarTrotinete(int id_cliente, String modelo, String marca, String num_serie, String tipo_motor) {
+          validaDadosTrotinete(modelo, marca, num_serie, tipo_motor);
           Cliente cliente = clientesDAO.get(id_cliente);
           if (cliente != null) {
                int id = trotinetesDAO.generateNewId();
@@ -77,10 +81,11 @@ public class SClientesFacade implements ISClientes {
      public Trotinete atualizarTrotinete(int id, int id_cliente, String modelo, String marca, String num_serie, String tipo_motor) {
           Trotinete t = trotinetesDAO.get(id);
           if (t != null) {
+               validaDadosTrotinete(modelo, marca, num_serie, tipo_motor);
                t.setCod_cliente(id_cliente);
                if (modelo != null)    t.setModelo(modelo);
                if (marca != null)     t.setMarca(marca);
-               if (num_serie != null && !num_serie.isEmpty()) t.setNum_serie(num_serie);
+               if (num_serie != null && !num_serie.isBlank()) t.setNum_serie(num_serie);
                if (tipo_motor != null) t.setTipo_motor(tipo_motor);
                trotinetesDAO.put(id, t);
                return t;
@@ -124,5 +129,21 @@ public class SClientesFacade implements ISClientes {
           } else {
                throw new EcoRideException("Cliente com ID " + id + " não encontrado.");
           }
+     }
+
+     // Utilitários
+
+     private void validaDadosCliente(String nome, String email, String telemovel, String nif) {
+          Validacoes.naoVazio(nome, "Nome");
+          Validacoes.emailValido(email);
+          Validacoes.telemovel(telemovel);
+          Validacoes.nif(nif);
+     }
+
+     private void validaDadosTrotinete(String modelo, String marca, String num_serie, String tipo_motor) {
+          Validacoes.naoVazio(modelo, "Modelo");
+          Validacoes.naoVazio(marca, "Marca");
+          Validacoes.naoVazio(num_serie, "Número de série");
+          Validacoes.naoVazio(tipo_motor, "Tipo de motor");
      }
 }

@@ -14,6 +14,7 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador) {
+        validaDadosUtilizador(password, idFuncionario, cargo, identificador);
         if (utilizadoresDAO.containsKey(idFuncionario)) {
             throw new EcoRideException("Utilizador com ID " + idFuncionario + " já existe.");
         }
@@ -27,11 +28,12 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public Utilizador atualizarUtilizador(int id, int idFuncionario, Cargo cargo, String identificador) {
+        validaDadosUtilizador(null, idFuncionario, cargo, identificador);
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         }
         if (utilizadoresDAO.existeIdentificador(identificador)) {
-            throw new EcoRideException("Identificador '" + identificador + "' já está em uso por outro utilizador.");
+            throw new EcoRideException("Identificador '" + identificador + "' já está em uso.");
         }
         Utilizador u = utilizadoresDAO.get(id);
 
@@ -126,5 +128,22 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         if (u == null) throw new EcoRideException("Utilizador com ID " + id + " não existe.");
         u.setCargo(novoCargo);
         utilizadoresDAO.put(id, u);
+    }
+
+    // Utilitários
+
+    private void validaDadosUtilizador(String password, int idFuncionario, Cargo cargo, String identificador) {
+        if (password == null || password.isEmpty()) {
+            throw new EcoRideException("A password não pode ser vazia.");
+        }
+        if (idFuncionario < 0) {
+            throw new EcoRideException("O ID do funcionário deve ser um número positivo.");
+        }
+        if (cargo == null) {
+            throw new EcoRideException("O cargo do utilizador não pode ser nulo.");
+        }
+        if (identificador == null || identificador.isEmpty()) {
+            throw new EcoRideException("O identificador do utilizador não pode ser vazio.");
+        }
     }
 }
