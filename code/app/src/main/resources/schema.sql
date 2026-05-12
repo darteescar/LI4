@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS Fornecedor (
 CREATE TABLE IF NOT EXISTS Peca (
     id            INT          NOT NULL,
     referencia    VARCHAR(100) NOT NULL,
+    marca         VARCHAR(100) NULL,
     nome          VARCHAR(150) NULL,
     descricao     TEXT         NULL,
     stock_minimo  INT          NOT NULL DEFAULT 0,
@@ -118,6 +119,7 @@ CREATE TABLE IF NOT EXISTS Peca (
     PRIMARY KEY (id),
     FOREIGN KEY (codFornecedor) REFERENCES Fornecedor(id)
 );
+ALTER TABLE Peca ADD COLUMN marca VARCHAR(100) NULL AFTER referencia;
 
 -- Stock + StockComGarantia partilham tabela: nr_serie e garantia ficam NULL
 -- para itens sem garantia. O DAO devolve a subclasse certa em runtime.

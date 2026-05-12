@@ -98,8 +98,8 @@ public interface IEcoRideLN {
 
      // ------------------- Peças -------------------
      // feito
-     public Peca       registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor);
-     public Peca       atualizarPeca(int id, String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
+     public Peca       registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor);
+     public Peca       atualizarPeca(int id, String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa);
      public Peca       obterPeca(int id);
      public boolean    existePeca_id(int id);
      public boolean    existePeca_ref(String ref);

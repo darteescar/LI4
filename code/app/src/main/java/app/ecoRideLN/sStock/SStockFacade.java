@@ -71,7 +71,7 @@ public class SStockFacade implements ISStock {
     // ------------------- Peca -------------------
 
     @Override
-    public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
+    public Peca registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
         Validacoes.naoVazio(ref, "Referência");
         Validacoes.naoVazio(nome, "Nome da peça");
         Validacoes.naoVazio(descricao, "Descrição");
@@ -79,13 +79,13 @@ public class SStockFacade implements ISStock {
         Validacoes.valorMonetario(preco_venda, "Preço de venda");
         if (!fornecedorDAO.containsKey(id_fornecedor)) throw new EcoRideException("Fornecedor " + id_fornecedor + " não encontrado.");
         int id = pecaDAO.generateNewId();
-        Peca nova = new Peca(id, ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor, true);
+        Peca nova = new Peca(id, ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor, true);
         pecaDAO.put(id, nova);
         return nova;
     }
 
     @Override
-    public Peca atualizarPeca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
+    public Peca atualizarPeca(int id, String referencia, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
         Peca p = pecaDAO.get(id);
         if (p == null) throw new EcoRideException("Peça " + id + " não encontrada.");
         Validacoes.naoVazio(referencia, "Referência");
@@ -95,6 +95,7 @@ public class SStockFacade implements ISStock {
         Validacoes.valorMonetario(preco_venda, "Preço de venda");
         if (!fornecedorDAO.containsKey(id_fornecedor)) throw new EcoRideException("Fornecedor " + id_fornecedor + " não encontrado.");
         p.setReferencia(referencia);
+        p.setMarca(marca);
         p.setNome(nome);
         p.setDescricao(descricao);
         p.setStock_minimo(stock_minimo);

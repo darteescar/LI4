@@ -222,7 +222,7 @@ public class TesteFacade {
         } catch (Exception e) { fail("Registar fornecedor", e); }
 
         try {
-            Peca p = ln.registarPeca("REF-001","Travão Dianteiro","Travão dianteiro reforçado",2,29.99f,idFornecedor);
+            Peca p = ln.registarPeca("REF-001","","Travão Dianteiro","Travão dianteiro reforçado",2,29.99f,idFornecedor);
             idPeca = p.getId();
             ok("Registar peça");
         } catch (Exception e) { fail("Registar peça", e); }

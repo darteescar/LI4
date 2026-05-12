@@ -82,7 +82,7 @@ public class StockController {
         app.post("/api/pecas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             PecaRequest req = ctx.bodyAsClass(PecaRequest.class);
-            ctx.status(201).json(facade.registarPeca(req.referencia(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor()));
+            ctx.status(201).json(facade.registarPeca(req.referencia(), req.marca(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor()));
         });
 
         app.delete("/api/pecas/{id}", ctx -> {
@@ -95,7 +95,7 @@ public class StockController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PecaRequest req = ctx.bodyAsClass(PecaRequest.class);
-            Peca atualizado = facade.atualizarPeca(id, req.referencia(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor(), req.ativa());
+            Peca atualizado = facade.atualizarPeca(id, req.referencia(), req.marca(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor(), req.ativa());
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
         });

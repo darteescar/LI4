@@ -33,7 +33,7 @@ interface Trotinete {
 interface Cliente {
   id: number;
   nome: string;
-  nif: string;
+  nif: string; // backend serializes getNIF() as lowercase "nif"
 }
 
 const TIPOS_MOTOR = [

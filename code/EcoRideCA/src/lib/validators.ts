@@ -55,6 +55,7 @@ export const fornecedorSchema = z
 
 export const pecaSchema = z.object({
   referencia:    z.string().trim().min(1, "Referência obrigatória").max(40),
+  marca:         z.string().trim().max(100).default(""),
   nome:          z.string().trim().min(1, "Nome obrigatório").max(80),
   descricao:     z.string().max(300).default(""),
   codFornecedor: z.number({ invalid_type_error: "Fornecedor obrigatório" }).min(1, "Fornecedor obrigatório"),

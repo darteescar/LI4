@@ -4,6 +4,7 @@ public class Peca {
 
      private int id;
      private String referencia;
+     private String marca;
      private String nome;
      private String descricao;
      private int stock_minimo;
@@ -11,9 +12,10 @@ public class Peca {
      private int codFornecedor;
      private boolean ativa;
 
-     public Peca(int id, String referencia, String nome, String descricao, int stock_minimo, float preco_venda, int codFornecedor, boolean ativa) {
+     public Peca(int id, String referencia, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int codFornecedor, boolean ativa) {
           this.id = id;
           this.referencia = referencia;
+          this.marca = marca;
           this.nome = nome;
           this.descricao = descricao;
           this.stock_minimo = stock_minimo;
@@ -36,6 +38,14 @@ public class Peca {
 
      public void setReferencia(String referencia) {
           this.referencia = referencia;
+     }
+
+     public String getMarca() {
+          return marca;
+     }
+
+     public void setMarca(String marca) {
+          this.marca = marca;
      }
 
      public String getNome() {

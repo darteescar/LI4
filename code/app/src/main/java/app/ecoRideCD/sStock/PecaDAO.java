@@ -27,12 +27,13 @@ public class PecaDAO implements Map<Integer, Peca> {
     }
 
     private static final String BASE_SELECT =
-            "SELECT id, referencia, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa FROM Peca";
+            "SELECT id, referencia, marca, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa FROM Peca";
 
     private Peca buildFromRow(ResultSet rs) throws SQLException {
         return new Peca(
                 rs.getInt("id"),
                 rs.getString("referencia"),
+                rs.getString("marca"),
                 rs.getString("nome"),
                 rs.getString("descricao"),
                 rs.getInt("stock_minimo"),
@@ -91,10 +92,10 @@ public class PecaDAO implements Map<Integer, Peca> {
     public Peca put(Integer key, Peca value) {
         Peca prev = get(key);
         String sql = """
-                INSERT INTO Peca (id, referencia, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Peca (id, referencia, marca, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
-                    referencia = VALUES(referencia), nome = VALUES(nome), descricao = VALUES(descricao),
+                    referencia = VALUES(referencia), marca = VALUES(marca), nome = VALUES(nome), descricao = VALUES(descricao),
                     stock_minimo = VALUES(stock_minimo), preco_venda = VALUES(preco_venda),
                     codFornecedor = VALUES(codFornecedor), ativa = VALUES(ativa)
                 """;
@@ -102,12 +103,13 @@ public class PecaDAO implements Map<Integer, Peca> {
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
             ps.setString(2, value.getReferencia());
-            ps.setString(3, value.getNome());
-            ps.setString(4, value.getDescricao());
-            ps.setInt(5, value.getStock_minimo());
-            ps.setFloat(6, value.getPreco_venda());
-            ps.setInt(7, value.getCodFornecedor());
-            ps.setBoolean(8, value.isAtiva());
+            ps.setString(3, value.getMarca());
+            ps.setString(4, value.getNome());
+            ps.setString(5, value.getDescricao());
+            ps.setInt(6, value.getStock_minimo());
+            ps.setFloat(7, value.getPreco_venda());
+            ps.setInt(8, value.getCodFornecedor());
+            ps.setBoolean(9, value.isAtiva());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar peca " + key, e);

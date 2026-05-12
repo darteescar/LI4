@@ -412,13 +412,13 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Peças -------------------
 
     @Override
-    public Peca registarPeca(String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
-        return sStock.registarPeca(ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor);
+    public Peca registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
+        return sStock.registarPeca(ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor);
     }
 
     @Override
-    public Peca atualizarPeca(int id, String ref, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa){
-        return sStock.atualizarPeca(id, ref, nome, descricao, stock_minimo, preco_venda, id_fornecedor, ativa);
+    public Peca atualizarPeca(int id, String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa){
+        return sStock.atualizarPeca(id, ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor, ativa);
     }
 
     @Override

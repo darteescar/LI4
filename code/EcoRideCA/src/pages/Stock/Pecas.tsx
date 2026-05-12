@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, AlertCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, AlertCircle, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -23,16 +23,26 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import {
+  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { api } from "@/services/api";
 import { formatEUR } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
 import { pecaSchema } from "@/lib/validators";
 
+const MARCAS_SUGERIDAS = [
+  "Bafang", "Bosch", "Brembo", "Continental", "Kenda",
+  "Michelin", "Ninebot", "Schwalbe", "Shimano", "Tektro",
+  "TRP", "Xiaomi",
+];
+
 type PecaForm = z.infer<typeof pecaSchema>;
 
 interface Peca {
-  id: number; referencia: string; nome: string; descricao: string;
+  id: number; referencia: string; marca: string; nome: string; descricao: string;
   stock_minimo: number; preco_venda: number; codFornecedor: number; ativa: boolean;
 }
 
@@ -140,6 +150,7 @@ export default function StockPecas() {
             <TableRow>
               <TableHead>Referência</TableHead>
               <TableHead>Nome</TableHead>
+              <TableHead>Marca</TableHead>
               <TableHead>Fornecedor</TableHead>
               <TableHead>Preço venda</TableHead>
               <TableHead>Stock</TableHead>
@@ -149,9 +160,9 @@ export default function StockPecas() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={canEdit ? 7 : 6} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={canEdit ? 7 : 6} className="h-24 text-center text-sm text-muted-foreground">Sem peças</TableCell></TableRow>
+              <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="h-24 text-center text-sm text-muted-foreground">Sem peças</TableCell></TableRow>
             ) : filtered.map((p) => {
               const atual = stockPorPeca[p.id] ?? 0;
               const baixo = atual > 0 && atual < p.stock_minimo;
@@ -160,6 +171,7 @@ export default function StockPecas() {
                 <TableRow key={p.id}>
                   <TableCell><span className="font-mono text-xs">{p.referencia}</span></TableCell>
                   <TableCell><span className="font-medium">{p.nome}</span></TableCell>
+                  <TableCell>{p.marca || <span className="text-xs text-muted-foreground">—</span>}</TableCell>
                   <TableCell>{fornecedorNome(p.codFornecedor)}</TableCell>
                   <TableCell>{formatEUR(p.preco_venda)}</TableCell>
                   <TableCell>
@@ -224,11 +236,11 @@ function PecaDialog({
     resolver: zodResolver(pecaSchema),
     values: editing
       ? {
-          referencia: editing.referencia, nome: editing.nome, descricao: editing.descricao,
+          referencia: editing.referencia, marca: editing.marca ?? "", nome: editing.nome, descricao: editing.descricao,
           codFornecedor: editing.codFornecedor, preco_venda: editing.preco_venda,
           stock_minimo: editing.stock_minimo, ativa: editing.ativa,
         }
-      : { referencia: "", nome: "", descricao: "", codFornecedor: fornecedores[0]?.id ?? 0, preco_venda: "" as unknown as number, stock_minimo: "" as unknown as number, ativa: true },
+      : { referencia: "", marca: "", nome: "", descricao: "", codFornecedor: fornecedores[0]?.id ?? 0, preco_venda: "" as unknown as number, stock_minimo: "" as unknown as number, ativa: true },
   });
 
   const saveMutation = useMutation({
@@ -252,6 +264,12 @@ function PecaDialog({
         <form onSubmit={form.handleSubmit((v) => saveMutation.mutate(v))} className="grid gap-3 sm:grid-cols-2">
           <Field label="Referência" error={form.formState.errors.referencia?.message}>
             <Input {...form.register("referencia")} />
+          </Field>
+          <Field label="Marca" error={form.formState.errors.marca?.message}>
+            <MarcaCombobox
+              value={form.watch("marca")}
+              onChange={(v) => form.setValue("marca", v, { shouldValidate: true })}
+            />
           </Field>
           <Field label="Nome" error={form.formState.errors.nome?.message}>
             <Input {...form.register("nome")} />
@@ -301,6 +319,58 @@ function PecaDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function MarcaCombobox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(value);
+
+  useEffect(() => { setQuery(value); }, [value]);
+
+  const filtered = MARCAS_SUGERIDAS.filter((m) =>
+    m.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between font-normal"
+        >
+          {value || <span className="text-muted-foreground">Ex: Bosch</span>}
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popover-trigger-width)" }}>
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Escrever ou pesquisar…"
+            value={query}
+            onValueChange={(v) => { setQuery(v); onChange(v); }}
+          />
+          <CommandList>
+            {filtered.length === 0 && query ? (
+              <CommandEmpty className="px-3 py-2 text-sm text-muted-foreground">
+                Prima Enter ou selecione uma sugestão.
+              </CommandEmpty>
+            ) : (
+              <CommandGroup>
+                {filtered.map((m) => (
+                  <CommandItem key={m} value={m} onSelect={() => { onChange(m); setQuery(m); setOpen(false); }}>
+                    {m}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
