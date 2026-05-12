@@ -33,7 +33,7 @@ interface Trotinete {
 interface Cliente {
   id: number;
   nome: string;
-  NIF: string;
+  nif: string;
 }
 
 const TIPOS_MOTOR = [
@@ -188,7 +188,7 @@ function TrotineteForm({
               <SelectTrigger><SelectValue placeholder="Selecionar cliente" /></SelectTrigger>
               <SelectContent>
                 {clientes.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>{c.nome} — {c.NIF}</SelectItem>
+                  <SelectItem key={c.id} value={String(c.id)}>{c.nome} — {c.nif}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
