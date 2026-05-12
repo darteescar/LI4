@@ -4,10 +4,10 @@
 
 INSERT IGNORE INTO Fornecedor(id,nome,telemovel,email)
 VALUES
-    (1, Correia & Cardoso, 253 801 080, geral@correiacardoso.com),
-    (2, MotoFreitas, 253 576 231,motofreitas@sapo.pt),
-    (3, Barcelpeças, 253 809 420, geral@barcelpecas.pt),
-    (4, Centrauto, 253 837 214, barcelos@centrauto.pt);
+    (1, 'Correia & Cardoso', '253801080', 'geral@correiacardoso.com'),
+    (2, 'MotoFreitas',       '253576231', 'motofreitas@sapo.pt'),
+    (3, 'Barcelpeças',       '253809420', 'geral@barcelpecas.pt'),
+    (4, 'Centrauto',         '253837214', 'barcelos@centrauto.pt');
 
 
 
@@ -39,9 +39,9 @@ VALUES
      '5', 'Rua do Comércio', 'Lisboa', '1000-005');
 
 INSERT IGNORE INTO Utilizador (id, password, idFuncionario, cargo, identificador)
-VALUES (1, 'admin123', 1, 'Gerente', 'admin'),
-        (2, 'joao123', 2, 'Gerente', 'joao'),
-        (3, 'joaoS123', 2, 'GestorStock', 'joaoS'),
-        (4, 'silvina123', 4, 'Secretaria', 'silvina'),
-        (5, 'ramiro123', 5, 'Mecanico', 'ramiro'),
-        (6, 'edgar123', 6, 'Mecanico', 'edgar');
+VALUES (1, 'admin123',   1, 'Gerente',     'admin'),
+       (2, 'joao123',    2, 'Gerente',     'joao'),
+       (3, 'joaoS123',   2, 'GestorStock', 'joaoS'),
+       (4, 'silvina123', 3, 'Secretaria',  'silvina'),
+       (5, 'ramiro123',  4, 'Mecanico',    'ramiro'),
+       (6, 'edgar123',   5, 'Mecanico',    'edgar');
