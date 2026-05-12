@@ -1,0 +1,60 @@
+services:
+
+  # ── Base de dados ───────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: EcoRide
+      MYSQL_USER: ecoride
+      MYSQL_PASSWORD: EcoRide123!
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uecoride", "-pEcoRide123!"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── API de dados (Javalin) ──────────────────────────────────────────────────
+  backend:
+    build: ./app
+    restart: unless-stopped
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: EcoRide
+      DB_USER: ecoride
+      DB_PASS: EcoRide123!
+    ports:
+      - "7000:7000"   # exposto para testes directos à API
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # ── Interface (React + nginx) ───────────────────────────────────────────────
+  frontend:
+    build: ./EcoRideCA
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # ── Swagger UI ─────────────────────────────────────────────────────────────
+  # Quando a documentação OpenAPI estiver implementada no backend, aponta
+  # SWAGGER_JSON_URL para o endpoint que devolve o ficheiro openapi.json.
+  # Exemplo com Javalin OpenAPI: http://localhost/api/openapi.json
+  swagger:
+    image: swaggerapi/swagger-ui
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      SWAGGER_JSON_URL: http://localhost/api/openapi.json
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
