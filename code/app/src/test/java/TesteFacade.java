@@ -222,13 +222,13 @@ public class TesteFacade {
         } catch (Exception e) { fail("Registar fornecedor", e); }
 
         try {
-            Peca p = ln.registarPeca("REF-001","","Travão Dianteiro","Travão dianteiro reforçado",2,29.99f,idFornecedor);
+            Peca p = ln.registarPeca("REF-001","","Travão Dianteiro","Travão dianteiro reforçado",2,29.99f,idFornecedor, 12);
             idPeca = p.getId();
             ok("Registar peça");
         } catch (Exception e) { fail("Registar peça", e); }
 
         try {
-            Stock s = ln.registarStock_PecaNormal(idPeca, 12.50f, LocalDate.now(), 10);
+            Stock s = ln.registarStock(idPeca, 12.50f, LocalDate.now(), 10);
             idStock = s.getId();
             if (s.getQuantidade() != 10) throw new RuntimeException("quantidade errada: " + s.getQuantidade());
             ok("Registar stock (10 unidades)");
@@ -365,7 +365,7 @@ public class TesteFacade {
 
         int idStockDefeito;
         try {
-            Stock s = ln.registarStock_PecaNormal(idPeca, 12.50f, LocalDate.now(), 5);
+            Stock s = ln.registarStock(idPeca, 12.50f, LocalDate.now(), 5);
             idStockDefeito = s.getId();
             ok("Registar stock adicional para defeito (5 unidades)");
         } catch (Exception e) { fail("Registar stock adicional", e); return; }
@@ -453,7 +453,7 @@ public class TesteFacade {
 
         // 6. Marcar como recebida (peça com preco_venda < 70 → listas vazias)
         try {
-            Encomenda e = ln.marcarEncomendaComoRecebida(idEncomenda, List.of(), List.of());
+            Encomenda e = ln.marcarEncomendaComoRecebida(idEncomenda);
             if (e.getEstado() != EstadoEncomenda.RECEBIDA)
                 throw new RuntimeException("estado errado: " + e.getEstado());
             if (e.getData_rececao() == null)
@@ -484,7 +484,7 @@ public class TesteFacade {
 
         // 9. Tentar marcar como recebida uma encomenda já recebida — deve lançar exceção
         try {
-            ln.marcarEncomendaComoRecebida(idEncomenda, List.of(), List.of());
+            ln.marcarEncomendaComoRecebida(idEncomenda);
             fail("Receber encomenda já recebida deve lançar exceção", new RuntimeException("nenhuma exceção lançada"));
         } catch (app.common.EcoRideException ex) {
             ok("Receber encomenda já recebida lança EcoRideException");
@@ -501,7 +501,7 @@ public class TesteFacade {
         // Cenário A: defeito reportado e depois descartado (stock volta ao estado original)
         int idStockA;
         try {
-            Stock s = ln.registarStock_PecaNormal(idPeca, 10.0f, LocalDate.now(), 3);
+            Stock s = ln.registarStock(idPeca, 10.0f, LocalDate.now(), 3);
             idStockA = s.getId();
             ok("Cenário A: registar stock (3 unidades) para defeito a descartar");
         } catch (Exception e) { fail("Cenário A: registar stock", e); return; }
@@ -535,8 +535,8 @@ public class TesteFacade {
         // Cenário B: múltiplos stocks com defeito em simultâneo
         int idStockB1, idStockB2;
         try {
-            idStockB1 = ln.registarStock_PecaNormal(idPeca, 10.0f, LocalDate.now(), 2).getId();
-            idStockB2 = ln.registarStock_PecaNormal(idPeca, 10.0f, LocalDate.now(), 4).getId();
+            idStockB1 = ln.registarStock(idPeca, 10.0f, LocalDate.now(), 2).getId();
+            idStockB2 = ln.registarStock(idPeca, 10.0f, LocalDate.now(), 4).getId();
             ok("Cenário B: registar dois stocks para defeito simultâneo");
         } catch (Exception e) { fail("Cenário B: registar stocks", e); return; }
 
