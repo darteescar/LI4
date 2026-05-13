@@ -11,6 +11,8 @@ Alterar use case de pesquisa dos Clientes (dá nome, email e NIF)
 Alterar use case de pesquisa das Trotinetes (dá marca, modelo, numero serie, cliente e tipo de motor)
 Alterar use case de pesquisa dos fornecedores (dá nome, nif, email)
 
+PARA GERAR SEED USAMOS CHAT
+
 ==============================================================
 CODE
 ==============================================================
