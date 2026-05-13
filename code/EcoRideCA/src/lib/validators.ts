@@ -76,18 +76,6 @@ export const entradaNormalSchema = z.object({
   dataChegada: z.string().min(1, "Data obrigatória"),
 });
 
-export const unidadeGarantiaSchema = z.object({
-  nr_serie: z.string().trim().min(1, "Nº de série obrigatório"),
-  garantia: z.coerce.number().int().min(1, "Garantia ≥ 1 mês").max(120),
-});
-
-export const entradaGarantiaSchema = z.object({
-  pecaId:      z.number({ invalid_type_error: "Peça obrigatória" }).min(1, "Peça obrigatória"),
-  preco:       z.coerce.number().min(0, "Preço inválido"),
-  dataChegada: z.string().min(1, "Data obrigatória"),
-  unidades:    z.array(unidadeGarantiaSchema).min(1, "Adiciona pelo menos uma unidade"),
-});
-
 export const reparacaoSchema = z.object({
   nomenclatura: z.string().trim().min(2, "Nomenclatura obrigatória").max(80),
   descricao: z.string().trim().min(3, "Descrição obrigatória").max(300),
@@ -95,26 +83,6 @@ export const reparacaoSchema = z.object({
   disponivel: z.boolean().default(true),
 });
 
-export const unidadeSerieSchema = z.object({
-  numeroSerie: z.string().trim().min(1, "Nº de série obrigatório").max(60),
-  garantiaMeses: z.coerce.number().int().min(0).max(120),
-});
-
-export const entradaStockSchema = z
-  .object({
-    pecaId: z.string().min(1, "Peça obrigatória"),
-    quantidade: z.coerce.number().int().min(1, "Quantidade ≥ 1"),
-    precoUnitario: z.coerce.number().min(0, "Preço inválido"),
-    data: z.string().min(1, "Data obrigatória"),
-    unidades: z.array(unidadeSerieSchema).optional(),
-  })
-  .refine(
-    (d) => d.precoUnitario <= 70 || (d.unidades && d.unidades.length === d.quantidade),
-    {
-      message: "Preço > 70€: cada unidade precisa de nº de série e garantia",
-      path: ["unidades"],
-    },
-  );
 
 export const devolucaoSchema = z.object({
   pecaId: z.string().min(1, "Peça obrigatória"),
