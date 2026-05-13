@@ -122,7 +122,7 @@ VALUES (1, 'admin123',   1, 'Gerente',     'admin'),
        (2, 'joao123',    2, 'Gerente',     'joao'),
        (3, 'joaoS123',   2, 'GestorStock', 'joaoS'),
        (4, 'silvina123', 3, 'Secretaria',  'silvina'),
-       (5, 'ramiro123',  4, 'Mecanico',    'ramiro'),
+       (5, 'ramiro123',  4, 'Mecanico',    'ramiro');
 
 INSERT INTO Cliente (id, nome, email, telemovel, NIF)
 VALUES

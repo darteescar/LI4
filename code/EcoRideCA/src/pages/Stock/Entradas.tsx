@@ -33,7 +33,6 @@ interface Peca { id: number; referencia: string; marca: string; nome: string; pr
 interface StockEntry {
   id: number; codPeca: number; quantidade: number; estado: string;
   preco_compra: number; data_chegada: string;
-  nr_serie?: string;
 }
 
 const ESTADO_LABELS: Record<string, string> = {
@@ -125,11 +124,6 @@ export default function StockEntradas() {
                 <TableCell className="font-medium">{pecaLabel(s.codPeca)}</TableCell>
                 <TableCell>{s.quantidade}</TableCell>
                 <TableCell>{formatEUR(s.preco_compra)}</TableCell>
-                <TableCell>
-                  {s.nr_serie
-                    ? <Badge variant="outline" className="font-mono text-[10px]">{s.nr_serie}</Badge>
-                    : <span className="text-xs text-muted-foreground">—</span>}
-                </TableCell>
                 <TableCell>
                   <Badge variant="secondary" className="text-xs">
                     {ESTADO_LABELS[s.estado] ?? s.estado}

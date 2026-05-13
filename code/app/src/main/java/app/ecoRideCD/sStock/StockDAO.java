@@ -43,7 +43,7 @@ public class StockDAO implements Map<Integer, Stock> {
         var dataChegada = dataChegadaRaw != null ? dataChegadaRaw.toLocalDate() : null;
         int qtd = rs.getInt("quantidade");
         EstadoStock estado = rs.getString("estado") != null ? EstadoStock.valueOf(rs.getString("estado")) : null;
-        var dataGarantiaRaw = rs.getDate("data_garantia");
+        var dataGarantiaRaw = rs.getDate("garantia");
         var dataGarantia = dataGarantiaRaw != null ? dataGarantiaRaw.toLocalDate() : null;
         return new Stock(id, preco, codPeca, dataChegada, qtd, estado, dataGarantia);
     }
@@ -108,12 +108,13 @@ public class StockDAO implements Map<Integer, Stock> {
     public Stock put(Integer key, Stock value) {
         Stock prev = get(key);
         String sql = """
-                INSERT INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, estado, data_garantia)
+                INSERT INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, garantia, estado)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     preco_compra = VALUES(preco_compra), codPeca = VALUES(codPeca),
                     data_chegada = VALUES(data_chegada), quantidade = VALUES(quantidade),
-                    estado = VALUES(estado), data_garantia = VALUES(data_garantia)
+                    garantia = VALUES(garantia),
+                    estado = VALUES(estado)
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
@@ -124,8 +125,12 @@ public class StockDAO implements Map<Integer, Stock> {
             else
                 ps.setNull(4, Types.DATE);
             ps.setInt(5, value.getQuantidade());
-            ps.setString(6, value.getEstado().name());
-            ps.setDate(7, value.getGarantia() != null ? Date.valueOf(value.getGarantia()) : null);
+            if (value.getGarantia() != null)
+                ps.setDate(6, Date.valueOf(value.getGarantia()));
+            else
+                ps.setNull(6, Types.DATE);
+
+            ps.setString(7, value.getEstado().name());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar stock " + key, e);

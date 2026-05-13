@@ -547,25 +547,13 @@ function ReceberEncomendaDialog({
 }: {
   encomenda: Encomenda | null; onClose: () => void; onSaved: () => void;
 }) {
-  const [numeros, setNumeros] = useState<string[]>([]);
-  const [garantias, setGarantias] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (encomenda) {
-      setNumeros(encomenda.codStocks.map(() => ""));
-      setGarantias(encomenda.codStocks.map(() => 0));
-    }
-  }, [encomenda]);
 
   const submit = async () => {
     if (!encomenda) return;
     setSaving(true);
     try {
-      await api.patch(`/encomendas/${encomenda.id}/recebida`, {
-        numeros_serie: numeros,
-        garantias,
-      });
+      await api.patch(`/encomendas/${encomenda.id}/recebida`, {});
       toast.success("Encomenda marcada como recebida");
       onSaved();
     } catch (e) { toast.error((e as Error).message); }
@@ -579,36 +567,9 @@ function ReceberEncomendaDialog({
       <DialogContent className="max-w-xl">
         <DialogHeader><DialogTitle>Registar receção da encomenda</DialogTitle></DialogHeader>
         {nItems > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Preenche os nºs de série e garantias para os {nItems} stock(s) desta encomenda (deixa vazio se não aplicável).
-            </p>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">#</TableHead>
-                  <TableHead>Nº de série</TableHead>
-                  <TableHead className="w-32">Garantia (meses)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {encomenda?.codStocks.map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>{i + 1}</TableCell>
-                    <TableCell>
-                      <Input value={numeros[i] ?? ""} className="h-8"
-                        onChange={(e) => setNumeros((arr) => arr.map((v, j) => j === i ? e.target.value : v))}
-                        placeholder="Opcional" />
-                    </TableCell>
-                    <TableCell>
-                      <Input type="number" min={0} value={garantias[i] ?? 0} className="h-8"
-                        onChange={(e) => setGarantias((arr) => arr.map((v, j) => j === i ? Number(e.target.value) : v))} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Esta encomenda contém {nItems} stock{nItems !== 1 ? "s" : ""}. O tempo de garantia será obtido automaticamente a partir de cada peça.
+          </p>
         )}
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
