@@ -124,3 +124,34 @@ VALUES (1, 'admin123',   1, 'Gerente',     'admin'),
        (4, 'silvina123', 3, 'Secretaria',  'silvina'),
        (5, 'ramiro123',  4, 'Mecanico',    'ramiro'),
        (6, 'edgar123',   5, 'Mecanico',    'edgar');
+
+INSERT INTO Cliente (id, nome, email, telemovel, NIF)
+VALUES
+(1,  'João Silva',        'joao.silva@gmail.com',        '912345678', '245678901'),
+(2,  'Ana Martins',       'ana.martins@gmail.com',       '913456789', '256789012'),
+(3,  'Pedro Costa',       'pedro.costa@gmail.com',       '914567890', '267890123'),
+(4,  'Mariana Sousa',     'mariana.sousa@gmail.com',     '915678901', '278901234'),
+(5,  'Ricardo Ferreira',  'ricardo.ferreira@gmail.com',  '916789012', '289012345'),
+(6,  'Carla Mendes',      'carla.mendes@gmail.com',      '917890123', '290123456'),
+(7,  'Tiago Oliveira',    'tiago.oliveira@gmail.com',    '918901234', '201234567'),
+(8,  'Beatriz Gomes',     'beatriz.gomes@gmail.com',     '919012345', '212345678'),
+(9,  'Luís Almeida',      'luis.almeida@gmail.com',      '920123456', '223456789'),
+(10, 'Sofia Ribeiro',     'sofia.ribeiro@gmail.com',     '921234567', '234567890');
+
+
+INSERT INTO Trotinete (
+    id, modelo, marca,
+    num_serie, tipo_motor,
+    cod_cliente
+)
+VALUES
+(1,  'Mi Electric Scooter Pro 2', 'Xiaomi',   'XM2026A001', 'Brushless',     1),
+(2,  'Max G30',                   'Ninebot',  'NB2026B002', 'Hub Motor',     2),
+(3,  'M365',                      'Xiaomi',   'XM2026C003', 'Brushless',     3),
+(4,  'Kirin M4',                  'Kugoo',    'KG2026D004', 'Dual Motor',    4),
+(5,  'S1',                        'SmartGyro','SG2026E005', 'Rear Drive',    5),
+(6,  'E25E',                      'Ninebot',  'NB2026F006', 'Front Drive',   6),
+(7,  'Zero 9',                    'Zero',     'ZR2026G007', 'Hub Motor',     7),
+(8,  'Speedway Mini 4 Pro',       'Minimotors','MM2026H008','Brushless',     8),
+(9,  'Urban Glide Ride 80XL',     'UrbanGlide','UG2026I009','Direct Drive',  9),
+(10, 'Dualtron Mini',             'Dualtron', 'DT2026J010', 'Dual Motor',    10);
