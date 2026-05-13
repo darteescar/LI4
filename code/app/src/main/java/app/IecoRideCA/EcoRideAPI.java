@@ -1,5 +1,6 @@
 package app.IecoRideCA;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import app.IecoRideCA.auth.GestorSessoes;
@@ -33,6 +34,7 @@ public class EcoRideAPI {
             config.showJavalinBanner = false;
             config.jsonMapper(new JavalinJackson().updateMapper(m ->
                 m.registerModule(new JavaTimeModule())
+                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             ));
             config.bundledPlugins.enableCors(cors ->
                 cors.addRule(it -> it.allowHost("http://localhost:8080"))
