@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Pencil, Trash2, Clock, RotateCcw } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Banknote } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -168,7 +168,7 @@ export default function Funcionarios() {
               <Clock className="h-4 w-4" />
             </Button>
             <ConfirmDialog
-              trigger={<Button variant="ghost" size="icon" title="Pagar salário"><RotateCcw className="h-4 w-4" /></Button>}
+              trigger={<Button variant="ghost" size="icon" title="Pagar salário"><Banknote className="h-4 w-4" /></Button>}
               title="Pagar salário?"
               description={`As horas extra de ${f.nome} serão liquidadas.`}
               onConfirm={async () => {
@@ -217,11 +217,11 @@ function FuncionarioForm({
   initial: FuncionarioRow | null; onSaved: () => void;
 }) {
   const form = useForm<CreateValues>({
-    resolver: zodResolver(createSchema) as any,
+    resolver: zodResolver(initial ? createSchema.extend({ password: z.string().optional() }) : createSchema) as any,
     values: initial ? {
       nome: initial.nome, telemovel: initial.telemovel, email: initial.email,
-      data_nascimento: initial.data_nascimento, NISS: initial.NISS, NIF: initial.NIF,
-      NUS: initial.NUS, IBAN: (initial.IBAN ?? "").replace(/^PT50/, ""), salario_hora: initial.salario_hora,
+      data_nascimento: initial.data_nascimento, NISS: initial.NISS || (initial as any).niss || "", NIF: initial.NIF || (initial as any).nif || "",
+      NUS: initial.NUS || (initial as any).nus || "", IBAN: (initial.IBAN || (initial as any).iban || "").replace(/^PT50/, ""), salario_hora: initial.salario_hora,
       salario_bruto: initial.salario_bruto, numero_porta: initial.numero_porta, rua: initial.rua,
       localidade: initial.localidade, codigo_postal: initial.codigo_postal,
       cargo: initial.cargo ?? "MECANICO", identificador: initial.identificador ?? "", password: "",

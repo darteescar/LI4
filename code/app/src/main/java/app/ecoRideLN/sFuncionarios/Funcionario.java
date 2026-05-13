@@ -2,15 +2,24 @@ package app.ecoRideLN.sFuncionarios;
 
 import java.time.LocalDate;
 
-public class Funcionario {
+     import com.fasterxml.jackson.annotation.JsonProperty;
+     public class Funcionario {
      private int id;
      private String nome;
      private String telemovel;
      private String email;
      private LocalDate data_nascimento;
+     
+     @JsonProperty("NISS")
      private String NISS;
+     
+     @JsonProperty("NIF")
      private String NIF;
+     
+     @JsonProperty("NUS")
      private String NUS;
+     
+     @JsonProperty("IBAN")
      private String IBAN;
      private float salario_hora;
      private float salario_liquido;

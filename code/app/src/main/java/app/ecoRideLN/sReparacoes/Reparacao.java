@@ -7,6 +7,9 @@ public class Reparacao {
      private float preco;
      private boolean disponivel;
 
+     public Reparacao() {
+     }
+
      public Reparacao(int id, String nomenclatura, String descricao, float preco) {
           this.id = id;
           this.nomenclatura = nomenclatura;

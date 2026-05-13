@@ -249,7 +249,7 @@ export default function OSDetail() {
                     ) : canPegar ? (
                       <div className="space-y-2">
                         <p className="text-xs text-muted-foreground">
-                          Esta OS está disponível. Ao pegar, ficas responsável pelo diagnóstico e reparação.
+                          Esta OS está disponível.
                         </p>
                         <Button onClick={() => pegarMutation.mutate()} disabled={pegarMutation.isPending}>
                           <ShieldCheck className="h-4 w-4" /> Pegar nesta OS
