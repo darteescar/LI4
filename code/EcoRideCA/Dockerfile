@@ -12,5 +12,6 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY openapi.yaml /usr/share/nginx/html/openapi.yaml
 
 EXPOSE 80

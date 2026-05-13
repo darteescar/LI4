@@ -1,0 +1,1001 @@
+openapi: 3.0.3
+
+info:
+  title: EcoRide Solutions — API de Gestão
+  description: |
+    API REST para o sistema de gestão interno da **EcoRide Solutions**.
+
+    Permite gerir clientes, trotinetes, funcionários, reparações, ordens de serviço,
+    notificações e movimentos financeiros.
+
+    ### Autenticação
+    Todas as rotas `/api/*` requerem um token de sessão enviado no header `Authorization`.
+    O token é obtido através do endpoint `POST /auth/login`.
+
+    ### Permissões (Cargos)
+    | Cargo         | Acesso                                      |
+    |---------------|---------------------------------------------|
+    | `Gerente`     | Acesso total                                |
+    | `Secretaria`  | Clientes, trotinetes, reparações (leitura)  |
+    | `Mecanico`    | Reparações, notificações                    |
+    | `GestorStock` | Stock, reparações, notificações             |
+  version: 1.0.0
+
+servers:
+  - url: http://localhost
+    description: Servidor local (porta 80)
+
+tags:
+  - name: Auth
+    description: Autenticação e gestão de sessões
+  - name: Clientes
+    description: Gestão de clientes
+  - name: Trotinetes
+    description: Gestão de trotinetes dos clientes
+  - name: Funcionários
+    description: Gestão de funcionários
+  - name: Reparações
+    description: Catálogo de reparações
+  - name: Notificações
+    description: Notificações internas
+  - name: Financeiro
+    description: Movimentos financeiros e análise
+
+security:
+  - TokenAuth: []
+
+components:
+
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token de sessão obtido via POST /auth/login
+
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Identificador único do recurso
+
+  responses:
+    Unauthorized:
+      description: Token em falta ou inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroResponse'
+          example:
+            status: 401
+            erro: Unauthorized
+            mensagem: Token em falta
+
+    Forbidden:
+      description: Sem permissão para esta operação
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroResponse'
+          example:
+            status: 403
+            erro: Forbidden
+            mensagem: Acesso negado para o cargo atual
+
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroResponse'
+          example:
+            status: 404
+            erro: Not Found
+            mensagem: Recurso não encontrado
+
+    BadRequest:
+      description: Pedido inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroResponse'
+          example:
+            status: 400
+            erro: Bad Request
+            mensagem: Dados inválidos no corpo do pedido
+
+  schemas:
+
+    # ── Auth ──────────────────────────────────────────────────────────────────
+    LoginRequest:
+      type: object
+      required: [identificador, password]
+      properties:
+        identificador:
+          type: string
+          example: admin01
+        password:
+          type: string
+          format: password
+          example: "senha123"
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        cargo:
+          type: string
+          enum: [Gerente, Secretaria, Mecanico, GestorStock]
+          example: Gerente
+        idFuncionario:
+          type: integer
+          example: 3
+        idUtilizador:
+          type: integer
+          example: 1
+
+    # ── Cliente ───────────────────────────────────────────────────────────────
+    ClienteRequest:
+      type: object
+      required: [nome, email, telemovel, nif]
+      properties:
+        nome:
+          type: string
+          example: João Silva
+        email:
+          type: string
+          format: email
+          example: joao.silva@email.com
+        telemovel:
+          type: string
+          example: "912345678"
+        nif:
+          type: string
+          example: "123456789"
+        num_trotinetes:
+          type: integer
+          example: 2
+
+    Cliente:
+      allOf:
+        - $ref: '#/components/schemas/ClienteRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+
+    # ── Trotinete ─────────────────────────────────────────────────────────────
+    TrotineteRequest:
+      type: object
+      required: [marca, modelo, num_serie, motor]
+      properties:
+        cod_cliente:
+          type: integer
+          example: 1
+        marca:
+          type: string
+          example: Xiaomi
+        modelo:
+          type: string
+          example: Pro 4
+        num_serie:
+          type: string
+          example: "XM-2024-00123"
+        motor:
+          type: string
+          example: "350W"
+
+    Trotinete:
+      allOf:
+        - $ref: '#/components/schemas/TrotineteRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 5
+
+    # ── Funcionário ───────────────────────────────────────────────────────────
+    FuncionarioRequest:
+      type: object
+      required:
+        - nome
+        - telemovel
+        - email
+        - data_nascimento
+        - NISS
+        - NIF
+        - NUS
+        - IBAN
+        - salario_hora
+        - salario_liquido
+        - salario_bruto
+        - horas_extra
+        - numero_porta
+        - rua
+        - localidade
+        - codigo_postal
+      properties:
+        nome:
+          type: string
+          example: Maria Santos
+        telemovel:
+          type: string
+          example: "931234567"
+        email:
+          type: string
+          format: email
+          example: maria.santos@ecoride.pt
+        data_nascimento:
+          type: string
+          format: date
+          example: "1990-05-15"
+        NISS:
+          type: string
+          example: "12345678901"
+        NIF:
+          type: string
+          example: "987654321"
+        NUS:
+          type: string
+          example: "NS12345"
+        IBAN:
+          type: string
+          example: "PT50000201231234567890154"
+        salario_hora:
+          type: number
+          format: float
+          example: 8.50
+        salario_liquido:
+          type: number
+          format: float
+          example: 900.00
+        salario_bruto:
+          type: number
+          format: float
+          example: 1100.00
+        horas_extra:
+          type: integer
+          example: 5
+        numero_porta:
+          type: string
+          example: "12A"
+        rua:
+          type: string
+          example: Rua das Flores
+        localidade:
+          type: string
+          example: Braga
+        codigo_postal:
+          type: string
+          example: "4700-000"
+
+    Funcionario:
+      allOf:
+        - $ref: '#/components/schemas/FuncionarioRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 3
+
+    # ── Reparação ─────────────────────────────────────────────────────────────
+    ReparacaoRequest:
+      type: object
+      required: [nomenclatura, descricao, preco, disponivel]
+      properties:
+        nomenclatura:
+          type: string
+          example: "REP-001"
+        descricao:
+          type: string
+          example: "Substituição de travão dianteiro"
+        preco:
+          type: number
+          format: float
+          example: 25.00
+        disponivel:
+          type: boolean
+          example: true
+
+    Reparacao:
+      allOf:
+        - $ref: '#/components/schemas/ReparacaoRequest'
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 10
+
+    # ── Notificação ───────────────────────────────────────────────────────────
+    Notificacao:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 42
+        mensagem:
+          type: string
+          example: "Nova ordem de serviço atribuída."
+        lida:
+          type: boolean
+          example: false
+        tratada:
+          type: boolean
+          example: false
+        idDestinatario:
+          type: integer
+          example: 3
+
+    # ── Financeiro ────────────────────────────────────────────────────────────
+    MovimentoFinanceiro:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 100
+        data:
+          type: string
+          format: date
+          example: "2025-04-01"
+        tipo:
+          type: string
+          enum: [Receita, Despesa]
+          example: Receita
+        valor:
+          type: number
+          format: float
+          example: 150.00
+        descricao:
+          type: string
+          example: "Pagamento OS #45"
+
+    AnaliseFinanceira:
+      type: object
+      properties:
+        totalReceitas:
+          type: number
+          format: float
+          example: 5000.00
+        totalDespesas:
+          type: number
+          format: float
+          example: 2000.00
+        saldo:
+          type: number
+          format: float
+          example: 3000.00
+
+    MovimentoFinanceiroResponse:
+      type: object
+      properties:
+        movimentos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovimentoFinanceiro'
+        analise:
+          $ref: '#/components/schemas/AnaliseFinanceira'
+
+    # ── Erros ─────────────────────────────────────────────────────────────────
+    ErroResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 400
+        erro:
+          type: string
+          example: Bad Request
+        mensagem:
+          type: string
+          example: "Parâmetro numérico inválido"
+
+paths:
+
+  # ── AUTH ────────────────────────────────────────────────────────────────────
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Autenticar utilizador
+      description: Valida as credenciais e devolve um token de sessão. Não requer token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Autenticação bem-sucedida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Terminar sessão
+      description: Invalida o token de sessão atual.
+      responses:
+        '204':
+          description: Sessão terminada com sucesso
+
+  # ── CLIENTES ────────────────────────────────────────────────────────────────
+  /api/clientes:
+    get:
+      tags: [Clientes]
+      summary: Listar todos os clientes
+      description: Requer cargo Gerente ou Secretaria.
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Clientes]
+      summary: Criar novo cliente
+      description: Requer cargo Gerente ou Secretaria.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+      responses:
+        '201':
+          description: Cliente criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/clientes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Clientes]
+      summary: Obter cliente por ID
+      description: Requer cargo Gerente ou Secretaria.
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Clientes]
+      summary: Atualizar dados do cliente
+      description: Requer cargo Gerente ou Secretaria.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+      responses:
+        '200':
+          description: Cliente atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Clientes]
+      summary: Eliminar cliente
+      description: Requer cargo Gerente.
+      responses:
+        '204':
+          description: Cliente eliminado com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ── TROTINETES ──────────────────────────────────────────────────────────────
+  /api/trotinetes:
+    get:
+      tags: [Trotinetes]
+      summary: Listar todas as trotinetes
+      description: Requer cargo Gerente ou Secretaria.
+      responses:
+        '200':
+          description: Lista de trotinetes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trotinete'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/clientes/{id}/trotinetes:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    post:
+      tags: [Trotinetes]
+      summary: Registar trotinete para um cliente
+      description: Requer cargo Gerente ou Secretaria.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrotineteRequest'
+      responses:
+        '201':
+          description: Trotinete criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trotinete'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/trotinetes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Trotinetes]
+      summary: Obter trotinete por ID
+      description: Requer cargo Gerente ou Secretaria.
+      responses:
+        '200':
+          description: Trotinete encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trotinete'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Trotinetes]
+      summary: Atualizar trotinete
+      description: Requer cargo Gerente ou Secretaria.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrotineteRequest'
+      responses:
+        '200':
+          description: Trotinete atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trotinete'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Trotinetes]
+      summary: Eliminar trotinete
+      description: Requer cargo Gerente.
+      responses:
+        '204':
+          description: Trotinete eliminada com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ── FUNCIONÁRIOS ────────────────────────────────────────────────────────────
+  /api/funcionarios:
+    get:
+      tags: [Funcionários]
+      summary: Listar todos os funcionários
+      description: Requer cargo Gerente.
+      responses:
+        '200':
+          description: Lista de funcionários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Funcionario'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Funcionários]
+      summary: Registar novo funcionário
+      description: Requer cargo Gerente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FuncionarioRequest'
+      responses:
+        '201':
+          description: Funcionário criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/funcionarios/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Funcionários]
+      summary: Obter funcionário por ID
+      description: Requer cargo Gerente.
+      responses:
+        '200':
+          description: Funcionário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Funcionários]
+      summary: Atualizar dados do funcionário
+      description: Requer cargo Gerente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FuncionarioRequest'
+      responses:
+        '200':
+          description: Funcionário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Funcionários]
+      summary: Remover funcionário
+      description: Requer cargo Gerente.
+      responses:
+        '204':
+          description: Funcionário removido com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/funcionarios/pagar/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Funcionários]
+      summary: Registar pagamento de salário
+      description: Requer cargo Gerente.
+      responses:
+        '204':
+          description: Pagamento registado com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/funcionarios/horas_extra/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Funcionários]
+      summary: Registar horas extra do funcionário
+      description: Requer cargo Gerente. Apenas o campo horas_extra é utilizado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [horas_extra]
+              properties:
+                horas_extra:
+                  type: integer
+                  example: 8
+      responses:
+        '204':
+          description: Horas extra registadas com sucesso
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ── REPARAÇÕES ──────────────────────────────────────────────────────────────
+  /api/reparacoes:
+    get:
+      tags: [Reparações]
+      summary: Listar reparações
+      description: Requer cargo Gerente, Mecanico, GestorStock ou Secretaria. Parâmetro opcional disponiveis=true para filtrar apenas as disponíveis.
+      parameters:
+        - name: disponiveis
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Se true, devolve apenas reparações disponíveis
+      responses:
+        '200':
+          description: Lista de reparações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reparacao'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Reparações]
+      summary: Criar nova reparação
+      description: Requer cargo Gerente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReparacaoRequest'
+      responses:
+        '201':
+          description: Reparação criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reparacao'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/reparacoes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Reparações]
+      summary: Obter reparação por ID
+      description: Requer cargo Gerente, Mecanico, GestorStock ou Secretaria.
+      responses:
+        '200':
+          description: Reparação encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reparacao'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Reparações]
+      summary: Atualizar reparação
+      description: Requer cargo Gerente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReparacaoRequest'
+      responses:
+        '200':
+          description: Reparação atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reparacao'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Reparações]
+      summary: Eliminar reparação
+      description: Requer cargo Gerente.
+      responses:
+        '204':
+          description: Reparação eliminada com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ── NOTIFICAÇÕES ────────────────────────────────────────────────────────────
+  /api/notificacoes/destinatario/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Notificações]
+      summary: Listar notificações de um destinatário
+      description: Requer cargo Gerente, Mecanico, GestorStock ou Secretaria.
+      responses:
+        '200':
+          description: Lista de notificações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notificacao'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/notificacoes/lida/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Notificações]
+      summary: Marcar notificação como lida
+      description: Requer cargo Gerente, Mecanico, GestorStock ou Secretaria.
+      responses:
+        '204':
+          description: Notificação marcada como lida
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/notificacoes/tratada/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Notificações]
+      summary: Marcar notificação como tratada
+      description: Requer cargo Gerente, Mecanico, GestorStock ou Secretaria.
+      responses:
+        '204':
+          description: Notificação marcada como tratada
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/notificacoes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    delete:
+      tags: [Notificações]
+      summary: Eliminar notificação
+      description: Requer cargo Gerente, Mecanico, GestorStock ou Secretaria.
+      responses:
+        '204':
+          description: Notificação eliminada com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ── FINANCEIRO ──────────────────────────────────────────────────────────────
+  /api/movimentosfinanceiros:
+    get:
+      tags: [Financeiro]
+      summary: Listar movimentos financeiros com análise
+      description: Requer cargo Gerente. Suporta filtragem por intervalo de datas e tipo de movimento.
+      parameters:
+        - name: desde
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Data de início do filtro (ex. 2025-01-01)
+        - name: ate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Data de fim do filtro (ex. 2025-12-31)
+        - name: tipo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [Receita, Despesa]
+          description: Filtrar por tipo de movimento
+      responses:
+        '200':
+          description: Movimentos financeiros e análise
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovimentoFinanceiroResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'

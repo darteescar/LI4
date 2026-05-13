@@ -49,16 +49,16 @@ services:
       - backend
 
   # ── Swagger UI ─────────────────────────────────────────────────────────────
-  # Quando a documentação OpenAPI estiver implementada no backend, aponta
-  # SWAGGER_JSON_URL para o endpoint que devolve o ficheiro openapi.json.
-  # Exemplo com Javalin OpenAPI: http://localhost/api/openapi.json
+  # O ficheiro openapi.yaml é servido pelo nginx do frontend em /api-docs.
+  # Garante que o nginx.conf do frontend tem a location /api-docs configurada
+  # e serve o ficheiro openapi.yaml com o header Content-Type correcto.
   swagger:
     image: swaggerapi/swagger-ui
     restart: unless-stopped
     ports:
       - "8081:8080"
     environment:
-      SWAGGER_JSON_URL: http://localhost/api/openapi.json
+      SWAGGER_JSON_URL: http://localhost/api-docs
     depends_on:
       - backend
 
