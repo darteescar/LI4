@@ -29,6 +29,62 @@ VALUES
     (3, 'Barcelpeças',       '253809420', 'geral@barcelpecas.pt'),
     (4, 'Centrauto',         '253837214', 'barcelos@centrauto.pt');
 
+INSERT IGNORE INTO Peca(id, referencia, marca, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa)
+VALUES
+    (1,  'BAT-XM-36V10A',   'Xiaomi',      'Bateria 36V 10Ah',          'Bateria de lítio para trotinetes elétricas.',                     2, 149.99, 1, TRUE),
+    (2,  'BAT-XM-48V15A',   'Ninebot',     'Bateria 48V 15Ah',          'Bateria de alta autonomia.',                                     2, 229.99, 1, TRUE),
+    (3,  'MOT-HUB-350W',    'Bafang',      'Motor Hub 350W',            'Motor brushless de roda dianteira.',                             1, 119.99, 2, TRUE),
+    (4,  'MOT-HUB-500W',    'Bosch',       'Motor Hub 500W',            'Motor brushless de alto desempenho.',                            1, 169.99, 2, TRUE),
+    (5,  'MOT-HUB-800W',    'Bafang',      'Motor Hub 800W',            'Motor para trotinetes de potência elevada.',                     1, 249.99, 2, TRUE),
+    (6,  'PNEU-8.5',        'Kenda',       'Pneu 8.5 Polegadas',        'Pneu compatível com Xiaomi M365.',                               6, 24.99, 3, TRUE),
+    (7,  'PNEU-10',         'Michelin',    'Pneu 10 Polegadas',         'Pneu reforçado para estrada.',                                   6, 29.99, 3, TRUE),
+    (8,  'CAM-8.5',         'Continental', 'Câmara de Ar 8.5',          'Câmara de ar resistente.',                                       10, 7.99, 3, TRUE),
+    (9,  'CAM-10',          'Schwalbe',    'Câmara de Ar 10',           'Câmara de ar para pneus 10".',                                   10, 8.99, 3, TRUE),
+    (10, 'TRV-PST-01',      'Brembo',      'Pastilhas de Travão',       'Conjunto de pastilhas semi-metálicas.',                          8, 11.99, 4, TRUE),
+
+    (11, 'TRV-DSC-120',     'Tektro',      'Disco de Travão 120mm',     'Disco ventilado em aço.',                                        4, 14.99, 4, TRUE),
+    (12, 'TRV-CAB-01',      'Shimano',     'Cabo de Travão',            'Cabo reforçado para travagem.',                                  5, 6.50, 4, TRUE),
+    (13, 'LCD-M365',        'Xiaomi',      'Display LCD M365',          'Painel digital compatível com Xiaomi.',                          2, 34.99, 1, TRUE),
+    (14, 'LCD-UNIV',        'Ninebot',     'Display Universal',         'Display LCD universal para trotinetes.',                         2, 39.99, 1, TRUE),
+    (15, 'CTRL-36V',        'Bosch',       'Controlador 36V',           'Controlador eletrónico 36V.',                                    2, 49.99, 2, TRUE),
+    (16, 'CTRL-48V',        'Bosch',       'Controlador 48V',           'Controlador eletrónico 48V.',                                    2, 64.99, 2, TRUE),
+    (17, 'ACEL-THR-01',     'Xiaomi',      'Acelerador Universal',      'Punho acelerador universal.',                                    4, 12.99, 1, TRUE),
+    (18, 'LUZ-FRT-LED',     'Ninebot',     'Luz Frontal LED',           'Farol LED frontal branco.',                                      5, 15.99, 3, TRUE),
+    (19, 'LUZ-TRS-LED',     'Ninebot',     'Luz Traseira LED',          'Luz traseira vermelha LED.',                                     5, 11.99, 3, TRUE),
+    (20, 'SUSP-FRT',        'TRP',         'Suspensão Dianteira',       'Kit de suspensão dianteira.',                                    1, 59.99, 2, TRUE),
+
+    (21, 'SUSP-TRS',        'TRP',         'Suspensão Traseira',        'Suspensão traseira reforçada.',                                  1, 64.99, 2, TRUE),
+    (22, 'GUARDA-FRT',      'Xiaomi',      'Guarda-Lamas Frontal',      'Guarda-lamas frontal em ABS.',                                   3, 13.99, 4, TRUE),
+    (23, 'GUARDA-TRS',      'Xiaomi',      'Guarda-Lamas Traseiro',     'Guarda-lamas traseiro em ABS.',                                  3, 15.99, 4, TRUE),
+    (24, 'SUP-TELEM',       'Ninebot',     'Suporte de Telemóvel',      'Suporte ajustável para guiador.',                                5, 9.99, 1, TRUE),
+    (25, 'CAR-42V2A',       'Xiaomi',      'Carregador 42V 2A',         'Carregador para baterias 36V.',                                  3, 29.99, 1, TRUE),
+    (26, 'CAR-54V2A',       'Ninebot',     'Carregador 54V 2A',         'Carregador para baterias 48V.',                                  3, 39.99, 1, TRUE),
+    (27, 'MAN-GUI-01',      'Schwalbe',    'Punhos de Guiador',         'Punhos ergonómicos antiderrapantes.',                            6, 8.99, 3, TRUE),
+    (28, 'CAB-ELET-01',     'Bosch',       'Kit Cablagem',              'Conjunto de cabos elétricos.',                                   4, 17.99, 2, TRUE),
+    (29, 'FUS-15A',         'Bosch',       'Fusível 15A',               'Fusível de proteção elétrica.',                                  10, 2.99, 4, TRUE),
+    (30, 'FUS-20A',         'Bosch',       'Fusível 20A',               'Fusível para controladores.',                                    10, 3.49, 4, TRUE),
+
+    (31, 'ROL-608',         'Shimano',     'Rolamento 608ZZ',           'Rolamento metálico de precisão.',                                10, 4.50, 3, TRUE),
+    (32, 'ROL-6001',        'Shimano',     'Rolamento 6001',            'Rolamento para eixo de motor.',                                  8, 5.99, 3, TRUE),
+    (33, 'EST-BAT-01',      'Xiaomi',      'Suporte de Bateria',        'Base de fixação para bateria.',                                  3, 12.99, 2, TRUE),
+    (34, 'PED-BOR-01',      'Ninebot',     'Tapete Antiderrapante',     'Tapete em borracha para base.',                                  5, 14.99, 4, TRUE),
+    (35, 'CAM-TRS-01',      'Xiaomi',      'Câmara Traseira',           'Câmara traseira de vigilância.',                                 1, 49.99, 1, TRUE),
+    (36, 'BUZ-ELT',         'Ninebot',     'Campainha Elétrica',        'Campainha eletrónica compacta.',                                 5, 9.50, 3, TRUE),
+    (37, 'DOB-HINGE',       'Xiaomi',      'Dobradiça de Fecho',        'Mecanismo de dobragem reforçado.',                               2, 24.99, 2, TRUE),
+    (38, 'PARAF-M6',        'Bosch',       'Kit Parafusos M6',          'Conjunto de parafusos em aço.',                                  15, 5.99, 4, TRUE),
+    (39, 'PARAF-M8',        'Bosch',       'Kit Parafusos M8',          'Parafusos de fixação reforçados.',                               15, 7.99, 4, TRUE),
+    (40, 'DESC-LAT',        'Xiaomi',      'Descanso Lateral',          'Suporte lateral dobrável.',                                      4, 11.99, 3, TRUE),
+
+    (41, 'SEL-BAT-01',      'Continental', 'Vedante de Bateria',        'Vedante impermeável para compartimento.',                        5, 6.99, 2, TRUE),
+    (42, 'PLACA-BT',        'Xiaomi',      'Módulo Bluetooth',          'Módulo Bluetooth para app móvel.',                               2, 18.99, 1, TRUE),
+    (43, 'GPS-TRACK',       'Ninebot',     'Localizador GPS',           'Dispositivo GPS para rastreamento.',                             1, 39.99, 1, TRUE),
+    (44, 'TRV-HID-01',      'Brembo',      'Travão Hidráulico',         'Sistema de travagem hidráulica.',                                2, 79.99, 4, TRUE),
+    (45, 'PED-ALUM',        'Xiaomi',      'Base em Alumínio',          'Plataforma reforçada em alumínio.',                              1, 69.99, 2, TRUE),
+    (46, 'COL-DIR-01',      'TRP',         'Coluna de Direção',         'Coluna principal de direção.',                                   1, 54.99, 2, TRUE),
+    (47, 'REF-LAT-01',      'Continental', 'Refletor Lateral',          'Refletor de segurança lateral.',                                 8, 3.99, 3, TRUE),
+    (48, 'BLOQ-DISC',       'Tektro',      'Bloqueador de Disco',       'Sistema anti-roubo para disco.',                                 2, 21.99, 4, TRUE),
+    (49, 'BOL-TRANSP',      'Xiaomi',      'Bolsa de Transporte',       'Bolsa impermeável para acessórios.',                             3, 16.99, 1, TRUE),
+    (50, 'KIT-FERR',        'Shimano',     'Kit Ferramentas',           'Conjunto de ferramentas para manutenção.',                       2, 27.99, 4, TRUE);
 
 
 INSERT IGNORE INTO Funcionario
