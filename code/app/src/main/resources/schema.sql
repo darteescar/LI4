@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS Defeito (
     idFuncionario   INT          NOT NULL,
     estado_anterior ENUM('StockEmArmazem','StockUsadoConserto') NOT NULL DEFAULT 'StockEmArmazem',
     PRIMARY KEY (id),
-    FOREIGN KEY (codStock)      REFERENCES Stock(id),
+    FOREIGN KEY (codStock)      REFERENCES Stock(id) ON DELETE CASCADE,
     FOREIGN KEY (idFuncionario) REFERENCES Funcionario(id)
 );
 
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS Devolucao (
     estado   ENUM('StockPendenteDeDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
     codStock INT          NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (codStock) REFERENCES Stock(id)
+    FOREIGN KEY (codStock) REFERENCES Stock(id) ON DELETE CASCADE
 );
 
 -- Encomenda + tabela de junção para a lista de codEntradasStock.
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS Encomenda_EntradaStock (
     codStock    INT NOT NULL,
     PRIMARY KEY (idEncomenda, ordem),
     FOREIGN KEY (idEncomenda) REFERENCES Encomenda(id) ON DELETE CASCADE,
-    FOREIGN KEY (codStock)    REFERENCES Stock(id)
+    FOREIGN KEY (codStock)    REFERENCES Stock(id) ON DELETE CASCADE
 );
 
 -- =========================================================
@@ -317,7 +317,7 @@ CREATE TABLE IF NOT EXISTS Conserto_PecaUsada (
     quantidade INT NOT NULL DEFAULT 1,
     PRIMARY KEY (idOS, codStock),
     FOREIGN KEY (idOS)     REFERENCES Conserto(idOS) ON DELETE CASCADE,
-    FOREIGN KEY (codStock) REFERENCES Stock(id)
+    FOREIGN KEY (codStock) REFERENCES Stock(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Conserto_Reparacao (
