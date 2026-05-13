@@ -405,28 +405,15 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
-    public Map<Integer, Encomenda> gerarListaAutomatica() {
-        Map<Integer, List<Integer>> idsPecas    = new java.util.HashMap<>();
-        Map<Integer, List<Float>>   precos      = new java.util.HashMap<>();
-        Map<Integer, List<Integer>> quantidades = new java.util.HashMap<>();
+    public Map<Integer, Map<Integer, Integer>> gerarListaAutomatica() {
+        Map<Integer, Map<Integer, Integer>> resultado = new java.util.HashMap<>();
         for (Peca p : pecaDAO.values()) {
             int stockTotal = obter_quantidade_Stock_Peca_id(p.getId());
             if (stockTotal < p.getStock_minimo()) {
-                int qtd         = p.getStock_minimo() - stockTotal;
-                int fornecedor  = p.getCodFornecedor();
-                idsPecas   .computeIfAbsent(fornecedor, k -> new ArrayList<>()).add(p.getId());
-                precos     .computeIfAbsent(fornecedor, k -> new ArrayList<>()).add(0f);
-                quantidades.computeIfAbsent(fornecedor, k -> new ArrayList<>()).add(qtd);
+                int qtd = p.getStock_minimo() - stockTotal;
+                int fornecedor = p.getCodFornecedor();
+                resultado.computeIfAbsent(fornecedor, k -> new java.util.HashMap<>()).put(p.getId(), qtd);
             }
-        }
-        Map<Integer, Encomenda> resultado = new java.util.HashMap<>();
-        for (int fornecedor : idsPecas.keySet()) {
-            Encomenda e = registarEncomenda(
-                    idsPecas.get(fornecedor),
-                    precos.get(fornecedor),
-                    quantidades.get(fornecedor),
-                    fornecedor);
-            resultado.put(fornecedor, e);
         }
         return resultado;
     }

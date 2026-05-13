@@ -583,7 +583,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public Map<Integer, Encomenda> gerarListaAutomatica() { return sStock.gerarListaAutomatica(); }
+    public Map<Integer, Map<Integer, Integer>> gerarListaAutomatica() { return sStock.gerarListaAutomatica(); }
 
     // ------------------- Fornecedores -------------------
     // feito

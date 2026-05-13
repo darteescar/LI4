@@ -75,5 +75,5 @@ public interface ISStock {
     public Encomenda marcarEncomendaComoEnviada(int id);
     public Encomenda marcarEncomendaComoRecebida(int id);
 
-    public Map<Integer, Encomenda> gerarListaAutomatica();
+    public Map<Integer, Map<Integer, Integer>> gerarListaAutomatica();
 }

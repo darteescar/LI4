@@ -209,8 +209,7 @@ function ListaAutomaticaDialog({
   open: boolean; onOpenChange: (v: boolean) => void;
   pecas: Peca[]; fornecedores: Fornecedor[]; onSaved: () => void;
 }) {
-  const [autoResult, setAutoResult] = useState<Record<string, Encomenda> | null>(null);
-  const [freshStocks, setFreshStocks] = useState<StockEntry[]>([]);
+  const [autoResult, setAutoResult] = useState<Record<string, Record<string, number>> | null>(null);
   const [generating, setGenerating] = useState(false);
   const [selectedFornId, setSelectedFornId] = useState<number | null>(null);
   const [itens, setItens] = useState<ItemEncomenda[]>([]);
@@ -220,7 +219,6 @@ function ListaAutomaticaDialog({
 
   const reset = () => {
     setAutoResult(null);
-    setFreshStocks([]);
     setSelectedFornId(null);
     setItens([]);
   };
@@ -230,10 +228,8 @@ function ListaAutomaticaDialog({
   const generate = async () => {
     setGenerating(true);
     try {
-      const result = await api.post<Record<string, Encomenda>>("/encomendas/automatica", {});
-      const stocks = await api.get<StockEntry[]>("/stocks");
+      const result = await api.post<Record<string, Record<string, number>>>("/encomendas/automatica", {});
       setAutoResult(result);
-      setFreshStocks(stocks);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -241,15 +237,7 @@ function ListaAutomaticaDialog({
     }
   };
 
-  const deleteAutoEncomendas = () => {
-    if (!autoResult) return Promise.resolve();
-    return Promise.all(
-      Object.values(autoResult).map((e) => api.delete(`/encomendas/${e.id}`).catch(() => {}))
-    );
-  };
-
   const handleClose = () => {
-    if (hasResult) deleteAutoEncomendas();
     reset();
     onOpenChange(false);
   };
@@ -257,12 +245,11 @@ function ListaAutomaticaDialog({
   const pickFornecedor = (id: number) => {
     setSelectedFornId(id);
     if (!autoResult) return;
-    const enc = autoResult[String(id)];
-    if (!enc) return;
+    const pecasSugeridas = autoResult[String(id)];
+    if (!pecasSugeridas) return;
     setItens(
-      enc.codStocks.flatMap((sId) => {
-        const s = freshStocks.find((x) => x.id === sId);
-        return s ? [{ codPeca: s.codPeca, quantidade: s.quantidade, preco_compra: 0 }] : [];
+      Object.entries(pecasSugeridas).map(([codPecaStr, qtd]) => {
+        return { codPeca: Number(codPecaStr), quantidade: qtd, preco_compra: 0 };
       })
     );
   };
@@ -284,7 +271,6 @@ function ListaAutomaticaDialog({
     if (!selectedFornId || itens.length === 0) return;
     setSaving(true);
     try {
-      await deleteAutoEncomendas();
       await api.post("/encomendas", {
         cod_fornecedor: selectedFornId,
         itens: itens.map((i) => ({ codPeca: i.codPeca, quantidade: i.quantidade, preco_compra: i.preco_compra })),
@@ -325,8 +311,8 @@ function ListaAutomaticaDialog({
               <Label className="text-sm font-medium">1. Seleciona o fornecedor</Label>
               <div className="grid gap-2 sm:grid-cols-2">
                 {fornComEncomendas.map((f) => {
-                  const enc = autoResult[String(f.id)];
-                  const nItems = enc?.codStocks.length ?? 0;
+                  const pecasFornecedor = autoResult[String(f.id)];
+                  const nItems = pecasFornecedor ? Object.keys(pecasFornecedor).length : 0;
                   const isSelected = selectedFornId === f.id;
                   return (
                     <button
