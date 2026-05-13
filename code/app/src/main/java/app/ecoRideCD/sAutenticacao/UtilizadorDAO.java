@@ -186,8 +186,6 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
 
     // --------- Aliases / domínio ---------
 
-    public void add(Utilizador u)            { put(u.getId(), u); }
-
     public int generateNewId() {
         try (Connection c = ConnectionFactory.get();
              Statement s = c.createStatement();

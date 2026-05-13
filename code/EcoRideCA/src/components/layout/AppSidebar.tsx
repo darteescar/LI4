@@ -107,14 +107,6 @@ export function AppSidebar() {
           );
         })}
       </SidebarContent>
-
-      <SidebarFooter className="border-t">
-        {!collapsed && (
-          <div className="px-2 py-1 text-[11px] text-muted-foreground">
-            v0.1 · Mock data
-          </div>
-        )}
-      </SidebarFooter>
     </Sidebar>
   );
 }
