@@ -24,6 +24,7 @@ public interface ISStock {
     public boolean    existePeca_ref(String ref);
     public boolean    removerPeca(int id);
     public List<Peca> obterPecas();
+    public List<Peca> obterPecasAtivas();
 
     public int         obter_quantidade_Stock_Peca_id(int id);
 

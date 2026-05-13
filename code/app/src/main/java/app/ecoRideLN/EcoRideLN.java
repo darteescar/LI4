@@ -455,10 +455,21 @@ public class EcoRideLN implements IEcoRideLN {
         return sStock.obterPecas();
     }
 
+    @Override
+    public List<Peca> obterPecasAtivas() {
+        return sStock.obterPecasAtivas();
+    }
+
     // ------------------- Stock -------------------
 
     @Override
     public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
+
+        Peca p = sStock.obterPeca(id_peca);
+        if (!p.isAtiva()) {
+            throw new EcoRideException("Peça " + p.getNome() + " está inativa. Stock não pode ser registado.");
+        }
+
         Stock s = sStock.registarStockComGarantia(id_peca, preco_compra, data, garantia, nr_serie);
         sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra, "Compra " + sStock.obterPeca(id_peca).getNome() + "x1");
         return s;
@@ -466,6 +477,12 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
+
+        Peca p = sStock.obterPeca(id_peca);
+        if (!p.isAtiva()) {
+            throw new EcoRideException("Peça " + p.getNome() + " está inativa. Stock não pode ser registado.");
+        }
+
         Stock s = sStock.registarStock_PecaNormal(id_peca, preco_compra, data, quantidade);
         sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra * quantidade, "Compra " + sStock.obterPeca(id_peca).getNome() + "x" + quantidade);
         return s;

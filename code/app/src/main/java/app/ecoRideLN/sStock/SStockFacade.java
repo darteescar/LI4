@@ -121,6 +121,15 @@ public class SStockFacade implements ISStock {
     @Override
     public List<Peca> obterPecas() { return new ArrayList<>(pecaDAO.values()); }
 
+    @Override
+    public List<Peca> obterPecasAtivas() {
+        List<Peca> resultado = new ArrayList<>();
+        for (Peca p : pecaDAO.values()) {
+            if (p.isAtiva()) resultado.add(p);
+        }
+        return resultado;
+    }
+
     // ------------------- Stock -------------------
 
     @Override

@@ -105,6 +105,7 @@ public interface IEcoRideLN {
      public boolean    existePeca_ref(String ref);
      public boolean    removerPeca(int id);
      public List<Peca> obterPecas();
+     public List<Peca> obterPecasAtivas();
 
      // ------------------- Stock -------------------
 
