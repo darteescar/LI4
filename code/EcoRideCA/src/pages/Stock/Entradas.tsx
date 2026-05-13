@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, AlertTriangle, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -22,13 +22,17 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import {
+  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { api } from "@/services/api";
 import { formatEUR } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
 import { entradaNormalSchema, entradaGarantiaSchema } from "@/lib/validators";
 
-interface Peca { id: number; referencia: string; nome: string; preco_venda: number; codFornecedor: number; }
+interface Peca { id: number; referencia: string; marca: string; nome: string; preco_venda: number; codFornecedor: number; }
 interface StockEntry {
   id: number; codPeca: number; quantidade: number; estado: string;
   preco_compra: number; data_chegada: string;
@@ -157,7 +161,6 @@ export default function StockEntradas() {
         <EntradaDialog
           open={open}
           onOpenChange={setOpen}
-          pecas={pecas}
           onSaved={() => {
             setOpen(false);
             qc.invalidateQueries({ queryKey: ["stocks"] });
@@ -169,12 +172,17 @@ export default function StockEntradas() {
 }
 
 function EntradaDialog({
-  open, onOpenChange, pecas, onSaved,
+  open, onOpenChange, onSaved,
 }: {
-  open: boolean; onOpenChange: (v: boolean) => void;
-  pecas: Peca[]; onSaved: () => void;
+  open: boolean; onOpenChange: (v: boolean) => void; onSaved: () => void;
 }) {
   const [comGarantia, setComGarantia] = useState(false);
+
+  const { data: pecas = [] } = useQuery<Peca[]>({
+    queryKey: ["pecasAtivas"],
+    queryFn: () => api.get<Peca[]>("/pecasAtivas"),
+    enabled: open,
+  });
 
   const normalForm = useForm<NormalForm>({
     resolver: zodResolver(entradaNormalSchema),
@@ -262,14 +270,7 @@ function EntradaDialog({
 
           <div className="sm:col-span-2 space-y-1">
             <Label className="text-xs">Peça</Label>
-            <Select value={String(pecaId)} onValueChange={(v) => setPecaId(Number(v))}>
-              <SelectTrigger><SelectValue placeholder="Escolher peça…" /></SelectTrigger>
-              <SelectContent>
-                {pecas.map((p) => (
-                  <SelectItem key={p.id} value={String(p.id)}>{p.referencia} — {p.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <PecaCombobox pecas={pecas} value={pecaId} onChange={setPecaId} />
             {pecaErr && <p className="text-xs text-destructive">{pecaErr}</p>}
           </div>
 
@@ -366,6 +367,80 @@ function EntradaDialog({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function PecaCombobox({
+  pecas, value, onChange,
+}: {
+  pecas: Peca[]; value: number; onChange: (id: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const selected = value ? pecas.find((p) => p.id === value) : undefined;
+
+  const filtered = pecas.filter((p) => {
+    if (!query.trim()) return true;
+    const q = query.toLowerCase();
+    return (
+      p.referencia.toLowerCase().includes(q) ||
+      p.nome.toLowerCase().includes(q) ||
+      (p.marca ?? "").toLowerCase().includes(q)
+    );
+  });
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between font-normal"
+        >
+          {selected ? (
+            <span className="truncate">
+              <span className="font-mono text-xs">{selected.referencia}</span>
+              {selected.marca && <span className="text-muted-foreground"> · {selected.marca}</span>}
+              {" — "}{selected.nome}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">Escolher peça…</span>
+          )}
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popover-trigger-width)" }}>
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Pesquisar por referência, marca ou nome…"
+            value={query}
+            onValueChange={setQuery}
+          />
+          <CommandList>
+            {filtered.length === 0 ? (
+              <CommandEmpty>Nenhuma peça encontrada.</CommandEmpty>
+            ) : (
+              <CommandGroup>
+                {filtered.map((p) => (
+                  <CommandItem
+                    key={p.id}
+                    value={String(p.id)}
+                    onSelect={() => { onChange(p.id); setQuery(""); setOpen(false); }}
+                  >
+                    <span className="font-mono text-xs mr-1">{p.referencia}</span>
+                    {p.marca && <span className="text-muted-foreground text-xs">· {p.marca} · </span>}
+                    <span className="text-sm">{p.nome}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
