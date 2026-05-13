@@ -62,6 +62,7 @@ export const pecaSchema = z.object({
   preco_venda:   z.coerce.number().min(0, "Preço inválido"),
   stock_minimo:  z.coerce.number().int().min(0, "Stock mínimo inválido"),
   ativa:         z.boolean().default(true),
+  garantia:      z.coerce.number().int().min(0, "Garantia inválida").default(0),
 });
 
 export const devolverDefeitoSchema = z.object({

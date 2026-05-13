@@ -44,6 +44,7 @@ type PecaForm = z.infer<typeof pecaSchema>;
 interface Peca {
   id: number; referencia: string; marca: string; nome: string; descricao: string;
   stock_minimo: number; preco_venda: number; codFornecedor: number; ativa: boolean;
+  garantia: number;
 }
 
 interface Fornecedor { id: number; nome: string; telemovel: string; email: string; }
@@ -155,14 +156,15 @@ export default function StockPecas() {
               <TableHead>Preço venda</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Estado</TableHead>
+              <TableHead>Garantia</TableHead>
               {canEdit && <TableHead className="w-[1%] text-right">Ações</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={canEdit ? 9 : 8} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="h-24 text-center text-sm text-muted-foreground">Sem peças</TableCell></TableRow>
+              <TableRow><TableCell colSpan={canEdit ? 9 : 8} className="h-24 text-center text-sm text-muted-foreground">Sem peças</TableCell></TableRow>
             ) : filtered.map((p) => {
               const atual = stockPorPeca[p.id] ?? 0;
               const baixo = atual > 0 && atual < p.stock_minimo;
@@ -185,6 +187,9 @@ export default function StockPecas() {
                     {p.ativa
                       ? <span className="inline-flex items-center rounded-md bg-success-soft px-2 py-1 text-xs font-medium text-success">Ativa</span>
                       : <span className="inline-flex items-center rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive">Inativa</span>}
+                  </TableCell>
+                  <TableCell>
+                    {p.garantia ? `${p.garantia} meses` : "—"}
                   </TableCell>
                   {canEdit && (
                     <TableCell className="text-right">
@@ -238,9 +243,9 @@ function PecaDialog({
       ? {
           referencia: editing.referencia, marca: editing.marca ?? "", nome: editing.nome, descricao: editing.descricao,
           codFornecedor: editing.codFornecedor, preco_venda: editing.preco_venda,
-          stock_minimo: editing.stock_minimo, ativa: editing.ativa,
+          stock_minimo: editing.stock_minimo, ativa: editing.ativa, garantia: editing.garantia,
         }
-      : { referencia: "", marca: "", nome: "", descricao: "", codFornecedor: fornecedores[0]?.id ?? 0, preco_venda: "" as unknown as number, stock_minimo: "" as unknown as number, ativa: true },
+      : { referencia: "", marca: "", nome: "", descricao: "", codFornecedor: fornecedores[0]?.id ?? 0, preco_venda: "" as unknown as number, stock_minimo: "" as unknown as number, ativa: true, garantia: 0 },
   });
 
   const saveMutation = useMutation({
@@ -309,6 +314,9 @@ function PecaDialog({
                 <SelectItem value="false">Inativa</SelectItem>
               </SelectContent>
             </Select>
+          </Field>
+          <Field label="Garantia (meses)" error={form.formState.errors.garantia?.message}>
+            <Input type="number" min={0} placeholder="0" {...form.register("garantia")} />
           </Field>
           <DialogFooter className="sm:col-span-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
