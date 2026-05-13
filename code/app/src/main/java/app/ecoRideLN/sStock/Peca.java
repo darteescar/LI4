@@ -11,8 +11,9 @@ public class Peca {
      private float preco_venda;
      private int codFornecedor;
      private boolean ativa;
+     private int garantia;
 
-     public Peca(int id, String referencia, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int codFornecedor, boolean ativa) {
+     public Peca(int id, String referencia, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int codFornecedor, boolean ativa, int garantia) {
           this.id = id;
           this.referencia = referencia;
           this.marca = marca;
@@ -22,6 +23,7 @@ public class Peca {
           this.preco_venda = preco_venda;
           this.codFornecedor = codFornecedor;
           this.ativa = ativa;
+          this.garantia = garantia;
      }
 
      public int getId() {
@@ -94,5 +96,13 @@ public class Peca {
 
      public void setAtiva(boolean ativa) {
           this.ativa = ativa;
+     }
+
+     public int getGarantia() {
+          return garantia;
+     }
+
+     public void setGarantia(int garantia) {
+          this.garantia = garantia;
      }
 }

@@ -43,7 +43,6 @@ import app.ecoRideLN.sStock.ISStock;
 import app.ecoRideLN.sStock.Peca;
 import app.ecoRideLN.sStock.SStockFacade;
 import app.ecoRideLN.sStock.Stock;
-import app.ecoRideLN.sStock.StockComGarantia;
 
 public class EcoRideLN implements IEcoRideLN {
 
@@ -214,34 +213,21 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public List<Defeito> reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario) {
-        List<Integer> stocksDaPeca = sOrdensServico.obterStocksUsadosConsertoOS(idOS).entrySet().stream()
-            .filter(e -> {
-                Stock s = sStock.obterStock(e.getKey());
-                return s != null && !(s instanceof StockComGarantia) && s.getCodPeca() == codPeca;
-            })
-            .map(Map.Entry::getKey)
-            .collect(java.util.stream.Collectors.toList());
+    List<Integer> stocksDaPeca = sOrdensServico.obterStocksUsadosConsertoOS(idOS).entrySet().stream()
+        .filter(e -> {
+            Stock s = sStock.obterStock(e.getKey());
+            return s != null && s.getCodPeca() == codPeca;  // sem instanceof
+        })
+        .map(Map.Entry::getKey)
+        .collect(java.util.stream.Collectors.toList());
 
-        if (stocksDaPeca.isEmpty())
-            throw new EcoRideException("Nenhum stock fungível da peça " + codPeca + " na OS " + idOS);
-        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
-        String nome = sStock.obterPeca(codPeca) != null ? sStock.obterPeca(codPeca).getNome() : String.valueOf(codPeca);
-        sNotificacoes.registarNotificacaoStock("Possível defeito nas Pecas " + nome + " da OS " + idOS, idFuncionario, destinatarios, codPeca);
-        return sStock.registarDefeito(stocksDaPeca, motivo, idFuncionario);
-    }
+    if (stocksDaPeca.isEmpty())
+        throw new EcoRideException("Nenhum stock da peça " + codPeca + " na OS " + idOS);
 
-    @Override
-    public List<Defeito> reportarDefeitoSerializadoConsertoOS(int idOS, List<Integer> codStocks, String motivo, int idFuncionario) {
-        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
-        List<Integer> stocksDaOS = new java.util.ArrayList<>(sOrdensServico.obterStocksUsadosConsertoOS(idOS).keySet());
-        for (int id : codStocks) {
-            if (!stocksDaOS.contains(id))
-                throw new EcoRideException("Stock " + id + " não pertence à OS " + idOS);
-            int codPeca = sStock.obterStock(id).getCodPeca();
-            String nomePeca = sStock.obterPeca(codPeca) != null ? sStock.obterPeca(codPeca).getNome() : String.valueOf(codPeca);
-            sNotificacoes.registarNotificacaoStock("Possível defeito no Stock " + nomePeca + " da OS " + idOS, idFuncionario, destinatarios, codPeca);
-        }
-        return sStock.registarDefeito(codStocks, motivo, idFuncionario);
+    List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
+    String nome = sStock.obterPeca(codPeca) != null ? sStock.obterPeca(codPeca).getNome() : String.valueOf(codPeca);
+    sNotificacoes.registarNotificacaoStock("Possível defeito nas Peças " + nome + " da OS " + idOS, idFuncionario, destinatarios, codPeca);
+    return sStock.registarDefeito(stocksDaPeca, motivo, idFuncionario);
     }
 
     @Override
@@ -421,13 +407,13 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Peças -------------------
 
     @Override
-    public Peca registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
-        return sStock.registarPeca(ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor);
+    public Peca registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, int garantia) {
+        return sStock.registarPeca(ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor, garantia);
     }
 
     @Override
-    public Peca atualizarPeca(int id, String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa){
-        return sStock.atualizarPeca(id, ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor, ativa);
+    public Peca atualizarPeca(int id, String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa, int garantia) {
+        return sStock.atualizarPeca(id, ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor, ativa, garantia);
     }
 
     @Override
@@ -463,27 +449,14 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Stock -------------------
 
     @Override
-    public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
+    public Stock registarStock(int id_peca, float preco_compra, LocalDate data, int quantidade) {
 
         Peca p = sStock.obterPeca(id_peca);
         if (!p.isAtiva()) {
             throw new EcoRideException("Peça " + p.getNome() + " está inativa. Stock não pode ser registado.");
         }
 
-        Stock s = sStock.registarStockComGarantia(id_peca, preco_compra, data, garantia, nr_serie);
-        sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra, "Compra " + sStock.obterPeca(id_peca).getNome() + "x1");
-        return s;
-    }
-
-    @Override
-    public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
-
-        Peca p = sStock.obterPeca(id_peca);
-        if (!p.isAtiva()) {
-            throw new EcoRideException("Peça " + p.getNome() + " está inativa. Stock não pode ser registado.");
-        }
-
-        Stock s = sStock.registarStock_PecaNormal(id_peca, preco_compra, data, quantidade);
+        Stock s = sStock.registarStock(id_peca, preco_compra, data, quantidade);
         sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra * quantidade, "Compra " + sStock.obterPeca(id_peca).getNome() + "x" + quantidade);
         return s;
     }
@@ -511,11 +484,6 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade) {
         return sStock.atualizarStock(id_stock, preco_compra, cod_Peca, data_rececao, quantidade);
-    }
-
-    @Override
-    public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie) {
-        return sStock.atualizarStockComGarantia(id_stock, preco_compra, cod_Peca, data_rececao, quantidade, garantia, nr_serie);
     }
 
     // ------------------- Defeitos -------------------
@@ -601,8 +569,8 @@ public class EcoRideLN implements IEcoRideLN {
     public Encomenda marcarEncomendaComoEnviada(int id) { return sStock.marcarEncomendaComoEnviada(id); }
 
     @Override
-    public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias) {
-        Encomenda e = sStock.marcarEncomendaComoRecebida(id, numeros_serie, garantias);
+    public Encomenda marcarEncomendaComoRecebida(int id) {
+        Encomenda e = sStock.marcarEncomendaComoRecebida(id);
         for (int stockId : e.getCodStocks()) {
             Stock s = sStock.obterStock(stockId);
             if (s != null) {

@@ -1,11 +1,11 @@
 package app.ecoRideCD.sStock;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Date;
 import java.sql.Types;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
 import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.Stock;
-import app.ecoRideLN.sStock.StockComGarantia;
 
 public class StockDAO implements Map<Integer, Stock> {
 
@@ -36,7 +35,6 @@ public class StockDAO implements Map<Integer, Stock> {
         return instance;
     }
 
-    // Single-table inheritance: se nr_serie != null, instancia StockComGarantia.
     private Stock buildFromRow(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         float preco = rs.getFloat("preco_compra");
@@ -44,16 +42,10 @@ public class StockDAO implements Map<Integer, Stock> {
         var dataChegadaRaw = rs.getDate("data_chegada");
         var dataChegada = dataChegadaRaw != null ? dataChegadaRaw.toLocalDate() : null;
         int qtd = rs.getInt("quantidade");
-        String nrSerie = rs.getString("nr_serie");
-        int garantia = rs.getInt("garantia");
         EstadoStock estado = rs.getString("estado") != null ? EstadoStock.valueOf(rs.getString("estado")) : null;
-
-        if (nrSerie != null) {
-            StockComGarantia scg = new StockComGarantia(id, preco, codPeca, dataChegada, nrSerie, garantia);
-            if (estado != null) scg.setEstado(estado);
-            return scg;
-        }
-        return new Stock(id, preco, codPeca, dataChegada, qtd, estado);
+        var dataGarantiaRaw = rs.getDate("data_garantia");
+        var dataGarantia = dataGarantiaRaw != null ? dataGarantiaRaw.toLocalDate() : null;
+        return new Stock(id, preco, codPeca, dataChegada, qtd, estado, dataGarantia);
     }
 
     @Override
@@ -116,12 +108,12 @@ public class StockDAO implements Map<Integer, Stock> {
     public Stock put(Integer key, Stock value) {
         Stock prev = get(key);
         String sql = """
-                INSERT INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, nr_serie, garantia, estado)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, estado, data_garantia)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE
                     preco_compra = VALUES(preco_compra), codPeca = VALUES(codPeca),
                     data_chegada = VALUES(data_chegada), quantidade = VALUES(quantidade),
-                    nr_serie = VALUES(nr_serie), garantia = VALUES(garantia), estado = VALUES(estado)
+                    estado = VALUES(estado), data_garantia = VALUES(data_garantia)
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, key);
@@ -132,15 +124,8 @@ public class StockDAO implements Map<Integer, Stock> {
             else
                 ps.setNull(4, Types.DATE);
             ps.setInt(5, value.getQuantidade());
-            if (value instanceof StockComGarantia g) {
-                ps.setString(6, g.getNr_serie());
-                ps.setInt(7, g.getGarantia());
-                ps.setString(8, g.getEstado().name());
-            } else {
-                ps.setNull(6, Types.VARCHAR);
-                ps.setNull(7, Types.INTEGER);
-                ps.setString(8, value.getEstado() != null ? value.getEstado().name() : null);
-            }
+            ps.setString(6, value.getEstado().name());
+            ps.setDate(7, value.getGarantia() != null ? Date.valueOf(value.getGarantia()) : null);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar stock " + key, e);
@@ -225,18 +210,6 @@ public class StockDAO implements Map<Integer, Stock> {
             return rs.next() ? rs.getInt(1) + 1 : 1;
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gerar novo ID para stock", e);
-        }
-    }
-
-    public Stock getByNrSerie(String nrSerie) {
-        try (Connection c = ConnectionFactory.get();
-             PreparedStatement ps = c.prepareStatement("SELECT * FROM Stock WHERE nr_serie = ?")) {
-            ps.setString(1, nrSerie);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? buildFromRow(rs) : null;
-            }
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a obter stock por nr_serie " + nrSerie, e);
         }
     }
 

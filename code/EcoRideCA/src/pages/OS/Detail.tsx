@@ -1000,7 +1000,7 @@ function DefeitoDialog({
           motivo: motivo.trim(),
         });
       } else {
-        await api.post(`/ordensservicos/${osId}/defeitos/fungivel`, {
+        await api.post(`/ordensservicos/${osId}/defeitos`, {
           codPeca: pecaId,
           motivo: motivo.trim(),
         });

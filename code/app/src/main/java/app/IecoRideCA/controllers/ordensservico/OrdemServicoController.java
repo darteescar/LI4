@@ -2,7 +2,6 @@ package app.IecoRideCA.controllers.ordensservico;
 
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.ConsertoRequest;
-import app.IecoRideCA.controllers.ordensservico.dto.DefeitoStockComGarantiaRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.DefeitoStockRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.DiagnosticoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.OrdemServicoRequest;
@@ -142,7 +141,7 @@ public class OrdemServicoController {
         });
 
         // Reportar defeito em peça fungível do conserto
-        app.post("/api/ordensservicos/{id}/defeitos/fungivel", ctx -> {
+        app.post("/api/ordensservicos/{id}/defeitos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             DefeitoStockRequest req = ctx.bodyAsClass(DefeitoStockRequest.class);
@@ -150,13 +149,5 @@ public class OrdemServicoController {
             ctx.status(201).json(facade.reportarDefeitoFungivelConsertoOS(id, req.codPeca(), req.motivo(), idFuncionario));
         });
 
-        // Reportar defeito em peça serializada (com garantia) do conserto
-        app.post("/api/ordensservicos/{id}/defeitos/serializado", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            DefeitoStockComGarantiaRequest req = ctx.bodyAsClass(DefeitoStockComGarantiaRequest.class);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            ctx.status(201).json(facade.reportarDefeitoSerializadoConsertoOS(id, req.codStocks(), req.motivo(), idFuncionario));
-        });
     }
 }

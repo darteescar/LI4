@@ -4,11 +4,9 @@ import java.util.List;
 
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.DefeitoToDevolucaoRequest;
-import app.IecoRideCA.controllers.stock.dto.EncomendaRecebidaRequest;
 import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
 import app.IecoRideCA.controllers.stock.dto.FornecedorRequest;
 import app.IecoRideCA.controllers.stock.dto.PecaRequest;
-import app.IecoRideCA.controllers.stock.dto.StockComGarantiaRequest;
 import app.IecoRideCA.controllers.stock.dto.StockRequest;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
@@ -87,7 +85,7 @@ public class StockController {
         app.post("/api/pecas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             PecaRequest req = ctx.bodyAsClass(PecaRequest.class);
-            ctx.status(201).json(facade.registarPeca(req.referencia(), req.marca(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor()));
+            ctx.status(201).json(facade.registarPeca(req.referencia(), req.marca(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor(), req.garantia()));
         });
 
         app.delete("/api/pecas/{id}", ctx -> {
@@ -100,7 +98,7 @@ public class StockController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PecaRequest req = ctx.bodyAsClass(PecaRequest.class);
-            Peca atualizado = facade.atualizarPeca(id, req.referencia(), req.marca(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor(), req.ativa());
+            Peca atualizado = facade.atualizarPeca(id, req.referencia(), req.marca(), req.nome(), req.descricao(), req.stock_minimo(), req.preco_venda(), req.codFornecedor(), req.ativa(), req.garantia());
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
         });
@@ -123,13 +121,7 @@ public class StockController {
         app.post("/api/stocks", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             StockRequest req = ctx.bodyAsClass(StockRequest.class);
-            ctx.status(201).json(facade.registarStock_PecaNormal(req.codPeca(), req.preco(), req.dataChegada(), req.quantidade()));
-        });
-
-        app.post("/api/stocks/garantia", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            StockComGarantiaRequest req = ctx.bodyAsClass(StockComGarantiaRequest.class);
-            ctx.status(201).json(facade.registarStockComGarantia(req.codPeca(), req.preco(), req.dataChegada(), req.garantia(), req.nr_serie()));
+            ctx.status(201).json(facade.registarStock(req.codPeca(), req.preco(), req.dataChegada(), req.quantidade()));
         });
 
         app.delete("/api/stocks/{id}", ctx -> {
@@ -143,15 +135,6 @@ public class StockController {
             int id = Integer.parseInt(ctx.pathParam("id"));
             StockRequest req = ctx.bodyAsClass(StockRequest.class);
             Stock atualizado = facade.atualizarStock(id, req.preco(), req.codPeca(), req.dataChegada(), req.quantidade());
-            if (atualizado == null) ctx.status(404);
-            else ctx.status(200).json(atualizado);
-        });
-
-        app.patch("/api/stocks/{id}/garantia", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            StockComGarantiaRequest req = ctx.bodyAsClass(StockComGarantiaRequest.class);
-            Stock atualizado = facade.atualizarStockComGarantia(id, req.preco(), req.codPeca(), req.dataChegada(), req.quantidade(), req.garantia(), req.nr_serie());
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
         });
@@ -203,8 +186,7 @@ public class StockController {
         app.patch("/api/encomendas/{id}/recebida", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            EncomendaRecebidaRequest req = ctx.bodyAsClass(EncomendaRecebidaRequest.class);
-            Encomenda atualizado = facade.marcarEncomendaComoRecebida(id, req.numeros_serie(), req.garantias());
+            Encomenda atualizado = facade.marcarEncomendaComoRecebida(id);
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
         });

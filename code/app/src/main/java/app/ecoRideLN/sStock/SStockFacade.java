@@ -71,27 +71,29 @@ public class SStockFacade implements ISStock {
     // ------------------- Peca -------------------
 
     @Override
-    public Peca registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor) {
+    public Peca registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, int garantia) {
         Validacoes.naoVazio(ref, "Referência");
         Validacoes.naoVazio(nome, "Nome da peça");
         Validacoes.naoVazio(descricao, "Descrição");
         Validacoes.inteiroNaoNegativo(stock_minimo, "Stock mínimo");
+        Validacoes.inteiroPositivo(garantia, "Garantia");
         Validacoes.valorMonetario(preco_venda, "Preço de venda");
         if (!fornecedorDAO.containsKey(id_fornecedor)) throw new EcoRideException("Fornecedor " + id_fornecedor + " não encontrado.");
         int id = pecaDAO.generateNewId();
-        Peca nova = new Peca(id, ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor, true);
+        Peca nova = new Peca(id, ref, marca, nome, descricao, stock_minimo, preco_venda, id_fornecedor, true, garantia);
         pecaDAO.put(id, nova);
         return nova;
     }
 
     @Override
-    public Peca atualizarPeca(int id, String referencia, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa) {
+    public Peca atualizarPeca(int id, String referencia, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa, int garantia) {
         Peca p = pecaDAO.get(id);
         if (p == null) throw new EcoRideException("Peça " + id + " não encontrada.");
         Validacoes.naoVazio(referencia, "Referência");
         Validacoes.naoVazio(nome, "Nome da peça");
         Validacoes.naoVazio(descricao, "Descrição");
         Validacoes.inteiroNaoNegativo(stock_minimo, "Stock mínimo");
+        Validacoes.inteiroPositivo(garantia, "Garantia");
         Validacoes.valorMonetario(preco_venda, "Preço de venda");
         if (!fornecedorDAO.containsKey(id_fornecedor)) throw new EcoRideException("Fornecedor " + id_fornecedor + " não encontrado.");
         p.setReferencia(referencia);
@@ -102,6 +104,7 @@ public class SStockFacade implements ISStock {
         p.setPreco_venda(preco_venda);
         p.setCodFornecedor(id_fornecedor);
         p.setAtiva(ativa);
+        p.setGarantia(garantia);
         pecaDAO.put(id, p);
         return p;
     }
@@ -133,24 +136,14 @@ public class SStockFacade implements ISStock {
     // ------------------- Stock -------------------
 
     @Override
-    public Stock registarStockComGarantia(int id_peca, float preco_compra, LocalDate data, int garantia, String nr_serie) {
-        Validacoes.valorMonetario(preco_compra, "Preço de compra");
-        Validacoes.naoNulo(data, "Data de receção");
-        Validacoes.inteiroPositivo(garantia, "Garantia (meses)");
-        Validacoes.naoVazio(nr_serie, "Número de série");
-        int id = stockDAO.generateNewId();
-        Stock novo = new StockComGarantia(id, preco_compra, id_peca, data, nr_serie, garantia);
-        stockDAO.put(id, novo);
-        return novo;
-    }
-
-    @Override
-    public Stock registarStock_PecaNormal(int id_peca, float preco_compra, LocalDate data, int quantidade) {
+    public Stock registarStock(int id_peca, float preco_compra, LocalDate data, int quantidade) {
         Validacoes.valorMonetario(preco_compra, "Preço de compra");
         Validacoes.naoNulo(data, "Data de receção");
         Validacoes.inteiroPositivo(quantidade, "Quantidade");
         int id = stockDAO.generateNewId();
-        Stock novo = new Stock(id, preco_compra, id_peca, data, quantidade);
+        int garantia = pecaDAO.get(id_peca) != null ? pecaDAO.get(id_peca).getGarantia() : 0;
+        LocalDate dataGarantia = garantia > 0 ? data.plusMonths(garantia) : null;
+        Stock novo = new Stock(id, preco_compra, id_peca, data, quantidade, dataGarantia);
         stockDAO.put(id, novo);
         return novo;
     }
@@ -158,27 +151,15 @@ public class SStockFacade implements ISStock {
     @Override
     public Stock atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade) {
         Stock s = stockDAO.get(id_stock);
-        if (s != null && !(s instanceof StockComGarantia) && preco_compra >= 0 && cod_Peca >= 0 && data_rececao != null && quantidade >= 0) {
+        if (s != null && preco_compra >= 0 && cod_Peca >= 0 && data_rececao != null && quantidade >= 0) {
             s.setPreco_compra(preco_compra);
             s.setCodPeca(cod_Peca);
             s.setData_chegada(data_rececao);
             s.setQuantidade(quantidade);
+            int garantia = pecaDAO.get(cod_Peca) != null ? pecaDAO.get(cod_Peca).getGarantia() : 0;
+            LocalDate dataGarantia = garantia > 0 ? data_rececao.plusMonths(garantia) : null;
+            s.setGarantia(dataGarantia);
             stockDAO.put(id_stock, s);
-        }
-        return s;
-    }
-
-    @Override
-    public Stock atualizarStockComGarantia(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade, int garantia, String nr_serie) {
-        Stock s = stockDAO.get(id_stock);
-        if (s instanceof StockComGarantia g && preco_compra >= 0 && cod_Peca >= 0 && data_rececao != null && quantidade >= 0 && garantia != 0 && nr_serie != null && !nr_serie.isBlank()) {
-            g.setPreco_compra(preco_compra);
-            g.setCodPeca(cod_Peca);
-            g.setData_chegada(data_rececao);
-            g.setQuantidade(quantidade);
-            g.setGarantia(garantia);
-            g.setNr_serie(nr_serie);
-            stockDAO.put(id_stock, g);
         }
         return s;
     }
@@ -361,52 +342,23 @@ public class SStockFacade implements ISStock {
     // ------------------- Encomenda -------------------
 
     @Override
-    public Stock registarStock_Encomenda(int id_peca, float preco_compra, int quantidade) {
-        int id = stockDAO.generateNewId();
-        if (preco_compra < 0) throw new EcoRideException("Preço de compra não pode ser negativo.");
-        if (quantidade < 0) throw new EcoRideException("Quantidade não pode ser negativa.");
-        Stock novo = new Stock(id, preco_compra, id_peca, null, quantidade, EstadoStock.StockEncomendado);
-        stockDAO.put(id, novo);
-        return novo;
-    }
-
-    @Override
     public Encomenda registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor) {
         int id = encomendaDAO.generateNewId();
         List<Integer> stockIds = new ArrayList<>();
+        LocalDate dataPedido = LocalDate.now();
         for (int i = 0; i < id_peca.size(); i++) {
             Peca p = pecaDAO.get(id_peca.get(i));
             if (p == null) throw new EcoRideException("Peça " + id_peca.get(i) + " não encontrada.");
-            if (p.getPreco_venda() >= 70) {
-                StockComGarantia s = new StockComGarantia(stockDAO.generateNewId(), preco_compra.get(i), id_peca.get(i), null, "N/A", 24);
-                stockDAO.put(s.getId(), s);
-                stockIds.add(s.getId());
-            } else {
-                Stock s = new Stock(stockDAO.generateNewId(), preco_compra.get(i), id_peca.get(i), null, quantidade.get(i), EstadoStock.StockEncomendado);
-                stockDAO.put(s.getId(), s);
-                stockIds.add(s.getId());
-            }
+            int garantia = p.getGarantia();
+            LocalDate dataGarantia = garantia > 0 ? dataPedido.plusMonths(garantia) : null;
+            Stock s = new Stock(stockDAO.generateNewId(), preco_compra.get(i), id_peca.get(i), null, quantidade.get(i), EstadoStock.StockEncomendado, dataGarantia);
+            stockDAO.put(s.getId(), s);
+            stockIds.add(s.getId());
         }
         Encomenda e = new Encomenda(id, cod_fornecedor, stockIds);
         encomendaDAO.put(id, e);
         return e;
     }
-
-    @Override
-    public Encomenda atualizarEncomenda(int id, List<Integer> stockIds, LocalDate data_pedido, LocalDate data_chegada, EstadoEncomenda estado) {
-        Encomenda e = encomendaDAO.get(id);
-        if (e != null && stockIds != null && !stockIds.isEmpty() && data_pedido != null && data_chegada != null && estado != null) {
-            e.setCodStocks(stockIds);
-            e.setData_criacao(data_pedido);
-            e.setData_rececao(data_chegada);
-            e.setEstado(estado);
-            encomendaDAO.put(id, e);
-        }
-        return e;
-    }
-
-    @Override
-    public Encomenda obterEncomenda(int id) { return encomendaDAO.get(id); }
 
     @Override
     public boolean removerEncomenda(int id) { return encomendaDAO.remove(id) != null; }
@@ -426,30 +378,17 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
-    public Encomenda marcarEncomendaComoRecebida(int id, List<String> numeros_serie, List<Integer> garantias) {
+    public Encomenda marcarEncomendaComoRecebida(int id) {
         Encomenda e = encomendaDAO.get(id);
         if (e == null) throw new EcoRideException("Encomenda " + id + " não encontrada.");
-        if (numeros_serie.size() != garantias.size())
-            throw new EcoRideException("A lista de números de série e garantias deve ter o mesmo tamanho.");
-        if (numeros_serie.size() > e.getCodStocks().size() || garantias.size() > e.getCodStocks().size())
-            throw new EcoRideException("A lista de números de série e garantias não pode ser maior que a quantidade de stocks na encomenda.");
-        int contador = 0;
         if (e.getEstado() == EstadoEncomenda.ENVIADA) {
             for (int stockId : e.getCodStocks()) {
                 Stock s = stockDAO.get(stockId);
                 if (s != null) {
-                    Peca p = pecaDAO.get(s.getCodPeca());
-                    if (p != null && p.getPreco_venda() >= 70) {
-                        if (s instanceof StockComGarantia scg) {
-                            scg.setNr_serie(numeros_serie.get(contador));
-                            scg.setGarantia(garantias.get(contador));
-                        }
-                    }
                     s.setEstado(EstadoStock.StockEmArmazem);
                     s.setData_chegada(LocalDate.now());
                     stockDAO.put(stockId, s);
                 }
-                contador++;
             }
             e.setEstado(EstadoEncomenda.RECEBIDA);
             e.setData_rececao(LocalDate.now());

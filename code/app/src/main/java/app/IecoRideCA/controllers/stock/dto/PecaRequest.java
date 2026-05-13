@@ -8,5 +8,6 @@ public record PecaRequest (
      int stock_minimo,
      float preco_venda,
      int codFornecedor,
-     boolean ativa
+     boolean ativa,
+     int garantia
 ) {}

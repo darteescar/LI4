@@ -10,22 +10,25 @@ public class Stock {
      private LocalDate data_chegada;
      private int quantidade;
      private EstadoStock estado;
+     private LocalDate garantia;
 
-     public Stock(int id, float preco_compra, int codPeca, LocalDate data_chegada, int quantidade) {
+     public Stock(int id, float preco_compra, int codPeca, LocalDate data_chegada, int quantidade, LocalDate garantia) {
           this.id = id;
           this.preco_compra = preco_compra;
           this.codPeca = codPeca;
           this.data_chegada = data_chegada;
           this.quantidade = quantidade;
+          this.garantia = garantia;
           this.estado = EstadoStock.StockEmArmazem;
      }
 
-     public Stock(int id, float preco_compra, int codPeca, LocalDate data_chegada, int quantidade, EstadoStock estado) {
+     public Stock(int id, float preco_compra, int codPeca, LocalDate data_chegada, int quantidade, EstadoStock estado, LocalDate garantia) {
           this.id = id;
           this.preco_compra = preco_compra;
           this.codPeca = codPeca;
           this.data_chegada = data_chegada;
           this.quantidade = quantidade;
+          this.garantia = garantia;
           this.estado = estado;
      }
 
@@ -75,6 +78,14 @@ public class Stock {
 
      public void setEstado(EstadoStock estado) {
           this.estado = estado;
+     }
+
+     public LocalDate getGarantia() {
+          return garantia;
+     }
+
+     public void setGarantia(LocalDate garantia) {
+          this.garantia = garantia;
      }
 
      public float calcularValorTotal() {
