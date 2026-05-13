@@ -4,6 +4,4 @@ public record ReparacaoRequest(
      String nomenclatura,
      String descricao,
      float preco,
-     boolean disponivel) {
-
-}
+     boolean disponivel) {}

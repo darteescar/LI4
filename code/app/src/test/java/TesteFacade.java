@@ -297,7 +297,7 @@ public class TesteFacade {
 
         // 4. Aprovar orçamento
         try {
-            boolean r = ln.aprovarOrcamentoOS(idOS);
+            boolean r = ln.aprovarOrcamentoOS(idOS, idFuncSecretaria);
             if (!r) throw new RuntimeException("retornou false");
             OrdemServico os = ln.obterOS(idOS);
             if (os.getEstado() != EstadoOS.PendenteReparacao)

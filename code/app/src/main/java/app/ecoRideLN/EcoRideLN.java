@@ -276,7 +276,10 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean aprovarOrcamentoOS(int id) {
+    public boolean aprovarOrcamentoOS(int id, int idFuncionario) {
+        Cargo cargo = sAutenticacao.obterCargoUtilizador(obterIdUtilizadorPorFuncionario(idFuncionario));
+        if (cargo != Cargo.Gerente && cargo != Cargo.Secretaria)
+            throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem aprovar um orçamento.");
         boolean resultado = sOrdensServico.aprovarOrcamentoOS(id);
         if (resultado) {
             OrdemServico os = sOrdensServico.obterOS(id);
@@ -291,7 +294,10 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean rejeitarOrcamentoOS(int id) {
+    public boolean rejeitarOrcamentoOS(int id, int idFuncionario) {
+        Cargo cargo = sAutenticacao.obterCargoUtilizador(obterIdUtilizadorPorFuncionario(idFuncionario));
+        if (cargo != Cargo.Gerente && cargo != Cargo.Secretaria)
+            throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem rejeitar um orçamento.");
         boolean resultado = sOrdensServico.rejeitarOrcamentoOS(id);
         if (resultado) {
             OrdemServico os = sOrdensServico.obterOS(id);
@@ -311,7 +317,10 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean registarNotificacaoPagamentoOS(int id_OS){
+    public boolean registarNotificacaoPagamentoOS(int id_OS, int idFuncionario){
+        Cargo cargo = sAutenticacao.obterCargoUtilizador(obterIdUtilizadorPorFuncionario(idFuncionario));
+        if (cargo != Cargo.Gerente && cargo != Cargo.Secretaria)
+            throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem registar notificações de pagamento.");
         return sOrdensServico.registarNotificacaoPagamentoOS(id_OS);
     }
 

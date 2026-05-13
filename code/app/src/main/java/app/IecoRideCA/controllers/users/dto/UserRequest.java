@@ -7,6 +7,4 @@ public record UserRequest(
     int idFuncionario, 
     Cargo cargo, 
     String identificador 
-) {
-
-}
+) {}

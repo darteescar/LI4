@@ -63,7 +63,7 @@ public class OrdemServicoController {
 
         // Remover OrdemServico
         app.delete("/api/ordensservicos/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerOS(id) ? 204 : 404);
         });
@@ -79,7 +79,7 @@ public class OrdemServicoController {
 
         // Cancelar OrdemServico
         app.patch("/api/ordensservicos/{id}/cancelar", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.cancelarOS(id);
             ctx.status(204);
@@ -107,17 +107,19 @@ public class OrdemServicoController {
 
         // Aprovar orçamento
         app.patch("/api/ordensservicos/{id}/aprovarOrcamento", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            facade.aprovarOrcamentoOS(id);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            facade.aprovarOrcamentoOS(id, idFuncionario);
             ctx.status(204);
         });
 
         // Rejeitar orçamento
         app.patch("/api/ordensservicos/{id}/rejeitarOrcamento", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            facade.rejeitarOrcamentoOS(id);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            facade.rejeitarOrcamentoOS(id, idFuncionario);
             ctx.status(204);
         });
 
@@ -125,7 +127,8 @@ public class OrdemServicoController {
         app.patch("/api/ordensservicos/{id}/notificarCliente", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
-            facade.registarNotificacaoPagamentoOS(id);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            facade.registarNotificacaoPagamentoOS(id, idFuncionario);
             ctx.status(204);
         });
 

@@ -65,10 +65,10 @@ public interface IEcoRideLN {
      public boolean            registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
-     public boolean            aprovarOrcamentoOS(int id);
-     public boolean            rejeitarOrcamentoOS(int id);
+     public boolean            aprovarOrcamentoOS(int id, int idFuncionario);
+     public boolean            rejeitarOrcamentoOS(int id, int idFuncionario);
      public boolean            atribuirOS(int id, int id_funcionario);
-     public boolean            registarNotificacaoPagamentoOS(int id_OS);
+     public boolean            registarNotificacaoPagamentoOS(int id_OS, int idFuncionario);
 
      // ------------------- Clientes -------------------
      // feito
