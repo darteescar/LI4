@@ -54,7 +54,7 @@ public class FuncionariosController {
             FuncionarioRequest req = ctx.bodyAsClass(FuncionarioRequest.class);
             Funcionario atualizado = facade.atualizarFuncionario(id, req.nome(), req.telemovel(), req.email(), req.data_nascimento(), req.NISS(), req.NIF(), req.NUS(), req.IBAN(), req.salario_hora(), req.salario_liquido(), req.salario_bruto(), req.horas_extra(), req.numero_porta(), req.rua(), req.localidade(), req.codigo_postal());
             if (atualizado == null) ctx.status(404);
-            else ctx.json(atualizado);
+            else ctx.status(200).json(atualizado);
         });
 
         // Pagar Funcionario

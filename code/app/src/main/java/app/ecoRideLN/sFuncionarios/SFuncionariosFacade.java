@@ -30,8 +30,9 @@ public class SFuncionariosFacade implements ISFuncionarios {
           Funcionario func = funcionarioDAO.get(id);
           if (func != null) {
                validaDadosFuncionario(nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
-               funcionarioDAO.put(id, func);
-               return func;
+               Funcionario funcAtualizado = new Funcionario(id, nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
+               funcionarioDAO.put(id, funcAtualizado);
+               return funcAtualizado;
           } else {
                throw new EcoRideException("Funcionário com ID " + id + " não existe.");
           }
