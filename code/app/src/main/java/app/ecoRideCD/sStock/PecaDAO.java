@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -202,6 +204,20 @@ public class PecaDAO implements Map<Integer, Peca> {
         } catch (SQLException e) {
             throw new EcoRideException("Erro a verificar peca por referencia " + ref, e);
         }
+    }
+
+    public List<Peca> getPecasByFornecedorId(int id_fornecedor) {
+        List<Peca> out = new ArrayList<>();
+        String sql = "SELECT * FROM Peca WHERE codFornecedor = ? AND ativa = true ORDER BY id ASC";
+        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id_fornecedor);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter pecas do fornecedor " + id_fornecedor, e);
+        }
+        return out;
     }
 
 }

@@ -68,6 +68,11 @@ public class SStockFacade implements ISStock {
     @Override
     public List<Fornecedor> obterFornecedores() { return new ArrayList<>(fornecedorDAO.values()); }
 
+    @Override
+    public List<Peca> obterPecasDoFornecedor(int id_fornecedor) {
+        return pecaDAO.getPecasByFornecedorId(id_fornecedor);
+    }
+
     // ------------------- Peca -------------------
 
     @Override

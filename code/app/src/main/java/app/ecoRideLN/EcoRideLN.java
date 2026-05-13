@@ -618,6 +618,11 @@ public class EcoRideLN implements IEcoRideLN {
         return sStock.obterFornecedores();
     }
 
+    @Override
+    public List<Peca> obterPecasDoFornecedor(int id_fornecedor) {
+        return sStock.obterPecasDoFornecedor(id_fornecedor);
+    }
+
     // ------------------- Funcionários -------------------
     // feito
 

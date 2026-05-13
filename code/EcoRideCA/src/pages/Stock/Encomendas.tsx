@@ -417,11 +417,23 @@ function NovaEncomendaDialog({
   const [preco, setPreco] = useState<number | "">("");
   const [saving, setSaving] = useState(false);
 
+  const { data: pecasFornecedor = [], isLoading: isLoadingPecas } = useQuery<Peca[]>({
+    queryKey: ["pecas", "fornecedor", codFornecedor],
+    queryFn: () => api.get<Peca[]>(`/fornecedores/${codFornecedor}/pecas`),
+    enabled: !!codFornecedor,
+  });
+
   useEffect(() => {
     if (open) {
       setCodFornecedor(""); setItens([]); setPecaId(""); setQty(""); setPreco("");
     }
   }, [open]);
+
+  const handleFornecedorChange = (val: string) => {
+    setCodFornecedor(val);
+    setItens([]);
+    setPecaId("");
+  };
 
   const addItem = () => {
     if (!pecaId) { toast.error("Escolhe uma peça"); return; }
@@ -432,8 +444,8 @@ function NovaEncomendaDialog({
   };
 
   const pecasDisponiveis = useMemo(
-    () => pecas.filter((p) => p.ativa && !itens.some((i) => i.codPeca === p.id)),
-    [pecas, itens],
+    () => pecasFornecedor.filter((p) => p.ativa && !itens.some((i) => i.codPeca === p.id)),
+    [pecasFornecedor, itens],
   );
 
   const submit = async () => {
@@ -463,7 +475,7 @@ function NovaEncomendaDialog({
         <div className="space-y-4">
           <div className="space-y-1">
             <Label className="text-xs">Fornecedor</Label>
-            <Select value={codFornecedor} onValueChange={setCodFornecedor}>
+            <Select value={codFornecedor} onValueChange={handleFornecedorChange}>
               <SelectTrigger><SelectValue placeholder="Escolher fornecedor…" /></SelectTrigger>
               <SelectContent>
                 {fornecedores.map((f) => (
@@ -478,8 +490,8 @@ function NovaEncomendaDialog({
             <div className="grid gap-2 sm:grid-cols-4">
               <div className="sm:col-span-2 space-y-1">
                 <Label className="text-xs">Peça</Label>
-                <Select value={pecaId} onValueChange={setPecaId}>
-                  <SelectTrigger><SelectValue placeholder="Escolher…" /></SelectTrigger>
+                <Select value={pecaId} onValueChange={setPecaId} disabled={!codFornecedor || isLoadingPecas}>
+                  <SelectTrigger><SelectValue placeholder={!codFornecedor ? "Escolher fornecedor..." : isLoadingPecas ? "A carregar..." : "Escolher…" } /></SelectTrigger>
                   <SelectContent>
                     {pecasDisponiveis.map((p) => (
                       <SelectItem key={p.id} value={String(p.id)}>{p.referencia} — {p.nome}</SelectItem>

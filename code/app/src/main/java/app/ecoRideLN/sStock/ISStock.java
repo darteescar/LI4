@@ -14,6 +14,7 @@ public interface ISStock {
     public boolean    existeFornecedor(int id);
     public boolean    removerFornecedor(int id);
     public List<Fornecedor> obterFornecedores();
+    public List<Peca> obterPecasDoFornecedor(int id_fornecedor);
 
     // ------------------- Peca -------------------
 

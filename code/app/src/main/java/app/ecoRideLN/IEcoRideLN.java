@@ -153,6 +153,7 @@ public interface IEcoRideLN {
      public boolean          existeFornecedor(int id);
      public boolean          removerFornecedor(int id);
      public List<Fornecedor> obterFornecedores();
+     public List<Peca> obterPecasDoFornecedor(int id_fornecedor);
 
      // ------------------- Funcionários -------------------
      // feito

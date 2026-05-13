@@ -41,6 +41,12 @@ public class StockController {
             else ctx.status(200).json(c);
         });
 
+        app.get("/api/fornecedores/{id}/pecas", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            ctx.status(200).json(facade.obterPecasDoFornecedor(id));
+        });
+
         app.post("/api/fornecedores", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             FornecedorRequest req = ctx.bodyAsClass(FornecedorRequest.class);
