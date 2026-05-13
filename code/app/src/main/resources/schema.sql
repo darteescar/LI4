@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS Peca (
     preco_venda   FLOAT        NOT NULL,
     codFornecedor INT          NOT NULL,
     ativa         BOOLEAN      NOT NULL DEFAULT TRUE,
+    garantia      INT          NOT NULL DEFAULT 0, -- garantia em meses
     PRIMARY KEY (id),
     FOREIGN KEY (codFornecedor) REFERENCES Fornecedor(id)
 );
@@ -130,8 +131,7 @@ CREATE TABLE IF NOT EXISTS Stock (
     codPeca      INT          NOT NULL,
     data_chegada DATE         NULL,
     quantidade   INT          NOT NULL,
-    nr_serie     VARCHAR(100) NULL,
-    garantia     INT          NULL,
+    garantia     DATE          NULL,
     estado       ENUM('StockEncomendado','StockEmArmazem','StockComPossivelDefeito','StockPendenteDeDevolucao','StockEnviadoParaFornecedor','StockDevolvidoFornecedor','StockinvalidoParaDevolucao','StockUsadoConserto') NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codPeca) REFERENCES Peca(id)
