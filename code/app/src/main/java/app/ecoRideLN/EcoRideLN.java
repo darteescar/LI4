@@ -473,6 +473,7 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean removerStock(int id) {
+        sFinanceiro.removerMovimentosFinanceirosPorStock(id);
         return sStock.removerStock(id);
     }
 

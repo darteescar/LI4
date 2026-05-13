@@ -23,6 +23,7 @@ public interface ISFinanceiro {
      public boolean existeMovimentoFinanceiro(int id);
 
      public boolean removerMovimentoFinanceiro(int id);
+     public void removerMovimentosFinanceirosPorStock(int codStock);
 
      // ------------------- Cálculos -------------------
 

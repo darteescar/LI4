@@ -276,4 +276,16 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
             throw new EcoRideException("Erro a gerar novo ID para movimento", e);
         }
     }
-}
+    public void removeByStock(int codStock) {
+        String sql = "SELECT id FROM MovimentoPeca WHERE codStock = ?";
+        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, codStock);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    remove(rs.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter movimentos por stock " + codStock, e);
+        }
+    }}

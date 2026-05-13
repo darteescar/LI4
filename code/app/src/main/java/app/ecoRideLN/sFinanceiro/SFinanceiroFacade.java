@@ -89,6 +89,11 @@ public class SFinanceiroFacade implements ISFinanceiro {
           return movimentoFinanceiroDAO.remove(id) != null;
      }
 
+     @Override
+     public void removerMovimentosFinanceirosPorStock(int codStock) {
+          movimentoFinanceiroDAO.removeByStock(codStock);
+     }
+
      // ------------------- Cálculos -------------------
 
      @Override
