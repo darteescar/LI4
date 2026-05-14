@@ -230,9 +230,6 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
-    public Defeito obterDefeito(int id) { return defeitoDAO.get(id); }
-
-    @Override
     public List<Defeito> obterDefeitos() { return new ArrayList<>(defeitoDAO.values()); }
 
     @Override

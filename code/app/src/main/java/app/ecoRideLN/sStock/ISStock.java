@@ -42,7 +42,6 @@ public interface ISStock {
 
     public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario);
 
-    public Defeito       obterDefeito(int id);
     public List<Defeito> obterDefeitos();
     public boolean       removerDefeito(int id);
 

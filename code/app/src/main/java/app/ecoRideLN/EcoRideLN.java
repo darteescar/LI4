@@ -511,10 +511,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public Defeito obterDefeito(int id) { return sStock.obterDefeito(id); }
-
-
-    @Override
     public List<Defeito> obterDefeitos() { return sStock.obterDefeitos(); }
 
     @Override
