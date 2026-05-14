@@ -140,7 +140,6 @@ export default function OSDetail() {
   const { data: pecas = [] } = useQuery<Peca[]>({
     queryKey: ["pecas"],
     queryFn: () => api.get<Peca[]>("/pecas"),
-    enabled: !isMec,
   });
 
   const trotinete = useMemo(
@@ -640,6 +639,20 @@ function ConsertoTab({
   const [pecasQtd, setPecasQtd] = useState<Record<number, number>>(initPecs);
   const [check, setCheck] = useState<CheckList>(existing?.checkList ?? CHECK_INIT);
   const [saving, setSaving] = useState(false);
+  const [novoDiagOpen, setNovoDiagOpen] = useState(false);
+  const [novoDiagDesc, setNovoDiagDesc] = useState("");
+
+  const maoObra = useMemo(
+    () => selectedReps.reduce((s, rid) => s + (reparacoes.find((r) => r.id === rid)?.preco ?? 0), 0),
+    [selectedReps, reparacoes],
+  );
+  const totalPecas = useMemo(
+    () => Object.entries(pecasQtd).reduce((s, [pid, q]) => s + (pecas.find((p) => p.id === Number(pid))?.preco_venda ?? 0) * q, 0),
+    [pecasQtd, pecas],
+  );
+  const total = maoObra + totalPecas;
+  const orcamentoAprovado = os.diagnostico?.orcamento ?? null;
+  const exceedsOrcamento = orcamentoAprovado !== null && total > orcamentoAprovado;
 
   useEffect(() => {
     const e = os.conserto;
@@ -687,6 +700,22 @@ function ConsertoTab({
     finally { setSaving(false); }
   };
 
+  const submitNovoDiag = async () => {
+    if (selectedReps.length === 0) { toast.error("Adiciona pelo menos uma reparação"); return; }
+    if (!novoDiagDesc.trim()) { toast.error("Adiciona uma descrição para o novo diagnóstico"); return; }
+    setSaving(true);
+    try {
+      await api.patch(`/ordensservicos/${os.id}/diagnostico`, {
+        pecasQuantidades: pecasQtd,
+        reparacoes: selectedReps.map((rid) => reparacoes.find((r) => r.id === rid)!).filter(Boolean),
+        descricao: novoDiagDesc.trim(),
+      });
+      toast.success("Novo diagnóstico submetido — aguarda aprovação do orçamento");
+      onChanged();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
   const blockedStates: EstadoOS[] = ["PendenteDiagnostico", "PendenteAprovacaoOrcamento", "OrcamentoNaoAprovado"];
   if (blockedStates.includes(os.estado) || (!canEdit && !existing)) {
     return (
@@ -715,17 +744,19 @@ function ConsertoTab({
               <TableHeader>
                 <TableRow>
                   <TableHead>Nomenclatura</TableHead>
+                  <TableHead className="text-right">Preço</TableHead>
                   {canEdit && <TableHead />}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {selectedReps.length === 0 ? (
-                  <TableRow><TableCell colSpan={2} className="text-center text-sm text-muted-foreground">Sem reparações</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={canEdit ? 3 : 2} className="text-center text-sm text-muted-foreground">Sem reparações</TableCell></TableRow>
                 ) : selectedReps.map((rid) => {
                   const r = reparacoes.find((x) => x.id === rid);
                   return (
                     <TableRow key={rid}>
                       <TableCell className="font-medium">{r?.nomenclatura ?? `#${rid}`}</TableCell>
+                      <TableCell className="text-right">{r ? formatEUR(r.preco) : "—"}</TableCell>
                       {canEdit && (
                         <TableCell className="w-[1%]">
                           <Button variant="ghost" size="icon" onClick={() => removeRep(rid)}>
@@ -746,7 +777,7 @@ function ConsertoTab({
                 <AddSelect
                   placeholder="Adicionar peça…"
                   options={pecas.filter((p) => p.ativa && !(p.id in pecasQtd))
-                    .map((p) => ({ value: String(p.id), label: `${p.referencia} — ${p.nome}` }))}
+                    .map((p) => ({ value: String(p.id), label: `${p.referencia} — ${p.nome} · ${formatEUR(p.preco_venda)}` }))}
                   onAdd={addPeca}
                 />
               )}
@@ -756,6 +787,8 @@ function ConsertoTab({
                     <TableRow>
                       <TableHead>Peça</TableHead>
                       <TableHead className="w-24">Qtd</TableHead>
+                      <TableHead className="text-right">Preço unit.</TableHead>
+                      <TableHead className="text-right">Subtotal</TableHead>
                       {canEdit && <TableHead />}
                     </TableRow>
                   </TableHeader>
@@ -772,6 +805,8 @@ function ConsertoTab({
                                 onChange={(e) => setQtd(pid, Number(e.target.value))} />
                             ) : q}
                           </TableCell>
+                          <TableCell className="text-right">{p ? formatEUR(p.preco_venda) : "—"}</TableCell>
+                          <TableCell className="text-right">{p ? formatEUR(p.preco_venda * Number(q)) : "—"}</TableCell>
                           {canEdit && (
                             <TableCell className="w-[1%]">
                               <Button variant="ghost" size="icon" onClick={() => removePeca(pid)}>
@@ -806,24 +841,71 @@ function ConsertoTab({
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Ações</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
+        <CardHeader><CardTitle className="text-base">Totais</CardTitle></CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <Row label="Mão de obra" value={formatEUR(maoObra)} />
+          <Row label="Peças" value={formatEUR(totalPecas)} />
+          <div className="flex justify-between border-t pt-2 text-base font-semibold">
+            <span>Total</span><span>{formatEUR(total)}</span>
+          </div>
+          {orcamentoAprovado !== null && (
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Orçamento aprovado</span>
+              <span>{formatEUR(orcamentoAprovado)}</span>
+            </div>
+          )}
+          {exceedsOrcamento && (
+            <div className="rounded border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">
+              O total excede o orçamento aprovado. Submete um novo diagnóstico.
+            </div>
+          )}
+
           {existing ? (
             <div className="rounded border border-success/30 bg-success-soft p-3 text-sm text-success">
               Conserto registado — preço total: <strong>{formatEUR(existing.preco_total)}</strong>
             </div>
           ) : canEdit ? (
-            <Button className="w-full" disabled={saving || !allChecked || selectedReps.length === 0} onClick={concluir}>
-              {saving ? "A registar…" : "Concluir reparação"}
-            </Button>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              Apenas o mecânico atribuído ou o gerente podem registar o conserto.
-            </p>
-          )}
-          {!allChecked && canEdit && (
-            <p className="text-xs text-muted-foreground">Completa o checklist para poder concluir.</p>
-          )}
+            <div className="space-y-2 pt-1">
+              <Button
+                className="w-full"
+                disabled={saving || !allChecked || selectedReps.length === 0 || exceedsOrcamento}
+                onClick={concluir}
+              >
+                {saving ? "A registar…" : "Concluir reparação"}
+              </Button>
+              {!allChecked && (
+                <p className="text-xs text-muted-foreground">Completa o checklist para poder concluir.</p>
+              )}
+              {exceedsOrcamento && (
+                <p className="text-xs text-destructive">O total excede o orçamento — conclui um novo diagnóstico primeiro.</p>
+              )}
+              <hr />
+              {!novoDiagOpen ? (
+                <Button variant="outline" className="w-full" onClick={() => setNovoDiagOpen(true)}>
+                  Submeter novo Diagnóstico
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <Label>Descrição do novo diagnóstico</Label>
+                  <Textarea
+                    rows={3}
+                    value={novoDiagDesc}
+                    onChange={(e) => setNovoDiagDesc(e.target.value)}
+                    placeholder="Descreve as alterações ao diagnóstico…"
+                  />
+                  <div className="flex gap-2">
+                    <Button className="flex-1" onClick={submitNovoDiag} disabled={saving || !novoDiagDesc.trim()}>
+                      Confirmar
+                    </Button>
+                    <Button variant="outline" className="flex-1" onClick={() => { setNovoDiagOpen(false); setNovoDiagDesc(""); }}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
+
           {canReportDefeito && existing && (
             <>
               <hr />
