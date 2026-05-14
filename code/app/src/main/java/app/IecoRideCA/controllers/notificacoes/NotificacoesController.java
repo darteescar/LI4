@@ -16,9 +16,10 @@ public class NotificacoesController {
     public void register(Javalin app) {
 
         // List<Notificacao> por destinatário
-        app.get("/api/notificacoes/destinatario/{id}", ctx -> {
+        app.get("/api/notificacoes/minhas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.GestorStock, Cargo.Secretaria);
-            ctx.json(facade.obterNotificacoesPorDestinatario(Integer.parseInt(ctx.pathParam("id"))));
+            int id = GestorSessoes.sessao(ctx).getIdUtilizador();
+            ctx.json(facade.obterNotificacoesPorDestinatario(id));
         });
 
         // Colocar como lida

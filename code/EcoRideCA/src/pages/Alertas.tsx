@@ -31,7 +31,7 @@ export default function Alertas() {
 
   const { data: todas = [], isLoading } = useQuery<Notificacao[]>({
     queryKey: ["notificacoes", user?.id],
-    queryFn: () => api.get<Notificacao[]>(`/notificacoes/destinatario/${user!.id}`),
+    queryFn: () => api.get<Notificacao[]>(`/notificacoes/minhas`),
     enabled: !!user,
   });
 
