@@ -40,11 +40,6 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
-    public boolean existeOS(int id) {
-        return ordemServicoDAO.containsKey(id);
-    }
-
-    @Override
     public List<OrdemServico> obterOSs() {
         return new ArrayList<>(ordemServicoDAO.values());
     }
@@ -128,11 +123,18 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
         OrdemServico os = ordemServicoDAO.get(idOS);
         if (os != null) {
+
+            if (os.getCodMecanico() == null) {
+                os.setCodMecanico(id_funcionario);
+            }
+
             if (os.getCodMecanico() != id_funcionario) {
                 throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
             }
+
             if (!os.getEstado().podeTransicionar(EstadoOS.PendenteAprovacaoOrcamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + idOS);
+
             Diagnostico diag = new Diagnostico(descricao, reparacoes, pecasQuantidades, orcamento);
             os.setDiagnostico(diag);
             os.setEstado(EstadoOS.PendenteAprovacaoOrcamento);
@@ -152,11 +154,14 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
+
             if (os.getCodMecanico() != id_funcionario) {
                 throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
             }
+            
             if (!os.getEstado().podeTransicionar(EstadoOS.PendentePagamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + id_OS);
+            
             Conserto con = new Conserto(stocksUsados, reparacoes, orcamento);
             os.setConserto(con);
             os.setEstado(EstadoOS.PendentePagamento);
@@ -181,6 +186,15 @@ public class SOrdensServicoFacade implements ISOrdensServico {
         if (os == null) {
             throw new EcoRideException("OS " + id_OS + " não encontrada.");
         }
+
+        if (os.getEstado() != EstadoOS.PendentePagamento) {
+            throw new EcoRideException("OS " + id_OS + " não está pendente de pagamento.");
+        }
+
+        if (metodo_pagamento == null) {
+            throw new EcoRideException("Método de pagamento inválido.");
+        }
+
         os.setMetodo_pagamento(metodo_pagamento);
         return alterarEstadoOS(id_OS, EstadoOS.Paga);
     }

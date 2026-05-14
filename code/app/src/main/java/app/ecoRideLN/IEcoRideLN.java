@@ -60,7 +60,7 @@ public interface IEcoRideLN {
      public Diagnostico             registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Reparacao> reparacoes, String descricao, int id_funcionario);
      public Conserto                registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
 
-     public List<Defeito>      reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
+     public List<Defeito>      reportarDefeitoConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
      public boolean            registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
@@ -100,8 +100,6 @@ public interface IEcoRideLN {
      public Peca       registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, int garantia);
      public Peca       atualizarPeca(int id, String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa, int garantia);
      public Peca       obterPeca(int id);
-     public boolean    existePeca_id(int id);
-     public boolean    existePeca_ref(String ref);
      public boolean    removerPeca(int id);
      public List<Peca> obterPecas();
      public List<Peca> obterPecasAtivas();
@@ -110,7 +108,6 @@ public interface IEcoRideLN {
 
      public Stock        registarStock(int id_peca, float preco_compra, LocalDate data, int quantidade);
      public Stock        obterStock(int id);
-     public boolean      existeStock(int id);
      public boolean      removerStock(int id);
      public List<Stock>  obterStocks();
      public Stock        atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
@@ -150,7 +147,6 @@ public interface IEcoRideLN {
      public Fornecedor       registarFornecedor(String nome, String telemovel, String email);
      public Fornecedor       atualizarFornecedor(int id, String nome, String telemovel, String email);
      public Fornecedor       obterFornecedor(int id);
-     public boolean          existeFornecedor(int id);
      public boolean          removerFornecedor(int id);
      public List<Fornecedor> obterFornecedores();
      public List<Peca> obterPecasDoFornecedor(int id_fornecedor);

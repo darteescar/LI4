@@ -156,7 +156,7 @@ public class OrdemServicoController {
             int id = Integer.parseInt(ctx.pathParam("id"));
             DefeitoStockRequest req = ctx.bodyAsClass(DefeitoStockRequest.class);
             int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            ctx.status(201).json(facade.reportarDefeitoFungivelConsertoOS(id, req.codPeca(), req.motivo(), idFuncionario));
+            ctx.status(201).json(facade.reportarDefeitoConsertoOS(id, req.codPeca(), req.motivo(), idFuncionario));
         });
 
     }

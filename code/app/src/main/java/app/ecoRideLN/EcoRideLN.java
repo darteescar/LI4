@@ -216,7 +216,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public List<Defeito> reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario) {
+    public List<Defeito> reportarDefeitoConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario) {
     List<Integer> stocksDaPeca = sOrdensServico.obterStocksUsadosConsertoOS(idOS).entrySet().stream()
         .filter(e -> {
             Stock s = sStock.obterStock(e.getKey());
@@ -426,16 +426,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean existePeca_id(int id) {
-        return sStock.existePeca_id(id);
-    }
-
-    @Override
-    public boolean existePeca_ref(String ref) {
-        return sStock.existePeca_ref(ref);
-    }
-
-    @Override
     public boolean removerPeca(int id) {
         return sStock.removerPeca(id);
     }
@@ -468,11 +458,6 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public Stock obterStock(int id) {
         return sStock.obterStock(id);
-    }
-
-    @Override
-    public boolean existeStock(int id) {
-        return sStock.existeStock(id);
     }
 
     @Override
@@ -606,11 +591,6 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public Fornecedor obterFornecedor(int id) {
         return sStock.obterFornecedor(id);
-    }
-
-    @Override
-    public boolean existeFornecedor(int id) {
-        return sStock.existeFornecedor(id);
     }
 
     @Override

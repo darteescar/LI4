@@ -14,8 +14,6 @@ public interface ISOrdensServico {
 
      public OrdemServico obterOS(int id);
 
-     public boolean existeOS(int id);
-
      public List<OrdemServico> obterOSs();
 
      public List<OrdemServico> obterOSsDisponiveis();
