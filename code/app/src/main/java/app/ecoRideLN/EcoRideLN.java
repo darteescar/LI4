@@ -3,6 +3,7 @@ package app.ecoRideLN;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import app.common.EcoRideException;
 import app.ecoRideLN.sAutenticacao.Cargo;
@@ -172,7 +173,7 @@ public class EcoRideLN implements IEcoRideLN {
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         float orcamento = 0;
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
-        for (Map.Entry<Integer, Integer> e : pecasQuantidades.entrySet()) {
+        for (Entry<Integer, Integer> e : pecasQuantidades.entrySet()) {
             Peca p = sStock.obterPeca(e.getKey());
             if (p != null) orcamento += e.getValue() * p.getPreco_venda();
         }
@@ -186,6 +187,22 @@ public class EcoRideLN implements IEcoRideLN {
     public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
         if (!checklist.isCheckListComplete())
             throw new EcoRideException("Checklist incompleta. Conserto não pode ser registado.");
+
+        //validar se peças usadas e reparações preenchem o orçamento aprovado
+        OrdemServico os = sOrdensServico.obterOS(id_OS);
+        if (os == null) throw new EcoRideException("Ordem de serviço não encontrada: " + id_OS);
+        Diagnostico diag = os.getDiagnostico();
+        if (diag == null) throw new EcoRideException("Diagnóstico não encontrado para a OS: " + id_OS);
+        float custoPecas = 0;
+        for (Entry<Integer, Integer> e : pecaQuantidades.entrySet()) {
+            Peca p = sStock.obterPeca(e.getKey());
+            if (p != null) custoPecas += e.getValue() * p.getPreco_venda();
+        }
+        float custoReparacoes = 0;
+        for (Reparacao r : reparacoes) custoReparacoes += r.getPreco();
+        float orcamentoCalculado = custoPecas + custoReparacoes;
+        if (orcamentoCalculado > diag.getOrcamento())
+            throw new EcoRideException(String.format("Custo total do conserto (%.2f) excede orçamento aprovado (%.2f).", orcamentoCalculado, diag.getOrcamento()));
 
         // FIFO: para cada peça, atribui stocks por ordem de chegada e decrementa quantidade
         Map<Integer, Integer> stocksUsados = new java.util.LinkedHashMap<>();
@@ -272,11 +289,9 @@ public class EcoRideLN implements IEcoRideLN {
             throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem aprovar um orçamento.");
         boolean resultado = sOrdensServico.aprovarOrcamentoOS(id);
         if (resultado) {
-            OrdemServico os = sOrdensServico.obterOS(id);
-            List<Integer> destinatarios = sAutenticacao.obterUtilizadores().stream()
-                .filter(u -> u.getIdFuncionario() == os.getCodMecanico())
-                .map(Utilizador::getId)
-                .collect(java.util.stream.Collectors.toList());
+            int codMec = sOrdensServico.obterOS(id).getCodMecanico();
+            int destinatarioId = sAutenticacao.obterIdUserPorIdFuncionario(codMec);
+            List<Integer> destinatarios = List.of(destinatarioId);
             if (!destinatarios.isEmpty())
                 sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + id + " aprovado. Pode avançar com o conserto.", 0, destinatarios, id);
         }
@@ -290,11 +305,9 @@ public class EcoRideLN implements IEcoRideLN {
             throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem rejeitar um orçamento.");
         boolean resultado = sOrdensServico.rejeitarOrcamentoOS(id);
         if (resultado) {
-            OrdemServico os = sOrdensServico.obterOS(id);
-            List<Integer> destinatarios = sAutenticacao.obterUtilizadores().stream()
-                .filter(u -> u.getIdFuncionario() == os.getCodMecanico())
-                .map(Utilizador::getId)
-                .collect(java.util.stream.Collectors.toList());
+            int codMec = sOrdensServico.obterOS(id).getCodMecanico();
+            int destinatarioId = sAutenticacao.obterIdUserPorIdFuncionario(codMec);
+            List<Integer> destinatarios = List.of(destinatarioId);
             if (!destinatarios.isEmpty())
                 sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + id + " rejeitado pelo cliente.", 0, destinatarios, id);
         }

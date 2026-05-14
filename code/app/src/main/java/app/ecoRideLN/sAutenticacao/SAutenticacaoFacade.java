@@ -121,7 +121,10 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         return utilizadoresDAO.getByIdentificador(identificador);
     }
 
-    // Utilitários
+    @Override
+    public int obterIdUserPorIdFuncionario(int idFuncionario) {
+        return utilizadoresDAO.getIdByIdFuncionario(idFuncionario);
+    }
 
     private void validaDadosUtilizador(String password, int idFuncionario, Cargo cargo, String identificador) {
         if (password == null || password.isEmpty()) {

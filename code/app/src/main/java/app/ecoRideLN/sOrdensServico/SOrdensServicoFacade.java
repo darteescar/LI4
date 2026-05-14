@@ -129,7 +129,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             }
 
             if (os.getCodMecanico() != id_funcionario) {
-                throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
+                throw new EcoRideException("Não é o responsável por esta OS.");
             }
 
             if (!os.getEstado().podeTransicionar(EstadoOS.PendenteAprovacaoOrcamento))
@@ -154,11 +154,10 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
-
-            if (os.getCodMecanico() != id_funcionario) {
-                throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
-            }
             
+            if (os.getCodMecanico() != id_funcionario) {
+                throw new EcoRideException("Não é o responsável por esta OS.");
+            }
             if (!os.getEstado().podeTransicionar(EstadoOS.PendentePagamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + id_OS);
             

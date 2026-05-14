@@ -31,3 +31,7 @@ Agora o tempo de garantia está na peça e não há número de série, logo alte
 Retirar fotografia
 
 Refazer Swagger
+
+Rever Código:
+
+método 'obterIdUtilizadorPorFuncionario' faz o mesmo que 'obterIdUserPorIdFuncionario' (rever nomes)

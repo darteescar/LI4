@@ -422,7 +422,7 @@ function DiagnosticoTab({
 
   const submit = async () => {
     if (selectedReps.length === 0) { toast.error("Adiciona pelo menos uma reparação"); return; }
-    if (!notas.trim()) { toast.error("Adiciona uma descrição do diagnóstico"); return; }
+    if (!notas.trim()) { toast.error("Adiciona uma descrição ao Diagnóstico"); return; }
     setSaving(true);
     try {
       await api.patch(`/ordensservicos/${os.id}/diagnostico`, {
@@ -599,7 +599,7 @@ function DiagnosticoTab({
                   <ConfirmDialog
                     trigger={<Button variant="outline" className="w-full text-destructive">Rejeitar orçamento</Button>}
                     title="Rejeitar orçamento?"
-                    description="O cliente não aprovou o orçamento. A OS ficará no estado OrcamentoNaoAprovado."
+                    description="Apenas rejeite o orçamento se o cliente não aceitar o valor. Esta ação não pode ser revertida."
                     destructive
                     onConfirm={rejeitar}
                   />
