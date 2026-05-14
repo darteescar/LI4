@@ -169,7 +169,7 @@ export default function OSDetail() {
 
   const isMecAtribuido = isMec && !!mecIdUtilizador && user?.idUtilizador === mecIdUtilizador.idUtilizador;
   const canMecOps = isMecAtribuido;
-  const canPegar = (isMec || isGerente) && !os.codMecanico && os.estado === "PendenteDiagnostico";
+  const canPegar = isMec && !os.codMecanico && os.estado === "PendenteDiagnostico";
   const bloqueadoOutroMec = isMec && !!os.codMecanico && !isMecAtribuido;
 
   const mecNome = funcionarios.find((f) => f.id === os.codMecanico)?.nome ?? (os.codMecanico ? `#${os.codMecanico}` : null);
@@ -628,10 +628,14 @@ function ConsertoTab({
   const diag = os.diagnostico;
   const existing = os.conserto;
 
+  const { data: pecasConserto } = useQuery<Record<number, number>>({
+    queryKey: ["ordensservicos", os.id, "conserto", "pecas"],
+    queryFn: () => api.get<Record<number, number>>(`/ordensservicos/${os.id}/conserto/pecas`),
+    enabled: !!existing,
+  });
+
   const initReps = existing?.cod_reparacoes ?? diag?.cod_reparacoes ?? [];
-  const initPecs: Record<number, number> = existing
-    ? {}
-    : diag
+  const initPecs: Record<number, number> = !existing && diag
     ? Object.fromEntries(Object.entries(diag.pecasOrcamento).map(([k, v]) => [Number(k), v]))
     : {};
 
@@ -653,19 +657,25 @@ function ConsertoTab({
   );
   const total = maoObra + totalPecas;
   const orcamentoAprovado = os.diagnostico?.orcamento ?? null;
-  const exceedsOrcamento = orcamentoAprovado !== null && total > orcamentoAprovado;
+  const exceedsOrcamento = orcamentoAprovado !== null && total > orcamentoAprovado+0.01;
 
+  // Reset quando muda de OS
   useEffect(() => {
     const e = os.conserto;
     const d = os.diagnostico;
     setSelectedReps(e?.cod_reparacoes ?? d?.cod_reparacoes ?? []);
-    setPecasQtd(e
-      ? {}
-      : d
+    setPecasQtd(!e && d
       ? Object.fromEntries(Object.entries(d.pecasOrcamento).map(([k, v]) => [Number(k), v]))
       : {});
     setCheck(e?.checkList ?? CHECK_INIT);
   }, [os.id, os.conserto, os.diagnostico]);
+
+  // Aplica pecasConserto quando os dados chegam do servidor (só uma vez por query)
+  useEffect(() => {
+    if (pecasConserto && Object.keys(pecasConserto).length > 0) {
+      setPecasQtd(pecasConserto);
+    }
+  }, [pecasConserto]);
 
   const addRep = (idStr: string) => {
     const id = Number(idStr);
@@ -962,10 +972,17 @@ function PagamentoTab({
   const [metodo, setMetodo] = useState<MetodoPagamento>("MULTIBANCO");
   const [saving, setSaving] = useState(false);
 
-  const maoObra = (os.diagnostico?.cod_reparacoes ?? []).reduce(
+  const maoObra = (os.conserto?.cod_reparacoes ?? os.diagnostico?.cod_reparacoes ?? []).reduce(
     (s, rid) => s + (reparacoes.find((r) => r.id === rid)?.preco ?? 0), 0
   );
-  const totalPecas = Object.entries(os.diagnostico?.pecasOrcamento ?? {}).reduce(
+
+  const { data: pecasConserto = {} } = useQuery<Record<number, number>>({
+    queryKey: ["ordensservicos", os.id, "conserto", "pecas"],
+    queryFn: () => api.get<Record<number, number>>(`/ordensservicos/${os.id}/conserto/pecas`),
+    enabled: !!os.conserto,
+  });
+  const pecasParaCalculo = os.conserto ? pecasConserto : os.diagnostico?.pecasOrcamento ?? {};
+  const totalPecas = Object.entries(pecasParaCalculo).reduce(
     (s, [pid, q]) => s + (pecas.find((p) => p.id === Number(pid))?.preco_venda ?? 0) * q, 0
   );
   const total = os.conserto?.preco_total ?? (maoObra + totalPecas);

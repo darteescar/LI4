@@ -87,8 +87,4 @@ public class Stock {
      public void setGarantia(LocalDate garantia) {
           this.garantia = garantia;
      }
-
-     public float calcularValorTotal() {
-          return preco_compra * quantidade;
-     }
 }

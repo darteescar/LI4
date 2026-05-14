@@ -7,6 +7,6 @@ import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sReparacoes.Reparacao;
 
 public record ConsertoRequest(
-     Map<Integer, Integer> pecasQuantidades,
+     Map<String, Integer> pecasQuantidades,
      List<Reparacao> reparacoes,
      CheckList checklist) {}

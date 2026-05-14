@@ -8,6 +8,7 @@ import app.IecoRideCA.controllers.stock.dto.DefeitoRequest;
 import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
 import app.IecoRideCA.controllers.stock.dto.FornecedorRequest;
 import app.IecoRideCA.controllers.stock.dto.PecaRequest;
+import app.IecoRideCA.controllers.stock.dto.SplitDefeitoRequest;
 import app.IecoRideCA.controllers.stock.dto.StockRequest;
 import app.ecoRideLN.IEcoRideLN;
 import app.ecoRideLN.sAutenticacao.Cargo;
@@ -229,6 +230,14 @@ public class StockController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             facade.descartarDefeito(id);
+            ctx.status(204);
+        });
+
+        app.patch("/api/defeitos/{id}/split", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            SplitDefeitoRequest req = ctx.bodyAsClass(SplitDefeitoRequest.class);
+            facade.resolverDefeitoComSplit(id, req.quantidade(), req.motivo(), req.data());
             ctx.status(204);
         });
 

@@ -40,7 +40,7 @@ public interface ISOrdensServico {
 
      public Diagnostico registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario);
 
-     public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float orcamento, int id_funcionario);
+     public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float valor, int id_funcionario);
 
      public Map<Integer, Integer> obterStocksUsadosConsertoOS(int id_OS);
 

@@ -59,7 +59,8 @@ public interface IEcoRideLN {
      public List<OrdemServico>      obterOSsDisponiveis();
      public void                    cancelarOS(int id);
      public Diagnostico             registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Reparacao> reparacoes, String descricao, int id_funcionario);
-     public Conserto                registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
+     public Conserto                registarConsertoOS(int id_OS, Map<String, Integer> pecaQuantidadesRaw, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
+     public Map<Integer, Integer> obterPecasUsadasConsertoOS(int id_OS);
 
      public boolean            registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
@@ -115,6 +116,7 @@ public interface IEcoRideLN {
 
      // ------------------- Defeitos -------------------
 
+     public void          resolverDefeitoComSplit(int idDefeito, int qtdDefeituosa, String motivo, LocalDate data);    
      public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario);
      public List<Defeito> obterDefeitos();
      public boolean       removerDefeito(int id);
@@ -125,7 +127,7 @@ public interface IEcoRideLN {
 
      public Devolucao       obterDevolucao(int id);
      public boolean         existeDevolucao(int id);
-     public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data);
+     public Devolucao       registarDevolucao(int codStock, String motivo, LocalDate data);
      public List<Devolucao> obterDevolucoes();
      public boolean         removerDevolucao(int id);
      public void            marcarDevolucaoComoEnviada(int id);

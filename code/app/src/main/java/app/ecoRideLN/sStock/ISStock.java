@@ -45,12 +45,13 @@ public interface ISStock {
     public List<Defeito> obterDefeitos();
     public boolean       removerDefeito(int id);
 
-    public Devolucao confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data);
-    public void      descartarDefeito(int idDefeito);
+    public Devolucao     confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data);
+    public void          resolverDefeitoComSplit(int idDefeito, int qtdDefeituosa, String motivo, LocalDate data);
+    public void          descartarDefeito(int idDefeito);
 
     // ------------------- Devolucao -------------------
 
-    public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data);
+    public Devolucao registarDevolucao(int stockIds, String motivo, LocalDate data);
 
     public Devolucao       obterDevolucao(int id);
     public boolean         existeDevolucao(int id);

@@ -1,6 +1,8 @@
 package app.IecoRideCA.controllers.ordensservico;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.ConsertoRequest;
@@ -72,6 +74,13 @@ public class OrdemServicoController {
             OrdemServico c = facade.obterOS(id);
             if (c == null) ctx.status(404);
             else ctx.json(c);
+        });
+
+        app.get("/api/ordensservicos/{id}/conserto/pecas", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            Map<Integer, Integer> pecasUsadas = facade.obterPecasUsadasConsertoOS(id);
+            ctx.json(pecasUsadas);
         });
 
         // Registar OrdemServico — codCriador vem da sessão

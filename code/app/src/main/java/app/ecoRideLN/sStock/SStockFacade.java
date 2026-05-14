@@ -215,14 +215,14 @@ public class SStockFacade implements ISStock {
         for (Stock s : stockDAO.getByPecaId(codPeca)) {
             if (s.getEstado() != EstadoStock.StockEmArmazem || s.getQuantidade() <= 0) continue;
             int id = defeitoDAO.generateNewId();
-            Defeito d = new Defeito(id, s.getId(),motivo, s.getId(), s.getEstado());
+            Defeito d = new Defeito(id, s.getId(), motivo, idFuncionario, s.getEstado());
             defeitoDAO.put(id, d);
             s.setEstado(EstadoStock.StockComPossivelDefeito);
             stockDAO.put(s.getId(), s);
             resultado.add(d);
         }
-         if (resultado.isEmpty())
-             throw new EcoRideException("Não foram encontrados stocks disponíveis para a peça " + pecaDAO.get(codPeca).getNome() + ".");
+        if (resultado.isEmpty())
+            throw new EcoRideException("Não foram encontrados stocks disponíveis para a peça " + pecaDAO.get(codPeca).getNome() + ".");
         return resultado;
     }
 
@@ -249,6 +249,46 @@ public class SStockFacade implements ISStock {
     }
 
     @Override
+    public void resolverDefeitoComSplit(int idDefeito, int qtdDefeituosa, String motivo, LocalDate data) {
+        Defeito defeito = defeitoDAO.get(idDefeito);
+        if (defeito == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
+        
+        Stock original = stockDAO.get(defeito.getCodStock());
+        if (original == null) throw new EcoRideException("Stock associado não encontrado.");
+        
+        if (qtdDefeituosa <= 0 || qtdDefeituosa > original.getQuantidade())
+            throw new EcoRideException("Quantidade inválida — tem de ser entre 1 e " + original.getQuantidade() + ".");
+
+        if (qtdDefeituosa == original.getQuantidade()) {
+            // Sem split — todas as unidades são defeituosas, cria devolução diretamente
+            original.setEstado(EstadoStock.StockPendenteDeDevolucao);
+            stockDAO.put(original.getId(), original);
+            defeitoDAO.remove(idDefeito);
+            registarDevolucao(original.getId(), motivo, data);
+            return;
+        }
+
+        // Split — algumas boas, algumas defeituosas
+        // 1. Original fica com as boas, repõe estado anterior
+        original.setQuantidade(original.getQuantidade() - qtdDefeituosa);
+        original.setEstado(defeito.getEstadoAnterior());
+        stockDAO.put(original.getId(), original);
+
+        // 2. Novo stock só com as defeituosas
+        int novoId = stockDAO.generateNewId();
+        Stock novo = new Stock(novoId, original.getPreco_compra(), original.getCodPeca(),
+                            original.getData_chegada(), qtdDefeituosa,
+                            EstadoStock.StockPendenteDeDevolucao, original.getGarantia());
+        stockDAO.put(novoId, novo);
+
+        // 3. Remove o defeito
+        defeitoDAO.remove(idDefeito);
+
+        // 4. Cria devolução para o novo stock
+        registarDevolucao(novoId, motivo, data);
+    }
+
+    @Override
     public void descartarDefeito(int idDefeito) {
         Defeito d = defeitoDAO.get(idDefeito);
         if (d == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
@@ -263,24 +303,20 @@ public class SStockFacade implements ISStock {
     // ------------------- Devolucao -------------------
 
     @Override
-    public List<Devolucao> registarDevolucao(List<Integer> stockIds, String motivo, LocalDate data) {
+    public Devolucao registarDevolucao(int stockId, String motivo, LocalDate data) {
         if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
         if (data == null) throw new EcoRideException("Data não pode ser nula.");
-        List<Devolucao> resultado = new ArrayList<>();
-        for (int stockId : stockIds) {
-            Stock s = stockDAO.get(stockId);
-            if (s == null)
-                throw new EcoRideException("Stock " + stockId + " não encontrado.");
-            if (s.getEstado() != EstadoStock.StockEmArmazem)
-                throw new EcoRideException("Stock " + stockId + " não está disponível (estado: " + s.getEstado() + ").");
-            s.setEstado(EstadoStock.StockPendenteDeDevolucao);
-            stockDAO.put(stockId, s);
-            int id = devolucaoDAO.generateNewId();
-            Devolucao nova = new Devolucao(id, data, motivo, stockId);
-            devolucaoDAO.put(id, nova);
-            resultado.add(nova);
-        }
-        return resultado;
+        Stock s = stockDAO.get(stockId);
+        if (s == null)
+            throw new EcoRideException("Stock " + stockId + " não encontrado.");
+        if (s.getEstado() != EstadoStock.StockComPossivelDefeito && s.getEstado() != EstadoStock.StockEmArmazem)
+            throw new EcoRideException("Stock " + stockId + " não está disponível (estado: " + s.getEstado() + ").");
+        s.setEstado(EstadoStock.StockPendenteDeDevolucao);
+        stockDAO.put(stockId, s);
+        int id = devolucaoDAO.generateNewId();
+        Devolucao nova = new Devolucao(id, data, motivo, stockId);
+        devolucaoDAO.put(id, nova);
+        return nova;
     }
 
     @Override

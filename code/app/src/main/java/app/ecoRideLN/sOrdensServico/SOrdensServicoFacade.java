@@ -155,7 +155,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
     // ------------------- Conserto -------------------
     @Override
-    public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float orcamento, int id_funcionario) {
+    public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float valor, int id_funcionario) {
 
         if (stocksUsados == null || reparacoes == null) {
             throw new EcoRideException("Dados de conserto incompletos ou inválidos.");
@@ -170,7 +170,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             if (!os.getEstado().podeTransicionar(EstadoOS.PendentePagamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + id_OS);
             
-            Conserto con = new Conserto(stocksUsados, reparacoes, orcamento);
+            Conserto con = new Conserto(stocksUsados, reparacoes, valor);
             os.setConserto(con);
             os.setEstado(EstadoOS.PendentePagamento);
             ordemServicoDAO.put(id_OS, os);
