@@ -18,6 +18,8 @@ public interface ISOrdensServico {
 
      public List<OrdemServico> obterOSs();
 
+     public List<OrdemServico> obterOSsDisponiveis();
+
      public boolean removerOS(int id);
 
      // ------------------- Máquina de estados -------------------
@@ -50,6 +52,5 @@ public interface ISOrdensServico {
 
      public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
 
-     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
-
+     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);   
 }

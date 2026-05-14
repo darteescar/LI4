@@ -501,4 +501,23 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         }
         return out;
     }
+
+    public List<OrdemServico> getAvailableOSs() {
+        
+        List<OrdemServico> out = new ArrayList<>();
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(
+                     SELECT_BASE + " WHERE estado IN (?, ?, ?, ?) ORDER BY id")) {
+            ps.setString(1, EstadoOS.PendenteDiagnostico.name());
+            ps.setString(2, EstadoOS.PendenteAprovacaoOrcamento.name());
+            ps.setString(3, EstadoOS.PendenteReparacao.name());
+            ps.setString(4, EstadoOS.AguardarPecas.name());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(c, rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter OSs disponíveis", e);
+        }
+        return out;
+    }
 }

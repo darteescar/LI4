@@ -50,6 +50,11 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
+    public List<OrdemServico> obterOSsDisponiveis(){
+        return ordemServicoDAO.getAvailableOSs();
+    }
+
+    @Override
     public boolean removerOS(int id) {
         return ordemServicoDAO.remove(id) != null;
     }
@@ -180,7 +185,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
         return alterarEstadoOS(id_OS, EstadoOS.Paga);
     }
 
-    // ------------------- Utilitários -------------------
+        // ------------------- Utilitários -------------------
 
     @Override
     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario) {

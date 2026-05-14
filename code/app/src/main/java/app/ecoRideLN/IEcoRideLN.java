@@ -55,6 +55,7 @@ public interface IEcoRideLN {
      public OrdemServico            obterOS(int id);
      public boolean                 removerOS(int id);
      public List<OrdemServico>      obterOSs();
+     public List<OrdemServico>      obterOSsDisponiveis();
      public void                    cancelarOS(int id);
      public Diagnostico             registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Reparacao> reparacoes, String descricao, int id_funcionario);
      public Conserto                registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);

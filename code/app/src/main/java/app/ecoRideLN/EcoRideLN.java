@@ -158,6 +158,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public List<OrdemServico> obterOSsDisponiveis(){
+        return sOrdensServico.obterOSsDisponiveis();
+    }
+
+    @Override
     public void cancelarOS(int id) {
         sOrdensServico.eliminarOS(id);
     }

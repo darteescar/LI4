@@ -1,5 +1,7 @@
 package app.IecoRideCA.controllers.ordensservico;
 
+import java.util.List;
+
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.ConsertoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.DefeitoStockRequest;
@@ -40,6 +42,14 @@ public class OrdemServicoController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             int id_trotinete = Integer.parseInt(ctx.pathParam("id_trotinete"));
             ctx.json(facade.obterOSs_Trotinete(id_trotinete));
+        });
+
+        // List<OrdemServico> disponíveis para mecanicos
+        app.get("/api/ordensservicos/disponiveis", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            List<OrdemServico> res = facade.obterOSsDisponiveis();
+            if (res == null) ctx.status(404);
+            else ctx.json(res);
         });
 
         // Obter OrdemServico por id
@@ -124,7 +134,7 @@ public class OrdemServicoController {
 
         // Registar notificação de pagamento ao cliente
         app.patch("/api/ordensservicos/{id}/notificarCliente", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             facade.registarNotificacaoPagamentoOS(id, idFuncionario);
@@ -133,14 +143,14 @@ public class OrdemServicoController {
 
         // Registar pagamento da OS
         app.patch("/api/ordensservicos/{id}/pagar", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PagamentoRequest req = ctx.bodyAsClass(PagamentoRequest.class);
             facade.registarPagamentoOS(id, req.metodo_pagamento());
             ctx.status(204);
         });
 
-        // Reportar defeito em peça fungível do conserto
+        // Reportar defeito em peça do conserto
         app.post("/api/ordensservicos/{id}/defeitos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
