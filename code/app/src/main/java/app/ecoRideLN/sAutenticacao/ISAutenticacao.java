@@ -26,8 +26,6 @@ public interface ISAutenticacao {
 
      public boolean atualizarPalavraPasseUtilizador(int id, String passwordvelha, String novaPassword);
 
-     public void atualizarCargoUtilizador(int id, Cargo novoCargo);
-
      public Utilizador obterUtilizadorPorIdentificador(String identificador);
 
      public int obterIdUserPorIdFuncionario(int idFuncionario);

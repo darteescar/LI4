@@ -22,7 +22,7 @@ export default function Dashboard() {
 
   const { data: notificacoes = [] } = useQuery<{ estado: string }[]>({
     queryKey: ["notificacoes", user?.id],
-    queryFn: () => api.get<{ estado: string }[]>(`/notificacoes/destinatario/${user!.id}`),
+    queryFn: () => api.get<{ estado: string }[]>(`/notificacoes/minhas`),
     enabled: !!user,
   });
 

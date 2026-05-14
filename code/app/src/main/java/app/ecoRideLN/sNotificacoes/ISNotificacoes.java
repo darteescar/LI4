@@ -8,19 +8,13 @@ public interface ISNotificacoes {
 
      public void registarNotificacaoStock(String descricao, int id_remetente, List<Integer> ids_destinatarios, int id_peca);
 
-     public Notificacao obterNotificacao(int id);
-
-     public boolean removerNotificacao(int id);
-
-     public List<Notificacao> obterNotificacoes();
+     public boolean removerNotificacao(int id, int idUser);
 
      // Utilitários
 
      public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
 
-     public List<Notificacao> obterNotificacoesNaoTratadas(int id_destinatario);
+     public boolean sinalizarNotificacao_comoTratada(int id, int idUser);
 
-     public boolean sinalizarNotificacao_comoTratada(int id);
-
-     public boolean sinalizarNotificacao_comoLida(int id);
+     public boolean sinalizarNotificacao_comoLida(int id, int idUser);
 }

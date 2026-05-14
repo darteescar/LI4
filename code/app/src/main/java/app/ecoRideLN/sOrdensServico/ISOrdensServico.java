@@ -8,15 +8,15 @@ public interface ISOrdensServico {
 
      // ------------------- Registo -------------------
 
-     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
+     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador);
 
-     public void atualizarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete);
+     public void atualizarOS(int id, String descricao, List<String> acessorios, int id_cliente, int id_trotinete);
 
      public OrdemServico obterOS(int id);
 
-     public boolean existeOS(int id);
-
      public List<OrdemServico> obterOSs();
+
+     public List<OrdemServico> obterOSsDisponiveis();
 
      public boolean removerOS(int id);
 
@@ -50,7 +50,5 @@ public interface ISOrdensServico {
 
      public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
 
-     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
-
-     public boolean validarFotografia(Fotografia foto);
+     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);   
 }

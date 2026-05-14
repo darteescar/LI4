@@ -119,6 +119,7 @@ export default function StockEncomendas() {
               <TableHead>Fornecedor</TableHead>
               <TableHead>Data criação</TableHead>
               <TableHead>Data envio</TableHead>
+              <TableHead>Data receção</TableHead>
               <TableHead>Stocks</TableHead>
               <TableHead>Estado</TableHead>
               {canEdit && <TableHead className="w-[1%] text-right">Ações</TableHead>}
@@ -135,6 +136,7 @@ export default function StockEncomendas() {
                 <TableCell className="font-medium">{fornecedorNome(e.codFornecedor)}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">{e.data_criacao}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">{e.data_envio ?? "—"}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{e.data_rececao ?? "—"}</TableCell>
                 <TableCell>{e.codStocks.length}</TableCell>
                 <TableCell>
                   <Badge variant={ESTADO_VARIANT[e.estado]} className="text-xs">

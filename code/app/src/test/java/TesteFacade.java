@@ -86,7 +86,6 @@ public class TesteFacade {
             "Diagnostico_PecaOrcamento",
             "Diagnostico_Reparacao",
             "Diagnostico",
-            "Fotografia",
             "OrdemServico_Acessorio",
             "OrdemServico",
             "Defeito",
@@ -264,7 +263,7 @@ public class TesteFacade {
         // 1. Criar OS
         try {
             OrdemServico os = ln.registarOS(idCliente, idTrotinete,
-                "Travão dianteiro com ruído", List.of("Carregador"), List.of(), idFuncSecretaria);
+                "Travão dianteiro com ruído", List.of("Carregador"), idFuncSecretaria);
             idOS = os.getId();
             if (os.getEstado() != EstadoOS.PendenteDiagnostico)
                 throw new RuntimeException("estado inicial errado: " + os.getEstado());

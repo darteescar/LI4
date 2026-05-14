@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS MovimentoPeca (
 
 -- =========================================================
 -- SOrdensServico
--- A OS guarda os campos comuns. Cada coleção (acessorios, fotografias,
+-- A OS guarda os campos comuns. Cada coleção (acessorios,
 -- pecasOrcamento, pecasUsadas, cod_reparacoes do diagnostico/conserto)
 -- vive em tabela própria com FK para a OS (ou para o Diagnostico/Conserto)
 -- e ON DELETE CASCADE para que apagar a OS limpe tudo o que pendura.
@@ -262,14 +262,6 @@ CREATE TABLE IF NOT EXISTS OrdemServico_Acessorio (
     ordem INT          NOT NULL,
     valor VARCHAR(255) NOT NULL,
     PRIMARY KEY (idOS, ordem),
-    FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS Fotografia (
-    id      INT          NOT NULL AUTO_INCREMENT,
-    idOS    INT          NOT NULL,
-    caminho VARCHAR(500) NOT NULL,
-    PRIMARY KEY (id),
     FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
 );
 

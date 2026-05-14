@@ -13,22 +13,21 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     private final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
 
     @Override
-    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador) {
+    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador) {
         int id = ordemServicoDAO.generateNewId();
         if (id_cliente <= 0 || id_trotinete <= 0) throw new EcoRideException("ID de cliente e trotinete devem ser positivos.");
         if (descricao == null || descricao.isBlank()) throw new EcoRideException("Descrição não pode ser vazia.");
-        OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, fotografias, acessorios);
+        OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, acessorios);
         ordemServicoDAO.put(id, os);
         return os;
     }
         
     @Override
-    public void atualizarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete) {
+    public void atualizarOS(int id, String descricao, List<String> acessorios, int id_cliente, int id_trotinete) {
         OrdemServico os = ordemServicoDAO.get(id);
         if (os != null && descricao != null && !descricao.isBlank() && (id_cliente > 0 || id_cliente == 0) && (id_trotinete > 0 || id_trotinete == 0)) {
             os.setDescricao(descricao);
             os.setAcessorios(acessorios);
-            os.setFotografias(fotografias);
             os.setCodCliente(id_cliente);
             os.setCodTrotinete(id_trotinete);
             ordemServicoDAO.put(id, os);
@@ -41,13 +40,13 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
-    public boolean existeOS(int id) {
-        return ordemServicoDAO.containsKey(id);
+    public List<OrdemServico> obterOSs() {
+        return new ArrayList<>(ordemServicoDAO.values());
     }
 
     @Override
-    public List<OrdemServico> obterOSs() {
-        return new ArrayList<>(ordemServicoDAO.values());
+    public List<OrdemServico> obterOSsDisponiveis(){
+        return ordemServicoDAO.getAvailableOSs();
     }
 
     @Override
@@ -124,11 +123,18 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
         OrdemServico os = ordemServicoDAO.get(idOS);
         if (os != null) {
-            if (os.getCodMecanico() != id_funcionario) {
-                throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
+
+            if (os.getCodMecanico() == null) {
+                os.setCodMecanico(id_funcionario);
             }
+
+            if (os.getCodMecanico() != id_funcionario) {
+                throw new EcoRideException("Não é o responsável por esta OS.");
+            }
+
             if (!os.getEstado().podeTransicionar(EstadoOS.PendenteAprovacaoOrcamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + idOS);
+
             Diagnostico diag = new Diagnostico(descricao, reparacoes, pecasQuantidades, orcamento);
             os.setDiagnostico(diag);
             os.setEstado(EstadoOS.PendenteAprovacaoOrcamento);
@@ -148,11 +154,13 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
+            
             if (os.getCodMecanico() != id_funcionario) {
-                throw new EcoRideException("Funcionário " + id_funcionario + " não é o responsável por esta OS.");
+                throw new EcoRideException("Não é o responsável por esta OS.");
             }
             if (!os.getEstado().podeTransicionar(EstadoOS.PendentePagamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + id_OS);
+            
             Conserto con = new Conserto(stocksUsados, reparacoes, orcamento);
             os.setConserto(con);
             os.setEstado(EstadoOS.PendentePagamento);
@@ -177,20 +185,24 @@ public class SOrdensServicoFacade implements ISOrdensServico {
         if (os == null) {
             throw new EcoRideException("OS " + id_OS + " não encontrada.");
         }
+
+        if (os.getEstado() != EstadoOS.PendentePagamento) {
+            throw new EcoRideException("OS " + id_OS + " não está pendente de pagamento.");
+        }
+
+        if (metodo_pagamento == null) {
+            throw new EcoRideException("Método de pagamento inválido.");
+        }
+
         os.setMetodo_pagamento(metodo_pagamento);
         return alterarEstadoOS(id_OS, EstadoOS.Paga);
     }
 
-    // ------------------- Utilitários -------------------
+        // ------------------- Utilitários -------------------
 
     @Override
     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario) {
         return ordemServicoDAO.filtrarOSs(estado, desde, ate, id_cliente, id_funcionario);
-    }
-
-    @Override
-    public boolean validarFotografia(Fotografia foto) {
-        return foto.isValid();
     }
 
 }

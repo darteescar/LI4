@@ -19,6 +19,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
@@ -75,7 +78,6 @@ interface OrdemServico {
   codCliente: number;
   codCriador: number;
   codMecanico: number | null;
-  fotografias: { caminho: string }[];
   estado: EstadoOS;
   acessorios: string[];
   conserto: Conserto | null;
@@ -86,7 +88,7 @@ interface OrdemServico {
 interface Reparacao { id: number; nomenclatura: string; descricao: string; preco: number; disponivel: boolean; }
 interface Peca { id: number; referencia: string; nome: string; preco_venda: number; codFornecedor: number; ativa: boolean; }
 interface Funcionario { id: number; nome: string; }
-interface Cliente { id: number; nome: string; NIF: string; telemovel: string; email: string; }
+interface Cliente { id: number; nome: string; nif: string; telemovel: string; email: string; }
 interface Trotinete { id: number; marca: string; modelo: string; num_serie: string; tipo_motor: string; cod_cliente: number; }
 
 
@@ -213,7 +215,7 @@ export default function OSDetail() {
                 <CardHeader><CardTitle className="text-base">Cliente & Trotinete</CardTitle></CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   <Row label="Cliente" value={cliente?.nome ?? "—"} />
-                  <Row label="NIF" value={cliente?.NIF ?? "—"} />
+                  <Row label="NIF" value={cliente?.nif ?? "—"} />
                   <Row label="Telemóvel" value={cliente?.telemovel ?? "—"} />
                   <Row label="Trotinete" value={trotinete ? `${trotinete.marca} ${trotinete.modelo}` : "—"} />
                   <Row label="Nº de série" value={trotinete?.num_serie ?? "—"} />
@@ -277,19 +279,6 @@ export default function OSDetail() {
                     )}
                   </div>
                 </div>
-                {os.fotografias.length > 0 && (
-                  <div>
-                    <div className="text-xs font-medium text-muted-foreground">Fotos</div>
-                    <div className="mt-1 grid grid-cols-3 gap-2">
-                      {os.fotografias.map((f, i) => (
-                        <a key={i} href={f.caminho} target="_blank" rel="noreferrer"
-                          className="block aspect-square overflow-hidden rounded border">
-                          <img src={f.caminho} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" />
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>
@@ -439,7 +428,7 @@ function DiagnosticoTab({
 
   const submit = async () => {
     if (selectedReps.length === 0) { toast.error("Adiciona pelo menos uma reparação"); return; }
-    if (!notas.trim()) { toast.error("Adiciona uma descrição do diagnóstico"); return; }
+    if (!notas.trim()) { toast.error("Adiciona uma descrição ao Diagnóstico"); return; }
     setSaving(true);
     try {
       await api.patch(`/ordensservicos/${os.id}/diagnostico`, {
@@ -613,7 +602,7 @@ function DiagnosticoTab({
                   <ConfirmDialog
                     trigger={<Button variant="outline" className="w-full text-destructive">Rejeitar orçamento</Button>}
                     title="Rejeitar orçamento?"
-                    description="O cliente não aprovou o orçamento. A OS ficará no estado OrcamentoNaoAprovado."
+                    description="Apenas rejeite o orçamento se o cliente não aceitar o valor. Esta ação não pode ser revertida."
                     destructive
                     onConfirm={rejeitar}
                   />
@@ -906,7 +895,7 @@ function PagamentoTab({
   if (blockedStates.includes(os.estado)) {
     return (
       <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">
-        O pagamento estará disponível após a conclusão da reparação.
+        O pagamento estará disponível após a conclusão do conserto.
       </CardContent></Card>
     );
   }

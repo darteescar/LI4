@@ -16,7 +16,6 @@ import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Diagnostico;
-import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sReparacoes.Reparacao;
@@ -46,22 +45,23 @@ public interface IEcoRideLN {
      // ------------------- Notificações -------------------
      // feito
 
-     public boolean           removerNotificacao(int id);
+     public boolean           removerNotificacao(int id, int idUser);
      public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
-     public boolean           sinalizarNotificacao_comoTratada(int id);
-     public boolean           sinalizarNotificacao_comoLida(int id);
+     public boolean           sinalizarNotificacao_comoTratada(int id, int idUser);
+     public boolean           sinalizarNotificacao_comoLida(int id, int idUser);
 
      // ------------------- Ordens de Serviço -------------------
 
-     public OrdemServico            registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
+     public OrdemServico            registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador);
      public OrdemServico            obterOS(int id);
      public boolean                 removerOS(int id);
      public List<OrdemServico>      obterOSs();
+     public List<OrdemServico>      obterOSsDisponiveis();
      public void                    cancelarOS(int id);
      public Diagnostico             registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Reparacao> reparacoes, String descricao, int id_funcionario);
      public Conserto                registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
 
-     public List<Defeito>      reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
+     public List<Defeito>      reportarDefeitoConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
      public boolean            registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
@@ -101,8 +101,6 @@ public interface IEcoRideLN {
      public Peca       registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, int garantia);
      public Peca       atualizarPeca(int id, String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa, int garantia);
      public Peca       obterPeca(int id);
-     public boolean    existePeca_id(int id);
-     public boolean    existePeca_ref(String ref);
      public boolean    removerPeca(int id);
      public List<Peca> obterPecas();
      public List<Peca> obterPecasAtivas();
@@ -111,7 +109,6 @@ public interface IEcoRideLN {
 
      public Stock        registarStock(int id_peca, float preco_compra, LocalDate data, int quantidade);
      public Stock        obterStock(int id);
-     public boolean      existeStock(int id);
      public boolean      removerStock(int id);
      public List<Stock>  obterStocks();
      public Stock        atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
@@ -151,7 +148,6 @@ public interface IEcoRideLN {
      public Fornecedor       registarFornecedor(String nome, String telemovel, String email);
      public Fornecedor       atualizarFornecedor(int id, String nome, String telemovel, String email);
      public Fornecedor       obterFornecedor(int id);
-     public boolean          existeFornecedor(int id);
      public boolean          removerFornecedor(int id);
      public List<Fornecedor> obterFornecedores();
      public List<Peca> obterPecasDoFornecedor(int id_fornecedor);

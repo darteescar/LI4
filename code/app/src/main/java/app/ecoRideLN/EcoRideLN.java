@@ -3,6 +3,7 @@ package app.ecoRideLN;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import app.common.EcoRideException;
 import app.ecoRideLN.sAutenticacao.Cargo;
@@ -27,7 +28,6 @@ import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
 import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Diagnostico;
-import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
@@ -122,8 +122,8 @@ public class EcoRideLN implements IEcoRideLN {
     // feito
 
     @Override
-    public boolean removerNotificacao(int id) {
-        return sNotificacoes.removerNotificacao(id);
+    public boolean removerNotificacao(int id, int idUser) {
+        return sNotificacoes.removerNotificacao(id, idUser);
     }
 
     @Override
@@ -132,20 +132,20 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean sinalizarNotificacao_comoTratada(int id) {
-        return sNotificacoes.sinalizarNotificacao_comoTratada(id);
+    public boolean sinalizarNotificacao_comoTratada(int id, int idUser) {
+        return sNotificacoes.sinalizarNotificacao_comoTratada(id, idUser);
     }
 
     @Override
-    public boolean sinalizarNotificacao_comoLida(int id) {
-        return sNotificacoes.sinalizarNotificacao_comoLida(id);
+    public boolean sinalizarNotificacao_comoLida(int id, int idUser) {
+        return sNotificacoes.sinalizarNotificacao_comoLida(id, idUser);
     }
 
     // ------------------- Ordens de Serviço -------------------
 
     @Override
-    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador) {
-        return sOrdensServico.registarOS(id_cliente, id_trotinete, descricao, acessorios, fotografias, codCriador);
+    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador) {
+        return sOrdensServico.registarOS(id_cliente, id_trotinete, descricao, acessorios, codCriador);
     }
 
     @Override
@@ -164,6 +164,11 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
+    public List<OrdemServico> obterOSsDisponiveis(){
+        return sOrdensServico.obterOSsDisponiveis();
+    }
+
+    @Override
     public void cancelarOS(int id) {
         sOrdensServico.eliminarOS(id);
     }
@@ -173,7 +178,7 @@ public class EcoRideLN implements IEcoRideLN {
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
         float orcamento = 0;
         for (Reparacao r : reparacoes) orcamento += r.getPreco();
-        for (Map.Entry<Integer, Integer> e : pecasQuantidades.entrySet()) {
+        for (Entry<Integer, Integer> e : pecasQuantidades.entrySet()) {
             Peca p = sStock.obterPeca(e.getKey());
             if (p != null) orcamento += e.getValue() * p.getPreco_venda();
         }
@@ -187,6 +192,22 @@ public class EcoRideLN implements IEcoRideLN {
     public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
         if (!checklist.isCheckListComplete())
             throw new EcoRideException("Checklist incompleta. Conserto não pode ser registado.");
+
+        //validar se peças usadas e reparações preenchem o orçamento aprovado
+        OrdemServico os = sOrdensServico.obterOS(id_OS);
+        if (os == null) throw new EcoRideException("Ordem de serviço não encontrada: " + id_OS);
+        Diagnostico diag = os.getDiagnostico();
+        if (diag == null) throw new EcoRideException("Diagnóstico não encontrado para a OS: " + id_OS);
+        float custoPecas = 0;
+        for (Entry<Integer, Integer> e : pecaQuantidades.entrySet()) {
+            Peca p = sStock.obterPeca(e.getKey());
+            if (p != null) custoPecas += e.getValue() * p.getPreco_venda();
+        }
+        float custoReparacoes = 0;
+        for (Reparacao r : reparacoes) custoReparacoes += r.getPreco();
+        float orcamentoCalculado = custoPecas + custoReparacoes;
+        if (orcamentoCalculado > diag.getOrcamento())
+            throw new EcoRideException(String.format("Custo total do conserto (%.2f) excede orçamento aprovado (%.2f).", orcamentoCalculado, diag.getOrcamento()));
 
         // FIFO: para cada peça, atribui stocks por ordem de chegada e decrementa quantidade
         Map<Integer, Integer> stocksUsados = new java.util.LinkedHashMap<>();
@@ -217,7 +238,7 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public List<Defeito> reportarDefeitoFungivelConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario) {
+    public List<Defeito> reportarDefeitoConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario) {
     List<Integer> stocksDaPeca = sOrdensServico.obterStocksUsadosConsertoOS(idOS).entrySet().stream()
         .filter(e -> {
             Stock s = sStock.obterStock(e.getKey());
@@ -273,11 +294,9 @@ public class EcoRideLN implements IEcoRideLN {
             throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem aprovar um orçamento.");
         boolean resultado = sOrdensServico.aprovarOrcamentoOS(id);
         if (resultado) {
-            OrdemServico os = sOrdensServico.obterOS(id);
-            List<Integer> destinatarios = sAutenticacao.obterUtilizadores().stream()
-                .filter(u -> u.getIdFuncionario() == os.getCodMecanico())
-                .map(Utilizador::getId)
-                .collect(java.util.stream.Collectors.toList());
+            int codMec = sOrdensServico.obterOS(id).getCodMecanico();
+            int destinatarioId = sAutenticacao.obterIdUserPorIdFuncionario(codMec);
+            List<Integer> destinatarios = List.of(destinatarioId);
             if (!destinatarios.isEmpty())
                 sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + id + " aprovado. Pode avançar com o conserto.", 0, destinatarios, id);
         }
@@ -291,11 +310,9 @@ public class EcoRideLN implements IEcoRideLN {
             throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem rejeitar um orçamento.");
         boolean resultado = sOrdensServico.rejeitarOrcamentoOS(id);
         if (resultado) {
-            OrdemServico os = sOrdensServico.obterOS(id);
-            List<Integer> destinatarios = sAutenticacao.obterUtilizadores().stream()
-                .filter(u -> u.getIdFuncionario() == os.getCodMecanico())
-                .map(Utilizador::getId)
-                .collect(java.util.stream.Collectors.toList());
+            int codMec = sOrdensServico.obterOS(id).getCodMecanico();
+            int destinatarioId = sAutenticacao.obterIdUserPorIdFuncionario(codMec);
+            List<Integer> destinatarios = List.of(destinatarioId);
             if (!destinatarios.isEmpty())
                 sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + id + " rejeitado pelo cliente.", 0, destinatarios, id);
         }
@@ -427,16 +444,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean existePeca_id(int id) {
-        return sStock.existePeca_id(id);
-    }
-
-    @Override
-    public boolean existePeca_ref(String ref) {
-        return sStock.existePeca_ref(ref);
-    }
-
-    @Override
     public boolean removerPeca(int id) {
         return sStock.removerPeca(id);
     }
@@ -469,11 +476,6 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public Stock obterStock(int id) {
         return sStock.obterStock(id);
-    }
-
-    @Override
-    public boolean existeStock(int id) {
-        return sStock.existeStock(id);
     }
 
     @Override
@@ -607,11 +609,6 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public Fornecedor obterFornecedor(int id) {
         return sStock.obterFornecedor(id);
-    }
-
-    @Override
-    public boolean existeFornecedor(int id) {
-        return sStock.existeFornecedor(id);
     }
 
     @Override

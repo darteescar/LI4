@@ -123,22 +123,8 @@ public class SAutenticacaoFacade implements ISAutenticacao {
 
     @Override
     public int obterIdUserPorIdFuncionario(int idFuncionario) {
-        return utilizadoresDAO.values().stream()
-            .filter(u -> u.getIdFuncionario() == idFuncionario)
-            .map(Utilizador::getId)
-            .findFirst()
-            .orElseThrow(() -> new EcoRideException("Nenhum utilizador associado ao funcionário #" + idFuncionario));
+        return utilizadoresDAO.getIdByIdFuncionario(idFuncionario);
     }
-
-    @Override
-    public void atualizarCargoUtilizador(int id, Cargo novoCargo) {
-        Utilizador u = utilizadoresDAO.get(id);
-        if (u == null) throw new EcoRideException("Utilizador com ID " + id + " não existe.");
-        u.setCargo(novoCargo);
-        utilizadoresDAO.put(id, u);
-    }
-
-    // Utilitários
 
     private void validaDadosUtilizador(String password, int idFuncionario, Cargo cargo, String identificador) {
         if (password == null || password.isEmpty()) {

@@ -236,4 +236,17 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
             throw new EcoRideException("Erro a actualizar password do utilizador " + id, e);
         }
     }
+
+    public int getIdByIdFuncionario (int idFuncionario) {
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement("SELECT id FROM Utilizador WHERE idFuncionario = ?")) {
+            ps.setInt(1, idFuncionario);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : -1;
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter ID de utilizador por ID de funcionário " + idFuncionario, e);
+        }
+    }
+
 }

@@ -60,9 +60,6 @@ public class SStockFacade implements ISStock {
     public Fornecedor obterFornecedor(int id) { return fornecedorDAO.get(id); }
 
     @Override
-    public boolean existeFornecedor(int id) { return fornecedorDAO.containsKey(id); }
-
-    @Override
     public boolean removerFornecedor(int id) { return fornecedorDAO.remove(id) != null; }
 
     @Override
@@ -118,12 +115,6 @@ public class SStockFacade implements ISStock {
     public Peca obterPeca(int id) { return pecaDAO.get(id); }
 
     @Override
-    public boolean existePeca_id(int id) { return pecaDAO.containsKey(id); }
-
-    @Override
-    public boolean existePeca_ref(String ref) { return pecaDAO.getByReference(ref); }
-
-    @Override
     public boolean removerPeca(int id) { return pecaDAO.remove(id) != null; }
 
     @Override
@@ -171,9 +162,6 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Stock obterStock(int id) { return stockDAO.get(id); }
-
-    @Override
-    public boolean existeStock(int id) { return stockDAO.containsKey(id); }
 
     @Override
     public boolean removerStock(int id) { return stockDAO.remove(id) != null; }

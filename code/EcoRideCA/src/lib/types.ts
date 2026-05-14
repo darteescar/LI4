@@ -185,7 +185,6 @@ export interface OS {
   clienteId: string;
   trotineteId: string;
   acessorios: string[];
-  fotos: string[]; // data urls (mock)
   descricaoProblema: string;
   estado: EstadoOS;
   mecanicoId?: string;

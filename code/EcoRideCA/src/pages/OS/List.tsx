@@ -76,9 +76,11 @@ export default function OSList() {
   const [dataDesde, setDataDesde] = useState("");
   const [dataAte, setDataAte] = useState("");
 
+  const isMec = role === "MECANICO";
+
   const { data: ordens = [], isLoading } = useQuery<OrdemServico[]>({
-    queryKey: ["ordensservicos"],
-    queryFn: () => api.get<OrdemServico[]>("/ordensservicos"),
+    queryKey: isMec ? ["ordensservicos", "disponiveis"] : ["ordensservicos"],
+    queryFn: () => api.get<OrdemServico[]>(isMec ? "/ordensservicos/disponiveis" : "/ordensservicos"),
   });
 
   const { data: clientes = [] } = useQuery<Cliente[]>({
@@ -108,21 +110,13 @@ export default function OSList() {
   const mecanicoNome = (id: number | null) =>
     id ? (mecanicos.find((m) => m.id === id)?.nome ?? "—") : "—";
 
-  const isMec = role === "MECANICO";
   const estadosDisponiveis = isMec ? ESTADOS_MEC : TODOS_ESTADOS;
 
   const filtered = useMemo(() => {
     let r = ordens;
 
-    if (isMec && user) {
-      r = r.filter((o) => o.estado !== "Paga" && o.estado !== "PendentePagamento");
-      if (meu) {
-        r = r.filter((o) => o.codMecanico === user.id);
-      } else {
-        r = r.filter((o) =>
-          o.codMecanico === user.id || (!o.codMecanico && o.estado === "PendenteDiagnostico")
-        );
-      }
+    if (isMec && user && meu) {
+      r = r.filter((o) => o.codMecanico === user.id);
     }
 
     if (estado !== "ALL") r = r.filter((o) => o.estado === estado);

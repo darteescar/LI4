@@ -12,8 +12,26 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },  
     proxy: {
-      '/api':  'http://localhost:7000',
-      '/auth': 'http://localhost:7000',
+      '/api': {
+        target: 'http://localhost:7000',
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            const auth = req.headers['authorization'];
+            if (auth) proxyReq.setHeader('Authorization', auth);
+          });
+        },
+      },
+      '/auth': {
+        target: 'http://localhost:7000',
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            const auth = req.headers['authorization'];
+            if (auth) proxyReq.setHeader('Authorization', auth);
+          });
+        },
+      },
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),

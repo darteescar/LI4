@@ -15,10 +15,7 @@ import { DataTable } from "@/components/data-table";
 
 import { api } from "@/services/api";
 
-const MAX_FOTO_BYTES = 5 * 1024 * 1024;
-const FOTO_TYPES = ["image/png", "image/jpeg"];
-
-interface Cliente { id: number; nome: string; NIF: string; telemovel: string; email: string; }
+interface Cliente { id: number; nome: string; nif: string; telemovel: string; email: string; }
 interface Trotinete { id: number; marca: string; modelo: string; num_serie: string; tipo_motor: string; cod_cliente: number; }
 interface OrdemServico { id: number; }
 
@@ -31,7 +28,6 @@ export default function NewOS() {
   const [acessorios, setAcessorios] = useState<string[]>([]);
   const [novoAcessorio, setNovoAcessorio] = useState("");
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [fotos, setFotos] = useState<string[]>([]);
   const [descricao, setDescricao] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -74,24 +70,6 @@ export default function NewOS() {
   const editAcessorio = (i: number) => { setEditIndex(i); setNovoAcessorio(acessorios[i]); };
   const cancelEdit = () => { setEditIndex(null); setNovoAcessorio(""); };
 
-  const handleFiles = async (files: FileList | null) => {
-    if (!files) return;
-    const novos: string[] = [];
-    for (const file of Array.from(files)) {
-      if (!FOTO_TYPES.includes(file.type)) { toast.error(`${file.name}: formato inválido (apenas PNG/JPEG)`); continue; }
-      if (file.size > MAX_FOTO_BYTES) { toast.error(`${file.name}: excede 5MB`); continue; }
-      const dataUrl = await new Promise<string>((res, rej) => {
-        const r = new FileReader();
-        r.onload = () => res(r.result as string);
-        r.onerror = rej;
-        r.readAsDataURL(file);
-      });
-      novos.push(dataUrl);
-    }
-    setFotos((prev) => [...prev, ...novos]);
-  };
-
-  const removeFoto = (i: number) => setFotos((prev) => prev.filter((_, idx) => idx !== i));
 
   const canNext = () => {
     if (step === 1) return clienteId !== null;
@@ -114,7 +92,6 @@ export default function NewOS() {
         id_trotinete: trotineteId,
         descricao: descricao.trim(),
         acessorios,
-        fotografias: [],
       });
       toast.success(`OS-${os.id} criada`);
       navigate(`/os/${os.id}`);
@@ -127,7 +104,7 @@ export default function NewOS() {
 
   const Steps = (
     <div className="mb-6 flex items-center gap-2 text-xs">
-      {["Cliente", "Trotinete", "Acessórios e fotos", "Problema"].map((s, i) => {
+      {["Cliente", "Trotinete", "Acessórios", "Problema"].map((s, i) => {
         const n = i + 1;
         const active = n === step;
         const done = n < step;
@@ -180,7 +157,7 @@ export default function NewOS() {
                   isRowSelected={(c) => clienteId === c.id}
                   columns={[
                     { key: "nome", header: "Nome", cell: (c) => <span className="font-medium">{c.nome}</span> },
-                    { key: "NIF", header: "NIF", cell: (c) => c.NIF },
+                    { key: "nif", header: "NIF", cell: (c) => c.nif },
                     { key: "telemovel", header: "Telemóvel", cell: (c) => c.telemovel },
                     { key: "email", header: "Email", cell: (c) => c.email },
                     { key: "selecionado", header: "", className: "w-[1%]", cell: (c) => (
@@ -189,7 +166,7 @@ export default function NewOS() {
                         : null
                     ) },
                   ]}
-                  searchKeys={["nome", "email", "NIF", "telemovel"]}
+                  searchKeys={["nome", "email", "nif", "telemovel"]}
                   searchPlaceholder="Pesquisar por nome, email, NIF ou telemóvel"
                   searchClassName="max-w-md"
                 />
@@ -273,37 +250,6 @@ export default function NewOS() {
                       </li>
                     ))}
                   </ul>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Fotos da trotinete (PNG/JPEG, máx. 5MB cada)</Label>
-                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed bg-muted/40 px-3 py-6 text-sm text-muted-foreground hover:bg-muted">
-                  <Upload className="h-4 w-4" />
-                  Carregar imagens
-                  <input type="file" accept="image/png,image/jpeg" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
-                </label>
-                {fotos.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {fotos.map((src, i) => (
-                      <div key={i} className="group relative aspect-square overflow-hidden rounded border">
-                        <img src={src} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => removeFoto(i)}
-                          className="absolute right-1 top-1 rounded bg-destructive p-1 text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                          aria-label="Remover foto"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {fotos.length === 0 && (
-                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <ImageIcon className="h-3 w-3" /> Nenhuma foto carregada
-                  </p>
                 )}
               </div>
             </div>

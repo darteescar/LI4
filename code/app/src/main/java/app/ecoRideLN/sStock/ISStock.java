@@ -11,7 +11,6 @@ public interface ISStock {
     public Fornecedor registarFornecedor(String nome, String telemovel, String email);
     public Fornecedor atualizarFornecedor(int id, String nome, String telemovel, String email);
     public Fornecedor obterFornecedor(int id);
-    public boolean    existeFornecedor(int id);
     public boolean    removerFornecedor(int id);
     public List<Fornecedor> obterFornecedores();
     public List<Peca> obterPecasDoFornecedor(int id_fornecedor);
@@ -21,8 +20,6 @@ public interface ISStock {
     public Peca       registarPeca(String ref, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, int garantia);
     public Peca       atualizarPeca(int id, String referencia, String marca, String nome, String descricao, int stock_minimo, float preco_venda, int id_fornecedor, boolean ativa, int garantia);
     public Peca       obterPeca(int id);
-    public boolean    existePeca_id(int id);
-    public boolean    existePeca_ref(String ref);
     public boolean    removerPeca(int id);
     public List<Peca> obterPecas();
     public List<Peca> obterPecasAtivas();
@@ -34,7 +31,6 @@ public interface ISStock {
     public Stock       registarStock(int id_peca, float preco_compra, LocalDate data, int quantidade);
     public Stock       atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
     public Stock       obterStock(int id);
-    public boolean     existeStock(int id);
     public boolean     removerStock(int id);
     public List<Stock> obterStocks();
 
