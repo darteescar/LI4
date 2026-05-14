@@ -925,7 +925,7 @@ function ConsertoTab({
             </div>
           ) : null}
 
-          {canReportDefeito && existing && (
+          {canReportDefeito && Object.keys(pecasQtd).length > 0 && (
             <>
               <hr />
               <Button variant="outline" className="w-full text-destructive" onClick={() => setDefeitoOpen(true)}>
@@ -937,12 +937,14 @@ function ConsertoTab({
       </Card>
     </div>
 
-    {canReportDefeito && existing && (
+    {canReportDefeito && Object.keys(pecasQtd).length > 0 && (
       <DefeitoDialog
         open={defeitoOpen}
         onOpenChange={setDefeitoOpen}
         osId={os.id}
         pecas={pecas}
+        pecasUsadas={pecasQtd}
+        idFuncionario={os.codMecanico!}
         onSaved={() => { setDefeitoOpen(false); onChanged(); }}
       />
     )}
@@ -1049,30 +1051,50 @@ function PagamentoTab({
 
 // ---------- Defeito Dialog ----------
 function DefeitoDialog({
-  open, onOpenChange, osId, pecas, onSaved,
+  open, onOpenChange, osId, pecas, pecasUsadas, idFuncionario, onSaved,
 }: {
   open: boolean; onOpenChange: (v: boolean) => void;
-  osId: number; pecas: Peca[]; onSaved: () => void;
+  osId: number; pecas: Peca[]; pecasUsadas: Record<number, number>;
+  idFuncionario: number; onSaved: () => void;
 }) {
-  const [pecaId, setPecaId] = useState<number>(0);
+  const [selecionadas, setSelecionadas] = useState<Set<number>>(new Set());
   const [motivo, setMotivo] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const pecaAtiva = pecas.filter((p) => p.ativa);
+  const pecasDoConserto = useMemo(
+    () => Object.entries(pecasUsadas)
+      .map(([pidStr, qtd]) => ({ peca: pecas.find((p) => p.id === Number(pidStr)) ?? null, id: Number(pidStr), qtd }))
+      .filter((x) => x.peca !== null),
+    [pecasUsadas, pecas],
+  );
 
-  const reset = () => {
-    setPecaId(0); setMotivo(""); setSaving(false);
-  };
+  const reset = () => { setSelecionadas(new Set()); setMotivo(""); setSaving(false); };
+
+  const togglePeca = (id: number) =>
+    setSelecionadas((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
 
   const submit = async () => {
-    if (!pecaId) { return; }
-    if (!motivo.trim()) { return; }
+    if (selecionadas.size === 0 || !motivo.trim()) return;
     setSaving(true);
     try {
-      await api.post(`/ordensservicos/${osId}/defeitos`, {
-        codPeca: pecaId,
-        motivo: motivo.trim(),
-      });
+      // 1. Reportar defeito para cada peça selecionada — bloqueia todos os stocks dessa peça
+      await Promise.all(
+        [...selecionadas].map((codPeca) =>
+          api.post(`/defeitos`, { codPeca, motivo: motivo.trim(), idFuncionario })
+        )
+      );
+      // 2. Colocar a OS em AguardarPeças automaticamente
+      await api.patch(`/ordensservicos/${osId}/aguardarPecas`, {});
+
+      toast.success(
+        selecionadas.size === 1
+          ? "Defeito reportado — OS colocada em aguarda de peças"
+          : `${selecionadas.size} defeitos reportados — OS colocada em aguarda de peças`
+      );
       reset();
       onSaved();
     } catch (e) { toast.error((e as Error).message); }
@@ -1082,18 +1104,42 @@ function DefeitoDialog({
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
       <DialogContent className="max-w-lg">
-        <DialogHeader><DialogTitle>Reportar peça com defeito</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Reportar peça(s) com defeito</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
+          <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+            Todos os stocks em armazém das peças selecionadas serão bloqueados para inspeção pelo Gestor de Stock.
+            A OS passará automaticamente para <strong>Aguarda Peças</strong>.
+          </div>
+
           <div className="space-y-1">
-            <Label className="text-xs">Peça</Label>
-            <Select value={String(pecaId)} onValueChange={(v) => setPecaId(Number(v))}>
-              <SelectTrigger><SelectValue placeholder="Selecionar peça…" /></SelectTrigger>
-              <SelectContent>
-                {pecaAtiva.map((p) => (
-                  <SelectItem key={p.id} value={String(p.id)}>{p.referencia} — {p.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="text-xs">Peças usadas neste conserto</Label>
+            <div className="rounded-md border divide-y">
+              {pecasDoConserto.map(({ peca, id, qtd }) => (
+                <label
+                  key={id}
+                  className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
+                    selecionadas.has(id) ? "bg-destructive/5" : "hover:bg-muted/40"
+                  }`}
+                >
+                  <Checkbox
+                    checked={selecionadas.has(id)}
+                    onCheckedChange={() => togglePeca(id)}
+                  />
+                  <span className="flex-1 font-medium">
+                    <span className="font-mono text-xs text-muted-foreground">{peca!.referencia}</span>
+                    {" — "}{peca!.nome}
+                  </span>
+                  <Badge variant="secondary" className="shrink-0 font-mono text-xs">
+                    Qtd: {qtd}
+                  </Badge>
+                </label>
+              ))}
+            </div>
+            {selecionadas.size === 0 && (
+              <p className="text-xs text-destructive">Seleciona pelo menos uma peça</p>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -1108,10 +1154,13 @@ function DefeitoDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => { reset(); onOpenChange(false); }}>Cancelar</Button>
+          <Button type="button" variant="outline" onClick={() => { reset(); onOpenChange(false); }}>
+            Cancelar
+          </Button>
           <Button
             type="button"
-            disabled={saving || !pecaId || !motivo.trim()}
+            variant="destructive"
+            disabled={saving || selecionadas.size === 0 || !motivo.trim()}
             onClick={submit}
           >
             {saving ? "A reportar…" : "Reportar defeito"}
