@@ -183,6 +183,7 @@ public class SStockFacade implements ISStock {
     public Map<Integer, Integer> atribuirStocksFIFO(int codPeca, int quantidade) {
         Map<Integer, Integer> resultado = new LinkedHashMap<>();
         int restante = quantidade;
+
         for (Stock s : stockDAO.getByPecaId(codPeca)) {
             if (restante <= 0) break;
             if (s.getEstado() != EstadoStock.StockEmArmazem || s.getQuantidade() <= 0) continue;
@@ -193,8 +194,20 @@ public class SStockFacade implements ISStock {
             stockDAO.put(s.getId(), s);
             restante -= consumir;
         }
-        if (restante > 0)
+
+        if (restante > 0) {
+            // Reverter todos os stocks já modificados
+            for (Map.Entry<Integer, Integer> entry : resultado.entrySet()) {
+                Stock s = stockDAO.get(entry.getKey());
+                if (s != null) {
+                    s.setQuantidade(s.getQuantidade() + entry.getValue());
+                    s.setEstado(EstadoStock.StockEmArmazem);
+                    stockDAO.put(s.getId(), s);
+                }
+            }
             throw new EcoRideException("Stock insuficiente para a peça " + pecaDAO.get(codPeca).getNome() + ". Faltam " + restante + " unidades.");
+        }
+
         return resultado;
     }
 
@@ -260,9 +273,7 @@ public class SStockFacade implements ISStock {
             throw new EcoRideException("Quantidade inválida — tem de ser entre 1 e " + original.getQuantidade() + ".");
 
         if (qtdDefeituosa == original.getQuantidade()) {
-            // Sem split — todas as unidades são defeituosas, cria devolução diretamente
-            original.setEstado(EstadoStock.StockPendenteDeDevolucao);
-            stockDAO.put(original.getId(), original);
+            // Sem split — registarDevolucao trata de mudar o estado
             defeitoDAO.remove(idDefeito);
             registarDevolucao(original.getId(), motivo, data);
             return;
@@ -274,11 +285,11 @@ public class SStockFacade implements ISStock {
         original.setEstado(defeito.getEstadoAnterior());
         stockDAO.put(original.getId(), original);
 
-        // 2. Novo stock só com as defeituosas
+        // 2. Novo stock só com as defeituosas (StockComPossivelDefeito para registarDevolucao aceitar)
         int novoId = stockDAO.generateNewId();
         Stock novo = new Stock(novoId, original.getPreco_compra(), original.getCodPeca(),
-                            original.getData_chegada(), qtdDefeituosa,
-                            EstadoStock.StockPendenteDeDevolucao, original.getGarantia());
+                original.getData_chegada(), qtdDefeituosa,
+                EstadoStock.StockComPossivelDefeito, original.getGarantia());
         stockDAO.put(novoId, novo);
 
         // 3. Remove o defeito
@@ -356,7 +367,7 @@ public class SStockFacade implements ISStock {
         Devolucao d = devolucaoDAO.get(id);
         if (d != null) {
             // A entrada de stock volta a ficar disponível
-            atualizaEstadoStock(d.getCodStock(), EstadoStock.StockEmArmazem);
+            atualizaEstadoStock(d.getCodStock(), EstadoStock.StockinvalidoParaDevolucao);
             d.setEstado(EstadoDevolucao.Invalida);
             devolucaoDAO.put(id, d);
         }
