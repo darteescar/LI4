@@ -19,6 +19,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
@@ -75,7 +78,6 @@ interface OrdemServico {
   codCliente: number;
   codCriador: number;
   codMecanico: number | null;
-  fotografias: { caminho: string }[];
   estado: EstadoOS;
   acessorios: string[];
   conserto: Conserto | null;
@@ -271,19 +273,6 @@ export default function OSDetail() {
                     )}
                   </div>
                 </div>
-                {os.fotografias.length > 0 && (
-                  <div>
-                    <div className="text-xs font-medium text-muted-foreground">Fotos</div>
-                    <div className="mt-1 grid grid-cols-3 gap-2">
-                      {os.fotografias.map((f, i) => (
-                        <a key={i} href={f.caminho} target="_blank" rel="noreferrer"
-                          className="block aspect-square overflow-hidden rounded border">
-                          <img src={f.caminho} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" />
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>
