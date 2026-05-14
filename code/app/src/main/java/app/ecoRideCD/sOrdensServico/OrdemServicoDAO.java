@@ -1,15 +1,5 @@
 package app.ecoRideCD.sOrdensServico;
 
-import app.common.EcoRideException;
-import app.ecoRideCD.DAOconfig.ConnectionFactory;
-import app.ecoRideLN.sOrdensServico.CheckList;
-import app.ecoRideLN.sOrdensServico.Conserto;
-import app.ecoRideLN.sOrdensServico.Diagnostico;
-import app.ecoRideLN.sOrdensServico.EstadoOS;
-import app.ecoRideLN.sOrdensServico.Fotografia;
-import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
-import app.ecoRideLN.sOrdensServico.OrdemServico;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,6 +16,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import app.common.EcoRideException;
+import app.ecoRideCD.DAOconfig.ConnectionFactory;
+import app.ecoRideLN.sOrdensServico.CheckList;
+import app.ecoRideLN.sOrdensServico.Conserto;
+import app.ecoRideLN.sOrdensServico.Diagnostico;
+import app.ecoRideLN.sOrdensServico.EstadoOS;
+import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
+import app.ecoRideLN.sOrdensServico.OrdemServico;
 
 public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
 
@@ -54,20 +53,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
             ps.setInt(1, idOS);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) out.add(rs.getString(1));
-            }
-        }
-        return out;
-    }
-
-    private List<Fotografia> loadFotografias(Connection c, int idOS) throws SQLException {
-        List<Fotografia> out = new ArrayList<>();
-        try (PreparedStatement ps = c.prepareStatement(
-                "SELECT caminho FROM Fotografia WHERE idOS = ? ORDER BY id")) {
-            ps.setInt(1, idOS);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    out.add(new Fotografia(rs.getString("caminho")));
-                }
             }
         }
         return out;
@@ -155,7 +140,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 rs.getInt("codTrotinete"),
                 rs.getInt("codCliente"),
                 rs.getInt("codCriador"),
-                loadFotografias(c, id),
                 loadAcessorios(c, id));
         os.setEstado(EstadoOS.valueOf(rs.getString("estado")));
         os.setCodMecanico(rs.getObject("codMecanico", Integer.class));
@@ -209,7 +193,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     // (Diagnostico_PecaOrcamento, Conserto_PecaUsada, etc.).
     private void clearChildren(Connection c, int id) throws SQLException {
         for (String tbl : new String[]{
-                "Conserto", "Diagnostico", "Fotografia", "OrdemServico_Acessorio" }) {
+                "Conserto", "Diagnostico", "OrdemServico_Acessorio" }) {
             try (PreparedStatement ps = c.prepareStatement(
                     "DELETE FROM " + tbl + " WHERE idOS = ?")) {
                 ps.setInt(1, id);
@@ -227,19 +211,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 ps.setInt(1, idOS);
                 ps.setInt(2, i++);
                 ps.setString(3, a);
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        }
-    }
-
-    private void insertFotografias(Connection c, int idOS, List<Fotografia> fotos) throws SQLException {
-        if (fotos == null || fotos.isEmpty()) return;
-        try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO Fotografia (idOS, caminho) VALUES (?, ?)")) {
-            for (Fotografia f : fotos) {
-                ps.setInt(1, idOS);
-                ps.setString(2, f.getCaminho());
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -383,7 +354,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 upsertBase(c, key, value);
                 clearChildren(c, key);
                 insertAcessorios(c, key, value.getAcessorios());
-                insertFotografias(c, key, value.getFotografias());
                 if (value.getDiagnostico() != null) insertDiagnostico(c, key, value.getDiagnostico());
                 if (value.getConserto() != null)    insertConserto(c, key, value.getConserto());
                 c.commit();

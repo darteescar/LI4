@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS MovimentoPeca (
 
 -- =========================================================
 -- SOrdensServico
--- A OS guarda os campos comuns. Cada coleção (acessorios, fotografias,
+-- A OS guarda os campos comuns. Cada coleção (acessorios,
 -- pecasOrcamento, pecasUsadas, cod_reparacoes do diagnostico/conserto)
 -- vive em tabela própria com FK para a OS (ou para o Diagnostico/Conserto)
 -- e ON DELETE CASCADE para que apagar a OS limpe tudo o que pendura.

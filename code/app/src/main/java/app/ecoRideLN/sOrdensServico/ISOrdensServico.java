@@ -52,5 +52,4 @@ public interface ISOrdensServico {
 
      public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
 
-     public boolean validarFotografia(Fotografia foto);
 }

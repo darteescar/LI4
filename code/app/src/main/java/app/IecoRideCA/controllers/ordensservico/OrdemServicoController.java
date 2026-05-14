@@ -56,7 +56,7 @@ public class OrdemServicoController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
             OrdemServicoRequest req = ctx.bodyAsClass(OrdemServicoRequest.class);
             int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            OrdemServico criado = facade.registarOS(req.id_cliente(), req.id_trotinete(), req.descricao(), req.acessorios(), req.fotografias(), idFuncionario);
+            OrdemServico criado = facade.registarOS(req.id_cliente(), req.id_trotinete(), req.descricao(), req.acessorios(), idFuncionario);
             ctx.status(201).json(criado);
         });
 

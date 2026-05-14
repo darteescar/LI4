@@ -187,9 +187,4 @@ public class SOrdensServicoFacade implements ISOrdensServico {
         return ordemServicoDAO.filtrarOSs(estado, desde, ate, id_cliente, id_funcionario);
     }
 
-    @Override
-    public boolean validarFotografia(Fotografia foto) {
-        return foto.isValid();
-    }
-
 }
