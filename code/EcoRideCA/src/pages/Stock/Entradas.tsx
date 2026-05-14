@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, ChevronDown } from "lucide-react";
+import { Plus, Trash2, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -20,16 +20,15 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { api } from "@/services/api";
 import { formatEUR } from "@/lib/format";
 import { useAuth } from "@/context/AuthContext";
 import { entradaNormalSchema } from "@/lib/validators";
 
 interface Peca { id: number; referencia: string; marca: string; nome: string; preco_venda: number; codFornecedor: number; }
+interface Fornecedor { id: number; nome: string; telemovel: string; email: string; }
 interface StockEntry {
   id: number; codPeca: number; quantidade: number; estado: string;
   preco_compra: number; data_chegada: string;
@@ -65,6 +64,11 @@ export default function StockEntradas() {
   const { data: pecas = [] } = useQuery<Peca[]>({
     queryKey: ["pecas"],
     queryFn: () => api.get<Peca[]>("/pecas"),
+  });
+
+  const { data: fornecedores = [] } = useQuery<Fornecedor[]>({
+    queryKey: ["fornecedores"],
+    queryFn: () => api.get<Fornecedor[]>("/fornecedores"),
   });
 
   const deleteMutation = useMutation({
@@ -108,16 +112,15 @@ export default function StockEntradas() {
               <TableHead>Peça</TableHead>
               <TableHead>Qtd</TableHead>
               <TableHead>Preço compra</TableHead>
-              <TableHead>Nº série</TableHead>
               <TableHead>Estado</TableHead>
               {canEdit && <TableHead className="w-[1%] text-right">Ações</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={canEdit ? 7 : 6} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={canEdit ? 6 : 5} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
             ) : sortedStocks.length === 0 ? (
-              <TableRow><TableCell colSpan={canEdit ? 7 : 6} className="h-24 text-center text-sm text-muted-foreground">Sem entradas de stock</TableCell></TableRow>
+              <TableRow><TableCell colSpan={canEdit ? 6 : 5} className="h-24 text-center text-sm text-muted-foreground">Sem entradas de stock</TableCell></TableRow>
             ) : sortedStocks.map((s) => (
               <TableRow key={s.id}>
                 <TableCell className="text-xs text-muted-foreground">{s.data_chegada ?? "—"}</TableCell>
@@ -172,6 +175,15 @@ function EntradaDialog({
     enabled: open,
   });
 
+  const { data: fornecedores = [] } = useQuery<Fornecedor[]>({
+    queryKey: ["fornecedores"],
+    queryFn: () => api.get<Fornecedor[]>("/fornecedores"),
+    enabled: open,
+  });
+
+  const [filtroFornecedor, setFiltroFornecedor] = useState("TODOS");
+  const [filtroRef, setFiltroRef] = useState("");
+
   const form = useForm<NormalForm>({
     resolver: zodResolver(entradaNormalSchema),
     defaultValues: { pecaId: 0, quantidade: "" as unknown as number, preco: "" as unknown as number, dataChegada: today() },
@@ -180,11 +192,25 @@ function EntradaDialog({
   useEffect(() => {
     if (!open) {
       form.reset({ pecaId: 0, quantidade: "" as unknown as number, preco: "" as unknown as number, dataChegada: today() });
+      setFiltroFornecedor("TODOS");
+      setFiltroRef("");
     }
   }, [open]);
 
-  const pecaId = form.watch("pecaId");
-  const setPecaId = (n: number) => form.setValue("pecaId", n, { shouldValidate: true });
+  const pecaIdSelecionada = form.watch("pecaId");
+  const pecaSelecionada = pecas.find((p) => p.id === pecaIdSelecionada) ?? null;
+
+  const pecasFiltradas = useMemo(() => pecas.filter((p) => {
+    if (filtroFornecedor !== "TODOS" && p.codFornecedor !== Number(filtroFornecedor)) return false;
+    if (filtroRef.trim() &&
+        !p.referencia.toLowerCase().includes(filtroRef.toLowerCase()) &&
+        !p.nome.toLowerCase().includes(filtroRef.toLowerCase())) return false;
+    return true;
+  }), [pecas, filtroFornecedor, filtroRef]);
+
+  const fornecedorNome = (id: number) => fornecedores.find((f) => f.id === id)?.nome ?? "—";
+
+  const limparFiltros = () => { setFiltroFornecedor("TODOS"); setFiltroRef(""); };
 
   const submit = form.handleSubmit(async (v) => {
     try {
@@ -201,31 +227,112 @@ function EntradaDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-2xl">
         <DialogHeader><DialogTitle>Nova entrada de stock</DialogTitle></DialogHeader>
-        <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
+        <form onSubmit={submit} className="flex flex-col gap-4">
 
-          <div className="sm:col-span-2 space-y-1">
-            <Label className="text-xs">Peça</Label>
-            <PecaCombobox pecas={pecas} value={pecaId} onChange={setPecaId} />
+          {/* ── Filtros de pesquisa ── */}
+          <div className="grid gap-2 rounded-lg border bg-muted/40 p-3 sm:grid-cols-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Fornecedor</Label>
+              <Select value={filtroFornecedor} onValueChange={(v) => { setFiltroFornecedor(v); form.setValue("pecaId", 0); }}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="TODOS">Todos</SelectItem>
+                  {fornecedores.map((f) => (
+                    <SelectItem key={f.id} value={String(f.id)}>{f.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Referência / Nome</Label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                <Input
+                  className="pl-8"
+                  placeholder="Ex: BAT-36V"
+                  value={filtroRef}
+                  onChange={(e) => { setFiltroRef(e.target.value); form.setValue("pecaId", 0); }}
+                />
+              </div>
+            </div>
+            <div className="flex items-end">
+              <Button type="button" variant="outline" size="sm" onClick={limparFiltros} className="w-full gap-1">
+                <X className="h-3.5 w-3.5" /> Limpar filtros
+              </Button>
+            </div>
+          </div>
+
+          {/* ── Tabela de seleção de peça ── */}
+          <div className="space-y-1">
+            <Label className="text-xs">
+              Peça{" "}
+              <span className="text-muted-foreground font-normal">
+                — {pecasFiltradas.length} resultado{pecasFiltradas.length !== 1 ? "s" : ""}
+              </span>
+            </Label>
             {form.formState.errors.pecaId && (
               <p className="text-xs text-destructive">{form.formState.errors.pecaId.message}</p>
             )}
+            <div className="rounded-md border max-h-52 overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-6" />
+                    <TableHead>Referência</TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Fornecedor</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pecasFiltradas.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="h-16 text-center text-sm text-muted-foreground">
+                        Nenhuma peça encontrada.
+                      </TableCell>
+                    </TableRow>
+                  ) : pecasFiltradas.map((p) => {
+                    const selected = pecaIdSelecionada === p.id;
+                    return (
+                      <TableRow
+                        key={p.id}
+                        className={`cursor-pointer transition-colors ${selected ? "bg-primary/10 hover:bg-primary/15" : "hover:bg-muted/50"}`}
+                        onClick={() => form.setValue("pecaId", selected ? 0 : p.id, { shouldValidate: true })}
+                      >
+                        <TableCell className="pr-0">
+                          <div className={`h-3.5 w-3.5 rounded-full border-2 mx-auto transition-colors ${selected ? "border-primary bg-primary" : "border-muted-foreground/40"}`} />
+                        </TableCell>
+                        <TableCell><span className="font-mono text-xs">{p.referencia}</span></TableCell>
+                        <TableCell className="font-medium">{p.nome}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">{fornecedorNome(p.codFornecedor)}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+            {pecaSelecionada && (
+              <p className="text-xs text-muted-foreground">
+                Selecionada: <span className="font-medium text-foreground">{pecaSelecionada.referencia} — {pecaSelecionada.nome}</span>
+              </p>
+            )}
           </div>
 
-          <F label="Quantidade" error={form.formState.errors.quantidade?.message}>
-            <Input type="number" min={1} placeholder="1" {...form.register("quantidade")} />
-          </F>
+          {/* ── Campos de quantidade, preço e data ── */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <F label="Quantidade" error={form.formState.errors.quantidade?.message}>
+              <Input type="number" min={1} placeholder="1" {...form.register("quantidade")} />
+            </F>
+            <F label="Preço de compra (€)" error={form.formState.errors.preco?.message}>
+              <Input type="number" step="0.01" min={0} placeholder="0.00" {...form.register("preco")} />
+            </F>
+            <F label="Data de chegada" error={form.formState.errors.dataChegada?.message}>
+              <Input type="date" {...form.register("dataChegada")} />
+            </F>
+          </div>
 
-          <F label="Preço de compra (€)" error={form.formState.errors.preco?.message}>
-            <Input type="number" step="0.01" min={0} placeholder="0.00" {...form.register("preco")} />
-          </F>
-
-          <F label="Data de chegada" error={form.formState.errors.dataChegada?.message}>
-            <Input type="date" {...form.register("dataChegada")} />
-          </F>
-
-          <DialogFooter className="sm:col-span-2">
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
             <Button type="submit" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? "A registar…" : "Registar entrada"}
@@ -234,80 +341,6 @@ function EntradaDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function PecaCombobox({
-  pecas, value, onChange,
-}: {
-  pecas: Peca[]; value: number; onChange: (id: number) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-
-  const selected = value ? pecas.find((p) => p.id === value) : undefined;
-
-  const filtered = pecas.filter((p) => {
-    if (!query.trim()) return true;
-    const q = query.toLowerCase();
-    return (
-      p.referencia.toLowerCase().includes(q) ||
-      p.nome.toLowerCase().includes(q) ||
-      (p.marca ?? "").toLowerCase().includes(q)
-    );
-  });
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between font-normal"
-        >
-          {selected ? (
-            <span className="truncate">
-              <span className="font-mono text-xs">{selected.referencia}</span>
-              {selected.marca && <span className="text-muted-foreground"> · {selected.marca}</span>}
-              {" — "}{selected.nome}
-            </span>
-          ) : (
-            <span className="text-muted-foreground">Escolher peça…</span>
-          )}
-          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popover-trigger-width)" }}>
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Pesquisar por referência, marca ou nome…"
-            value={query}
-            onValueChange={setQuery}
-          />
-          <CommandList>
-            {filtered.length === 0 ? (
-              <CommandEmpty>Nenhuma peça encontrada.</CommandEmpty>
-            ) : (
-              <CommandGroup>
-                {filtered.map((p) => (
-                  <CommandItem
-                    key={p.id}
-                    value={String(p.id)}
-                    onSelect={() => { onChange(p.id); setQuery(""); setOpen(false); }}
-                  >
-                    <span className="font-mono text-xs mr-1">{p.referencia}</span>
-                    {p.marca && <span className="text-muted-foreground text-xs">· {p.marca} · </span>}
-                    <span className="text-sm">{p.nome}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
   );
 }
 
