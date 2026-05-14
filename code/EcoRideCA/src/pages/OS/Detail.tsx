@@ -88,7 +88,7 @@ interface OrdemServico {
 interface Reparacao { id: number; nomenclatura: string; descricao: string; preco: number; disponivel: boolean; }
 interface Peca { id: number; referencia: string; nome: string; preco_venda: number; codFornecedor: number; ativa: boolean; }
 interface Funcionario { id: number; nome: string; }
-interface Cliente { id: number; nome: string; NIF: string; telemovel: string; email: string; }
+interface Cliente { id: number; nome: string; nif: string; telemovel: string; email: string; }
 interface Trotinete { id: number; marca: string; modelo: string; num_serie: string; tipo_motor: string; cod_cliente: number; }
 
 
@@ -209,7 +209,7 @@ export default function OSDetail() {
                 <CardHeader><CardTitle className="text-base">Cliente & Trotinete</CardTitle></CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   <Row label="Cliente" value={cliente?.nome ?? "—"} />
-                  <Row label="NIF" value={cliente?.NIF ?? "—"} />
+                  <Row label="NIF" value={cliente?.nif ?? "—"} />
                   <Row label="Telemóvel" value={cliente?.telemovel ?? "—"} />
                   <Row label="Trotinete" value={trotinete ? `${trotinete.marca} ${trotinete.modelo}` : "—"} />
                   <Row label="Nº de série" value={trotinete?.num_serie ?? "—"} />

@@ -15,7 +15,7 @@ import { DataTable } from "@/components/data-table";
 
 import { api } from "@/services/api";
 
-interface Cliente { id: number; nome: string; NIF: string; telemovel: string; email: string; }
+interface Cliente { id: number; nome: string; nif: string; telemovel: string; email: string; }
 interface Trotinete { id: number; marca: string; modelo: string; num_serie: string; tipo_motor: string; cod_cliente: number; }
 interface OrdemServico { id: number; }
 
@@ -157,7 +157,7 @@ export default function NewOS() {
                   isRowSelected={(c) => clienteId === c.id}
                   columns={[
                     { key: "nome", header: "Nome", cell: (c) => <span className="font-medium">{c.nome}</span> },
-                    { key: "NIF", header: "NIF", cell: (c) => c.NIF },
+                    { key: "nif", header: "NIF", cell: (c) => c.nif },
                     { key: "telemovel", header: "Telemóvel", cell: (c) => c.telemovel },
                     { key: "email", header: "Email", cell: (c) => c.email },
                     { key: "selecionado", header: "", className: "w-[1%]", cell: (c) => (
@@ -166,7 +166,7 @@ export default function NewOS() {
                         : null
                     ) },
                   ]}
-                  searchKeys={["nome", "email", "NIF", "telemovel"]}
+                  searchKeys={["nome", "email", "nif", "telemovel"]}
                   searchPlaceholder="Pesquisar por nome, email, NIF ou telemóvel"
                   searchClassName="max-w-md"
                 />
