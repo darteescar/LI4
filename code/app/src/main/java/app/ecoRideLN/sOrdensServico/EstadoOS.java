@@ -17,7 +17,7 @@ public enum EstadoOS {
             case PendenteAprovacaoOrcamento  -> destino == PendenteReparacao || destino == OrcamentoNaoAprovado || destino == Eliminada;
             case OrcamentoNaoAprovado        -> destino == Eliminada;
             case PendenteReparacao           -> destino == AguardarPecas || destino == PendentePagamento || destino == PendenteAprovacaoOrcamento || destino == Eliminada;
-            case AguardarPecas               -> destino == PendenteReparacao || destino == PendenteAprovacaoOrcamento || destino == Eliminada;
+            case AguardarPecas               -> destino == PendenteReparacao || destino == PendenteAprovacaoOrcamento || destino == PendentePagamento || destino == Eliminada;
             case ClienteNotificado           -> destino == PendentePagamento || destino == Eliminada;
             case PendentePagamento           -> destino == Paga || destino == Eliminada;
             case Paga, Eliminada             -> false;

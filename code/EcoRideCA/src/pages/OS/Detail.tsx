@@ -716,6 +716,16 @@ function ConsertoTab({
     finally { setSaving(false); }
   };
 
+  const aguardarPecas = async () => {
+    setSaving(true);
+    try {
+      await api.patch(`/ordensservicos/${os.id}/aguardarPecas`, {});
+      toast.success("OS colocada em espera por peças");
+      onChanged();
+    } catch (e) { toast.error((e as Error).message); }
+    finally { setSaving(false); }
+  };
+
   const blockedStates: EstadoOS[] = ["PendenteDiagnostico", "PendenteAprovacaoOrcamento", "OrcamentoNaoAprovado"];
   if (blockedStates.includes(os.estado) || (!canEdit && !existing)) {
     return (
@@ -903,6 +913,10 @@ function ConsertoTab({
                   </div>
                 </div>
               )}
+              <hr />
+              <Button className="w-full bg-orange-500 text-white hover:bg-orange-600" disabled={saving} onClick={aguardarPecas}>
+                Aguardar Peças
+              </Button>
             </div>
           ) : null}
 

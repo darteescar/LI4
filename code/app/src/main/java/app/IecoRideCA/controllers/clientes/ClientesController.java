@@ -23,7 +23,7 @@ public class ClientesController {
 
         // List<Cliente>
         app.get("/api/clientes", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria, Cargo.Mecanico); // Mecanicos podem ver clientes para diagnostico
             ctx.status(200).json(facade.obterClientes());
         });
 
@@ -75,7 +75,7 @@ public class ClientesController {
 
         // List<Trotinete>
         app.get("/api/trotinetes", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria, Cargo.Mecanico); // Mecanicos podem ver trotinetes para diagnostico
             ctx.status(200).json(facade.obterTrotinetes());
         });
 

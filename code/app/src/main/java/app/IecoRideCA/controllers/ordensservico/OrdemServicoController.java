@@ -52,6 +52,20 @@ public class OrdemServicoController {
             else ctx.json(res);
         });
 
+        // Endpoint eficiente para o mecânico (evita obter todas)
+        app.get("/api/ordensservicos/mecanico/ativas", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            List<OrdemServico> filtradas = facade.obterOSs().stream()
+                .filter(os -> {
+                    if (os.getCodMecanico() == null || os.getCodMecanico() != idFuncionario) return false;
+                    String est = os.getEstado().name();
+                    return est.equals("PendenteDiagnostico") || est.equals("PendentePagamento") || est.equals("PendenteReparacao") || est.equals("AguardarPecas");
+                })
+                .toList();
+            ctx.json(filtradas);
+        });
+
         // Obter OrdemServico por id
         app.get("/api/ordensservicos/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
@@ -150,6 +164,14 @@ public class OrdemServicoController {
             ctx.status(204);
         });
 
+        app.patch("/api/ordensservicos/{id}/aguardarPecas", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
+            facade.aguardarPecas(id, idFuncionario);
+            ctx.status(204);
+        });
+
         // Reportar defeito em peça do conserto
         app.post("/api/ordensservicos/{id}/defeitos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
@@ -158,6 +180,8 @@ public class OrdemServicoController {
             int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
             ctx.status(201).json(facade.reportarDefeitoConsertoOS(id, req.codPeca(), req.motivo(), idFuncionario));
         });
+
+
 
     }
 }

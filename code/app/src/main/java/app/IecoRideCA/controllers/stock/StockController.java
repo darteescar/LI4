@@ -29,12 +29,12 @@ public class StockController {
         // Fornecedor
 
         app.get("/api/fornecedores", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico, Cargo.Secretaria);
             ctx.status(200).json(facade.obterFornecedores());
         });
 
         app.get("/api/fornecedores/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Fornecedor c = facade.obterFornecedor(id);
             if (c == null) ctx.status(404);
@@ -42,7 +42,7 @@ public class StockController {
         });
 
         app.get("/api/fornecedores/{id}/pecas", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(200).json(facade.obterPecasDoFornecedor(id));
         });
@@ -71,7 +71,7 @@ public class StockController {
         // Peça
 
         app.get("/api/pecas", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico);
             ctx.status(200).json(facade.obterPecas());
         });
 

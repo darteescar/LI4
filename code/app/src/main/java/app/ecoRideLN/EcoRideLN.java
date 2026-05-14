@@ -332,6 +332,11 @@ public class EcoRideLN implements IEcoRideLN {
         return sOrdensServico.registarNotificacaoPagamentoOS(id_OS);
     }
 
+    @Override
+    public boolean aguardarPecas(int id_OS, int id_funcionario) {
+        return sOrdensServico.marcarAguardarPecasOS(id_OS, id_funcionario);
+    }
+
     // ------------------- Clientes -------------------
     // feito
 

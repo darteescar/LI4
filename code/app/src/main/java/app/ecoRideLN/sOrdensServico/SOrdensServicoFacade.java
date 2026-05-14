@@ -78,7 +78,15 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
-    public boolean marcarAguardarPecasOS(int id) {
+    public boolean marcarAguardarPecasOS(int id, int id_funcionario) {
+        OrdemServico os = ordemServicoDAO.get(id);
+        if (os == null) {
+            throw new EcoRideException("OS " + id + " não encontrada.");
+        }
+        if (os.getCodMecanico() != id_funcionario) {
+                throw new EcoRideException("Não é o responsável por esta OS.");
+        }
+
         return alterarEstadoOS(id, EstadoOS.AguardarPecas);
     }
 
@@ -137,6 +145,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
             Diagnostico diag = new Diagnostico(descricao, reparacoes, pecasQuantidades, orcamento);
             os.setDiagnostico(diag);
+            os.setConserto(null);
             os.setEstado(EstadoOS.PendenteAprovacaoOrcamento);
             ordemServicoDAO.put(idOS, os);
             return diag;

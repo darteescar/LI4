@@ -86,7 +86,6 @@ export default function OSList() {
   const { data: clientes = [] } = useQuery<Cliente[]>({
     queryKey: ["clientes"],
     queryFn: () => api.get<Cliente[]>("/clientes"),
-    enabled: role === "GERENTE" || role === "SECRETARIA",
   });
 
   const { data: trotinetes = [] } = useQuery<Trotinete[]>({
@@ -97,7 +96,6 @@ export default function OSList() {
   const { data: funcionarios = [] } = useQuery<Funcionario[]>({
     queryKey: ["funcionarios"],
     queryFn: () => api.get<Funcionario[]>("/funcionarios"),
-    enabled: role === "GERENTE",
   });
 
   const mecanicos = funcionarios;

@@ -69,6 +69,7 @@ public interface IEcoRideLN {
      public boolean            rejeitarOrcamentoOS(int id, int idFuncionario);
      public boolean            atribuirOS(int id, int id_funcionario);
      public boolean            registarNotificacaoPagamentoOS(int id_OS, int idFuncionario);
+     public boolean            aguardarPecas(int id_OS, int id_funcionario);
 
      // ------------------- Clientes -------------------
      // feito

@@ -194,7 +194,7 @@ public class SStockFacade implements ISStock {
             restante -= consumir;
         }
         if (restante > 0)
-            throw new EcoRideException("Stock insuficiente para a peça " + codPeca + ". Faltam " + restante + " unidades.");
+            throw new EcoRideException("Stock insuficiente para a peça " + pecaDAO.get(codPeca).getNome() + ". Faltam " + restante + " unidades.");
         return resultado;
     }
 

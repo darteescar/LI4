@@ -28,7 +28,7 @@ public interface ISOrdensServico {
 
      public boolean rejeitarOrcamentoOS(int id);
 
-     public boolean marcarAguardarPecasOS(int id);
+     public boolean marcarAguardarPecasOS(int id, int id_funcionario);
 
      public boolean pecasRecebidasOS(int id);
 

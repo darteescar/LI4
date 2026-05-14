@@ -19,13 +19,13 @@ public class FuncionariosController {
 
         // List<Funcionario> 
         app.get("/api/funcionarios", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria, Cargo.GestorStock);
             ctx.json(facade.obterFuncionarios());
         });
 
         // Obter Funcionario por ID
         app.get("/api/funcionarios/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Funcionario c = facade.obterFuncionario(id);
             if (c == null) ctx.status(404);
