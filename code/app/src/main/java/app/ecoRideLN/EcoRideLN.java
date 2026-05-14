@@ -211,7 +211,12 @@ public class EcoRideLN implements IEcoRideLN {
             if (p != null) custoPecas += e.getValue() * p.getPreco_venda();
         }
         float custoReparacoes = 0;
-        for (Reparacao r : reparacoes) custoReparacoes += r.getPreco();
+        for (Reparacao r : reparacoes) {
+            if (!r.isDisponivel()) {
+                throw new EcoRideException("Reparação indisponível: " + r.getNomenclatura());
+            }
+            custoReparacoes += r.getPreco();
+        }
         float orcamentoCalculado = custoPecas + custoReparacoes;
         if (orcamentoCalculado > diag.getOrcamento())
             throw new EcoRideException(String.format("Custo total do conserto (%.2f) excede orçamento aprovado (%.2f).", orcamentoCalculado, diag.getOrcamento()));
@@ -288,7 +293,6 @@ public class EcoRideLN implements IEcoRideLN {
                     );
             }
         }
-
         return true;
     }
 
