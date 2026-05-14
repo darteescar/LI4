@@ -493,7 +493,7 @@ public class EcoRideLN implements IEcoRideLN {
         }
 
         Stock s = sStock.registarStock(id_peca, preco_compra, data, quantidade);
-        sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra * quantidade, "Compra " + sStock.obterPeca(id_peca).getNome() + "x" + quantidade);
+        sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra * quantidade, "Compra " + sStock.obterPeca(id_peca).getNome() + " x " + quantidade);
         return s;
     }
 
@@ -579,7 +579,7 @@ public class EcoRideLN implements IEcoRideLN {
                 Peca p = sStock.obterPeca(s.getCodPeca());
                 float valor = s.getPreco_compra() * s.getQuantidade();
                 String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
-                sFinanceiro.registarMovimentoVendaPeca(s.getId(), valor, "Reembolso Peça " + nome + "x" + s.getQuantidade());
+                sFinanceiro.registarMovimentoVendaPeca(s.getId(), valor, "Reembolso Peça " + nome + " x " + s.getQuantidade());
             }
         }
     }
