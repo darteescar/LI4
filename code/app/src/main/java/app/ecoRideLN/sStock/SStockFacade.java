@@ -208,24 +208,21 @@ public class SStockFacade implements ISStock {
     // ------------------- Defeito -------------------
 
     @Override
-    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario) {
+    public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario) {
         if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
         if (idFuncionario < 0) throw new EcoRideException("ID do funcionário não pode ser negativo.");
         List<Defeito> resultado = new ArrayList<>();
-        for (int stockId : stockIds) {
-            Stock s = stockDAO.get(stockId);
-            if (s == null)
-                throw new EcoRideException("Stock " + stockId + " não encontrado.");
-            EstadoStock estadoAtual = s.getEstado();
-            if (estadoAtual != EstadoStock.StockEmArmazem && estadoAtual != EstadoStock.StockUsadoConserto)
-                throw new EcoRideException("Stock " + stockId + " não pode ser sinalizado com defeito (estado: " + estadoAtual + ").");
-            s.setEstado(EstadoStock.StockComPossivelDefeito);
-            stockDAO.put(stockId, s);
+        for (Stock s : stockDAO.getByPecaId(codPeca)) {
+            if (s.getEstado() != EstadoStock.StockEmArmazem || s.getQuantidade() <= 0) continue;
             int id = defeitoDAO.generateNewId();
-            Defeito novo = new Defeito(id, stockId, motivo, idFuncionario, estadoAtual);
-            defeitoDAO.put(id, novo);
-            resultado.add(novo);
+            Defeito d = new Defeito(id, s.getId(),motivo, s.getId(), s.getEstado());
+            defeitoDAO.put(id, d);
+            s.setEstado(EstadoStock.StockComPossivelDefeito);
+            stockDAO.put(s.getId(), s);
+            resultado.add(d);
         }
+         if (resultado.isEmpty())
+             throw new EcoRideException("Não foram encontrados stocks disponíveis para a peça " + pecaDAO.get(codPeca).getNome() + ".");
         return resultado;
     }
 

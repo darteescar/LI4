@@ -61,7 +61,6 @@ public interface IEcoRideLN {
      public Diagnostico             registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Reparacao> reparacoes, String descricao, int id_funcionario);
      public Conserto                registarConsertoOS(int id_OS, Map<Integer, Integer> pecaQuantidades, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist);
 
-     public List<Defeito>      reportarDefeitoConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario);
      public boolean            registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
      public List<OrdemServico> obterOSs_Cliente(int id);
      public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
@@ -116,7 +115,7 @@ public interface IEcoRideLN {
 
      // ------------------- Defeitos -------------------
 
-     public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario);
+     public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario);
      public List<Defeito> obterDefeitos();
      public boolean       removerDefeito(int id);
      public Devolucao     confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data);

@@ -238,25 +238,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public List<Defeito> reportarDefeitoConsertoOS(int idOS, int codPeca, String motivo, int idFuncionario) {
-    List<Integer> stocksDaPeca = sOrdensServico.obterStocksUsadosConsertoOS(idOS).entrySet().stream()
-        .filter(e -> {
-            Stock s = sStock.obterStock(e.getKey());
-            return s != null && s.getCodPeca() == codPeca;  // sem instanceof
-        })
-        .map(Map.Entry::getKey)
-        .collect(java.util.stream.Collectors.toList());
-
-    if (stocksDaPeca.isEmpty())
-        throw new EcoRideException("Nenhum stock da peça " + codPeca + " na OS " + idOS);
-
-    List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
-    String nome = sStock.obterPeca(codPeca) != null ? sStock.obterPeca(codPeca).getNome() : String.valueOf(codPeca);
-    sNotificacoes.registarNotificacaoStock("Possível defeito nas Peças " + nome + " da OS " + idOS, idFuncionario, destinatarios, codPeca);
-    return sStock.registarDefeito(stocksDaPeca, motivo, idFuncionario);
-    }
-
-    @Override
     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
         OrdemServico os = sOrdensServico.obterOS(id_OS);
         sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
@@ -506,8 +487,11 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Defeitos -------------------
 
     @Override
-    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario) {
-        return sStock.registarDefeito(stockIds, motivo, idFuncionario);
+    public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario) {
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
+        int idUtilRemetente = obterIdUtilizadorPorFuncionario(idFuncionario);
+        sNotificacoes.registarNotificacaoStock("Possível defeito na peça " + codPeca, idUtilRemetente, destinatarios, codPeca);
+        return sStock.registarDefeito(codPeca, motivo, idFuncionario);
     }
 
     @Override

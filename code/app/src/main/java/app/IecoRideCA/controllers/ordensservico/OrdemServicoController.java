@@ -4,7 +4,6 @@ import java.util.List;
 
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.ConsertoRequest;
-import app.IecoRideCA.controllers.ordensservico.dto.DefeitoStockRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.DiagnosticoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.OrdemServicoRequest;
 import app.IecoRideCA.controllers.ordensservico.dto.PagamentoRequest;
@@ -171,17 +170,5 @@ public class OrdemServicoController {
             facade.aguardarPecas(id, idFuncionario);
             ctx.status(204);
         });
-
-        // Reportar defeito em peça do conserto
-        app.post("/api/ordensservicos/{id}/defeitos", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
-            int id = Integer.parseInt(ctx.pathParam("id"));
-            DefeitoStockRequest req = ctx.bodyAsClass(DefeitoStockRequest.class);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            ctx.status(201).json(facade.reportarDefeitoConsertoOS(id, req.codPeca(), req.motivo(), idFuncionario));
-        });
-
-
-
     }
 }

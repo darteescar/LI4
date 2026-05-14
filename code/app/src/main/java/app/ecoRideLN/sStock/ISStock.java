@@ -40,7 +40,7 @@ public interface ISStock {
 
     // ------------------- Defeito -------------------
 
-    public List<Defeito> registarDefeito(List<Integer> stockIds, String motivo, int idFuncionario);
+    public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario);
 
     public List<Defeito> obterDefeitos();
     public boolean       removerDefeito(int id);

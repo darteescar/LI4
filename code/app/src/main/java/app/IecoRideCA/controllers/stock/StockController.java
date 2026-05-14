@@ -4,6 +4,7 @@ import java.util.List;
 
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.ordensservico.dto.DefeitoToDevolucaoRequest;
+import app.IecoRideCA.controllers.stock.dto.DefeitoRequest;
 import app.IecoRideCA.controllers.stock.dto.EncomendaRequest;
 import app.IecoRideCA.controllers.stock.dto.FornecedorRequest;
 import app.IecoRideCA.controllers.stock.dto.PecaRequest;
@@ -208,6 +209,12 @@ public class StockController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             ctx.status(facade.removerDefeito(id) ? 204 : 404);
+        });
+
+        app.post("/api/defeitos", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico);
+            DefeitoRequest req = ctx.bodyAsClass(DefeitoRequest.class);
+            ctx.status(201).json(facade.registarDefeito(req.codPeca(), req.motivo(), req.idFuncionario()));
         });
 
         app.patch("/api/defeitos/{id}/devolver", ctx -> {
