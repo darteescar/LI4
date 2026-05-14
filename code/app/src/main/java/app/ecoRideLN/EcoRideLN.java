@@ -116,8 +116,8 @@ public class EcoRideLN implements IEcoRideLN {
     // feito
 
     @Override
-    public boolean removerNotificacao(int id) {
-        return sNotificacoes.removerNotificacao(id);
+    public boolean removerNotificacao(int id, int idUser) {
+        return sNotificacoes.removerNotificacao(id, idUser);
     }
 
     @Override
@@ -126,13 +126,13 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public boolean sinalizarNotificacao_comoTratada(int id) {
-        return sNotificacoes.sinalizarNotificacao_comoTratada(id);
+    public boolean sinalizarNotificacao_comoTratada(int id, int idUser) {
+        return sNotificacoes.sinalizarNotificacao_comoTratada(id, idUser);
     }
 
     @Override
-    public boolean sinalizarNotificacao_comoLida(int id) {
-        return sNotificacoes.sinalizarNotificacao_comoLida(id);
+    public boolean sinalizarNotificacao_comoLida(int id, int idUser) {
+        return sNotificacoes.sinalizarNotificacao_comoLida(id, idUser);
     }
 
     // ------------------- Ordens de Serviço -------------------

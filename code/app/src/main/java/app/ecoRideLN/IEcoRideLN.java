@@ -44,10 +44,10 @@ public interface IEcoRideLN {
      // ------------------- Notificações -------------------
      // feito
 
-     public boolean           removerNotificacao(int id);
+     public boolean           removerNotificacao(int id, int idUser);
      public List<Notificacao> obterNotificacoesPorDestinatario(int id_destinatario);
-     public boolean           sinalizarNotificacao_comoTratada(int id);
-     public boolean           sinalizarNotificacao_comoLida(int id);
+     public boolean           sinalizarNotificacao_comoTratada(int id, int idUser);
+     public boolean           sinalizarNotificacao_comoLida(int id, int idUser);
 
      // ------------------- Ordens de Serviço -------------------
 

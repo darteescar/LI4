@@ -1,6 +1,5 @@
 package app.ecoRideLN.sNotificacoes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
@@ -35,18 +34,13 @@ public class SNotificacoesFacade implements ISNotificacoes {
      }
 
      @Override
-     public Notificacao obterNotificacao(int id) {
-          return notificacaoDAO.get(id);
-     }
+     public boolean removerNotificacao(int id, int idUser) {
+          Notificacao notificacao = notificacaoDAO.get(id);
 
-     @Override
-     public boolean removerNotificacao(int id) {
-          return notificacaoDAO.remove(id) != null;
-     }
-
-     @Override
-     public List<Notificacao> obterNotificacoes() {
-          return new ArrayList<>(notificacaoDAO.values());
+          if (notificacao != null && notificacao.getId_destinatario() == idUser) {
+               return notificacaoDAO.remove(id) != null;
+          }
+          return false;
      }
 
      // Utilitários
@@ -57,14 +51,9 @@ public class SNotificacoesFacade implements ISNotificacoes {
      }
 
      @Override
-     public List<Notificacao> obterNotificacoesNaoTratadas(int id_destinatario) {
-          return notificacaoDAO.getUntreatedByDestinatario(id_destinatario);
-     }
-
-     @Override
-     public boolean sinalizarNotificacao_comoTratada(int id) {
+     public boolean sinalizarNotificacao_comoTratada(int id, int idUser) {
           Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
+          if (notificacao != null && notificacao.getId_destinatario() == idUser) {
                notificacao.setNotificacao_tratada();
                notificacaoDAO.put(id, notificacao);
                return true;
@@ -73,9 +62,9 @@ public class SNotificacoesFacade implements ISNotificacoes {
      }
 
      @Override
-     public boolean sinalizarNotificacao_comoLida(int id) {
+     public boolean sinalizarNotificacao_comoLida(int id, int idUser) {
           Notificacao notificacao = notificacaoDAO.get(id);
-          if (notificacao != null) {
+          if (notificacao != null && notificacao.getId_destinatario() == idUser) {
                notificacao.setNotificacao_lida();
                notificacaoDAO.put(id, notificacao);
                return true;
