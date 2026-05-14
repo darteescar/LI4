@@ -13,22 +13,21 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     private final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
 
     @Override
-    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador) {
+    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador) {
         int id = ordemServicoDAO.generateNewId();
         if (id_cliente <= 0 || id_trotinete <= 0) throw new EcoRideException("ID de cliente e trotinete devem ser positivos.");
         if (descricao == null || descricao.isBlank()) throw new EcoRideException("Descrição não pode ser vazia.");
-        OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, fotografias, acessorios);
+        OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, acessorios);
         ordemServicoDAO.put(id, os);
         return os;
     }
         
     @Override
-    public void atualizarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete) {
+    public void atualizarOS(int id, String descricao, List<String> acessorios, int id_cliente, int id_trotinete) {
         OrdemServico os = ordemServicoDAO.get(id);
         if (os != null && descricao != null && !descricao.isBlank() && (id_cliente > 0 || id_cliente == 0) && (id_trotinete > 0 || id_trotinete == 0)) {
             os.setDescricao(descricao);
             os.setAcessorios(acessorios);
-            os.setFotografias(fotografias);
             os.setCodCliente(id_cliente);
             os.setCodTrotinete(id_trotinete);
             ordemServicoDAO.put(id, os);

@@ -699,7 +699,7 @@ function ConsertoTab({
   if (blockedStates.includes(os.estado)) {
     return (
       <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">
-        O conserto só pode ser registado após a aprovação do orçamento.
+        O Conserto só pode ser registado após a aprovação do orçamento.
       </CardContent></Card>
     );
   }

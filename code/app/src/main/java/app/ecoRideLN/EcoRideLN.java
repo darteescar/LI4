@@ -27,7 +27,6 @@ import app.ecoRideLN.sNotificacoes.SNotificacoesFacade;
 import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Diagnostico;
-import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
@@ -139,8 +138,8 @@ public class EcoRideLN implements IEcoRideLN {
     // ------------------- Ordens de Serviço -------------------
 
     @Override
-    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador) {
-        return sOrdensServico.registarOS(id_cliente, id_trotinete, descricao, acessorios, fotografias, codCriador);
+    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador) {
+        return sOrdensServico.registarOS(id_cliente, id_trotinete, descricao, acessorios, codCriador);
     }
 
     @Override

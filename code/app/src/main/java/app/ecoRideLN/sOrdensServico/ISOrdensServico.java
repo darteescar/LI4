@@ -8,9 +8,9 @@ public interface ISOrdensServico {
 
      // ------------------- Registo -------------------
 
-     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
+     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador);
 
-     public void atualizarOS(int id, String descricao, List<String> acessorios, List<Fotografia> fotografias, int id_cliente, int id_trotinete);
+     public void atualizarOS(int id, String descricao, List<String> acessorios, int id_cliente, int id_trotinete);
 
      public OrdemServico obterOS(int id);
 

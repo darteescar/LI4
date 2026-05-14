@@ -13,14 +13,13 @@ public class OrdemServico {
      private int codCliente;
      private int codCriador;
      private Integer codMecanico;
-     private List<Fotografia> fotografias;
      private EstadoOS estado;
      private List<String> acessorios;
      private Conserto conserto;
      private Diagnostico diagnostico;
      private Metodo_Pagamento metodo_pagamento;
 
-     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codCriador, List<Fotografia> fotografias, List<String> acessorios) {
+     public OrdemServico(int id, String descricao, LocalDateTime data_criacao, int codTrotinete, int codCliente, int codCriador, List<String> acessorios) {
           this.id = id;
           this.descricao = descricao;
           this.data_criacao = data_criacao;
@@ -28,11 +27,6 @@ public class OrdemServico {
           this.codCliente = codCliente;
           this.codCriador = codCriador;
           this.codMecanico = null;
-          if (fotografias == null) {
-               this.fotografias = new ArrayList<>();
-          } else {
-               this.fotografias = new ArrayList<>(fotografias);
-          }
           this.estado = EstadoOS.PendenteDiagnostico;
           if (acessorios == null) {
                this.acessorios = new ArrayList<>();
@@ -97,14 +91,6 @@ public class OrdemServico {
 
      public void setCodMecanico(Integer codMecanico) {
           this.codMecanico = codMecanico;
-     }
-
-     public List<Fotografia> getFotografias() {
-          return new ArrayList<>(fotografias);
-     }
-
-     public void setFotografias(List<Fotografia> fotografias) {
-          this.fotografias = new ArrayList<>(fotografias);
      }
 
      public EstadoOS getEstado() {

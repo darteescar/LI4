@@ -16,7 +16,6 @@ import app.ecoRideLN.sNotificacoes.Notificacao;
 import app.ecoRideLN.sOrdensServico.CheckList;
 import app.ecoRideLN.sOrdensServico.Conserto;
 import app.ecoRideLN.sOrdensServico.Diagnostico;
-import app.ecoRideLN.sOrdensServico.Fotografia;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
 import app.ecoRideLN.sReparacoes.Reparacao;
@@ -52,7 +51,7 @@ public interface IEcoRideLN {
 
      // ------------------- Ordens de Serviço -------------------
 
-     public OrdemServico            registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, List<Fotografia> fotografias, int codCriador);
+     public OrdemServico            registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador);
      public OrdemServico            obterOS(int id);
      public boolean                 removerOS(int id);
      public List<OrdemServico>      obterOSs();
