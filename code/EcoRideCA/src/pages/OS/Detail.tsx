@@ -457,7 +457,7 @@ function DiagnosticoTab({
     return (
       <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">
         {UNAVAILABLE_STATES.includes(os.estado)
-          ? "O diagnóstico ainda não foi iniciado."
+          ? "O Diagnóstico ainda não foi feito."
           : "Sem diagnóstico registado."}
       </CardContent></Card>
     );
@@ -892,7 +892,7 @@ function PagamentoTab({
   if (blockedStates.includes(os.estado)) {
     return (
       <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">
-        O pagamento estará disponível após a conclusão da reparação.
+        O pagamento estará disponível após a conclusão do conserto.
       </CardContent></Card>
     );
   }

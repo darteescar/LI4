@@ -37,7 +37,7 @@ const VARIANTS: Record<string, string> = {
 
 const LABELS: Record<string, string> = {
   // OS (backend estados)
-  PendenteDiagnostico: "Pendente diagnóstico",
+  PendenteDiagnostico: "Em diagnóstico",
   PendenteAprovacaoOrcamento: "Aguarda aprovação",
   OrcamentoNaoAprovado: "Orçamento rejeitado",
   PendenteReparacao: "Em reparação",
@@ -46,23 +46,6 @@ const LABELS: Record<string, string> = {
   PendentePagamento: "Aguarda pagamento",
   Paga: "Paga",
   Eliminada: "Eliminada",
-  // OS (mock)
-  REGISTADA: "Registada",
-  EM_DIAGNOSTICO: "Em diagnóstico",
-  AGUARDA_APROVACAO: "Aguarda aprovação",
-  APROVADA: "Aprovada",
-  EM_REPARACAO: "Em reparação",
-  AGUARDA_PECAS: "Aguarda peças",
-  CONCLUIDA: "Concluída",
-  AGUARDA_PAGAMENTO: "Aguarda pagamento",
-  PAGA: "Paga",
-  CANCELADA: "Cancelada",
-  PENDENTE: "Pendente",
-  DEVOLVIDA: "Devolvida",
-  INVALIDA: "Inválida",
-  RASCUNHO: "Rascunho",
-  ENVIADA: "Enviada",
-  RECEBIDA: "Recebida",
 };
 
 export function StateBadge({ state, className }: { state: AnyState; className?: string }) {
