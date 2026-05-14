@@ -334,6 +334,10 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean aguardarPecas(int id_OS, int id_funcionario) {
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
+        int idUtilRemetente = obterIdUtilizadorPorFuncionario(id_funcionario);
+        String nomeCliente = sClientes.obterCliente(sOrdensServico.obterOS(id_OS).getCodCliente()).getNome();
+        sNotificacoes.registarNotificacaoOS("Ordem de serviço " + id_OS + " de " + nomeCliente + " em espera de peças.", idUtilRemetente, destinatarios, id_OS);
         return sOrdensServico.marcarAguardarPecasOS(id_OS, id_funcionario);
     }
 

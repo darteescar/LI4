@@ -641,6 +641,7 @@ function ConsertoTab({
   const [saving, setSaving] = useState(false);
   const [novoDiagOpen, setNovoDiagOpen] = useState(false);
   const [novoDiagDesc, setNovoDiagDesc] = useState("");
+  const [aguardandoPecas, setAguardandoPecas] = useState(false);
 
   const maoObra = useMemo(
     () => selectedReps.reduce((s, rid) => s + (reparacoes.find((r) => r.id === rid)?.preco ?? 0), 0),
@@ -718,11 +719,15 @@ function ConsertoTab({
 
   const aguardarPecas = async () => {
     setSaving(true);
+    setAguardandoPecas(true);
     try {
       await api.patch(`/ordensservicos/${os.id}/aguardarPecas`, {});
       toast.success("OS colocada em espera por peças");
       onChanged();
-    } catch (e) { toast.error((e as Error).message); }
+    } catch (e) { 
+      toast.error((e as Error).message);
+      setAguardandoPecas(false);
+    }
     finally { setSaving(false); }
   };
 
@@ -914,8 +919,8 @@ function ConsertoTab({
                 </div>
               )}
               <hr />
-              <Button className="w-full bg-orange-500 text-white hover:bg-orange-600" disabled={saving} onClick={aguardarPecas}>
-                Aguardar Peças
+              <Button className="w-full bg-orange-500 text-white hover:bg-orange-600" disabled={saving || aguardandoPecas} onClick={aguardarPecas}>
+                {aguardandoPecas ? "Aguardando peças…" : "Aguardar Peças"}
               </Button>
             </div>
           ) : null}
