@@ -1,5 +1,7 @@
 package app.IecoRideCA.controllers.users;
 
+import java.util.Map;
+
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.auth.SessaoUtilizador;
 import app.IecoRideCA.controllers.users.dto.PasswordChangeRequest;
@@ -49,6 +51,14 @@ public class UsersController {
             UserRequest req = ctx.bodyAsClass(UserRequest.class);
             Utilizador atualizado = facade.atualizarUtilizador(id, req.idFuncionario(), req.cargo(), req.identificador());
             ctx.status(200).json(atualizado);
+        });
+
+        // Obter ID de utilizador a partir do ID de funcionário
+        app.get("/api/utilizadores/por-funcionario/{idFuncionario}", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria, Cargo.GestorStock);
+            int idFuncionario = Integer.parseInt(ctx.pathParam("idFuncionario"));
+            int idUtilizador = facade.obterIdUserPorIdFuncionario(idFuncionario);
+            ctx.status(200).json(Map.of("idUtilizador", idUtilizador));
         });
 
         // Alterar palavra-passe — apenas o próprio utilizador ou o Gerente

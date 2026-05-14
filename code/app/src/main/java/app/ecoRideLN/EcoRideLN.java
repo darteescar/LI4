@@ -113,6 +113,11 @@ public class EcoRideLN implements IEcoRideLN {
         return sAutenticacao.obterUtilizador(idUtilizador).getIdFuncionario();
     }
 
+    @Override
+    public int obterIdUserPorIdFuncionario(int idFuncionario) {
+        return sAutenticacao.obterIdUserPorIdFuncionario(idFuncionario);
+    }
+
     // ------------------- Notificações -------------------
     // feito
 

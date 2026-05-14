@@ -124,6 +124,12 @@ export default function OSDetail() {
     enabled: isGerente,
   });
 
+  const { data: mecIdUtilizador } = useQuery<{ idUtilizador: number }>({
+    queryKey: ["utilizadores", "por-funcionario", os?.codMecanico],
+    queryFn: () => api.get<{ idUtilizador: number }>(`/utilizadores/por-funcionario/${os!.codMecanico}`),
+    enabled: !!os?.codMecanico && isMec,
+  });
+
   const { data: reparacoes = [] } = useQuery<Reparacao[]>({
     queryKey: ["reparacoes"],
     queryFn: () => api.get<Reparacao[]>("/reparacoes"),
@@ -160,10 +166,10 @@ export default function OSDetail() {
     return <div className="p-8 text-sm text-muted-foreground">A carregar OS…</div>;
   }
 
-  const isMecAtribuido = isMec && user?.id === os.codMecanico;
-  const canMecOps = isGerente || isMecAtribuido;
+  const isMecAtribuido = isMec && !!mecIdUtilizador && user?.idUtilizador === mecIdUtilizador.idUtilizador;
+  const canMecOps = isMecAtribuido;
   const canPegar = (isMec || isGerente) && !os.codMecanico && os.estado === "PendenteDiagnostico";
-  const bloqueadoOutroMec = isMec && !!os.codMecanico && os.codMecanico !== user?.id;
+  const bloqueadoOutroMec = isMec && !!os.codMecanico && !isMecAtribuido;
 
   const mecNome = funcionarios.find((f) => f.id === os.codMecanico)?.nome ?? (os.codMecanico ? `#${os.codMecanico}` : null);
   const criadorNome = funcionarios.find((f) => f.id === os.codCriador)?.nome ?? `#${os.codCriador}`;
@@ -306,7 +312,7 @@ export default function OSDetail() {
             reparacoes={reparacoes}
             pecas={pecas}
             canEdit={canMecOps && (os.estado === "PendenteReparacao" || os.estado === "AguardarPecas")}
-            canReportDefeito={canMecOps}
+            canReportDefeito={isGerente || isMecAtribuido}
             onChanged={reload}
           />
         </TabsContent>
@@ -463,13 +469,10 @@ function DiagnosticoTab({
     } catch (e) { toast.error((e as Error).message); }
   };
 
-  const UNAVAILABLE_STATES: EstadoOS[] = ["PendenteDiagnostico"];
   if (!canEdit && !canApprove && !existing) {
     return (
       <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">
-        {UNAVAILABLE_STATES.includes(os.estado)
-          ? "O diagnóstico ainda não foi iniciado."
-          : "Sem diagnóstico registado."}
+        O Diagnóstico ainda não foi feito.
       </CardContent></Card>
     );
   }
@@ -696,10 +699,10 @@ function ConsertoTab({
   };
 
   const blockedStates: EstadoOS[] = ["PendenteDiagnostico", "PendenteAprovacaoOrcamento", "OrcamentoNaoAprovado"];
-  if (blockedStates.includes(os.estado)) {
+  if (blockedStates.includes(os.estado) || (!canEdit && !existing)) {
     return (
       <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">
-        O conserto só pode ser registado após a aprovação do orçamento.
+        O Conserto só pode ser registado após a aprovação do orçamento.
       </CardContent></Card>
     );
   }
