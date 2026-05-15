@@ -1,19 +1,11 @@
-Pensar se os metodos de validacao estao bem assim ou é melhor fazer mais geral
-
-
 O ficheiro das responsabilidades esta desatualizado/Corrigi-lo com os use cases atuais
-
-
-alterar nos use cases que geração das Notificações tbm vao para o gerente
-Adicionar filtro por trotinete na listagem de OS (atenção no use case tbm)
-Alterar use case de pesquisa dos Clientes (dá nome, email e NIF)
-Alterar use case de pesquisa das Trotinetes (dá marca, modelo, numero serie, cliente e tipo de motor)
-Alterar use case de pesquisa dos fornecedores (dá nome, nif, email)
-
-PARA GERAR SEED USAMOS CHAT
 
 ==============================================================
 CODE
+
+método 'obterIdUtilizadorPorFuncionario' faz o mesmo que 'obterIdUserPorIdFuncionario' (rever nomes)
+Falta botao de que cliente foi notificado para pagar e impedir que o cliente pague se não tiver sido notificado
+Adicionar historico de OS's para trotinetes
 ==============================================================
 
 Facade:
@@ -21,17 +13,6 @@ Verificar se é o mecânico atribuido que esta a tentar marcar diagnostico ou co
 Verificar se quando se coloca o conserto, o diagnostico já existe, o orçamento foi aprovado e as peças usadas estão em stock e são as mesmas do orçamento (diagnostico)
 Verificar quando se regista pagamento se o cliente ja foi notificado
 
-Verificar com o Claude a lógica de respostas (codigos e metodos usados) e verificar se alterações no stock, devoluções e encomendas estão a ser feitas corretamente nos dados
-
-Retirar cena que diz que o cliente so pode pagar a mais antiga.
 Adicionar marca à peça nos Use cases e requisitos.
-Agora o tempo de garantia está na peça e não há número de série, logo alterar os use cases e requisitos para refletir isso.
 
 Refazer Swagger
-
-Rever Código:
-
-método 'obterIdUtilizadorPorFuncionario' faz o mesmo que 'obterIdUserPorIdFuncionario' (rever nomes)
-
-Falta botao de que cliente foi notificado para pagar e impedir que o cliente pague se não tiver sido notificado
-Adicionar historico de OS's para trotinetes
