@@ -5,7 +5,6 @@ O ficheiro das responsabilidades esta desatualizado/Corrigi-lo com os use cases 
 
 
 alterar nos use cases que geração das Notificações tbm vao para o gerente
-alterar estados da Interface na OS ?
 Adicionar filtro por trotinete na listagem de OS (atenção no use case tbm)
 Alterar use case de pesquisa dos Clientes (dá nome, email e NIF)
 Alterar use case de pesquisa das Trotinetes (dá marca, modelo, numero serie, cliente e tipo de motor)
@@ -19,7 +18,6 @@ CODE
 
 Facade:
 Verificar se é o mecânico atribuido que esta a tentar marcar diagnostico ou conserto
-Verificar se é a segunda vez que se coloca um diagnostico
 Verificar se quando se coloca o conserto, o diagnostico já existe, o orçamento foi aprovado e as peças usadas estão em stock e são as mesmas do orçamento (diagnostico)
 Verificar quando se regista pagamento se o cliente ja foi notificado
 
@@ -28,10 +26,12 @@ Verificar com o Claude a lógica de respostas (codigos e metodos usados) e verif
 Retirar cena que diz que o cliente so pode pagar a mais antiga.
 Adicionar marca à peça nos Use cases e requisitos.
 Agora o tempo de garantia está na peça e não há número de série, logo alterar os use cases e requisitos para refletir isso.
-Retirar fotografia
 
 Refazer Swagger
 
 Rever Código:
 
 método 'obterIdUtilizadorPorFuncionario' faz o mesmo que 'obterIdUserPorIdFuncionario' (rever nomes)
+
+Falta botao de que cliente foi notificado para pagar
+Adicionar historico de OS's para trotinetes

@@ -81,8 +81,8 @@
 		\textbf{1} & O gestor de armazém poderá consultar as peças existentes no sistema, as peças em stock, as peças com possível defeito em stock, as peças pendentes de devolução e as peças devolvidas ao fornecedor. Para isto, poderá filtrar por estado (se existe no sistema, stock, com possível defeito, pendente de devolução, devolvida ao fornecedor ou inválida para devolução), fornecedor, referência, data de receção (para as que estejam em stock), tipo ou preço. \\ \hline
 		\textbf{2} & O gestor de armazém poderá adicionar, remover e editar o stock de peças existentes. Para além disso, também poderá adicionar, remover e editar fornecedores. \\ \hline
 		\textbf{3} & O sistema deve permitir registar fornecedores obrigatoriamente com: nome e contacto (email ou número de telefone). \\ \hline
-		\textbf{4} & O sistema deve permitir o registo de peças obrigatoriamente com: fornecedor, referência (do fornecedor), preço de compra, preço de venda e nível mínimo aceitável em stock. \\ \hline
-		\textbf{5} & O sistema deve permitir registar entradas de peças obrigatoriamente com: referência, quantidade, fornecedor, preço de compra e venda, data de receção, e, quando o preço de compra for superior a 70€, número de série e tempo de garantia. \\ \hline
+		\textbf{4} & O sistema deve permitir o registo de peças obrigatoriamente com: fornecedor, referência (do fornecedor), preço de compra, preço de venda, nível mínimo aceitável em stock e tempo de garantia. \\ \hline
+		\textbf{5} & O sistema deve permitir registar entradas de peças obrigatoriamente com: referência, quantidade, fornecedor, preço de compra e venda e data de receção. \\ \hline
 		\textbf{6} & O sistema deve gerar listas de peças a encomendar com base em níveis mínimos, consumo e stock atual. \\ \hline
 		\textbf{7} & O sistema deve permitir registar e editar peças devolvidas ao fornecedor, com data, motivo e estado da devolução ("Pendente de Devolução", "Devolvida ao Fornecedor" ou "Inválida para Devolução"). \\ \hline
 	\end{tabularx}
@@ -99,11 +99,10 @@
 		\textbf{2} & A secretária deverá poder adicionar, remover e editar clientes, trotinetes e OS. \\ \hline
 		\textbf{3} & O registo de clientes deverá ser composto obrigatoriamente por: nome, email, telemóvel e NIF. \\ \hline
 		\textbf{4} & O registo de trotinetes deverá ser composto obrigatoriamente por: marca, modelo, número de série, tipo de motor e cliente. \\ \hline
-		\textbf{5} & O sistema deverá registar a criação de uma OS obrigatoriamente com: os dados do cliente, os dados técnicos da trotinete, uma descrição do problema e, opcionalmente, por acessórios e estado à entrada (com notas textuais ou até 5 fotos anexadas). Para todas as OS que forem criadas, deverá ser atribuído o estado de "Pendente Diagnóstico" e deverá ser criada uma referência única para a mesma.\\ \hline
+		\textbf{5} & O sistema deverá registar a criação de uma OS obrigatoriamente com: os dados do cliente, os dados técnicos da trotinete, uma descrição do problema e, opcionalmente, por acessórios e estado à entrada (com notas textuais). Para todas as OS que forem criadas, deverá ser atribuído o estado de "Pendente Diagnóstico" e deverá ser criada uma referência única para a mesma.\\ \hline
 		\textbf{6} & O sistema deve permitir registar a aprovação do orçamento por parte de um cliente somente em OS que estejam no estado "Pendente aprovação do orçamento", antes de permitir que o mecânico continue a reparação. Esta aprovação deverá colocar a OS num estado de "Pendente Reparação". \\ \hline
 		\textbf{7} & Para uma OS no estado "Pendente Pagamento" \space deverá ser registado quando um cliente foi notificado sobre o término da reparação da trotinete. \\ \hline
 		\textbf{8} & O sistema deve permitir registar a efetuação do pagamento e o respetivo método utilizado numa OS no estado "Pendente Pagamento" (numerário, multibanco, MBWay). Caso sejam ambos registados, a OS deverá ficar no estado "Paga". \\ \hline
-		\textbf{9} & O sistema deve impedir a conclusão de uma OS no estado "Pendente Pagamento"\space caso o cliente referenciado na mesma tenha outras OS no estado "Pendente Pagamento" que tenham tido a confirmação de término de reparação numa data anterior à primeira. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
@@ -120,7 +119,7 @@
 		\textbf{4} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação", deverá poder selecionar quais as reparações que ele executou a partir da tabela de reparações e poderá consultar (procurando por referência ou  fornecedor) e associar as peças que usou. Também deverá poder consultar rapidamente o histórico de reparações da trotinete (mostrando toda a informação das OS que já foram levantadas sobre ela). \\ \hline	
 		\textbf{5} & Quando um mecânico selecionar uma OS no estado "Pendente de reparação" \space e uma ou mais peças da lista do diagnóstico não estiver disponível no stock, o sistema deverá disponibilizar a opção de requisição de encomenda das peças. A OS deverá ficar em estado de "A aguardar peças", e a reparação poderá prosseguir normalmente, mas a sua terminação deverá ser impedida até que o stock da peça necessário esteja disponível. Quando uma das peças estiver disponível no stock, a OS deverá ficar no estado "Pendente reparação". \\ \hline
 		\textbf{6} & O sistema deve permitir ao mecânico adicionar novos problemas identificados durante a reparação, identificando-os com recurso à tabela de reparações. Esta ação deverá colocar o OS num estado de "Pendente aprovação do orçamento". \\ \hline
-		\textbf{7} & Durante a realização de uma reparação, depois de adicionadas peças à lista de peças usadas na OS, o mecânico poderá reportar defeitos nas peças instaladas, atribuindo o estado "Possível defeito"\space à peça e removendo-a da lista de peças usadas, diminuindo o valor final da reparação. Caso não hajam mais peças iguais em stock, a OS deverá ficar em estado de "A aguardar peças", e a reparação poderá prosseguir normalmente, mas a sua terminação deverá ser impedida até que o stock da peça necessário esteja disponível. Quando uma das peças estiver disponível no stock, a OS deverá ficar no estado "Pendente reparação".  \\ \hline
+		\textbf{7} & Durante a realização de uma reparação, depois de adicionadas peças à lista de peças usadas na OS, o mecânico poderá reportar defeitos nas peças instaladas, atribuindo o estado "Possível defeito"\space à peça e removendo-a da lista de peças usadas, diminuindo o valor final da reparação. Caso não hajam mais peças iguais em stock, a OS deverá ficar em estado de "A aguardar peças", e a reparação poderá prosseguir normalmente, mas a sua terminação deverá ser impedida até que o stock da peça necessário esteja disponível. \\ \hline
 		\textbf{8} & Quando um mecânico desejar terminar uma reparação, deverá verificar uma checklist obrigatória de segurança (luzes, pneus, aceleração, travagem, visor, teste de condução). \\ \hline
 		\textbf{9} & O sistema deve permitir ao mecânico marcar a OS como concluída, ficando esta no estado "Pendente Pagamento". \\ \hline
 	\end{tabularx}
@@ -130,9 +129,8 @@
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
 		\hline
 		\rowcolor{gray!10} \textbf{Número} & \textbf{Descrição} \\ \hline
-		\textbf{1} & O sistema precisa de uma funcionalidade rápida na abertura da ordem de serviço para "Registo de Danos Prévios", com a opção de anexar uma ou várias fotos à ficha.  \\ \hline
-		\textbf{2} & O sistema deverá ser possível nomear os itens que foram deixados na hora de entrega da trotinete, como por exemplo, carregador, cadeado e chave.  \\ \hline
-		\textbf{3} & O sistema deverá ter um "Quadro de Estado em Tempo Real" \space acessível na receção. O mecânico deverá identificar a ordem de serviço associada e atualizar o seu estado para que a assistente tenha sempre a resposta imediatamente. \\ \hline
+		\textbf{1} & O sistema deverá ser possível nomear os itens que foram deixados na hora de entrega da trotinete, como por exemplo, carregador, cadeado e chave.  \\ \hline
+		\textbf{2} & O sistema deverá ter um "Quadro de Estado em Tempo Real" \space acessível na receção. O mecânico deverá identificar a ordem de serviço associada e atualizar o seu estado para que a assistente tenha sempre a resposta imediatamente. \\ \hline
 	\end{tabularx}
 
 \end{document}
