@@ -61,13 +61,15 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     private Diagnostico loadDiagnostico(Connection c, int idOS) throws SQLException {
         String desc;
         float orc;
+        boolean aprovado;
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT descricao, orcamento FROM Diagnostico WHERE idOS = ?")) {
+                "SELECT descricao, orcamento, aprovado FROM Diagnostico WHERE idOS = ?")) {
             ps.setInt(1, idOS);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) return null;
                 desc = rs.getString("descricao");
                 orc = rs.getFloat("orcamento");
+                aprovado = rs.getBoolean("aprovado"); // ← ler o campo
             }
         }
         List<Integer> reps = new ArrayList<>();
@@ -86,7 +88,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 while (rs.next()) pecas.put(rs.getInt("codPeca"), rs.getInt("quantidade"));
             }
         }
-        return new Diagnostico(desc, reps, pecas, orc);
+        return new Diagnostico(desc, reps, pecas, orc, aprovado);
     }
 
     private Conserto loadConserto(Connection c, int idOS) throws SQLException {
@@ -219,12 +221,13 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
 
     private void insertDiagnostico(Connection c, int idOS, Diagnostico d) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement("""
-                INSERT INTO Diagnostico (idOS, descricao, orcamento)
-                VALUES (?, ?, ?)
+                INSERT INTO Diagnostico (idOS, descricao, orcamento, aprovado)
+                VALUES (?, ?, ?, ?)
                 """)) {
             ps.setInt(1, idOS);
             ps.setString(2, d.getDescricao());
             ps.setFloat(3, d.getOrcamento());
+            ps.setBoolean(4, d.isAprovado());
             ps.executeUpdate();
         }
         if (!d.getCod_reparacoes().isEmpty()) {

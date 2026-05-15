@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS OrdemServico (
     estado           ENUM('PendenteReparacao', 'PendenteDiagnostico',
                           'PendenteAprovacaoOrcamento', 'PendentePagamento',
                           'Paga', 'OrcamentoNaoAprovado', 'AguardarPecas',
-                          'Eliminada') NOT NULL,
+                          'Eliminada', 'ClienteNotificado') NOT NULL,
     metodo_pagamento ENUM('NUMERARIO', 'MULTIBANCO', 'MBWAY') NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codTrotinete) REFERENCES Trotinete(id),
@@ -269,6 +269,7 @@ CREATE TABLE IF NOT EXISTS Diagnostico (
     idOS      INT   NOT NULL,
     descricao TEXT,
     orcamento FLOAT NOT NULL,
+    aprovado  BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (idOS),
     FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
 );

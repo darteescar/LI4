@@ -50,7 +50,10 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-soft via-background to-background p-4">
+    <div className="flex min-h-screen items-center justify-center p-4"
+  style={{
+    background: "radial-gradient(ellipse at top left, hsl(var(--primary) / 0.4) 0%, hsl(var(--primary) / 0.15) 40%, hsl(var(--background)) 70%)"
+  }}>
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-3 text-center">
           <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl bg-white overflow-hidden shadow-md">

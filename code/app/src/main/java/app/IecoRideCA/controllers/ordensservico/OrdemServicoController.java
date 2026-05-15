@@ -1,6 +1,5 @@
 package app.IecoRideCA.controllers.ordensservico;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,20 +50,6 @@ public class OrdemServicoController {
             List<OrdemServico> res = facade.obterOSsDisponiveis();
             if (res == null) ctx.status(404);
             else ctx.json(res);
-        });
-
-        // Endpoint eficiente para o mecânico (evita obter todas)
-        app.get("/api/ordensservicos/mecanico/ativas", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico);
-            int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            List<OrdemServico> filtradas = facade.obterOSs().stream()
-                .filter(os -> {
-                    if (os.getCodMecanico() == null || os.getCodMecanico() != idFuncionario) return false;
-                    String est = os.getEstado().name();
-                    return est.equals("PendenteDiagnostico") || est.equals("PendentePagamento") || est.equals("PendenteReparacao") || est.equals("AguardarPecas");
-                })
-                .toList();
-            ctx.json(filtradas);
         });
 
         // Obter OrdemServico por id

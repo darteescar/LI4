@@ -106,16 +106,6 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public Cargo obterCargoUtilizador(int idUtilizador) {
-        return sAutenticacao.obterCargoUtilizador(idUtilizador);
-    }
-
-    @Override
-    public int obterIdFuncionario_Utilizador(int idUtilizador) {
-        return sAutenticacao.obterUtilizador(idUtilizador).getIdFuncionario();
-    }
-
-    @Override
     public int obterIdUserPorIdFuncionario(int idFuncionario) {
         return sAutenticacao.obterIdUserPorIdFuncionario(idFuncionario);
     }
@@ -185,8 +175,8 @@ public class EcoRideLN implements IEcoRideLN {
             if (p != null) orcamento += e.getValue() * p.getPreco_venda();
         }
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
-        int idUtilRemetente = obterIdUtilizadorPorFuncionario(id_funcionario);
-        sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente", idUtilRemetente, destinatarios, idOS);
+        int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
+        sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente"+ sClientes.obterCliente(sOrdensServico.obterOS(idOS).getCodCliente()).getNome(), idUtilRemetente, destinatarios, idOS);
         return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, codReps, orcamento, descricao, id_funcionario);
     }
 
@@ -235,7 +225,7 @@ public class EcoRideLN implements IEcoRideLN {
         List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
 
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
-        int idUtilRemetente = obterIdUtilizadorPorFuncionario(id_funcionario);
+        int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
         sNotificacoes.registarNotificacaoOS("Execução da OS#" + id_OS + " concluída", idUtilRemetente, destinatarios, id_OS);
         return sOrdensServico.registarConsertoOS(id_OS, stocksUsados, codReps, orcamento, id_funcionario);
     }
@@ -253,14 +243,6 @@ public class EcoRideLN implements IEcoRideLN {
             pecasUsadas.merge(codPeca, e.getValue(), Integer::sum);
         }
         return pecasUsadas;
-    }
-
-    private int obterIdUtilizadorPorFuncionario(int idFuncionario) {
-        return sAutenticacao.obterUtilizadores().stream()
-            .filter(u -> u.getIdFuncionario() == idFuncionario)
-            .map(Utilizador::getId)
-            .findFirst()
-            .orElse(0); // 0 → gravado como NULL no DAO (sem remetente)
     }
 
     @Override
@@ -308,12 +290,10 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean aprovarOrcamentoOS(int id, int idFuncionario) {
-        Cargo cargo = sAutenticacao.obterCargoUtilizador(obterIdUtilizadorPorFuncionario(idFuncionario));
-        if (cargo != Cargo.Gerente && cargo != Cargo.Secretaria)
-            throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem aprovar um orçamento.");
+        OrdemServico os = sOrdensServico.obterOS(id);
+        int codMec = os.getCodMecanico();
         boolean resultado = sOrdensServico.aprovarOrcamentoOS(id);
         if (resultado) {
-            int codMec = sOrdensServico.obterOS(id).getCodMecanico();
             int destinatarioId = sAutenticacao.obterIdUserPorIdFuncionario(codMec);
             List<Integer> destinatarios = List.of(destinatarioId);
             if (!destinatarios.isEmpty())
@@ -324,12 +304,10 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean rejeitarOrcamentoOS(int id, int idFuncionario) {
-        Cargo cargo = sAutenticacao.obterCargoUtilizador(obterIdUtilizadorPorFuncionario(idFuncionario));
-        if (cargo != Cargo.Gerente && cargo != Cargo.Secretaria)
-            throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem rejeitar um orçamento.");
+        OrdemServico os = sOrdensServico.obterOS(id);
+        int codMec = os.getCodMecanico();
         boolean resultado = sOrdensServico.rejeitarOrcamentoOS(id);
         if (resultado) {
-            int codMec = sOrdensServico.obterOS(id).getCodMecanico();
             int destinatarioId = sAutenticacao.obterIdUserPorIdFuncionario(codMec);
             List<Integer> destinatarios = List.of(destinatarioId);
             if (!destinatarios.isEmpty())
@@ -345,18 +323,37 @@ public class EcoRideLN implements IEcoRideLN {
 
     @Override
     public boolean registarNotificacaoPagamentoOS(int id_OS, int idFuncionario){
-        Cargo cargo = sAutenticacao.obterCargoUtilizador(obterIdUtilizadorPorFuncionario(idFuncionario));
-        if (cargo != Cargo.Gerente && cargo != Cargo.Secretaria)
-            throw new IllegalArgumentException("Apenas o Gerente ou a Secretaria podem registar notificações de pagamento.");
         return sOrdensServico.registarNotificacaoPagamentoOS(id_OS);
     }
 
     @Override
     public boolean aguardarPecas(int id_OS, int id_funcionario) {
+
+        OrdemServico os = sOrdensServico.obterOS(id_OS);
+
+        // Enviar mensagens a Gerente e Secretaria
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
-        int idUtilRemetente = obterIdUtilizadorPorFuncionario(id_funcionario);
-        String nomeCliente = sClientes.obterCliente(sOrdensServico.obterOS(id_OS).getCodCliente()).getNome();
+        int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
+        String nomeCliente = sClientes.obterCliente(os.getCodCliente()).getNome();
         sNotificacoes.registarNotificacaoOS("Ordem de serviço " + id_OS + " de " + nomeCliente + " em espera de peças.", idUtilRemetente, destinatarios, id_OS);
+
+        // Enviar mensagem a Gestor Stock
+        List<Integer> destinatariosStock = sAutenticacao.obterUtilizadoresPorCargo(Cargo.GestorStock);
+        Diagnostico diag = os.getDiagnostico();
+        diag.getPecasOrcamento().entrySet().stream()
+            .filter(e -> e.getValue() > 0)
+            .forEach(e -> {
+                Peca p = sStock.obterPeca(e.getKey());
+                if (p != null) {
+                    sNotificacoes.registarNotificacaoOS(
+                        "Peça necessária : " + p.getNome() + " x " + e.getValue(),
+                        idUtilRemetente,
+                        destinatariosStock,
+                        id_OS
+                    );
+                }
+            });
+
         return sOrdensServico.marcarAguardarPecasOS(id_OS, id_funcionario);
     }
 
@@ -497,7 +494,13 @@ public class EcoRideLN implements IEcoRideLN {
         }
 
         Stock s = sStock.registarStock(id_peca, preco_compra, data, quantidade);
-        sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra * quantidade, "Compra " + sStock.obterPeca(id_peca).getNome() + " x " + quantidade);
+        sFinanceiro.registarMovimentoCompraStock(s.getId(), preco_compra * quantidade, "Compra " + p.getNome() + " x " + quantidade);
+
+        // Enviar notificações a Mecânicos 
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Mecanico);
+        sNotificacoes.registarNotificacaoStock("Chegou uma encomenda, verifique os seus consertos com peças em falta.", 0, destinatarios, id_peca);
+
+
         return s;
     }
 
@@ -532,7 +535,7 @@ public class EcoRideLN implements IEcoRideLN {
     @Override
     public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario) {
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.GestorStock);
-        int idUtilRemetente = obterIdUtilizadorPorFuncionario(idFuncionario);
+        int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(idFuncionario);
         sNotificacoes.registarNotificacaoStock("Possível defeito na peça " + sStock.obterPeca(codPeca).getNome(), idUtilRemetente, destinatarios, codPeca);
         return sStock.registarDefeito(codPeca, motivo, idFuncionario);
     }
@@ -612,14 +615,17 @@ public class EcoRideLN implements IEcoRideLN {
         Encomenda e = sStock.marcarEncomendaComoRecebida(id);
         for (int stockId : e.getCodStocks()) {
             Stock s = sStock.obterStock(stockId);
-            float precoVenda = s.getCodPeca() != 0 ? sStock.obterPeca(s.getCodPeca()).getPreco_venda() : 0;
             float valor = s.getPreco_compra() * s.getQuantidade();
-            if (s != null) {
-                Peca p = sStock.obterPeca(s.getCodPeca());
-                String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
-                sFinanceiro.registarMovimentoCompraStock(stockId, valor, "Compra " + nome + " x " + s.getQuantidade());
-            }
+            Peca p = sStock.obterPeca(s.getCodPeca());
+            String nome = p != null ? p.getNome() : String.valueOf(s.getCodPeca());
+            sFinanceiro.registarMovimentoCompraStock(stockId, valor, "Compra " + nome + " x " + s.getQuantidade());
+            
         }
+        
+        // Enviar notificações a Mecânicos 
+        List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Mecanico);
+        sNotificacoes.registarNotificacaoStock("Chegou uma encomenda, verifique os seus consertos com peças em falta.", 0, destinatarios, id);
+
         return e;
     }
 

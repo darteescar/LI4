@@ -426,6 +426,7 @@ function DiagnosticoTab({
   );
 
   const submit = async () => {
+    if (saving) return;
     if (selectedReps.length === 0) { toast.error("Adiciona pelo menos uma reparação"); return; }
     if (!notas.trim()) { toast.error("Adiciona uma descrição ao Diagnóstico"); return; }
     setSaving(true);

@@ -96,14 +96,6 @@ public class SAutenticacaoFacade implements ISAutenticacao {
     }
 
     @Override
-    public Cargo obterCargoUtilizador(int id) {
-        if (!utilizadoresDAO.containsKey(id)) {
-            throw new EcoRideException("Utilizador com ID " + id + " não existe.");
-        }
-        return utilizadoresDAO.get(id).getCargo();
-    }
-
-    @Override
     public boolean atualizarPalavraPasseUtilizador(int id, String passwordvelha, String novaPassword) {
         if (!utilizadoresDAO.containsKey(id)) {
             throw new EcoRideException("Utilizador com ID " + id + " não existe.");

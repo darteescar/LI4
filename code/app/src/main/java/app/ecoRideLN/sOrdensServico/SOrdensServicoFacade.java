@@ -69,7 +69,18 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
     @Override
     public boolean aprovarOrcamentoOS(int id) {
-        return alterarEstadoOS(id, EstadoOS.PendenteReparacao);
+        OrdemServico os = ordemServicoDAO.get(id);
+        if (os == null)
+            throw new EcoRideException("OS " + id + " não encontrada.");
+        if (os.getDiagnostico() == null)
+            throw new EcoRideException("Não é possível aprovar o orçamento sem um diagnóstico prévio.");
+        if (!os.getEstado().podeTransicionar(EstadoOS.PendenteReparacao))
+            return false;
+
+        os.getDiagnostico().setAprovado(true);
+        os.setEstado(EstadoOS.PendenteReparacao);
+        ordemServicoDAO.put(id, os);
+        return true;
     }
 
     @Override
@@ -170,6 +181,14 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             if (!os.getEstado().podeTransicionar(EstadoOS.PendentePagamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + id_OS);
             
+            if (os.getDiagnostico() == null) {
+                throw new EcoRideException("Não é possível registar um conserto sem um diagnóstico prévio.");
+            }
+
+            if (!os.getDiagnostico().isAprovado()) {
+                throw new EcoRideException("Não é possível registar um conserto sem um orçamento aprovado.");
+            }
+
             Conserto con = new Conserto(stocksUsados, reparacoes, valor);
             os.setConserto(con);
             os.setEstado(EstadoOS.PendentePagamento);

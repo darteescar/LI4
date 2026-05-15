@@ -61,15 +61,34 @@ export default function Alertas() {
     qc.invalidateQueries({ queryKey: ["notificacoes", user?.id] });
   };
 
+  const eliminarTodas = async () => {
+    await Promise.all(todas.map((n) => api.delete(`/notificacoes/${n.id}`)));
+    toast.success("Todos os alertas eliminados");
+    qc.invalidateQueries({ queryKey: ["notificacoes", user?.id] });
+  };
+
   return (
     <div>
       <PageHeader
         title="Centro de Alertas"
         description="Notificações relevantes para a tua função"
         actions={
-          <Button variant="outline" onClick={marcarTodas} disabled={naoLidasCount === 0}>
-            <CheckCheck className="h-4 w-4" /> Marcar todas como lidas
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={marcarTodas} disabled={naoLidasCount === 0}>
+              <CheckCheck className="h-4 w-4" /> Marcar todas como lidas
+            </Button>
+            <ConfirmDialog
+              trigger={
+                <Button variant="outline" className="text-destructive hover:text-destructive" disabled={todas.length === 0}>
+                  <Trash2 className="h-4 w-4" /> Eliminar todas
+                </Button>
+              }
+              title="Eliminar todos os alertas?"
+              description="Esta ação remove permanentemente todos os alertas, incluindo os já lidos e tratados."
+              destructive
+              onConfirm={eliminarTodas}
+            />
+          </div>
         }
       />
 
