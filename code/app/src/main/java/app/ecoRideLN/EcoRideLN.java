@@ -176,7 +176,7 @@ public class EcoRideLN implements IEcoRideLN {
         }
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
         int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
-        sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente"+ sClientes.obterCliente(sOrdensServico.obterOS(idOS).getCodCliente()).getNome(), idUtilRemetente, destinatarios, idOS);
+        sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente "+ sClientes.obterCliente(sOrdensServico.obterOS(idOS).getCodCliente()).getNome(), idUtilRemetente, destinatarios, idOS);
         return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, codReps, orcamento, descricao, id_funcionario);
     }
 
