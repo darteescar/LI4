@@ -928,7 +928,7 @@ function ConsertoTab({
             </div>
           ) : null}
 
-          {canReportDefeito && Object.keys(pecasQtd).length > 0 && (
+          {canReportDefeito && !existing && Object.keys(pecasQtd).length > 0 && (
             <>
               <hr />
               <Button variant="outline" className="w-full text-destructive" onClick={() => setDefeitoOpen(true)}>
@@ -940,7 +940,7 @@ function ConsertoTab({
       </Card>
     </div>
 
-    {canReportDefeito && Object.keys(pecasQtd).length > 0 && (
+    {canReportDefeito && !existing && Object.keys(pecasQtd).length > 0 && (
       <DefeitoDialog
         open={defeitoOpen}
         onOpenChange={setDefeitoOpen}
