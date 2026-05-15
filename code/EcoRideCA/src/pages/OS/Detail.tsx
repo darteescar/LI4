@@ -262,16 +262,8 @@ export default function OSDetail() {
                           <ShieldCheck className="h-4 w-4" /> Pegar nesta OS
                         </Button>
                       </div>
-                    ) : isGerente && os.estado === "PendenteDiagnostico" && funcionarios.length > 0 ? (
-                      <AtribuirDialog
-                        funcionarios={funcionarios}
-                        onAtribuir={(funcId) =>
-                          api.patch(`/ordensservicos/${id}/atribuir`, { id_funcionario: funcId })
-                            .then(() => { toast.success("Mecânico atribuído"); reload(); })
-                            .catch((e: Error) => toast.error(e.message))
-                        }
-                      />
-                    ) : (
+                    ) 
+                    : (
                       <span className="text-muted-foreground">
                         {os.estado === "PendenteDiagnostico" ? "Aguarda que um mecânico pegue na OS" : "—"}
                       </span>
