@@ -33,5 +33,5 @@ Rever Código:
 
 método 'obterIdUtilizadorPorFuncionario' faz o mesmo que 'obterIdUserPorIdFuncionario' (rever nomes)
 
-Falta botao de que cliente foi notificado para pagar
+Falta botao de que cliente foi notificado para pagar e impedir que o cliente pague se não tiver sido notificado
 Adicionar historico de OS's para trotinetes
