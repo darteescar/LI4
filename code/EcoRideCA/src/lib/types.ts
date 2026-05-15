@@ -76,21 +76,6 @@ export interface Peca {
   disponivel: boolean;
 }
 
-export interface UnidadeSerie {
-  numeroSerie: string;
-  garantiaMeses: number;
-}
-
-export interface EntradaStock {
-  id: string;
-  pecaId: string;
-  quantidade: number;
-  precoUnitario: number;
-  data: string;
-  /** Quando preço unitário > 70€, exigido nº série + garantia por unidade */
-  unidades?: UnidadeSerie[];
-  registadoPor: string; // funcionario id
-}
 
 export type EstadoDevolucao = "PENDENTE" | "DEVOLVIDA" | "INVALIDA";
 

@@ -425,7 +425,7 @@ function DiagnosticoTab({
     try {
       await api.patch(`/ordensservicos/${os.id}/diagnostico`, {
         pecasQuantidades: pecasQtd,
-        reparacoes: selectedReps.map((rid) => reparacoes.find((r) => r.id === rid)!).filter(Boolean),
+        reparacoes: selectedReps,
         descricao: notas.trim(),
       });
       toast.success("Diagnóstico submetido — aguarda aprovação");
@@ -695,7 +695,7 @@ function ConsertoTab({
     try {
       await api.patch(`/ordensservicos/${os.id}/conserto`, {
         pecasQuantidades: pecasQtd,
-        reparacoes: selectedReps.map((rid) => reparacoes.find((r) => r.id === rid)!).filter(Boolean),
+        reparacoes: selectedReps,
         checklist: check,
       });
       toast.success("Reparação concluída");
@@ -711,7 +711,7 @@ function ConsertoTab({
     try {
       await api.patch(`/ordensservicos/${os.id}/diagnostico`, {
         pecasQuantidades: pecasQtd,
-        reparacoes: selectedReps.map((rid) => reparacoes.find((r) => r.id === rid)!).filter(Boolean),
+        reparacoes: selectedReps,
         descricao: novoDiagDesc.trim(),
       });
       toast.success("Novo diagnóstico submetido — aguarda aprovação do orçamento");

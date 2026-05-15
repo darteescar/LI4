@@ -1,5 +1,9 @@
 package app.IecoRideCA.controllers.funcionarios;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import app.IecoRideCA.auth.GestorSessoes;
 import app.IecoRideCA.controllers.funcionarios.dto.FuncionarioRequest;
 import app.ecoRideLN.IEcoRideLN;
@@ -17,19 +21,31 @@ public class FuncionariosController {
 
     public void register(Javalin app) {
 
-        // List<Funcionario> 
+        // List<Funcionario> — Gerente recebe dados completos; outros apenas {id, nome}
         app.get("/api/funcionarios", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria, Cargo.GestorStock);
-            ctx.json(facade.obterFuncionarios());
+            List<Funcionario> todos = facade.obterFuncionarios();
+            if (GestorSessoes.sessao(ctx).getCargo() == Cargo.Gerente) {
+                ctx.json(todos);
+            } else {
+                ctx.json(todos.stream()
+                    .map(f -> Map.of("id", f.getId(), "nome", f.getNome()))
+                    .collect(Collectors.toList()));
+            }
         });
 
-        // Obter Funcionario por ID
+        // Obter Funcionario por ID — Gerente recebe dados completos; outros apenas {id, nome}
         app.get("/api/funcionarios/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Funcionario c = facade.obterFuncionario(id);
-            if (c == null) ctx.status(404);
-            else ctx.json(c);
+            if (c == null) {
+                ctx.status(404);
+            } else if (GestorSessoes.sessao(ctx).getCargo() == Cargo.Gerente) {
+                ctx.json(c);
+            } else {
+                ctx.json(Map.of("id", c.getId(), "nome", c.getNome()));
+            }
         });
 
         // Criar Funcionario

@@ -29,7 +29,7 @@ public class ClientesController {
 
         // Obter Cliente por id
         app.get("/api/clientes/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Cliente c = facade.obterCliente(id);
             if (c == null) {
@@ -81,7 +81,7 @@ public class ClientesController {
 
         // Obter Trotinete por id
         app.get("/api/trotinetes/{id}", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria, Cargo.Mecanico);
             int id = Integer.parseInt(ctx.pathParam("id"));
             Trotinete c = facade.obterTrotinete(id);
             if (c == null) {

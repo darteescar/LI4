@@ -4,9 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import app.ecoRideLN.sOrdensServico.CheckList;
-import app.ecoRideLN.sReparacoes.Reparacao;
 
 public record ConsertoRequest(
      Map<String, Integer> pecasQuantidades,
-     List<Reparacao> reparacoes,
+     List<Integer> reparacoes,
      CheckList checklist) {}

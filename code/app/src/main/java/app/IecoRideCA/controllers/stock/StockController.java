@@ -78,7 +78,7 @@ public class StockController {
         });
 
         app.get("/api/pecasAtivas", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico);
             ctx.status(200).json(facade.obterPecasAtivas());
         });
 

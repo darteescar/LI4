@@ -20,7 +20,7 @@ interface Devolucao {
   id: number; data: string; motivo: string; estado: EstadoDevolucao; codStock: number;
 }
 
-interface StockEntry { id: number; codPeca: number; nr_serie?: string; }
+interface StockEntry { id: number; codPeca: number; }
 interface Peca { id: number; referencia: string; nome: string; }
 
 const ESTADO_LABELS: Record<EstadoDevolucao, string> = {
@@ -89,7 +89,7 @@ export default function StockDevolucoes() {
     if (!s) return `Stock #${codStock}`;
     const p = pecas.find((x) => x.id === s.codPeca);
     const pLabel = p ? `${p.referencia} · ${p.nome}` : `Peça #${s.codPeca}`;
-    return s.nr_serie ? `${pLabel} (${s.nr_serie})` : pLabel;
+    return pLabel;
   };
 
   return (

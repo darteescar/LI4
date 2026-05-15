@@ -166,10 +166,12 @@ public class EcoRideLN implements IEcoRideLN {
     }
 
     @Override
-    public Diagnostico registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Reparacao> reparacoes, String descricao, int id_funcionario) {
-        List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
+    public Diagnostico registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Integer> reparacoesIds, String descricao, int id_funcionario) {
         float orcamento = 0;
-        for (Reparacao r : reparacoes) orcamento += r.getPreco();
+        for (int repId : reparacoesIds) {
+            Reparacao r = sReparacoes.obterReparacao(repId);
+            if (r != null) orcamento += r.getPreco();
+        }
         for (Entry<Integer, Integer> e : pecasQuantidades.entrySet()) {
             Peca p = sStock.obterPeca(e.getKey());
             if (p != null) orcamento += e.getValue() * p.getPreco_venda();
@@ -177,11 +179,11 @@ public class EcoRideLN implements IEcoRideLN {
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
         int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
         sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente "+ sClientes.obterCliente(sOrdensServico.obterOS(idOS).getCodCliente()).getNome(), idUtilRemetente, destinatarios, idOS);
-        return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, codReps, orcamento, descricao, id_funcionario);
+        return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, reparacoesIds, orcamento, descricao, id_funcionario);
     }
 
     @Override
-    public Conserto registarConsertoOS(int id_OS, Map<String, Integer> pecaQuantidadesRaw, List<Reparacao> reparacoes, int id_funcionario, CheckList checklist) {
+    public Conserto registarConsertoOS(int id_OS, Map<String, Integer> pecaQuantidadesRaw, List<Integer> reparacoesIds, int id_funcionario, CheckList checklist) {
         if (!checklist.isCheckListComplete())
             throw new EcoRideException("Checklist incompleta. Conserto não pode ser registado.");
 
@@ -190,7 +192,6 @@ public class EcoRideLN implements IEcoRideLN {
             e -> Integer.parseInt(e.getKey()),
             Map.Entry::getValue
         ));
-        //validar se peças usadas e reparações preenchem o orçamento aprovado
         OrdemServico os = sOrdensServico.obterOS(id_OS);
         if (os == null) throw new EcoRideException("Ordem de serviço não encontrada: " + id_OS);
         Diagnostico diag = os.getDiagnostico();
@@ -201,17 +202,16 @@ public class EcoRideLN implements IEcoRideLN {
             if (p != null) custoPecas += e.getValue() * p.getPreco_venda();
         }
         float custoReparacoes = 0;
-        for (Reparacao r : reparacoes) {
-            if (!r.isDisponivel()) {
-                throw new EcoRideException("Reparação indisponível: " + r.getNomenclatura());
-            }
+        for (int repId : reparacoesIds) {
+            Reparacao r = sReparacoes.obterReparacao(repId);
+            if (r == null) throw new EcoRideException("Reparação não encontrada: " + repId);
+            if (!r.isDisponivel()) throw new EcoRideException("Reparação indisponível: " + r.getNomenclatura());
             custoReparacoes += r.getPreco();
         }
         float orcamentoCalculado = custoPecas + custoReparacoes;
         if (orcamentoCalculado > diag.getOrcamento())
             throw new EcoRideException(String.format("Custo total do conserto (%.2f) excede orçamento aprovado (%.2f).", orcamentoCalculado, diag.getOrcamento()));
 
-        // FIFO: para cada peça, atribui stocks por ordem de chegada e decrementa quantidade
         Map<Integer, Integer> stocksUsados = new java.util.LinkedHashMap<>();
         for (Map.Entry<Integer, Integer> entry : pecaQuantidades.entrySet()) {
             int codPeca = entry.getKey();
@@ -220,14 +220,10 @@ public class EcoRideLN implements IEcoRideLN {
             stocksUsados.putAll(atribuidos);
         }
 
-        float orcamento = custoPecas + custoReparacoes; // já calculado acima, reutiliza
-
-        List<Integer> codReps = reparacoes.stream().map(Reparacao::getId).collect(java.util.stream.Collectors.toList());
-
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
         int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
         sNotificacoes.registarNotificacaoOS("Execução da OS#" + id_OS + " concluída", idUtilRemetente, destinatarios, id_OS);
-        return sOrdensServico.registarConsertoOS(id_OS, stocksUsados, codReps, orcamento, id_funcionario);
+        return sOrdensServico.registarConsertoOS(id_OS, stocksUsados, reparacoesIds, orcamentoCalculado, id_funcionario);
     }
 
     @Override
