@@ -209,7 +209,7 @@ public class EcoRideController implements IEcoRideController {
             custoReparacoes += r.getPreco();
         }
         float orcamentoCalculado = custoPecas + custoReparacoes;
-        if (orcamentoCalculado > diag.getOrcamento())
+        if (orcamentoCalculado > diag.getOrcamento()+0.01f)
             throw new EcoRideException(String.format("Custo total do conserto (%.2f) excede orçamento aprovado (%.2f).", orcamentoCalculado, diag.getOrcamento()));
 
         Map<Integer, Integer> stocksUsados = new java.util.LinkedHashMap<>();

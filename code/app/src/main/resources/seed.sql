@@ -29,7 +29,7 @@ VALUES
     (3, 'Barcelpeças',       '253809420', 'geral@barcelpecas.pt'),
     (4, 'Centrauto',         '253837214', 'barcelos@centrauto.pt');
 
-INSERT INTO Peca (
+INSERT IGNORE INTO Peca (
     id, referencia, marca, nome, descricao,
     stock_minimo, preco_venda,
     codFornecedor, ativa, garantia
@@ -125,7 +125,7 @@ VALUES (1, 'admin123',   1, 'Gerente',     'admin'),
        (5, 'ramiro123',  4, 'Mecanico',    'ramiro'),
        (6, 'edgar123',   5, 'Mecanico',    'edgar');
 
-INSERT INTO Cliente (id, nome, email, telemovel, NIF)
+INSERT IGNORE INTO Cliente (id, nome, email, telemovel, NIF)
 VALUES
 (1,  'João Silva',        'joao.silva@gmail.com',        '912345678', '245678901'),
 (2,  'Ana Martins',       'ana.martins@gmail.com',       '913456789', '256789012'),
@@ -139,7 +139,7 @@ VALUES
 (10, 'Sofia Ribeiro',     'sofia.ribeiro@gmail.com',     '921234567', '234567890');
 
 
-INSERT INTO Trotinete (
+INSERT IGNORE INTO Trotinete (
     id, modelo, marca,
     num_serie, tipo_motor,
     cod_cliente

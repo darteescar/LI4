@@ -77,7 +77,9 @@ public class SOrdensServicoFacade implements ISOrdensServico {
         if (!os.getEstado().podeTransicionar(EstadoOS.PendenteReparacao))
             return false;
 
-        os.getDiagnostico().setAprovado(true);
+        Diagnostico diag = os.getDiagnostico();
+        diag.setAprovado(true);
+        os.setDiagnostico(diag);
         os.setEstado(EstadoOS.PendenteReparacao);
         ordemServicoDAO.put(id, os);
         return true;
