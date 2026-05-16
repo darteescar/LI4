@@ -194,7 +194,7 @@ export default function OSList() {
               <Label className="text-xs">Cliente</Label>
               <Select value={clienteFiltro} onValueChange={setClienteFiltro}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   <SelectItem value="ALL">Todos</SelectItem>
                   {clientes.map((c) => <SelectItem key={c.id} value={String(c.id)}>{c.nome}</SelectItem>)}
                 </SelectContent>
@@ -204,7 +204,7 @@ export default function OSList() {
               <Label className="text-xs">Trotinete</Label>
               <Select value={trotineteId} onValueChange={setTrotineteId}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60 overflow-y-auto">
                   <SelectItem value="ALL">Todas</SelectItem>
                   {trotinetes.map((t) => (
                     <SelectItem key={t.id} value={String(t.id)}>{trotineteLabel(t.id)}</SelectItem>
