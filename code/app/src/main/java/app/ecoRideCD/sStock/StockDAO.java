@@ -231,4 +231,19 @@ public class StockDAO implements Map<Integer, Stock> {
         }
         return out;
     }
+
+    public List<Stock> getOperacionais() {
+        List<Stock> out = new ArrayList<>();
+        String sql = "SELECT * FROM Stock WHERE estado IN (?, ?) ORDER BY data_chegada ASC, id ASC";
+        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, EstadoStock.StockEmArmazem.name());
+            ps.setString(2, EstadoStock.StockEncomendado.name());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter stocks operacionais", e);
+        }
+        return out;
+    }
 }

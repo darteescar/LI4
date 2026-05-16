@@ -45,6 +45,11 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
+    public List<OrdemServico> obterOSsAtivas() {
+        return ordemServicoDAO.getOSsAtivas();
+    }
+
+    @Override
     public List<OrdemServico> obterOSsDisponiveis(){
         return ordemServicoDAO.getAvailableOSs();
     }

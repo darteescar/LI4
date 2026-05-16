@@ -53,12 +53,13 @@ export default function StockEntradas() {
   const { role } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [historico, setHistorico] = useState(false);
 
   const canEdit = role === "GERENTE" || role === "GESTOR_STOCK";
 
   const { data: stocks = [], isLoading } = useQuery<StockEntry[]>({
-    queryKey: ["stocks"],
-    queryFn: () => api.get<StockEntry[]>("/stocks"),
+    queryKey: ["stocks", historico],
+    queryFn: () => api.get<StockEntry[]>(`/stocks${historico ? "?historico=true" : ""}`),
   });
 
   const { data: pecas = [] } = useQuery<Peca[]>({
@@ -103,6 +104,16 @@ export default function StockEntradas() {
         }
       />
       <StockTabs />
+
+      <div className="mb-3 flex justify-end">
+        <Button
+          variant={historico ? "default" : "outline"}
+          size="sm"
+          onClick={() => setHistorico((v) => !v)}
+        >
+          {historico ? "Ocultar histórico" : "Ver histórico completo"}
+        </Button>
+      </div>
 
       <div className="rounded-lg border bg-card shadow-sm">
         <Table>

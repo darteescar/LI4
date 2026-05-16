@@ -113,9 +113,11 @@ public class StockController {
 
         // Stock
 
+        // Por defeito devolve apenas StockEmArmazem e StockEncomendado; ?historico=true devolve todos
         app.get("/api/stocks", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock, Cargo.Mecanico);
-            ctx.status(200).json(facade.obterStocks());
+            boolean historico = "true".equalsIgnoreCase(ctx.queryParam("historico"));
+            ctx.status(200).json(historico ? facade.obterStocks() : facade.obterStocksOperacionais());
         });
 
         app.get("/api/stocks/{id}", ctx -> {

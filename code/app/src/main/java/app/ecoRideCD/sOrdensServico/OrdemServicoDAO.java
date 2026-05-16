@@ -506,7 +506,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     }
 
     public List<OrdemServico> getAvailableOSs() {
-        
+
         List<OrdemServico> out = new ArrayList<>();
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(
@@ -520,6 +520,22 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
             }
         } catch (SQLException e) {
             throw new EcoRideException("Erro a obter OSs disponíveis", e);
+        }
+        return out;
+    }
+
+    public List<OrdemServico> getOSsAtivas() {
+        List<OrdemServico> out = new ArrayList<>();
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(
+                     SELECT_BASE + " WHERE estado NOT IN (?, ?) ORDER BY id")) {
+            ps.setString(1, EstadoOS.Paga.name());
+            ps.setString(2, EstadoOS.Eliminada.name());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) out.add(buildFromRow(c, rs));
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter OSs ativas", e);
         }
         return out;
     }

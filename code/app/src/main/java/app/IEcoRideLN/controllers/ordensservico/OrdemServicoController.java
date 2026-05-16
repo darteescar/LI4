@@ -24,10 +24,11 @@ public class OrdemServicoController {
 
     public void register(Javalin app) {
 
-        // List<OrdemServico>
+        // List<OrdemServico> — por defeito devolve apenas estados não-terminais; ?historico=true inclui Paga e Eliminada
         app.get("/api/ordensservicos", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Mecanico, Cargo.Secretaria);
-            ctx.json(facade.obterOSs());
+            boolean historico = "true".equalsIgnoreCase(ctx.queryParam("historico"));
+            ctx.json(historico ? facade.obterOSs() : facade.obterOSsAtivas());
         });
 
         // List<OrdemServico> por cliente

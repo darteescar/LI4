@@ -16,6 +16,8 @@ public interface ISOrdensServico {
 
      public List<OrdemServico> obterOSs();
 
+     public List<OrdemServico> obterOSsAtivas();
+
      public List<OrdemServico> obterOSsDisponiveis();
 
      public boolean removerOS(int id);

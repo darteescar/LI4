@@ -150,9 +150,23 @@ export default function Funcionarios() {
         title="Funcionários"
         description="Gestão de colaboradores da oficina"
         actions={
-          <Button onClick={() => { setEditing(null); setOpenForm(true); }}>
-            <Plus className="h-4 w-4" /> Novo funcionário
-          </Button>
+          <div className="flex gap-2">
+            <ConfirmDialog
+              trigger={<Button variant="outline" disabled={rows.length === 0}><Banknote className="h-4 w-4" /> Pagar a todos</Button>}
+              title="Pagar salários a todos?"
+              description={`As horas extra de todos os ${rows.length} funcionários serão liquidadas.`}
+              onConfirm={async () => {
+                for (const f of rows) {
+                  await api.patch(`/funcionarios/pagar/${f.id}`, {});
+                }
+                toast.success("Salários pagos a todos os funcionários");
+                qc.invalidateQueries({ queryKey: ["funcionarios"] });
+              }}
+            />
+            <Button onClick={() => { setEditing(null); setOpenForm(true); }}>
+              <Plus className="h-4 w-4" /> Novo funcionário
+            </Button>
+          </div>
         }
       />
 

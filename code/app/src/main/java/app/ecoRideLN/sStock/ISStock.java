@@ -33,6 +33,7 @@ public interface ISStock {
     public Stock       obterStock(int id);
     public boolean     removerStock(int id);
     public List<Stock> obterStocks();
+    public List<Stock> obterStocksOperacionais();
 
     public Stock atualizaEstadoStock(int id, EstadoStock estado);
 

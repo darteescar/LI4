@@ -169,6 +169,9 @@ public class SStockFacade implements ISStock {
     public List<Stock> obterStocks() { return new ArrayList<>(stockDAO.values()); }
 
     @Override
+    public List<Stock> obterStocksOperacionais() { return stockDAO.getOperacionais(); }
+
+    @Override
     public Stock atualizaEstadoStock(int id, EstadoStock estado) {
         Stock s = stockDAO.get(id);
         if (s != null) {

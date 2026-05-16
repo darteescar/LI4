@@ -156,6 +156,11 @@ public class EcoRideController implements IEcoRideController {
     }
 
     @Override
+    public List<OrdemServico> obterOSsAtivas() {
+        return sOrdensServico.obterOSsAtivas();
+    }
+
+    @Override
     public List<OrdemServico> obterOSsDisponiveis(){
         return sOrdensServico.obterOSsDisponiveis();
     }
@@ -514,6 +519,11 @@ public class EcoRideController implements IEcoRideController {
     @Override
     public List<Stock> obterStocks() {
         return sStock.obterStocks();
+    }
+
+    @Override
+    public List<Stock> obterStocksOperacionais() {
+        return sStock.obterStocksOperacionais();
     }
 
     @Override

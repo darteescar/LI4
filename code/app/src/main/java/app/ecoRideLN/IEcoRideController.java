@@ -54,6 +54,7 @@ public interface IEcoRideController {
      public OrdemServico            obterOS(int id);
      public boolean                 removerOS(int id);
      public List<OrdemServico>      obterOSs();
+     public List<OrdemServico>      obterOSsAtivas();
      public List<OrdemServico>      obterOSsDisponiveis();
      public void                    cancelarOS(int id);
      public Diagnostico             registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Integer> reparacoesIds, String descricao, int id_funcionario);
@@ -110,6 +111,7 @@ public interface IEcoRideController {
      public Stock        obterStock(int id);
      public boolean      removerStock(int id);
      public List<Stock>  obterStocks();
+     public List<Stock>  obterStocksOperacionais();
      public Stock        atualizarStock(int id_stock, float preco_compra, int cod_Peca, LocalDate data_rececao, int quantidade);
 
      // ------------------- Defeitos -------------------

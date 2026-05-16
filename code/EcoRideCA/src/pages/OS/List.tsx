@@ -75,12 +75,15 @@ export default function OSList() {
   const [mecanicoFiltro, setMecanicoFiltro] = useState("ALL");
   const [dataDesde, setDataDesde] = useState("");
   const [dataAte, setDataAte] = useState("");
+  const [historico, setHistorico] = useState(false);
 
   const isMec = role === "MECANICO";
 
   const { data: ordens = [], isLoading } = useQuery<OrdemServico[]>({
-    queryKey: isMec ? ["ordensservicos", "disponiveis"] : ["ordensservicos"],
-    queryFn: () => api.get<OrdemServico[]>(isMec ? "/ordensservicos/disponiveis" : "/ordensservicos"),
+    queryKey: isMec ? ["ordensservicos", "disponiveis"] : ["ordensservicos", historico],
+    queryFn: () => api.get<OrdemServico[]>(
+      isMec ? "/ordensservicos/disponiveis" : `/ordensservicos${historico ? "?historico=true" : ""}`
+    ),
   });
 
   const { data: clientes = [] } = useQuery<Cliente[]>({
@@ -203,7 +206,14 @@ export default function OSList() {
               <Label className="text-xs">Criada até</Label>
               <Input type="date" value={dataAte} onChange={(e) => setDataAte(e.target.value)} />
             </div>
-            <div className="flex items-end justify-end sm:col-span-2 lg:col-span-4">
+            <div className="flex items-end justify-between sm:col-span-2 lg:col-span-4">
+              <Button
+                variant={historico ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistorico((v) => !v)}
+              >
+                {historico ? "Ocultar histórico" : "Ver histórico (Paga / Eliminada)"}
+              </Button>
               <Button variant="outline" size="sm" onClick={() => { setEstado("ALL"); setClienteFiltro("ALL"); setMecanicoFiltro("ALL"); setDataDesde(""); setDataAte(""); }}>
                 Limpar filtros
               </Button>
