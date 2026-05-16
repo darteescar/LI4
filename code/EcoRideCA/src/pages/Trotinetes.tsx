@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -60,6 +61,8 @@ type TrotineteRow = Trotinete & { clienteNome: string };
 
 export default function Trotinetes() {
   const qc = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const clienteIdUrl = searchParams.get("cliente");
   const [editing, setEditing] = useState<Trotinete | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -75,10 +78,11 @@ export default function Trotinetes() {
 
   const clienteMap = useMemo(() => new Map(clientes.map((c) => [c.id, c.nome])), [clientes]);
 
-  const rows: TrotineteRow[] = useMemo(
-    () => trotinetes.map((t) => ({ ...t, clienteNome: clienteMap.get(t.cod_cliente) ?? "" })),
-    [trotinetes, clienteMap],
-  );
+  const rows: TrotineteRow[] = useMemo(() => {
+    const all = trotinetes.map((t) => ({ ...t, clienteNome: clienteMap.get(t.cod_cliente) ?? "" }));
+    if (clienteIdUrl) return all.filter((t) => t.cod_cliente === Number(clienteIdUrl));
+    return all;
+  }, [trotinetes, clienteMap, clienteIdUrl]);
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => api.delete(`/trotinetes/${id}`),
@@ -112,6 +116,14 @@ export default function Trotinetes() {
           </Button>
         }
       />
+      {clienteIdUrl && (
+        <div className="mb-3 flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          <span>Trotinetes de: <strong className="text-foreground">{clienteMap.get(Number(clienteIdUrl)) ?? "—"}</strong></span>
+          <Button asChild variant="ghost" size="sm" className="h-6 w-6 p-0">
+            <Link to="/trotinetes"><X className="h-3.5 w-3.5" /></Link>
+          </Button>
+        </div>
+      )}
       <DataTable
         data={rows}
         columns={columns}
@@ -121,6 +133,9 @@ export default function Trotinetes() {
         isLoading={isLoading}
         rowActions={(t) => (
           <>
+            <Button asChild variant="ghost" size="icon" title="Ver ordens de serviço">
+              <Link to={`/os?trotinete=${t.id}`}><FileText className="h-4 w-4" /></Link>
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => { setEditing(t); setOpen(true); }}>
               <Pencil className="h-4 w-4" />
             </Button>

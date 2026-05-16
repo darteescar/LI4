@@ -55,6 +55,12 @@ export default function StockEntradas() {
   const [open, setOpen] = useState(false);
   const [historico, setHistorico] = useState(false);
 
+  const [filtroEstado, setFiltroEstado] = useState("ALL");
+  const [filtroDataDesde, setFiltroDataDesde] = useState("");
+  const [filtroDataAte, setFiltroDataAte] = useState("");
+  const [filtroFornecedor, setFiltroFornecedor] = useState("TODOS");
+  const [filtroRef, setFiltroRef] = useState("");
+
   const canEdit = role === "GERENTE" || role === "GESTOR_STOCK";
 
   const { data: stocks = [], isLoading } = useQuery<StockEntry[]>({
@@ -86,9 +92,25 @@ export default function StockEntradas() {
     return p ? `${p.referencia} · ${p.nome}` : `#${codPeca}`;
   };
 
-  const sortedStocks = [...stocks].sort((a, b) =>
-    (b.data_chegada ?? "").localeCompare(a.data_chegada ?? "")
-  );
+  const sortedStocks = useMemo(() => {
+    const filtered = stocks.filter((s) => {
+      if (filtroEstado !== "ALL" && s.estado !== filtroEstado) return false;
+      if (filtroDataDesde && s.data_chegada && s.data_chegada < filtroDataDesde) return false;
+      if (filtroDataAte && s.data_chegada && s.data_chegada > filtroDataAte) return false;
+      if (filtroFornecedor !== "TODOS") {
+        const p = pecas.find((x) => x.id === s.codPeca);
+        if (!p || p.codFornecedor !== Number(filtroFornecedor)) return false;
+      }
+      if (filtroRef.trim()) {
+        const p = pecas.find((x) => x.id === s.codPeca);
+        if (!p) return false;
+        const q = filtroRef.toLowerCase();
+        if (!p.referencia.toLowerCase().includes(q) && !p.nome.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+    return filtered.sort((a, b) => (b.data_chegada ?? "").localeCompare(a.data_chegada ?? ""));
+  }, [stocks, pecas, filtroEstado, filtroDataDesde, filtroDataAte, filtroFornecedor, filtroRef]);
 
   return (
     <div>
@@ -104,6 +126,53 @@ export default function StockEntradas() {
         }
       />
       <StockTabs />
+
+      <div className="mb-4 grid gap-3 rounded-lg border bg-card p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-1">
+          <Label className="text-xs">Estado</Label>
+          <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos</SelectItem>
+              {Object.entries(ESTADO_LABELS).map(([k, v]) => (
+                <SelectItem key={k} value={k}>{v}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Fornecedor</Label>
+          <Select value={filtroFornecedor} onValueChange={setFiltroFornecedor}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="TODOS">Todos</SelectItem>
+              {fornecedores.map((f) => (
+                <SelectItem key={f.id} value={String(f.id)}>{f.nome}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Referência / Nome da peça</Label>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <Input className="pl-8" placeholder="Ex: BAT-36V" value={filtroRef} onChange={(e) => setFiltroRef(e.target.value)} />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Data chegada desde</Label>
+          <Input type="date" value={filtroDataDesde} onChange={(e) => setFiltroDataDesde(e.target.value)} />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Data chegada até</Label>
+          <Input type="date" value={filtroDataAte} onChange={(e) => setFiltroDataAte(e.target.value)} />
+        </div>
+        <div className="flex items-end justify-end">
+          <Button variant="outline" size="sm" onClick={() => { setFiltroEstado("ALL"); setFiltroFornecedor("TODOS"); setFiltroRef(""); setFiltroDataDesde(""); setFiltroDataAte(""); }}>
+            Limpar filtros
+          </Button>
+        </div>
+      </div>
 
       <div className="mb-3 flex justify-end">
         <Button
@@ -159,7 +228,9 @@ export default function StockEntradas() {
           </TableBody>
         </Table>
       </div>
-      <div className="mt-2 text-xs text-muted-foreground">{sortedStocks.length} entradas</div>
+      <div className="mt-2 text-xs text-muted-foreground">
+        {sortedStocks.length} de {stocks.length} entradas
+      </div>
 
       {canEdit && (
         <EntradaDialog

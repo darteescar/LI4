@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Eye, Trash2 } from "lucide-react";
+import { Plus, Eye, Trash2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -60,7 +60,7 @@ interface OrdemServico {
   acessorios: string[];
 }
 
-interface Cliente { id: number; nome: string; }
+interface Cliente { id: number; nome: string; telemovel: string; }
 interface Trotinete { id: number; modelo: string; marca: string; }
 interface Funcionario { id: number; nome: string; }
 
@@ -71,7 +71,8 @@ export default function OSList() {
   const meu = params.get("meu") === "true";
 
   const [estado, setEstado] = useState("ALL");
-  const [clienteFiltro, setClienteFiltro] = useState("ALL");
+  const [clienteFiltro, setClienteFiltro] = useState(() => params.get("cliente") ?? "ALL");
+  const [trotineteId, setTrotineteId] = useState(() => params.get("trotinete") ?? "ALL");
   const [mecanicoFiltro, setMecanicoFiltro] = useState("ALL");
   const [dataDesde, setDataDesde] = useState("");
   const [dataAte, setDataAte] = useState("");
@@ -104,6 +105,7 @@ export default function OSList() {
   const mecanicos = funcionarios;
 
   const clienteNome = (id: number) => clientes.find((c) => c.id === id)?.nome ?? "—";
+  const clienteTel = (id: number) => clientes.find((c) => c.id === id)?.telemovel ?? "—";
   const trotineteLabel = (id: number) => {
     const t = trotinetes.find((x) => x.id === id);
     return t ? `${t.marca} ${t.modelo}` : "—";
@@ -124,6 +126,7 @@ export default function OSList() {
 
     if (!isMec) {
       if (clienteFiltro !== "ALL") r = r.filter((o) => o.codCliente === Number(clienteFiltro));
+      if (trotineteId !== "ALL") r = r.filter((o) => o.codTrotinete === Number(trotineteId));
       if (mecanicoFiltro !== "ALL") {
         if (mecanicoFiltro === "SEM_MEC") r = r.filter((o) => !o.codMecanico);
         else r = r.filter((o) => o.codMecanico === Number(mecanicoFiltro));
@@ -133,7 +136,7 @@ export default function OSList() {
     }
 
     return r;
-  }, [ordens, estado, clienteFiltro, mecanicoFiltro, dataDesde, dataAte, meu, isMec, user]);
+  }, [ordens, estado, clienteFiltro, trotineteId, mecanicoFiltro, dataDesde, dataAte, meu, isMec, user]);
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => api.delete(`/ordensservicos/${id}`),
@@ -144,8 +147,18 @@ export default function OSList() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const approveMutation = useMutation({
+    mutationFn: (id: number) => api.patch(`/ordensservicos/${id}/aprovarOrcamento`, {}),
+    onSuccess: () => {
+      toast.success("Orçamento aprovado");
+      qc.invalidateQueries({ queryKey: ["ordensservicos"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const canCreate = role === "GERENTE" || role === "SECRETARIA";
   const canDelete = role === "GERENTE" || role === "SECRETARIA";
+  const canApprove = role === "GERENTE" || role === "SECRETARIA";
 
   return (
     <div>
@@ -188,6 +201,18 @@ export default function OSList() {
               </Select>
             </div>
             <div className="space-y-1">
+              <Label className="text-xs">Trotinete</Label>
+              <Select value={trotineteId} onValueChange={setTrotineteId}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Todas</SelectItem>
+                  {trotinetes.map((t) => (
+                    <SelectItem key={t.id} value={String(t.id)}>{trotineteLabel(t.id)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
               <Label className="text-xs">Mecânico</Label>
               <Select value={mecanicoFiltro} onValueChange={setMecanicoFiltro}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -207,7 +232,7 @@ export default function OSList() {
               <Input type="date" value={dataAte} onChange={(e) => setDataAte(e.target.value)} />
             </div>
             <div className="flex items-end justify-end sm:col-span-2 lg:col-span-4">
-              <Button variant="outline" size="sm" onClick={() => { setEstado("ALL"); setClienteFiltro("ALL"); setMecanicoFiltro("ALL"); setDataDesde(""); setDataAte(""); }}>
+              <Button variant="outline" size="sm" onClick={() => { setEstado("ALL"); setClienteFiltro("ALL"); setTrotineteId("ALL"); setMecanicoFiltro("ALL"); setDataDesde(""); setDataAte(""); }}>
                 Limpar filtros
               </Button>
             </div>
@@ -284,6 +309,14 @@ export default function OSList() {
                     <Button asChild variant="ghost" size="icon">
                       <Link to={`/os/${o.id}`}><Eye className="h-4 w-4" /></Link>
                     </Button>
+                    {canApprove && o.estado === "PendenteAprovacaoOrcamento" && (
+                      <ConfirmDialog
+                        trigger={<Button variant="ghost" size="icon"><CheckCircle className="h-4 w-4 text-green-600" /></Button>}
+                        title={`Aprovar orçamento OS-${o.id}?`}
+                        description={`Cliente: ${clienteNome(o.codCliente)} · Tel: ${clienteTel(o.codCliente)}`}
+                        onConfirm={() => approveMutation.mutate(o.id)}
+                      />
+                    )}
                     {canDelete && !TERMINAL.includes(o.estado) && (
                       <ConfirmDialog
                         trigger={<Button variant="ghost" size="icon"><Trash2 className="h-4 w-4 text-destructive" /></Button>}

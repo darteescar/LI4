@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Pencil, Trash2, Bike } from "lucide-react";
+import { Plus, Pencil, Trash2, Bike, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -88,6 +89,12 @@ export default function Clientes() {
         isLoading={isLoading}
         rowActions={(c) => (
           <>
+            <Button asChild variant="ghost" size="icon" title="Ver ordens de serviço">
+              <Link to={`/os?cliente=${c.id}`}><FileText className="h-4 w-4" /></Link>
+            </Button>
+            <Button asChild variant="ghost" size="icon" title="Ver trotinetes">
+              <Link to={`/trotinetes?cliente=${c.id}`}><Bike className="h-4 w-4" /></Link>
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => { setEditing(c); setOpen(true); }}>
               <Pencil className="h-4 w-4" />
             </Button>

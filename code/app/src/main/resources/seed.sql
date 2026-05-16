@@ -209,9 +209,12 @@ VALUES
 
 INSERT IGNORE INTO Diagnostico (idOS, descricao, orcamento, aprovado)
 VALUES
-    (1, 'Pneu com corte irreparável. Câmara de ar furada. Necessária substituição de ambos.', 55.00, TRUE),
-    (2, 'Bateria com células degradadas. Capacidade real inferior a 20% do original.', 180.00, TRUE),
-    (3, 'Controlador com MOSFET danificado. Cablagem de alimentação com quebra interna.', 106.00, TRUE);
+    -- OS1: rep2(15)+rep3(8) + peca6(24.99)+peca8(7.99) = 55.98
+    (1, 'Pneu com corte irreparável. Câmara de ar furada. Necessária substituição de ambos.', 55.98, TRUE),
+    -- OS2: rep1(10)+rep8(20) + peca1(149.99) = 179.99
+    (2, 'Bateria com células degradadas. Capacidade real inferior a 20% do original.', 179.99, TRUE),
+    -- OS3: rep9(20)+rep18(18) + peca15(49.99)+peca28(17.99) = 105.98
+    (3, 'Controlador com MOSFET danificado. Cablagem de alimentação com quebra interna.', 105.98, TRUE);
 
 INSERT IGNORE INTO Diagnostico_PecaOrcamento (idOS, codPeca, quantidade)
 VALUES
@@ -236,9 +239,12 @@ VALUES
 
 INSERT IGNORE INTO Conserto (idOS, preco_total, chk_luzes, chk_pneus, chk_aceleracao, chk_travagem, chk_visor, chk_teste_pratico)
 VALUES
-    (1,  52.00, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE),
-    (2, 175.00, TRUE, TRUE, TRUE, TRUE, TRUE,  TRUE),
-    (3, 103.00, TRUE, TRUE, TRUE, TRUE, TRUE,  TRUE);
+    -- OS1: rep2(15)+rep3(8) + peca6(24.99)+peca8(7.99) = 55.98 <= orcamento(55.98)
+    (1,  55.98, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
+    -- OS2: rep8(20) + peca1(149.99) = 169.99 <= orcamento(179.99)
+    (2, 169.99, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
+    -- OS3: rep9(20)+rep18(18) + peca15(49.99)+peca28(17.99) = 105.98 <= orcamento(105.98)
+    (3, 105.98, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
 INSERT IGNORE INTO Conserto_PecaUsada (idOS, codStock, quantidade)
 VALUES
