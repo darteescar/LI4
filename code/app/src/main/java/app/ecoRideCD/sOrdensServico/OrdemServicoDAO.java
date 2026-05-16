@@ -25,6 +25,8 @@ import app.ecoRideLN.sOrdensServico.Diagnostico;
 import app.ecoRideLN.sOrdensServico.EstadoOS;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
+import app.ecoRideLN.sOrdensServico.Pagamento;
+import app.ecoRideLN.sOrdensServico.Registo;
 
 public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
 
@@ -37,10 +39,10 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         return instance;
     }
 
-    // SELECT só dos campos da tabela base; os filhos são carregados em queries separadas.
+    // Campos da tabela base — metodo_pagamento foi movido para tabela Pagamento
     private static final String SELECT_BASE = """
             SELECT id, descricao, data_criacao, codTrotinete, codCliente,
-                   codCriador, codMecanico, estado, metodo_pagamento
+                   codCriador, codMecanico, estado
             FROM   OrdemServico
             """;
 
@@ -58,6 +60,26 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         return out;
     }
 
+    private Pagamento loadPagamento(Connection c, int idOS) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT metodo, dataPagamento, clienteNotificado, dataNotificacao FROM Pagamento WHERE idOS = ?")) {
+            ps.setInt(1, idOS);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                String metodoStr = rs.getString("metodo");
+                Metodo_Pagamento metodo = metodoStr != null ? Metodo_Pagamento.valueOf(metodoStr) : null;
+                Timestamp dp = rs.getTimestamp("dataPagamento");
+                boolean cn = rs.getBoolean("clienteNotificado");
+                Timestamp dn = rs.getTimestamp("dataNotificacao");
+                return new Pagamento(
+                        metodo,
+                        dp != null ? dp.toLocalDateTime() : null,
+                        cn,
+                        dn != null ? dn.toLocalDateTime() : null);
+            }
+        }
+    }
+
     private Diagnostico loadDiagnostico(Connection c, int idOS) throws SQLException {
         String desc;
         float orc;
@@ -69,7 +91,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 if (!rs.next()) return null;
                 desc = rs.getString("descricao");
                 orc = rs.getFloat("orcamento");
-                aprovado = rs.getBoolean("aprovado"); // ← ler o campo
+                aprovado = rs.getBoolean("aprovado");
             }
         }
         List<Integer> reps = new ArrayList<>();
@@ -135,18 +157,18 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
 
     private OrdemServico buildFromRow(Connection c, ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
-        OrdemServico os = new OrdemServico(
-                id,
+        Registo registo = new Registo(
                 rs.getString("descricao"),
                 rs.getTimestamp("data_criacao").toLocalDateTime(),
                 rs.getInt("codTrotinete"),
                 rs.getInt("codCliente"),
                 rs.getInt("codCriador"),
                 loadAcessorios(c, id));
+        OrdemServico os = new OrdemServico(id, registo);
         os.setEstado(EstadoOS.valueOf(rs.getString("estado")));
         os.setCodMecanico(rs.getObject("codMecanico", Integer.class));
-        String mp = rs.getString("metodo_pagamento");
-        if (mp != null) os.setMetodo_pagamento(Metodo_Pagamento.valueOf(mp));
+        Pagamento pag = loadPagamento(c, id);
+        if (pag != null) os.setPagamento(pag);
         Diagnostico d = loadDiagnostico(c, id);
         if (d != null) os.setDiagnostico(d);
         Conserto con = loadConserto(c, id);
@@ -159,34 +181,30 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     private void updateBase(Connection c, int id, OrdemServico os) throws SQLException {
         String sql = """
                 UPDATE OrdemServico SET descricao=?, data_criacao=?, codTrotinete=?,
-                    codCliente=?, codCriador=?, codMecanico=?, estado=?, metodo_pagamento=?
+                    codCliente=?, codCriador=?, codMecanico=?, estado=?
                 WHERE id=?
                 """;
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, os.getDescricao());
-            ps.setTimestamp(2, Timestamp.valueOf(os.getDataCriacao()));
-            ps.setInt(3, os.getCodTrotinete());
-            ps.setInt(4, os.getCodCliente());
-            ps.setInt(5, os.getCodCriador());
+            Registo r = os.getRegisto();
+            ps.setString(1, r.getDescricao());
+            ps.setTimestamp(2, Timestamp.valueOf(r.getDataCriacao()));
+            ps.setInt(3, r.getCodTrotinete());
+            ps.setInt(4, r.getCodCliente());
+            ps.setInt(5, r.getCodCriador());
             if (os.getCodMecanico() == null)
                 ps.setNull(6, java.sql.Types.INTEGER);
             else
                 ps.setInt(6, os.getCodMecanico());
             ps.setString(7, os.getEstado().name());
-            if (os.getMetodo_pagamento() == null)
-                ps.setNull(8, java.sql.Types.VARCHAR);
-            else
-                ps.setString(8, os.getMetodo_pagamento().name());
-            ps.setInt(9, id);
+            ps.setInt(8, id);
             ps.executeUpdate();
         }
     }
 
-    // Apaga directamente o que pendura na OS. CASCADE remove os "netos"
-    // (Diagnostico_PecaOrcamento, Conserto_PecaUsada, etc.).
+    // Apaga o que pendura na OS. CASCADE remove os "netos".
     private void clearChildren(Connection c, int id) throws SQLException {
         for (String tbl : new String[]{
-                "Conserto", "Diagnostico", "OrdemServico_Acessorio" }) {
+                "Conserto", "Diagnostico", "Pagamento", "OrdemServico_Acessorio"}) {
             try (PreparedStatement ps = c.prepareStatement(
                     "DELETE FROM " + tbl + " WHERE idOS = ?")) {
                 ps.setInt(1, id);
@@ -207,6 +225,27 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
                 ps.addBatch();
             }
             ps.executeBatch();
+        }
+    }
+
+    private void insertPagamento(Connection c, int idOS, Pagamento p) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO Pagamento (idOS, metodo, dataPagamento, clienteNotificado, dataNotificacao) VALUES (?, ?, ?, ?, ?)")) {
+            ps.setInt(1, idOS);
+            if (p.getMetodo() == null)
+                ps.setNull(2, java.sql.Types.VARCHAR);
+            else
+                ps.setString(2, p.getMetodo().name());
+            if (p.getDataPagamento() == null)
+                ps.setNull(3, java.sql.Types.TIMESTAMP);
+            else
+                ps.setTimestamp(3, Timestamp.valueOf(p.getDataPagamento()));
+            ps.setBoolean(4, p.isClienteNotificado());
+            if (p.getDataNotificacao() == null)
+                ps.setNull(5, java.sql.Types.TIMESTAMP);
+            else
+                ps.setTimestamp(5, Timestamp.valueOf(p.getDataNotificacao()));
+            ps.executeUpdate();
         }
     }
 
@@ -347,9 +386,10 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
             try {
                 updateBase(c, key, value);
                 clearChildren(c, key);
-                insertAcessorios(c, key, value.getAcessorios());
+                insertAcessorios(c, key, value.getRegisto().getAcessorios());
                 if (value.getDiagnostico() != null) insertDiagnostico(c, key, value.getDiagnostico());
                 if (value.getConserto() != null)    insertConserto(c, key, value.getConserto());
+                if (value.getPagamento() != null)   insertPagamento(c, key, value.getPagamento());
                 c.commit();
             } catch (SQLException e) {
                 c.rollback();
@@ -366,37 +406,35 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     public int insert(OrdemServico value) {
         String sql = """
                 INSERT INTO OrdemServico (descricao, data_criacao, codTrotinete,
-                                          codCliente, codCriador, codMecanico, estado, metodo_pagamento)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                          codCliente, codCriador, codMecanico, estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection c = ConnectionFactory.get()) {
             c.setAutoCommit(false);
             try {
                 int id;
                 try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                    ps.setString(1, value.getDescricao());
-                    ps.setTimestamp(2, Timestamp.valueOf(value.getDataCriacao()));
-                    ps.setInt(3, value.getCodTrotinete());
-                    ps.setInt(4, value.getCodCliente());
-                    ps.setInt(5, value.getCodCriador());
+                    Registo r = value.getRegisto();
+                    ps.setString(1, r.getDescricao());
+                    ps.setTimestamp(2, Timestamp.valueOf(r.getDataCriacao()));
+                    ps.setInt(3, r.getCodTrotinete());
+                    ps.setInt(4, r.getCodCliente());
+                    ps.setInt(5, r.getCodCriador());
                     if (value.getCodMecanico() == null)
                         ps.setNull(6, java.sql.Types.INTEGER);
                     else
                         ps.setInt(6, value.getCodMecanico());
                     ps.setString(7, value.getEstado().name());
-                    if (value.getMetodo_pagamento() == null)
-                        ps.setNull(8, java.sql.Types.VARCHAR);
-                    else
-                        ps.setString(8, value.getMetodo_pagamento().name());
                     ps.executeUpdate();
                     try (ResultSet rs = ps.getGeneratedKeys()) {
                         if (rs.next()) { id = rs.getInt(1); value.setId(id); }
                         else throw new EcoRideException("Sem ID gerado para OS");
                     }
                 }
-                insertAcessorios(c, id, value.getAcessorios());
+                insertAcessorios(c, id, value.getRegisto().getAcessorios());
                 if (value.getDiagnostico() != null) insertDiagnostico(c, id, value.getDiagnostico());
                 if (value.getConserto() != null)    insertConserto(c, id, value.getConserto());
+                if (value.getPagamento() != null)   insertPagamento(c, id, value.getPagamento());
                 c.commit();
                 return id;
             } catch (SQLException e) {
@@ -415,7 +453,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         if (!(key instanceof Integer id)) return null;
         OrdemServico prev = get(id);
         if (prev == null) return null;
-        // ON DELETE CASCADE nas tabelas filhas faz a limpeza automaticamente.
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement("DELETE FROM OrdemServico WHERE id = ?")) {
             ps.setInt(1, id);
@@ -508,7 +545,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         return out;
     }
 
-    // Filtra por qualquer combinação dos critérios; passar null ignora o critério.
     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate,
                                          Integer idCliente, Integer idFuncionario) {
         StringBuilder sql = new StringBuilder(SELECT_BASE).append(" WHERE 1 = 1");
@@ -517,7 +553,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         if (desde != null)         { sql.append(" AND data_criacao >= ?"); params.add(Timestamp.valueOf(desde)); }
         if (ate != null)           { sql.append(" AND data_criacao <= ?"); params.add(Timestamp.valueOf(ate)); }
         if (idCliente != null)     { sql.append(" AND codCliente = ?");    params.add(idCliente); }
-        if (idFuncionario != null) { sql.append(" AND codMecanico = ?"); params.add(idFuncionario); }
+        if (idFuncionario != null) { sql.append(" AND codMecanico = ?");   params.add(idFuncionario); }
         sql.append(" ORDER BY id");
 
         List<OrdemServico> out = new ArrayList<>();
@@ -534,7 +570,6 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
     }
 
     public List<OrdemServico> getAvailableOSs() {
-
         List<OrdemServico> out = new ArrayList<>();
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(

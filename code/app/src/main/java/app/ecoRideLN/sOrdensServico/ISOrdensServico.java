@@ -8,9 +8,9 @@ public interface ISOrdensServico {
 
      // ------------------- Registo -------------------
 
-     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador);
+     public OrdemServico registarOS(Registo registo);
 
-     public void atualizarOS(int id, String descricao, List<String> acessorios, int id_cliente, int id_trotinete);
+     public void atualizarOS(int id, Registo registo);
 
      public OrdemServico obterOS(int id);
 
@@ -46,11 +46,11 @@ public interface ISOrdensServico {
 
      public Map<Integer, Integer> obterStocksUsadosConsertoOS(int id_OS);
 
-     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento);
+     public boolean registarPagamentoOS(int id_OS, Pagamento pagamento);
 
      // ------------------- Utilitários -------------------
 
      public List<OrdemServico> obterOSs_Trotinete(int id_trotinete);
 
-     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);   
+     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario);
 }

@@ -33,6 +33,8 @@ import app.ecoRideLN.sOrdensServico.Diagnostico;
 import app.ecoRideLN.sOrdensServico.ISOrdensServico;
 import app.ecoRideLN.sOrdensServico.Metodo_Pagamento;
 import app.ecoRideLN.sOrdensServico.OrdemServico;
+import app.ecoRideLN.sOrdensServico.Pagamento;
+import app.ecoRideLN.sOrdensServico.Registo;
 import app.ecoRideLN.sOrdensServico.SOrdensServicoFacade;
 import app.ecoRideLN.sReparacoes.ISReparacoes;
 import app.ecoRideLN.sReparacoes.Reparacao;
@@ -137,7 +139,8 @@ public class EcoRideController implements IEcoRideController {
 
     @Override
     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador) {
-        return sOrdensServico.registarOS(id_cliente, id_trotinete, descricao, acessorios, codCriador);
+        Registo registo = new Registo(descricao, java.time.LocalDateTime.now(), id_trotinete, id_cliente, codCriador, acessorios);
+        return sOrdensServico.registarOS(registo);
     }
 
     @Override
@@ -183,7 +186,7 @@ public class EcoRideController implements IEcoRideController {
         }
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
         int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
-        sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente "+ sClientes.obterCliente(sOrdensServico.obterOS(idOS).getCodCliente()).getNome(), idUtilRemetente, destinatarios, idOS);
+        sNotificacoes.registarNotificacaoOS("Orçamento da OS#" + idOS + " aguarda aprovação do cliente "+ sClientes.obterCliente(sOrdensServico.obterOS(idOS).getRegisto().getCodCliente()).getNome(), idUtilRemetente, destinatarios, idOS);
         return sOrdensServico.registarDiagnosticoOS(idOS, pecasQuantidades, reparacoesIds, orcamento, descricao, id_funcionario);
     }
 
@@ -249,7 +252,9 @@ public class EcoRideController implements IEcoRideController {
     @Override
     public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
         OrdemServico os = sOrdensServico.obterOS(id_OS);
-        sOrdensServico.registarPagamentoOS(id_OS, metodo_pagamento);
+        Pagamento pagamento = new Pagamento(metodo_pagamento, java.time.LocalDateTime.now());
+        boolean ok = sOrdensServico.registarPagamentoOS(id_OS, pagamento);
+        if (!ok) return false;
 
         List<Integer> reparacoes = os.getConserto().getCod_reparacoes();
         for (int codRep : reparacoes) {
@@ -258,7 +263,7 @@ public class EcoRideController implements IEcoRideController {
                 sFinanceiro.registarMovimentoReparacaoOS(
                     codRep,
                     r.getPreco(),
-                    "Pagamento reparação " + r.getNomenclatura() + " OS#" + id_OS
+                    "Pagamento Reparação " + r.getNomenclatura() + " OS#" + id_OS
                 );
         }
 
@@ -272,7 +277,7 @@ public class EcoRideController implements IEcoRideController {
                     sFinanceiro.registarMovimentoVendaPeca(
                         codStock,
                         p.getPreco_venda() * qtdUsada,
-                        "Pagamento peça " + p.getNome() + " OS#" + id_OS
+                        "Pagamento Peça " + p.getNome() + " OS#" + id_OS
                     );
             }
         }
@@ -335,7 +340,7 @@ public class EcoRideController implements IEcoRideController {
         // Enviar mensagens a Gerente e Secretaria
         List<Integer> destinatarios = sAutenticacao.obterUtilizadoresPorCargo(Cargo.Gerente, Cargo.Secretaria);
         int idUtilRemetente = sAutenticacao.obterIdUserPorIdFuncionario(id_funcionario);
-        String nomeCliente = sClientes.obterCliente(os.getCodCliente()).getNome();
+        String nomeCliente = sClientes.obterCliente(os.getRegisto().getCodCliente()).getNome();
         sNotificacoes.registarNotificacaoOS("Ordem de serviço " + id_OS + " de " + nomeCliente + " em espera de peças.", idUtilRemetente, destinatarios, id_OS);
 
         // Enviar mensagem a Gestor Stock

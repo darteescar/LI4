@@ -145,8 +145,8 @@ public class OrdemServicoController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             int idFuncionario = GestorSessoes.sessao(ctx).getIdFuncionario();
-            facade.registarNotificacaoPagamentoOS(id, idFuncionario);
-            ctx.status(204);
+            boolean ok = facade.registarNotificacaoPagamentoOS(id, idFuncionario);
+            ctx.status(ok ? 204 : 409);
         });
 
         // Registar pagamento da OS
@@ -154,8 +154,8 @@ public class OrdemServicoController {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.Secretaria);
             int id = Integer.parseInt(ctx.pathParam("id"));
             PagamentoRequest req = ctx.bodyAsClass(PagamentoRequest.class);
-            facade.registarPagamentoOS(id, req.metodo_pagamento());
-            ctx.status(204);
+            boolean ok = facade.registarPagamentoOS(id, req.metodo_pagamento());
+            ctx.status(ok ? 204 : 409);
         });
 
         app.patch("/api/ordensservicos/{id}/aguardarPecas", ctx -> {

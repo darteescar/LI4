@@ -182,18 +182,25 @@ VALUES
 -- Ordens de Serviço — Pagas (3) e Eliminadas (2)
 -- =========================================================
 
-INSERT IGNORE INTO OrdemServico (id, descricao, data_criacao, codTrotinete, codCliente, codCriador, codMecanico, estado, metodo_pagamento)
+INSERT IGNORE INTO OrdemServico (id, descricao, data_criacao, codTrotinete, codCliente, codCriador, codMecanico, estado)
 VALUES
     (1, 'Pneu furado e câmara de ar danificada. Cliente refere impacto com passeio.',
-        '2025-01-15 09:00:00', 1, 1, 3, 4, 'Paga', 'MULTIBANCO'),
+        '2025-01-15 09:00:00', 1, 1, 3, 4, 'Paga'),
     (2, 'Bateria não segura carga. Trotinete desliga-se após percurso mínimo.',
-        '2025-02-10 10:30:00', 3, 3, 3, 5, 'Paga', 'NUMERARIO'),
+        '2025-02-10 10:30:00', 3, 3, 3, 5, 'Paga'),
     (3, 'Controlador com falhas intermitentes e cablagem de alimentação danificada.',
-        '2025-03-05 14:00:00', 5, 5, 3, 4, 'Paga', 'MBWAY'),
+        '2025-03-05 14:00:00', 5, 5, 3, 4, 'Paga'),
     (4, 'Reclamação de ruído no motor. Cliente não compareceu para levantamento.',
-        '2025-02-20 11:00:00', 2, 2, 3, 4, 'Eliminada', NULL),
+        '2025-02-20 11:00:00', 2, 2, 3, 4, 'Eliminada'),
     (5, 'Solicitação de revisão geral. Cliente cancelou o serviço.',
-        '2025-04-01 09:30:00', 7, 7, 1, NULL, 'Eliminada', NULL);
+        '2025-04-01 09:30:00', 7, 7, 1, NULL, 'Eliminada');
+
+-- Pagamentos das OSs pagas (clienteNotificado=TRUE pois já estão pagas)
+INSERT IGNORE INTO Pagamento (idOS, metodo, dataPagamento, clienteNotificado, dataNotificacao)
+VALUES
+    (1, 'MULTIBANCO', '2025-01-20 10:00:00', TRUE, '2025-01-19 15:00:00'),
+    (2, 'NUMERARIO',  '2025-02-15 11:30:00', TRUE, '2025-02-14 09:00:00'),
+    (3, 'MBWAY',      '2025-03-10 16:00:00', TRUE, '2025-03-09 14:00:00');
 
 -- Acessórios entregues com as trotinetes
 INSERT IGNORE INTO OrdemServico_Acessorio (idOS, ordem, valor)

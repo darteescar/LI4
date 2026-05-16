@@ -48,16 +48,30 @@ const TODOS_ESTADOS = Object.keys(ESTADO_LABELS) as EstadoOS[];
 const ESTADOS_MEC = TODOS_ESTADOS.filter((e) => e !== "PendentePagamento" && e !== "Paga");
 const TERMINAL = ["Paga", "Eliminada"] as EstadoOS[];
 
-interface OrdemServico {
-  id: number;
+interface Registo {
   descricao: string;
   dataCriacao: string;
   codTrotinete: number;
   codCliente: number;
   codCriador: number;
+  acessorios: string[];
+}
+
+interface Registo {
+  descricao: string;
+  dataCriacao: string;
+  codTrotinete: number;
+  codCliente: number;
+  codCriador: number;
+  acessorios: string[];
+}
+
+interface OrdemServico {
+  id: number;
+  registo: Registo;
   codMecanico: number | null;
   estado: EstadoOS;
-  acessorios: string[];
+  pagamento: { clienteNotificado: boolean; dataNotificacao: string | null; metodo: string | null; dataPagamento: string | null; } | null;
 }
 
 interface Cliente { id: number; nome: string; telemovel: string; }
@@ -125,14 +139,14 @@ export default function OSList() {
     if (estado !== "ALL") r = r.filter((o) => o.estado === estado);
 
     if (!isMec) {
-      if (clienteFiltro !== "ALL") r = r.filter((o) => o.codCliente === Number(clienteFiltro));
-      if (trotineteId !== "ALL") r = r.filter((o) => o.codTrotinete === Number(trotineteId));
+      if (clienteFiltro !== "ALL") r = r.filter((o) => o.registo.codCliente === Number(clienteFiltro));
+      if (trotineteId !== "ALL") r = r.filter((o) => o.registo.codTrotinete === Number(trotineteId));
       if (mecanicoFiltro !== "ALL") {
         if (mecanicoFiltro === "SEM_MEC") r = r.filter((o) => !o.codMecanico);
         else r = r.filter((o) => o.codMecanico === Number(mecanicoFiltro));
       }
-      if (dataDesde) r = r.filter((o) => o.dataCriacao >= dataDesde);
-      if (dataAte) r = r.filter((o) => o.dataCriacao <= `${dataAte}T23:59:59`);
+      if (dataDesde) r = r.filter((o) => o.registo.dataCriacao >= dataDesde);
+      if (dataAte) r = r.filter((o) => o.registo.dataCriacao <= `${dataAte}T23:59:59`);
     }
 
     return r;
@@ -295,15 +309,15 @@ export default function OSList() {
             ) : filtered.map((o) => (
               <TableRow key={o.id}>
                 <TableCell><span className="font-mono text-xs">OS-{o.id}</span></TableCell>
-                <TableCell><span className="font-medium">{clienteNome(o.codCliente)}</span></TableCell>
-                <TableCell>{trotineteLabel(o.codTrotinete)}</TableCell>
+                <TableCell><span className="font-medium">{clienteNome(o.registo.codCliente)}</span></TableCell>
+                <TableCell>{trotineteLabel(o.registo.codTrotinete)}</TableCell>
                 {!isMec && (
                   <TableCell className="text-sm">
                     {o.codMecanico ? mecanicoNome(o.codMecanico) : <span className="text-xs text-muted-foreground">—</span>}
                   </TableCell>
                 )}
                 <TableCell><StateBadge state={o.estado} /></TableCell>
-                <TableCell><span className="text-xs text-muted-foreground">{formatDateTime(o.dataCriacao)}</span></TableCell>
+                <TableCell><span className="text-xs text-muted-foreground">{formatDateTime(o.registo.dataCriacao)}</span></TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
                     <Button asChild variant="ghost" size="icon">
@@ -313,7 +327,7 @@ export default function OSList() {
                       <ConfirmDialog
                         trigger={<Button variant="ghost" size="icon"><CheckCircle className="h-4 w-4 text-green-600" /></Button>}
                         title={`Aprovar orçamento OS-${o.id}?`}
-                        description={`Cliente: ${clienteNome(o.codCliente)} · Tel: ${clienteTel(o.codCliente)}`}
+                        description={`Cliente: ${clienteNome(o.registo.codCliente)} · Tel: ${clienteTel(o.registo.codCliente)}`}
                         onConfirm={() => approveMutation.mutate(o.id)}
                       />
                     )}

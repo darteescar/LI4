@@ -238,23 +238,33 @@ CREATE TABLE IF NOT EXISTS MovimentoPeca (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS OrdemServico (
-    id               INT      NOT NULL AUTO_INCREMENT,
-    descricao        TEXT,
-    data_criacao     DATETIME NOT NULL,
-    codTrotinete     INT      NOT NULL,
-    codCliente       INT      NOT NULL,
-    codCriador       INT      NOT NULL,
-    codMecanico      INT      NULL,
-    estado           ENUM('PendenteReparacao', 'PendenteDiagnostico',
-                          'PendenteAprovacaoOrcamento', 'PendentePagamento',
-                          'Paga', 'OrcamentoNaoAprovado', 'AguardarPecas',
-                          'Eliminada', 'ClienteNotificado') NOT NULL,
-    metodo_pagamento ENUM('NUMERARIO', 'MULTIBANCO', 'MBWAY') NULL,
+    id           INT      NOT NULL AUTO_INCREMENT,
+    descricao    TEXT,
+    data_criacao DATETIME NOT NULL,
+    codTrotinete INT      NOT NULL,
+    codCliente   INT      NOT NULL,
+    codCriador   INT      NOT NULL,
+    codMecanico  INT      NULL,
+    estado       ENUM('PendenteReparacao', 'PendenteDiagnostico',
+                      'PendenteAprovacaoOrcamento', 'PendentePagamento',
+                      'Paga', 'OrcamentoNaoAprovado', 'AguardarPecas',
+                      'Eliminada', 'ClienteNotificado') NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (codTrotinete) REFERENCES Trotinete(id),
     FOREIGN KEY (codCliente)   REFERENCES Cliente(id),
     FOREIGN KEY (codCriador)   REFERENCES Funcionario(id),
     FOREIGN KEY (codMecanico)  REFERENCES Funcionario(id)
+);
+
+-- Dados de pagamento e notificação ao cliente (padrão igual a Diagnostico/Conserto: idOS é PK e FK)
+CREATE TABLE IF NOT EXISTS Pagamento (
+    idOS              INT         NOT NULL,
+    metodo            ENUM('NUMERARIO', 'MULTIBANCO', 'MBWAY') NULL,
+    dataPagamento     DATETIME    NULL,
+    clienteNotificado BOOLEAN     NOT NULL DEFAULT FALSE,
+    dataNotificacao   DATETIME    NULL,
+    PRIMARY KEY (idOS),
+    FOREIGN KEY (idOS) REFERENCES OrdemServico(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS OrdemServico_Acessorio (

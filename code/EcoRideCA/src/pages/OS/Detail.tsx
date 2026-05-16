@@ -76,19 +76,30 @@ interface Conserto {
   checkList: CheckList;
 }
 
-interface OrdemServico {
-  id: number;
+interface Registo {
   descricao: string;
   dataCriacao: string;
   codTrotinete: number;
   codCliente: number;
   codCriador: number;
+  acessorios: string[];
+}
+
+interface PagamentoInfo {
+  metodo: MetodoPagamento | null;
+  dataPagamento: string | null;
+  clienteNotificado: boolean;
+  dataNotificacao: string | null;
+}
+
+interface OrdemServico {
+  id: number;
+  registo: Registo;
   codMecanico: number | null;
   estado: EstadoOS;
-  acessorios: string[];
   conserto: Conserto | null;
   diagnostico: Diagnostico | null;
-  metodo_pagamento: MetodoPagamento | null;
+  pagamento: PagamentoInfo | null;
 }
 
 interface Reparacao { id: number; nomenclatura: string; descricao: string; preco: number; disponivel: boolean; }
@@ -115,8 +126,8 @@ export default function OSDetail() {
   });
 
   const { data: cliente } = useQuery<Cliente>({
-    queryKey: ["clientes", os?.codCliente],
-    queryFn: () => api.get<Cliente>(`/clientes/${os!.codCliente}`),
+    queryKey: ["clientes", os?.registo.codCliente],
+    queryFn: () => api.get<Cliente>(`/clientes/${os!.registo.codCliente}`),
     enabled: !!os && !isMec,
   });
 
@@ -149,7 +160,7 @@ export default function OSDetail() {
   });
 
   const trotinete = useMemo(
-    () => trotinetes.find((t) => t.id === os?.codTrotinete) ?? null,
+    () => trotinetes.find((t) => t.id === os?.registo.codTrotinete) ?? null,
     [trotinetes, os],
   );
 
@@ -179,13 +190,13 @@ export default function OSDetail() {
   const bloqueadoOutroMec = isMec && !!os.codMecanico && !isMecAtribuido;
 
   const mecNome = funcionarios.find((f) => f.id === os.codMecanico)?.nome ?? (os.codMecanico ? `#${os.codMecanico}` : null);
-  const criadorNome = funcionarios.find((f) => f.id === os.codCriador)?.nome ?? `#${os.codCriador}`;
+  const criadorNome = funcionarios.find((f) => f.id === os.registo.codCriador)?.nome ?? `#${os.registo.codCriador}`;
 
   return (
     <div>
       <PageHeader
         title={`OS-${os.id}`}
-        description={`Criada em ${formatDateTime(os.dataCriacao)}`}
+        description={`Criada em ${formatDateTime(os.registo.dataCriacao)}`}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <StateBadge state={os.estado} />
@@ -239,14 +250,14 @@ export default function OSDetail() {
                 )}
                 <div>
                   <div className="text-xs font-medium text-muted-foreground">Problema reportado</div>
-                  <p className="mt-1 whitespace-pre-wrap">{os.descricao}</p>
+                  <p className="mt-1 whitespace-pre-wrap">{os.registo.descricao}</p>
                 </div>
                 <div>
                   <div className="text-xs font-medium text-muted-foreground">Acessórios</div>
                   <div className="mt-1 flex flex-wrap gap-1">
-                    {os.acessorios.length === 0
+                    {os.registo.acessorios.length === 0
                       ? <span className="text-muted-foreground">Nenhum</span>
-                      : os.acessorios.map((a, i) => <Badge key={i} variant="secondary">{a}</Badge>)}
+                      : os.registo.acessorios.map((a, i) => <Badge key={i} variant="secondary">{a}</Badge>)}
                   </div>
                 </div>
                 <div>
@@ -986,6 +997,9 @@ function PagamentoTab({
   );
   const total = os.conserto?.preco_total ?? (maoObra + totalPecas);
 
+  const clienteNotificado = os.pagamento?.clienteNotificado ?? false;
+  const consertoFeito = !!os.conserto;
+
   const notificar = async () => {
     setSaving(true);
     try {
@@ -1029,40 +1043,73 @@ function PagamentoTab({
           <Stat label="Total" value={formatEUR(total)} highlight />
         </div>
 
-        {os.estado === "ClienteNotificado" && canSec && (
-          <Button onClick={notificar} disabled={saving}>
-            {saving ? "A notificar…" : "Confirmar disponibilidade para levantamento"}
-          </Button>
-        )}
-
-        {os.estado === "PendentePagamento" && canSec && (
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="space-y-1">
-              <Label>Método de pagamento</Label>
-              <Select value={metodo} onValueChange={(v) => setMetodo(v as MetodoPagamento)}>
-                <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="NUMERARIO">Numerário</SelectItem>
-                  <SelectItem value="MULTIBANCO">Multibanco</SelectItem>
-                  <SelectItem value="MBWAY">MB Way</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={pagar} disabled={saving}>
-              <CheckCircle2 className="h-4 w-4" />
-              {saving ? "A registar…" : "Registar pagamento"}
-            </Button>
-          </div>
-        )}
-
-        {os.estado === "Paga" && (
+        {os.estado === "Paga" ? (
           <div className="rounded border border-success/30 bg-success-soft p-3 text-success space-y-1">
             <div className="font-semibold">OS paga</div>
-            {os.metodo_pagamento && (
+            {os.pagamento?.metodo && (
               <div className="text-xs">
-                Método de pagamento: <strong>{METODO_LABELS[os.metodo_pagamento]}</strong>
+                Método: <strong>{METODO_LABELS[os.pagamento.metodo]}</strong>
               </div>
             )}
+            {os.pagamento?.dataPagamento && (
+              <div className="text-xs text-muted-foreground">
+                Data de pagamento: {formatDateTime(os.pagamento.dataPagamento)}
+              </div>
+            )}
+            {os.pagamento?.dataNotificacao && (
+              <div className="text-xs text-muted-foreground">
+                Cliente notificado em: {formatDateTime(os.pagamento.dataNotificacao)}
+              </div>
+            )}
+          </div>
+        ) : canSec && (
+          <div className="space-y-4">
+            {/* Notificação ao cliente */}
+            {!consertoFeito && (
+              <div className="rounded border border-amber-300/50 bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                O conserto ainda não foi registado. Conclua o conserto antes de notificar o cliente.
+              </div>
+            )}
+
+            {clienteNotificado ? (
+              <div className="flex items-center gap-2 rounded border border-success/30 bg-success-soft px-3 py-2 text-xs text-success">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <span>
+                  Cliente notificado em <strong>{formatDateTime(os.pagamento!.dataNotificacao!)}</strong>
+                </span>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {consertoFeito && (
+                  <div className="rounded border border-amber-300/50 bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                    O cliente ainda não foi notificado. Notifique-o antes de registar o pagamento.
+                  </div>
+                )}
+                <Button onClick={notificar} disabled={saving || !consertoFeito} variant="outline">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {saving ? "A notificar…" : "Cliente notificado"}
+                </Button>
+              </div>
+            )}
+
+            {/* Formulário de pagamento — bloqueado até conserto feito e cliente notificado */}
+            <div className={`flex flex-wrap items-end gap-3 ${!clienteNotificado || !consertoFeito ? "opacity-40 pointer-events-none select-none" : ""}`}>
+              <div className="space-y-1">
+                <Label>Método de pagamento</Label>
+                <Select value={metodo} onValueChange={(v) => setMetodo(v as MetodoPagamento)} disabled={!clienteNotificado || !consertoFeito}>
+                  <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NUMERARIO">Numerário</SelectItem>
+                    <SelectItem value="MULTIBANCO">Multibanco</SelectItem>
+                    <SelectItem value="MBWAY">MB Way</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={pagar} disabled={saving || !clienteNotificado || !consertoFeito}>
+                <CheckCircle2 className="h-4 w-4" />
+                {saving ? "A registar…" : "Registar pagamento"}
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

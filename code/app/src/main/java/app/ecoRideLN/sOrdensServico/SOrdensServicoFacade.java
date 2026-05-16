@@ -13,22 +13,21 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     private final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
 
     @Override
-    public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador) {
-        if (id_cliente <= 0 || id_trotinete <= 0) throw new EcoRideException("ID de cliente e trotinete devem ser positivos.");
-        if (descricao == null || descricao.isBlank()) throw new EcoRideException("Descrição não pode ser vazia.");
-        OrdemServico os = new OrdemServico(0, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, acessorios);
+    public OrdemServico registarOS(Registo registo) {
+        if (registo.getCodCliente() <= 0 || registo.getCodTrotinete() <= 0)
+            throw new EcoRideException("ID de cliente e trotinete devem ser positivos.");
+        if (registo.getDescricao() == null || registo.getDescricao().isBlank())
+            throw new EcoRideException("Descrição não pode ser vazia.");
+        OrdemServico os = new OrdemServico(0, registo);
         ordemServicoDAO.insert(os);
         return os;
     }
-        
+
     @Override
-    public void atualizarOS(int id, String descricao, List<String> acessorios, int id_cliente, int id_trotinete) {
+    public void atualizarOS(int id, Registo registo) {
         OrdemServico os = ordemServicoDAO.get(id);
-        if (os != null && descricao != null && !descricao.isBlank() && (id_cliente > 0 || id_cliente == 0) && (id_trotinete > 0 || id_trotinete == 0)) {
-            os.setDescricao(descricao);
-            os.setAcessorios(acessorios);
-            os.setCodCliente(id_cliente);
-            os.setCodTrotinete(id_trotinete);
+        if (os != null && registo != null && !registo.getDescricao().isBlank()) {
+            os.setRegisto(registo);
             ordemServicoDAO.put(id, os);
         }
     }
@@ -49,7 +48,7 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     @Override
-    public List<OrdemServico> obterOSsDisponiveis(){
+    public List<OrdemServico> obterOSsDisponiveis() {
         return ordemServicoDAO.getAvailableOSs();
     }
 
@@ -97,13 +96,10 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     @Override
     public boolean marcarAguardarPecasOS(int id, int id_funcionario) {
         OrdemServico os = ordemServicoDAO.get(id);
-        if (os == null) {
+        if (os == null)
             throw new EcoRideException("OS " + id + " não encontrada.");
-        }
-        if (os.getCodMecanico() != id_funcionario) {
-                throw new EcoRideException("Não é o responsável por esta OS.");
-        }
-
+        if (os.getCodMecanico() != id_funcionario)
+            throw new EcoRideException("Não é o responsável por esta OS.");
         return alterarEstadoOS(id, EstadoOS.AguardarPecas);
     }
 
@@ -135,28 +131,32 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
     @Override
     public boolean registarNotificacaoPagamentoOS(int id_OS) {
-        return alterarEstadoOS(id_OS, EstadoOS.ClienteNotificado);
+        OrdemServico os = ordemServicoDAO.get(id_OS);
+        if (os == null)
+            throw new EcoRideException("OS " + id_OS + " não encontrada.");
+        if (!os.getEstado().podeTransicionar(EstadoOS.ClienteNotificado))
+            return false;
+        // Criar registo de pagamento com a notificação; metodo e data de pagamento são preenchidos depois
+        Pagamento pag = new Pagamento(true, LocalDateTime.now());
+        os.setPagamento(pag);
+        os.setEstado(EstadoOS.ClienteNotificado);
+        ordemServicoDAO.put(id_OS, os);
+        return true;
     }
 
     // ------------------- Diagnóstico -------------------
+
     @Override
     public Diagnostico registarDiagnosticoOS(int idOS, Map<Integer, Integer> pecasQuantidades, List<Integer> reparacoes, float orcamento, String descricao, int id_funcionario) {
-
-        if (pecasQuantidades == null || reparacoes == null || descricao == null || descricao.isBlank()) {
+        if (pecasQuantidades == null || reparacoes == null || descricao == null || descricao.isBlank())
             throw new EcoRideException("Dados de diagnóstico incompletos ou inválidos.");
-        }
 
         OrdemServico os = ordemServicoDAO.get(idOS);
         if (os != null) {
-
-            if (os.getCodMecanico() == null) {
+            if (os.getCodMecanico() == null)
                 os.setCodMecanico(id_funcionario);
-            }
-
-            if (os.getCodMecanico() != id_funcionario) {
+            if (os.getCodMecanico() != id_funcionario)
                 throw new EcoRideException("Não é o responsável por esta OS.");
-            }
-
             if (!os.getEstado().podeTransicionar(EstadoOS.PendenteAprovacaoOrcamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + idOS);
 
@@ -171,29 +171,22 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     }
 
     // ------------------- Conserto -------------------
+
     @Override
     public Conserto registarConsertoOS(int id_OS, Map<Integer, Integer> stocksUsados, List<Integer> reparacoes, float valor, int id_funcionario) {
-
-        if (stocksUsados == null || reparacoes == null) {
+        if (stocksUsados == null || reparacoes == null)
             throw new EcoRideException("Dados de conserto incompletos ou inválidos.");
-        }
 
         OrdemServico os = ordemServicoDAO.get(id_OS);
         if (os != null) {
-            
-            if (os.getCodMecanico() != id_funcionario) {
+            if (os.getCodMecanico() != id_funcionario)
                 throw new EcoRideException("Não é o responsável por esta OS.");
-            }
             if (!os.getEstado().podeTransicionar(EstadoOS.PendentePagamento))
                 throw new EcoRideException("Transição de estado inválida para a OS " + id_OS);
-            
-            if (os.getDiagnostico() == null) {
+            if (os.getDiagnostico() == null)
                 throw new EcoRideException("Não é possível registar um conserto sem um diagnóstico prévio.");
-            }
-
-            if (!os.getDiagnostico().isAprovado()) {
+            if (!os.getDiagnostico().isAprovado())
                 throw new EcoRideException("Não é possível registar um conserto sem um orçamento aprovado.");
-            }
 
             Conserto con = new Conserto(stocksUsados, reparacoes, valor);
             os.setConserto(con);
@@ -214,34 +207,32 @@ public class SOrdensServicoFacade implements ISOrdensServico {
     // ------------------- Pagamento -------------------
 
     @Override
-    public boolean registarPagamentoOS(int id_OS, Metodo_Pagamento metodo_pagamento) {
+    public boolean registarPagamentoOS(int id_OS, Pagamento pagamento) {
         OrdemServico os = ordemServicoDAO.get(id_OS);
-        if (os == null) {
+        if (os == null)
             throw new EcoRideException("OS " + id_OS + " não encontrada.");
-        }
+        if (os.getEstado() != EstadoOS.ClienteNotificado)
+            throw new EcoRideException("O cliente deve ser notificado antes de registar o pagamento.");
 
-        if (os.getEstado() != EstadoOS.PendentePagamento) {
-            throw new EcoRideException("OS " + id_OS + " não está pendente de pagamento.");
-        }
+        Pagamento existente = os.getPagamento();
+        if (existente == null || !existente.isClienteNotificado())
+            throw new EcoRideException("O cliente deve ser notificado antes de registar o pagamento.");
+        if (!os.getEstado().podeTransicionar(EstadoOS.Paga))
+            return false;
 
-        if (metodo_pagamento == null) {
-            throw new EcoRideException("Método de pagamento inválido.");
-        }
-
-        // Definir metodo e estado no mesmo objeto antes de persistir —
-        // chamar alterarEstadoOS faria um novo get() e descartaria o metodo_pagamento.
-        if (!os.getEstado().podeTransicionar(EstadoOS.Paga)) return false;
-        os.setMetodo_pagamento(metodo_pagamento);
+        // Preservar dados de notificação ao completar o pagamento
+        pagamento.setClienteNotificado(existente.isClienteNotificado());
+        pagamento.setDataNotificacao(existente.getDataNotificacao());
+        os.setPagamento(pagamento);
         os.setEstado(EstadoOS.Paga);
         ordemServicoDAO.put(id_OS, os);
         return true;
     }
 
-        // ------------------- Utilitários -------------------
+    // ------------------- Utilitários -------------------
 
     @Override
     public List<OrdemServico> filtrarOSs(EstadoOS estado, LocalDateTime desde, LocalDateTime ate, Integer id_cliente, Integer id_funcionario) {
         return ordemServicoDAO.filtrarOSs(estado, desde, ate, id_cliente, id_funcionario);
     }
-
 }
