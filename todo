@@ -4,7 +4,6 @@ O ficheiro das responsabilidades esta desatualizado/Corrigi-lo com os use cases 
 CODE
 
 Falta botao de que cliente foi notificado para pagar e impedir que o cliente pague se não tiver sido notificado
-Adicionar historico de OS's para trotinetes
 ==============================================================
 
 Facade:

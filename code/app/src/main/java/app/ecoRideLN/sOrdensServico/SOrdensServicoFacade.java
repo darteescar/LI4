@@ -228,8 +228,13 @@ public class SOrdensServicoFacade implements ISOrdensServico {
             throw new EcoRideException("Método de pagamento inválido.");
         }
 
+        // Definir metodo e estado no mesmo objeto antes de persistir —
+        // chamar alterarEstadoOS faria um novo get() e descartaria o metodo_pagamento.
+        if (!os.getEstado().podeTransicionar(EstadoOS.Paga)) return false;
         os.setMetodo_pagamento(metodo_pagamento);
-        return alterarEstadoOS(id_OS, EstadoOS.Paga);
+        os.setEstado(EstadoOS.Paga);
+        ordemServicoDAO.put(id_OS, os);
+        return true;
     }
 
         // ------------------- Utilitários -------------------

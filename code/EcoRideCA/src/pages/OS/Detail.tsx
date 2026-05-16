@@ -42,6 +42,12 @@ type EstadoOS =
 
 type MetodoPagamento = "NUMERARIO" | "MULTIBANCO" | "MBWAY";
 
+const METODO_LABELS: Record<MetodoPagamento, string> = {
+  NUMERARIO:  "Numerário",
+  MULTIBANCO: "Multibanco",
+  MBWAY:      "MB Way",
+};
+
 interface CheckList {
   luzes: boolean; pneus: boolean; aceleracao: boolean;
   travagem: boolean; visor: boolean; teste_pratico: boolean;
@@ -1050,8 +1056,13 @@ function PagamentoTab({
         )}
 
         {os.estado === "Paga" && (
-          <div className="rounded border border-success/30 bg-success-soft p-3 text-success">
-            <strong>OS paga</strong>{os.metodo_pagamento ? ` via ${os.metodo_pagamento}` : ""}.
+          <div className="rounded border border-success/30 bg-success-soft p-3 text-success space-y-1">
+            <div className="font-semibold">OS paga</div>
+            {os.metodo_pagamento && (
+              <div className="text-xs">
+                Método de pagamento: <strong>{METODO_LABELS[os.metodo_pagamento]}</strong>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
