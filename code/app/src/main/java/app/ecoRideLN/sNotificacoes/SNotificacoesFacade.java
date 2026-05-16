@@ -15,9 +15,8 @@ public class SNotificacoesFacade implements ISNotificacoes {
           }
 
           for (int iddest : ids_destinatarios) {
-               int id = notificacaoDAO.generateNewId();
-               NotificacaoOS notificacao = new NotificacaoOS(id, descricao, id_remetente, iddest, id_os);
-               notificacaoDAO.put(id, notificacao);
+               NotificacaoOS notificacao = new NotificacaoOS(0, descricao, id_remetente, iddest, id_os);
+               notificacaoDAO.insert(notificacao);
           }
      }
 
@@ -27,9 +26,8 @@ public class SNotificacoesFacade implements ISNotificacoes {
                throw new IllegalArgumentException("Descrição e destinatários são obrigatórios.");
           }
           for (int iddest : ids_destinatarios) {
-               int id = notificacaoDAO.generateNewId();
-               NotificacaoStock notificacao = new NotificacaoStock(id, descricao, id_remetente, iddest, id_peca);
-               notificacaoDAO.put(id, notificacao);
+               NotificacaoStock notificacao = new NotificacaoStock(0, descricao, id_remetente, iddest, id_peca);
+               notificacaoDAO.insert(notificacao);
           }
      }
 

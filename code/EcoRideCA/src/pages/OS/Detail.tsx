@@ -138,8 +138,8 @@ export default function OSDetail() {
   });
 
   const { data: pecas = [] } = useQuery<Peca[]>({
-    queryKey: ["pecas"],
-    queryFn: () => api.get<Peca[]>("/pecas"),
+    queryKey: ["pecasAtivas"],
+    queryFn: () => api.get<Peca[]>("/pecasAtivas"),
   });
 
   const trotinete = useMemo(

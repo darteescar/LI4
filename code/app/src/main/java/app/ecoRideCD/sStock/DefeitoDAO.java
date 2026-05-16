@@ -86,25 +86,37 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
     @Override
     public Defeito put(Integer key, Defeito value) {
         Defeito prev = get(key);
-        String sql = """
-                INSERT INTO Defeito (id, codStock, motivo, idFuncionario, estado_anterior)
-                VALUES (?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    codStock = VALUES(codStock), motivo = VALUES(motivo),
-                    idFuncionario = VALUES(idFuncionario), estado_anterior = VALUES(estado_anterior)
-                """;
+        String sql = "UPDATE Defeito SET codStock=?, motivo=?, idFuncionario=?, estado_anterior=? WHERE id=?";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setInt(2, value.getCodStock());
-            ps.setString(3, value.getMotivo());
-            ps.setInt(4, value.getIdFuncionario());
-            ps.setString(5, value.getEstadoAnterior().name());
+            ps.setInt(1, value.getCodStock());
+            ps.setString(2, value.getMotivo());
+            ps.setInt(3, value.getIdFuncionario());
+            ps.setString(4, value.getEstadoAnterior().name());
+            ps.setInt(5, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar defeito " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Defeito value) {
+        String sql = "INSERT INTO Defeito (codStock, motivo, idFuncionario, estado_anterior) VALUES (?, ?, ?, ?)";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, value.getCodStock());
+            ps.setString(2, value.getMotivo());
+            ps.setInt(3, value.getIdFuncionario());
+            ps.setString(4, value.getEstadoAnterior().name());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para defeito");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir defeito", e);
+        }
     }
 
     @Override
@@ -167,13 +179,4 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
         return out;
     }
 
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Defeito")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para defeito", e);
-        }
-    }
 }

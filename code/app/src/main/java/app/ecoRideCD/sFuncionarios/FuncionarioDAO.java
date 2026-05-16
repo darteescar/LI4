@@ -100,50 +100,69 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
      public Funcionario put(Integer key, Funcionario value) {
           Funcionario prev = get(key);
           String sql = """
-                    INSERT INTO Funcionario (id, nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE
-                         nome = VALUES(nome),
-                         telemovel = VALUES(telemovel),
-                         email = VALUES(email),
-                         data_nascimento = VALUES(data_nascimento),
-                         NISS = VALUES(NISS),
-                         NIF = VALUES(NIF),
-                         NUS = VALUES(NUS),
-                         IBAN = VALUES(IBAN),
-                         salario_hora = VALUES(salario_hora),
-                         salario_liquido = VALUES(salario_liquido),
-                         salario_bruto = VALUES(salario_bruto),
-                         horas_extra = VALUES(horas_extra),
-                         numero_porta = VALUES(numero_porta),
-                         rua = VALUES(rua),
-                         localidade = VALUES(localidade),
-                         codigo_postal = VALUES(codigo_postal)
+                    UPDATE Funcionario SET nome=?, telemovel=?, email=?, data_nascimento=?,
+                         NISS=?, NIF=?, NUS=?, IBAN=?, salario_hora=?, salario_liquido=?,
+                         salario_bruto=?, horas_extra=?, numero_porta=?, rua=?, localidade=?,
+                         codigo_postal=? WHERE id=?
                     """;
           try (Connection c = ConnectionFactory.get();
                PreparedStatement ps = c.prepareStatement(sql)) {
-               ps.setInt(1, key);
-               ps.setString(2, value.getNome());
-               ps.setString(3, value.getTelemovel());
-               ps.setString(4, value.getEmail());
-               ps.setDate(5, value.getData_nascimento() == null ? null : Date.valueOf(value.getData_nascimento()));
-               ps.setString(6, value.getNISS());
-               ps.setString(7, value.getNIF());
-               ps.setString(8, value.getNUS());
-               ps.setString(9, value.getIBAN());
-               ps.setDouble(10, value.getSalario_hora());
-               ps.setDouble(11, value.getSalario_liquido());
-               ps.setDouble(12, value.getSalario_bruto());
-               ps.setInt(13, value.getHoras_extra());
-               ps.setString(14, value.getNumero_porta());
-               ps.setString(15, value.getRua());
-               ps.setString(16, value.getLocalidade());
-               ps.setString(17, value.getCodigo_postal());
+               ps.setString(1, value.getNome());
+               ps.setString(2, value.getTelemovel());
+               ps.setString(3, value.getEmail());
+               ps.setDate(4, value.getData_nascimento() == null ? null : Date.valueOf(value.getData_nascimento()));
+               ps.setString(5, value.getNISS());
+               ps.setString(6, value.getNIF());
+               ps.setString(7, value.getNUS());
+               ps.setString(8, value.getIBAN());
+               ps.setDouble(9, value.getSalario_hora());
+               ps.setDouble(10, value.getSalario_liquido());
+               ps.setDouble(11, value.getSalario_bruto());
+               ps.setInt(12, value.getHoras_extra());
+               ps.setString(13, value.getNumero_porta());
+               ps.setString(14, value.getRua());
+               ps.setString(15, value.getLocalidade());
+               ps.setString(16, value.getCodigo_postal());
+               ps.setInt(17, key);
                ps.executeUpdate();
           } catch (SQLException e) {
                throw new EcoRideException("Erro a gravar funcionario " + key, e);
           }
           return prev;
+     }
+
+     public int insert(Funcionario value) {
+          String sql = """
+                    INSERT INTO Funcionario (nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN,
+                         salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """;
+          try (Connection c = ConnectionFactory.get();
+               PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+               ps.setString(1, value.getNome());
+               ps.setString(2, value.getTelemovel());
+               ps.setString(3, value.getEmail());
+               ps.setDate(4, value.getData_nascimento() == null ? null : Date.valueOf(value.getData_nascimento()));
+               ps.setString(5, value.getNISS());
+               ps.setString(6, value.getNIF());
+               ps.setString(7, value.getNUS());
+               ps.setString(8, value.getIBAN());
+               ps.setDouble(9, value.getSalario_hora());
+               ps.setDouble(10, value.getSalario_liquido());
+               ps.setDouble(11, value.getSalario_bruto());
+               ps.setInt(12, value.getHoras_extra());
+               ps.setString(13, value.getNumero_porta());
+               ps.setString(14, value.getRua());
+               ps.setString(15, value.getLocalidade());
+               ps.setString(16, value.getCodigo_postal());
+               ps.executeUpdate();
+               try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                    throw new EcoRideException("Sem ID gerado para funcionario");
+               }
+          } catch (SQLException e) {
+               throw new EcoRideException("Erro a inserir funcionario", e);
+          }
      }
 
      @Override
@@ -210,14 +229,4 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
      // --------- Aliases / domínio ---------
 
      public void add(Funcionario func)          { put(func.getId(), func); }
-
-     public int generateNewId() {
-          try (Connection c = ConnectionFactory.get();
-               Statement s = c.createStatement();
-               ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Funcionario")) {
-               return rs.next() ? rs.getInt(1) + 1 : 1;
-          } catch (SQLException e) {
-               throw new EcoRideException("Erro a gerar novo ID para funcionario", e);
-          }
-     }     
 }

@@ -206,14 +206,7 @@ export default function OSList() {
               <Label className="text-xs">Criada até</Label>
               <Input type="date" value={dataAte} onChange={(e) => setDataAte(e.target.value)} />
             </div>
-            <div className="flex items-end justify-between sm:col-span-2 lg:col-span-4">
-              <Button
-                variant={historico ? "default" : "outline"}
-                size="sm"
-                onClick={() => setHistorico((v) => !v)}
-              >
-                {historico ? "Ocultar histórico" : "Ver histórico (Paga / Eliminada)"}
-              </Button>
+            <div className="flex items-end justify-end sm:col-span-2 lg:col-span-4">
               <Button variant="outline" size="sm" onClick={() => { setEstado("ALL"); setClienteFiltro("ALL"); setMecanicoFiltro("ALL"); setDataDesde(""); setDataAte(""); }}>
                 Limpar filtros
               </Button>
@@ -235,6 +228,18 @@ export default function OSList() {
           </div>
         )}
       </div>
+
+      {!isMec && (
+        <div className="mb-3 flex justify-end">
+          <Button
+            variant={historico ? "default" : "outline"}
+            size="sm"
+            onClick={() => setHistorico((v) => !v)}
+          >
+            {historico ? "Ocultar histórico" : "Ver histórico completo"}
+          </Button>
+        </div>
+      )}
 
       <div className="rounded-lg border bg-card shadow-sm">
         <Table>

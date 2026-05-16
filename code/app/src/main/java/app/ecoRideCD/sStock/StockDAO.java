@@ -108,34 +108,56 @@ public class StockDAO implements Map<Integer, Stock> {
     public Stock put(Integer key, Stock value) {
         Stock prev = get(key);
         String sql = """
-                INSERT INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, garantia, estado)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    preco_compra = VALUES(preco_compra), codPeca = VALUES(codPeca),
-                    data_chegada = VALUES(data_chegada), quantidade = VALUES(quantidade),
-                    garantia = VALUES(garantia),
-                    estado = VALUES(estado)
+                UPDATE Stock SET preco_compra=?, codPeca=?, data_chegada=?, quantidade=?, garantia=?, estado=?
+                WHERE id=?
                 """;
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setFloat(2, value.getPreco_compra());
-            ps.setInt(3, value.getCodPeca());
+            ps.setFloat(1, value.getPreco_compra());
+            ps.setInt(2, value.getCodPeca());
             if (value.getData_chegada() != null)
-                ps.setDate(4, Date.valueOf(value.getData_chegada()));
+                ps.setDate(3, Date.valueOf(value.getData_chegada()));
             else
-                ps.setNull(4, Types.DATE);
-            ps.setInt(5, value.getQuantidade());
+                ps.setNull(3, Types.DATE);
+            ps.setInt(4, value.getQuantidade());
             if (value.getGarantia() != null)
-                ps.setDate(6, Date.valueOf(value.getGarantia()));
+                ps.setDate(5, Date.valueOf(value.getGarantia()));
             else
-                ps.setNull(6, Types.DATE);
-
-            ps.setString(7, value.getEstado().name());
+                ps.setNull(5, Types.DATE);
+            ps.setString(6, value.getEstado().name());
+            ps.setInt(7, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar stock " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Stock value) {
+        String sql = """
+                INSERT INTO Stock (preco_compra, codPeca, data_chegada, quantidade, garantia, estado)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setFloat(1, value.getPreco_compra());
+            ps.setInt(2, value.getCodPeca());
+            if (value.getData_chegada() != null)
+                ps.setDate(3, Date.valueOf(value.getData_chegada()));
+            else
+                ps.setNull(3, Types.DATE);
+            ps.setInt(4, value.getQuantidade());
+            if (value.getGarantia() != null)
+                ps.setDate(5, Date.valueOf(value.getGarantia()));
+            else
+                ps.setNull(5, Types.DATE);
+            ps.setString(6, value.getEstado().name());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para stock");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir stock", e);
+        }
     }
 
     @Override
@@ -209,14 +231,6 @@ public class StockDAO implements Map<Integer, Stock> {
     }
 
     // --------- Aliases / domínio ---------
-
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Stock")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para stock", e);
-        }
-    }
 
     public List<Stock> getByPecaId(int id_peca) {
         List<Stock> out = new ArrayList<>();

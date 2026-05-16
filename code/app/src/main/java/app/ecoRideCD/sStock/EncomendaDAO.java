@@ -56,21 +56,18 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           );
      }
 
-     private void upsertBase(Connection c, int id, Encomenda value) throws SQLException {
+     private void updateBase(Connection c, int id, Encomenda value) throws SQLException {
           String sql = """
-                    INSERT INTO Encomenda (id, codFornecedor, data_criacao, data_rececao, data_envio, estado)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE
-                         codFornecedor = VALUES(codFornecedor), data_criacao = VALUES(data_criacao),
-                         data_rececao = VALUES(data_rececao), data_envio = VALUES(data_envio), estado = VALUES(estado)
+                    UPDATE Encomenda SET codFornecedor=?, data_criacao=?, data_rececao=?, data_envio=?, estado=?
+                    WHERE id=?
                     """;
           try (PreparedStatement ps = c.prepareStatement(sql)) {
-               ps.setInt(1, id);
-               ps.setInt(2, value.getCodFornecedor());
-               ps.setDate(3, value.getData_criacao() != null ? Date.valueOf(value.getData_criacao()) : null);
-               ps.setDate(4, value.getData_rececao() != null ? Date.valueOf(value.getData_rececao()) : null);
-               ps.setDate(5, value.getData_envio()   != null ? Date.valueOf(value.getData_envio())   : null);
-               ps.setString(6, value.getEstado().name());
+               ps.setInt(1, value.getCodFornecedor());
+               ps.setDate(2, value.getData_criacao() != null ? Date.valueOf(value.getData_criacao()) : null);
+               ps.setDate(3, value.getData_rececao() != null ? Date.valueOf(value.getData_rececao()) : null);
+               ps.setDate(4, value.getData_envio()   != null ? Date.valueOf(value.getData_envio())   : null);
+               ps.setString(5, value.getEstado().name());
+               ps.setInt(6, id);
                ps.executeUpdate();
           }
      }
@@ -148,7 +145,7 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
           try (Connection c = ConnectionFactory.get()) {
                c.setAutoCommit(false);
                try {
-                    upsertBase(c, key, value);
+                    updateBase(c, key, value);
                     clearStocks(c, key);
                     insertStocks(c, key, value.getCodStocks());
                     c.commit();
@@ -162,6 +159,41 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                throw new EcoRideException("Erro a gravar encomenda " + key, e);
           }
           return prev;
+     }
+
+     public int insert(Encomenda value) {
+          String sql = """
+                    INSERT INTO Encomenda (codFornecedor, data_criacao, data_rececao, data_envio, estado)
+                    VALUES (?, ?, ?, ?, ?)
+                    """;
+          try (Connection c = ConnectionFactory.get()) {
+               c.setAutoCommit(false);
+               try {
+                    int id;
+                    try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                         ps.setInt(1, value.getCodFornecedor());
+                         ps.setDate(2, value.getData_criacao() != null ? Date.valueOf(value.getData_criacao()) : null);
+                         ps.setDate(3, value.getData_rececao() != null ? Date.valueOf(value.getData_rececao()) : null);
+                         ps.setDate(4, value.getData_envio()   != null ? Date.valueOf(value.getData_envio())   : null);
+                         ps.setString(5, value.getEstado().name());
+                         ps.executeUpdate();
+                         try (ResultSet rs = ps.getGeneratedKeys()) {
+                              if (rs.next()) { id = rs.getInt(1); value.setId(id); }
+                              else throw new EcoRideException("Sem ID gerado para encomenda");
+                         }
+                    }
+                    insertStocks(c, id, value.getCodStocks());
+                    c.commit();
+                    return id;
+               } catch (SQLException e) {
+                    c.rollback();
+                    throw new EcoRideException("Erro a inserir encomenda", e);
+               } finally {
+                    c.setAutoCommit(true);
+               }
+          } catch (SQLException e) {
+               throw new EcoRideException("Erro de ligação ao inserir encomenda", e);
+          }
      }
 
      @Override
@@ -231,16 +263,6 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                throw new EcoRideException("Erro a obter encomendas", e);
           }
           return out;
-     }
-
-     public int generateNewId() {
-          try (Connection c = ConnectionFactory.get();
-               Statement s = c.createStatement();
-               ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Encomenda")) {
-               return rs.next() ? rs.getInt(1) + 1 : 1;
-          } catch (SQLException e) {
-               throw new EcoRideException("Erro a gerar novo ID para encomenda", e);
-          }
      }
 
      public List<Encomenda> getByEstado(EstadoEncomenda estado) {

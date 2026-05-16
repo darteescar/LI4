@@ -14,11 +14,10 @@ public class SOrdensServicoFacade implements ISOrdensServico {
 
     @Override
     public OrdemServico registarOS(int id_cliente, int id_trotinete, String descricao, List<String> acessorios, int codCriador) {
-        int id = ordemServicoDAO.generateNewId();
         if (id_cliente <= 0 || id_trotinete <= 0) throw new EcoRideException("ID de cliente e trotinete devem ser positivos.");
         if (descricao == null || descricao.isBlank()) throw new EcoRideException("Descrição não pode ser vazia.");
-        OrdemServico os = new OrdemServico(id, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, acessorios);
-        ordemServicoDAO.put(id, os);
+        OrdemServico os = new OrdemServico(0, descricao, LocalDateTime.now(), id_trotinete, id_cliente, codCriador, acessorios);
+        ordemServicoDAO.insert(os);
         return os;
     }
         

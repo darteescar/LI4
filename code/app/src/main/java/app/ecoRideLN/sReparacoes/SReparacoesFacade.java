@@ -10,12 +10,11 @@ public class SReparacoesFacade implements ISReparacoes {
 
      @Override
      public Reparacao registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel) {
-          int id = reparacaoDAO.generateNewId();
           if (nomenclatura == null || nomenclatura.isBlank()) throw new EcoRideException("Nomenclatura não pode ser vazia.");
           if (descricao == null || descricao.isBlank()) throw new EcoRideException("Descrição não pode ser vazia.");
           if (preco < 0) throw new EcoRideException("Preço não pode ser negativo.");
-          Reparacao reparacao = new Reparacao(id, nomenclatura, descricao, preco, disponivel);
-          reparacaoDAO.put(id, reparacao);
+          Reparacao reparacao = new Reparacao(0, nomenclatura, descricao, preco, disponivel);
+          reparacaoDAO.insert(reparacao);
           return reparacao;
      }
 

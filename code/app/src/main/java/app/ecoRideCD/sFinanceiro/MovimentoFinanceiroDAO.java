@@ -111,24 +111,32 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
         }
     }
 
-    // Insert/update da tabela base.
-    private void upsertBase(Connection c, int id, MovimentoFinanceiro m) throws SQLException {
-        String sql = """
-                INSERT INTO MovimentoFinanceiro (id, valor, data, descricao, tipo)
-                VALUES (?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    valor     = VALUES(valor),
-                    data      = VALUES(data),
-                    descricao = VALUES(descricao),
-                    tipo      = VALUES(tipo)
-                """;
+    // Update da tabela base.
+    private void updateBase(Connection c, int id, MovimentoFinanceiro m) throws SQLException {
+        String sql = "UPDATE MovimentoFinanceiro SET valor=?, data=?, descricao=?, tipo=? WHERE id=?";
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.setFloat(2, m.getValor());
-            ps.setTimestamp(3, Timestamp.valueOf(m.getData()));
-            ps.setString(4, m.getDescricao());
-            ps.setString(5, m.getTipo().name());
+            ps.setFloat(1, m.getValor());
+            ps.setTimestamp(2, Timestamp.valueOf(m.getData()));
+            ps.setString(3, m.getDescricao());
+            ps.setString(4, m.getTipo().name());
+            ps.setInt(5, id);
             ps.executeUpdate();
+        }
+    }
+
+    // Insert na tabela base, devolve o id gerado.
+    private int insertBase(Connection c, MovimentoFinanceiro m) throws SQLException {
+        String sql = "INSERT INTO MovimentoFinanceiro (valor, data, descricao, tipo) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setFloat(1, m.getValor());
+            ps.setTimestamp(2, Timestamp.valueOf(m.getData()));
+            ps.setString(3, m.getDescricao());
+            ps.setString(4, m.getTipo().name());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); m.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para movimento financeiro");
+            }
         }
     }
 
@@ -180,7 +188,7 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
         try (Connection c = ConnectionFactory.get()) {
             c.setAutoCommit(false);
             try {
-                upsertBase(c, key, value);
+                updateBase(c, key, value);
                 clearChildren(c, key);
                 insertChild(c, key, value);
                 c.commit();
@@ -194,6 +202,25 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
             throw new EcoRideException("Erro de ligação ao gravar movimento " + key, e);
         }
         return prev;
+    }
+
+    public int insert(MovimentoFinanceiro value) {
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                int id = insertBase(c, value);
+                insertChild(c, id, value);
+                c.commit();
+                return id;
+            } catch (SQLException e) {
+                c.rollback();
+                throw new EcoRideException("Erro a inserir movimento financeiro", e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação ao inserir movimento financeiro", e);
+        }
     }
 
     @Override
@@ -267,15 +294,6 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
     public boolean exists(int id)                       { return containsKey(id); }
     public void add(MovimentoFinanceiro m)              { put(m.getId(), m); }
 
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM MovimentoFinanceiro")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para movimento", e);
-        }
-    }
     public void removeByStock(int codStock) {
         String sql = "SELECT id FROM MovimentoPeca WHERE codStock = ?";
         try (Connection c = ConnectionFactory.get(); PreparedStatement ps = c.prepareStatement(sql)) {

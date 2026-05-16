@@ -84,23 +84,35 @@ public class FornecedorDAO implements Map<Integer, Fornecedor> {
     @Override
     public Fornecedor put(Integer key, Fornecedor value) {
         Fornecedor prev = get(key);
-        String sql = """
-                INSERT INTO Fornecedor (id, nome, telemovel, email)
-                VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    nome = VALUES(nome), telemovel = VALUES(telemovel), email = VALUES(email)
-                """;
+        String sql = "UPDATE Fornecedor SET nome=?, telemovel=?, email=? WHERE id=?";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getNome());
-            ps.setString(3, value.getTelemovel());
-            ps.setString(4, value.getEmail());
+            ps.setString(1, value.getNome());
+            ps.setString(2, value.getTelemovel());
+            ps.setString(3, value.getEmail());
+            ps.setInt(4, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar fornecedor " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Fornecedor value) {
+        String sql = "INSERT INTO Fornecedor (nome, telemovel, email) VALUES (?, ?, ?)";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, value.getNome());
+            ps.setString(2, value.getTelemovel());
+            ps.setString(3, value.getEmail());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para fornecedor");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir fornecedor", e);
+        }
     }
 
     @Override
@@ -167,14 +179,4 @@ public class FornecedorDAO implements Map<Integer, Fornecedor> {
     // --------- Aliases / domínio ---------
 
     public void add(Fornecedor f)                  { put(f.getId(), f); }
-
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Fornecedor")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para fornecedor", e);
-        }
-    }
 }

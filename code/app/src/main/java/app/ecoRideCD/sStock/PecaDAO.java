@@ -96,30 +96,52 @@ public class PecaDAO implements Map<Integer, Peca> {
     public Peca put(Integer key, Peca value) {
         Peca prev = get(key);
         String sql = """
-                INSERT INTO Peca (id, referencia, marca, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa, garantia)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    referencia = VALUES(referencia), marca = VALUES(marca), nome = VALUES(nome), descricao = VALUES(descricao),
-                    stock_minimo = VALUES(stock_minimo), preco_venda = VALUES(preco_venda),
-                    codFornecedor = VALUES(codFornecedor), ativa = VALUES(ativa), garantia = VALUES(garantia)
+                UPDATE Peca SET referencia=?, marca=?, nome=?, descricao=?, stock_minimo=?,
+                    preco_venda=?, codFornecedor=?, ativa=?, garantia=? WHERE id=?
                 """;
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getReferencia());
-            ps.setString(3, value.getMarca());
-            ps.setString(4, value.getNome());
-            ps.setString(5, value.getDescricao());
-            ps.setInt(6, value.getStock_minimo());
-            ps.setFloat(7, value.getPreco_venda());
-            ps.setInt(8, value.getCodFornecedor());
-            ps.setBoolean(9, value.isAtiva());
-            ps.setInt(10, value.getGarantia());
+            ps.setString(1, value.getReferencia());
+            ps.setString(2, value.getMarca());
+            ps.setString(3, value.getNome());
+            ps.setString(4, value.getDescricao());
+            ps.setInt(5, value.getStock_minimo());
+            ps.setFloat(6, value.getPreco_venda());
+            ps.setInt(7, value.getCodFornecedor());
+            ps.setBoolean(8, value.isAtiva());
+            ps.setInt(9, value.getGarantia());
+            ps.setInt(10, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar peca " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Peca value) {
+        String sql = """
+                INSERT INTO Peca (referencia, marca, nome, descricao, stock_minimo, preco_venda, codFornecedor, ativa, garantia)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, value.getReferencia());
+            ps.setString(2, value.getMarca());
+            ps.setString(3, value.getNome());
+            ps.setString(4, value.getDescricao());
+            ps.setInt(5, value.getStock_minimo());
+            ps.setFloat(6, value.getPreco_venda());
+            ps.setInt(7, value.getCodFornecedor());
+            ps.setBoolean(8, value.isAtiva());
+            ps.setInt(9, value.getGarantia());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para peca");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir peca", e);
+        }
     }
 
     @Override
@@ -185,16 +207,6 @@ public class PecaDAO implements Map<Integer, Peca> {
     // --------- Aliases / domínio ---------
 
     public void add(Peca p) { put(p.getId(), p); }
-
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Peca")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para peca", e);
-        }
-    }
 
     public boolean getByReference(String ref) {
         try (Connection c = ConnectionFactory.get();

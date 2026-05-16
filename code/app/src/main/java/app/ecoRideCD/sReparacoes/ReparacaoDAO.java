@@ -85,25 +85,37 @@ public class ReparacaoDAO implements Map<Integer, Reparacao> {
     @Override
     public Reparacao put(Integer key, Reparacao value) {
         Reparacao prev = get(key);
-        String sql = """
-                INSERT INTO Reparacao (id, nomenclatura, descricao, preco, disponivel)
-                VALUES (?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    nomenclatura = VALUES(nomenclatura), descricao = VALUES(descricao),
-                    preco = VALUES(preco), disponivel = VALUES(disponivel)
-                """;
+        String sql = "UPDATE Reparacao SET nomenclatura=?, descricao=?, preco=?, disponivel=? WHERE id=?";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getNomenclatura());
-            ps.setString(3, value.getDescricao());
-            ps.setFloat(4, value.getPreco());
-            ps.setBoolean(5, value.isDisponivel());
+            ps.setString(1, value.getNomenclatura());
+            ps.setString(2, value.getDescricao());
+            ps.setFloat(3, value.getPreco());
+            ps.setBoolean(4, value.isDisponivel());
+            ps.setInt(5, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar reparacao " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Reparacao value) {
+        String sql = "INSERT INTO Reparacao (nomenclatura, descricao, preco, disponivel) VALUES (?, ?, ?, ?)";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, value.getNomenclatura());
+            ps.setString(2, value.getDescricao());
+            ps.setFloat(3, value.getPreco());
+            ps.setBoolean(4, value.isDisponivel());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para reparacao");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir reparacao", e);
+        }
     }
 
     @Override
@@ -169,13 +181,4 @@ public class ReparacaoDAO implements Map<Integer, Reparacao> {
 
     // --------- Aliases / domínio ---------
 
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Reparacao")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para reparacao", e);
-        }
-    }
 }

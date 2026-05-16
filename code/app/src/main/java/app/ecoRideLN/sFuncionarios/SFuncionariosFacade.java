@@ -19,9 +19,8 @@ public class SFuncionariosFacade implements ISFuncionarios {
 
           validaDadosFuncionario(nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
 
-          int id = funcionarioDAO.generateNewId();
-          Funcionario funcionario = new Funcionario(id, nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
-          funcionarioDAO.put(id, funcionario);
+          Funcionario funcionario = new Funcionario(0, nome, telemovel, email, data_nascimento, NISS, NIF, NUS, IBAN, salario_hora, salario_liquido, salario_bruto, horas_extra, numero_porta, rua, localidade, codigo_postal);
+          funcionarioDAO.insert(funcionario);
           return funcionario;
      }
 

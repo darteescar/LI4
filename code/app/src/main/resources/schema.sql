@@ -7,7 +7,7 @@
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS Utilizador (
-    id            INT          NOT NULL,
+    id            INT          NOT NULL AUTO_INCREMENT,
     password      VARCHAR(255) NOT NULL,
     idFuncionario INT          NOT NULL,
     cargo         ENUM('Gerente', 'GestorStock', 'Secretaria', 'Mecanico') NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Utilizador (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS Funcionario (
-    id                  INT           NOT NULL,
+    id                  INT           NOT NULL AUTO_INCREMENT,
     nome                VARCHAR(100)  NOT NULL,
     telemovel           VARCHAR(20)   NOT NULL,
     email               VARCHAR(150)  NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS Funcionario (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS Cliente (
-    id        INT          NOT NULL,
+    id        INT          NOT NULL AUTO_INCREMENT,
     nome      VARCHAR(100) NOT NULL,
     email     VARCHAR(150),
     telemovel VARCHAR(20),
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS Cliente (
 );
 
 CREATE TABLE IF NOT EXISTS Trotinete (
-    id          INT          NOT NULL,
+    id          INT          NOT NULL AUTO_INCREMENT,
     modelo      VARCHAR(100),
     marca       VARCHAR(100),
     num_serie   VARCHAR(50),
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS Trotinete (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS Reparacao (
-    id           INT           NOT NULL,
+    id           INT           NOT NULL AUTO_INCREMENT,
     nomenclatura VARCHAR(150)  NOT NULL,
     descricao    TEXT,
     preco        FLOAT         NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS Reparacao (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS Notificacao (
-    id               INT      NOT NULL,
+    id               INT      NOT NULL AUTO_INCREMENT,
     descricao        TEXT,
     data_emissao     DATETIME NOT NULL,
     id_remetente     INT      NULL,
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Notificacao (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS Fornecedor (
-    id        INT          NOT NULL,
+    id        INT          NOT NULL AUTO_INCREMENT,
     nome      VARCHAR(100) NOT NULL,
     telemovel VARCHAR(20),
     email     VARCHAR(150),
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS Fornecedor (
 );
 
 CREATE TABLE IF NOT EXISTS Peca (
-    id            INT          NOT NULL,
+    id            INT          NOT NULL AUTO_INCREMENT,
     referencia    VARCHAR(100) NOT NULL,
     marca         VARCHAR(100) NULL,
     nome          VARCHAR(150) NULL,
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS Peca (
 -- para itens sem garantia. O DAO devolve a subclasse certa em runtime.
 -- data_chegada é NULL para stocks em estado StockEncomendado (ainda não recebidos).
 CREATE TABLE IF NOT EXISTS Stock (
-    id           INT          NOT NULL,
+    id           INT          NOT NULL AUTO_INCREMENT,
     preco_compra FLOAT        NOT NULL,
     codPeca      INT          NOT NULL,
     data_chegada DATE         NULL,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS Stock (
 );
 
 CREATE TABLE IF NOT EXISTS Defeito (
-    id              INT          NOT NULL,
+    id              INT          NOT NULL AUTO_INCREMENT,
     codStock        INT          NOT NULL,
     motivo          VARCHAR(255) NOT NULL,
     idFuncionario   INT          NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS Defeito (
 );
 
 CREATE TABLE IF NOT EXISTS Devolucao (
-    id       INT          NOT NULL,
+    id       INT          NOT NULL AUTO_INCREMENT,
     data     DATE         NOT NULL,
     motivo   VARCHAR(255),
     estado   ENUM('StockPendenteDeDevolucao', 'Enviada', 'Devolvida', 'Invalida') NOT NULL,
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS Devolucao (
 -- ordem preserva a posição na List<Integer>; ON DELETE CASCADE limpa
 -- as entradas se a encomenda for apagada.
 CREATE TABLE IF NOT EXISTS Encomenda (
-    id            INT      NOT NULL,
+    id            INT      NOT NULL AUTO_INCREMENT,
     codFornecedor INT      NOT NULL,
     data_criacao  DATE NULL,
     data_rececao  DATE NULL,
@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS Encomenda_EntradaStock (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS MovimentoFinanceiro (
-    id        INT          NOT NULL,
+    id        INT          NOT NULL AUTO_INCREMENT,
     valor     FLOAT        NOT NULL,
     data      DATETIME     NOT NULL,
     descricao VARCHAR(255),
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS MovimentoPeca (
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS OrdemServico (
-    id               INT      NOT NULL,
+    id               INT      NOT NULL AUTO_INCREMENT,
     descricao        TEXT,
     data_criacao     DATETIME NOT NULL,
     codTrotinete     INT      NOT NULL,

@@ -156,37 +156,28 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
 
     // ---------------- Helpers de escrita ----------------
 
-    private void upsertBase(Connection c, int id, OrdemServico os) throws SQLException {
+    private void updateBase(Connection c, int id, OrdemServico os) throws SQLException {
         String sql = """
-                INSERT INTO OrdemServico (id, descricao, data_criacao, codTrotinete,
-                                          codCliente, codCriador, codMecanico, estado, metodo_pagamento)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    descricao        = VALUES(descricao),
-                    data_criacao     = VALUES(data_criacao),
-                    codTrotinete     = VALUES(codTrotinete),
-                    codCliente       = VALUES(codCliente),
-                    codCriador       = VALUES(codCriador),
-                    codMecanico      = VALUES(codMecanico),
-                    estado           = VALUES(estado),
-                    metodo_pagamento = VALUES(metodo_pagamento)
+                UPDATE OrdemServico SET descricao=?, data_criacao=?, codTrotinete=?,
+                    codCliente=?, codCriador=?, codMecanico=?, estado=?, metodo_pagamento=?
+                WHERE id=?
                 """;
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.setString(2, os.getDescricao());
-            ps.setTimestamp(3, Timestamp.valueOf(os.getDataCriacao()));
-            ps.setInt(4, os.getCodTrotinete());
-            ps.setInt(5, os.getCodCliente());
-            ps.setInt(6, os.getCodCriador());
+            ps.setString(1, os.getDescricao());
+            ps.setTimestamp(2, Timestamp.valueOf(os.getDataCriacao()));
+            ps.setInt(3, os.getCodTrotinete());
+            ps.setInt(4, os.getCodCliente());
+            ps.setInt(5, os.getCodCriador());
             if (os.getCodMecanico() == null)
-                ps.setNull(7, java.sql.Types.INTEGER);
+                ps.setNull(6, java.sql.Types.INTEGER);
             else
-                ps.setInt(7, os.getCodMecanico());
-            ps.setString(8, os.getEstado().name());
+                ps.setInt(6, os.getCodMecanico());
+            ps.setString(7, os.getEstado().name());
             if (os.getMetodo_pagamento() == null)
-                ps.setNull(9, java.sql.Types.VARCHAR);
+                ps.setNull(8, java.sql.Types.VARCHAR);
             else
-                ps.setString(9, os.getMetodo_pagamento().name());
+                ps.setString(8, os.getMetodo_pagamento().name());
+            ps.setInt(9, id);
             ps.executeUpdate();
         }
     }
@@ -354,7 +345,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         try (Connection c = ConnectionFactory.get()) {
             c.setAutoCommit(false);
             try {
-                upsertBase(c, key, value);
+                updateBase(c, key, value);
                 clearChildren(c, key);
                 insertAcessorios(c, key, value.getAcessorios());
                 if (value.getDiagnostico() != null) insertDiagnostico(c, key, value.getDiagnostico());
@@ -370,6 +361,53 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
             throw new EcoRideException("Erro de ligação ao gravar OS " + key, e);
         }
         return prev;
+    }
+
+    public int insert(OrdemServico value) {
+        String sql = """
+                INSERT INTO OrdemServico (descricao, data_criacao, codTrotinete,
+                                          codCliente, codCriador, codMecanico, estado, metodo_pagamento)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                int id;
+                try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setString(1, value.getDescricao());
+                    ps.setTimestamp(2, Timestamp.valueOf(value.getDataCriacao()));
+                    ps.setInt(3, value.getCodTrotinete());
+                    ps.setInt(4, value.getCodCliente());
+                    ps.setInt(5, value.getCodCriador());
+                    if (value.getCodMecanico() == null)
+                        ps.setNull(6, java.sql.Types.INTEGER);
+                    else
+                        ps.setInt(6, value.getCodMecanico());
+                    ps.setString(7, value.getEstado().name());
+                    if (value.getMetodo_pagamento() == null)
+                        ps.setNull(8, java.sql.Types.VARCHAR);
+                    else
+                        ps.setString(8, value.getMetodo_pagamento().name());
+                    ps.executeUpdate();
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (rs.next()) { id = rs.getInt(1); value.setId(id); }
+                        else throw new EcoRideException("Sem ID gerado para OS");
+                    }
+                }
+                insertAcessorios(c, id, value.getAcessorios());
+                if (value.getDiagnostico() != null) insertDiagnostico(c, id, value.getDiagnostico());
+                if (value.getConserto() != null)    insertConserto(c, id, value.getConserto());
+                c.commit();
+                return id;
+            } catch (SQLException e) {
+                c.rollback();
+                throw new EcoRideException("Erro a inserir OS", e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação ao inserir OS", e);
+        }
     }
 
     @Override
@@ -438,17 +476,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         return out;
     }
 
-    // ---------------- generateNewId + queries específicas ----------------
-
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM OrdemServico")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para OS", e);
-        }
-    }
+    // ---------------- queries específicas ----------------
 
     public List<OrdemServico> getOSDoCliente(int idCliente) {
         List<OrdemServico> out = new ArrayList<>();
@@ -528,9 +556,13 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
         List<OrdemServico> out = new ArrayList<>();
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(
-                     SELECT_BASE + " WHERE estado NOT IN (?, ?) ORDER BY id")) {
-            ps.setString(1, EstadoOS.Paga.name());
-            ps.setString(2, EstadoOS.Eliminada.name());
+                     SELECT_BASE + " WHERE estado IN (?, ?, ?, ?, ?, ?) ORDER BY id")) {
+            ps.setString(1, EstadoOS.PendenteDiagnostico.name());
+            ps.setString(2, EstadoOS.PendenteAprovacaoOrcamento.name());
+            ps.setString(3, EstadoOS.PendenteReparacao.name());
+            ps.setString(4, EstadoOS.AguardarPecas.name());
+            ps.setString(5, EstadoOS.ClienteNotificado.name());
+            ps.setString(6, EstadoOS.PendentePagamento.name());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) out.add(buildFromRow(c, rs));
             }

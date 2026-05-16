@@ -102,25 +102,37 @@ public class ClienteDAO implements Map<Integer, Cliente> {
     @Override
     public Cliente put(Integer key, Cliente value) {
         Cliente prev = get(key);
-        String sql = """
-                INSERT INTO Cliente (id, nome, email, telemovel, NIF)
-                VALUES (?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    nome = VALUES(nome), email = VALUES(email),
-                    telemovel = VALUES(telemovel), NIF = VALUES(NIF)
-                """;
+        String sql = "UPDATE Cliente SET nome=?, email=?, telemovel=?, NIF=? WHERE id=?";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getNome());
-            ps.setString(3, value.getEmail());
-            ps.setString(4, value.getTelemovel());
-            ps.setString(5, value.getNIF());
+            ps.setString(1, value.getNome());
+            ps.setString(2, value.getEmail());
+            ps.setString(3, value.getTelemovel());
+            ps.setString(4, value.getNIF());
+            ps.setInt(5, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar cliente " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Cliente value) {
+        String sql = "INSERT INTO Cliente (nome, email, telemovel, NIF) VALUES (?, ?, ?, ?)";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, value.getNome());
+            ps.setString(2, value.getEmail());
+            ps.setString(3, value.getTelemovel());
+            ps.setString(4, value.getNIF());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para cliente");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir cliente", e);
+        }
     }
 
     @Override
@@ -186,13 +198,4 @@ public class ClienteDAO implements Map<Integer, Cliente> {
 
     // --------- Aliases / domínio ---------
 
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Cliente")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para cliente", e);
-        }
-    }
 }

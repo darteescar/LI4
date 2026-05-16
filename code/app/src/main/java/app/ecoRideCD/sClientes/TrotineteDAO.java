@@ -105,27 +105,39 @@ public class TrotineteDAO implements Map<Integer, Trotinete> {
     @Override
     public Trotinete put(Integer key, Trotinete value) {
         Trotinete prev = get(key);
-        String sql = """
-                INSERT INTO Trotinete (id, modelo, marca, num_serie, tipo_motor, cod_cliente)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    modelo = VALUES(modelo), marca = VALUES(marca),
-                    num_serie = VALUES(num_serie), tipo_motor = VALUES(tipo_motor),
-                    cod_cliente = VALUES(cod_cliente)
-                """;
+        String sql = "UPDATE Trotinete SET modelo=?, marca=?, num_serie=?, tipo_motor=?, cod_cliente=? WHERE id=?";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getModelo());
-            ps.setString(3, value.getMarca());
-            ps.setString(4, value.getNum_serie());
-            ps.setString(5, value.getTipo_motor());
-            ps.setInt(6, value.getCod_cliente());
+            ps.setString(1, value.getModelo());
+            ps.setString(2, value.getMarca());
+            ps.setString(3, value.getNum_serie());
+            ps.setString(4, value.getTipo_motor());
+            ps.setInt(5, value.getCod_cliente());
+            ps.setInt(6, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar trotinete " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Trotinete value) {
+        String sql = "INSERT INTO Trotinete (modelo, marca, num_serie, tipo_motor, cod_cliente) VALUES (?, ?, ?, ?, ?)";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, value.getModelo());
+            ps.setString(2, value.getMarca());
+            ps.setString(3, value.getNum_serie());
+            ps.setString(4, value.getTipo_motor());
+            ps.setInt(5, value.getCod_cliente());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para trotinete");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir trotinete", e);
+        }
     }
 
     @Override
@@ -192,14 +204,4 @@ public class TrotineteDAO implements Map<Integer, Trotinete> {
     // --------- Aliases / domínio ---------
 
     public void add(Trotinete t)               { put(t.getId(), t); }
-
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Trotinete")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para trotinete", e);
-        }
-    }
 }

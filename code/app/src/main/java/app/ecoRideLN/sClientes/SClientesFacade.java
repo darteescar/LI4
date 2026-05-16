@@ -19,9 +19,8 @@ public class SClientesFacade implements ISClientes {
      @Override
      public Cliente registarCliente(String nome, String email, String telemovel, String nif) {
           validaDadosCliente(nome, email, telemovel, nif);
-          int id = clientesDAO.generateNewId();
-          Cliente cliente = new Cliente(id, nome, email, telemovel, nif);
-          clientesDAO.put(id, cliente);
+          Cliente cliente = new Cliente(0, nome, email, telemovel, nif);
+          clientesDAO.insert(cliente);
           return cliente;
      }
 
@@ -68,9 +67,8 @@ public class SClientesFacade implements ISClientes {
           validaDadosTrotinete(modelo, marca, num_serie, tipo_motor);
           Cliente cliente = clientesDAO.get(id_cliente);
           if (cliente != null) {
-               int id = trotinetesDAO.generateNewId();
-               Trotinete trotinete = new Trotinete(id, modelo, marca, num_serie, tipo_motor, id_cliente);
-               trotinetesDAO.put(id, trotinete);
+               Trotinete trotinete = new Trotinete(0, modelo, marca, num_serie, tipo_motor, id_cliente);
+               trotinetesDAO.insert(trotinete);
                return trotinete;
           } else {
                throw new EcoRideException("Cliente com ID " + id_cliente + " não encontrado.");

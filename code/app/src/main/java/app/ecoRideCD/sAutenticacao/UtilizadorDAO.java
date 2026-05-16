@@ -89,27 +89,37 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
     @Override
     public Utilizador put(Integer key, Utilizador value) {
         Utilizador prev = get(key);
-        String sql = """
-                INSERT INTO Utilizador (id, password, idFuncionario, cargo, identificador)
-                VALUES (?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    password      = VALUES(password),
-                    idFuncionario = VALUES(idFuncionario),
-                    cargo         = VALUES(cargo),
-                    identificador = VALUES(identificador)
-                """;
+        String sql = "UPDATE Utilizador SET password=?, idFuncionario=?, cargo=?, identificador=? WHERE id=?";
         try (Connection c = ConnectionFactory.get();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, key);
-            ps.setString(2, value.getPassword());
-            ps.setInt(3, value.getIdFuncionario());
-            ps.setString(4, value.getCargo().name());
-            ps.setString(5, value.getIdentificador());
+            ps.setString(1, value.getPassword());
+            ps.setInt(2, value.getIdFuncionario());
+            ps.setString(3, value.getCargo().name());
+            ps.setString(4, value.getIdentificador());
+            ps.setInt(5, key);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new EcoRideException("Erro a gravar utilizador " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Utilizador value) {
+        String sql = "INSERT INTO Utilizador (password, idFuncionario, cargo, identificador) VALUES (?, ?, ?, ?)";
+        try (Connection c = ConnectionFactory.get();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, value.getPassword());
+            ps.setInt(2, value.getIdFuncionario());
+            ps.setString(3, value.getCargo().name());
+            ps.setString(4, value.getIdentificador());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para utilizador");
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a inserir utilizador", e);
+        }
     }
 
     @Override
@@ -185,16 +195,6 @@ public class UtilizadorDAO implements Map<Integer, Utilizador> {
     }
 
     // --------- Aliases / domínio ---------
-
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Utilizador")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para utilizador", e);
-        }
-    }
 
     public boolean existeIdentificador(String identificador) {
         try (Connection c = ConnectionFactory.get();

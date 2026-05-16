@@ -118,50 +118,38 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
     public Notificacao put(Integer key, Notificacao value) {
         Notificacao prev = get(key);
         String sqlBase = """
-                INSERT INTO Notificacao (id, descricao, data_emissao, id_remetente,
-                                         id_destinatario, estado, data_horaTratada)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    descricao = VALUES(descricao), data_emissao = VALUES(data_emissao),
-                    id_remetente = VALUES(id_remetente), id_destinatario = VALUES(id_destinatario),
-                    estado = VALUES(estado),
-                    data_horaTratada = VALUES(data_horaTratada)
+                UPDATE Notificacao SET descricao=?, data_emissao=?, id_remetente=?,
+                    id_destinatario=?, estado=?, data_horaTratada=? WHERE id=?
                 """;
         try (Connection c = ConnectionFactory.get()) {
             try (PreparedStatement ps = c.prepareStatement(sqlBase)) {
-                ps.setInt(1, key);
-                ps.setString(2, value.getDescricao());
-                ps.setTimestamp(3, Timestamp.valueOf(value.getData_emissao()));
+                ps.setString(1, value.getDescricao());
+                ps.setTimestamp(2, Timestamp.valueOf(value.getData_emissao()));
                 if (value.getId_remetente() == 0)
-                    ps.setNull(4, java.sql.Types.INTEGER);
+                    ps.setNull(3, java.sql.Types.INTEGER);
                 else
-                    ps.setInt(4, value.getId_remetente());
-                ps.setInt(5, value.getId_destinatario());
-                ps.setString(6, value.getEstado().name());
+                    ps.setInt(3, value.getId_remetente());
+                ps.setInt(4, value.getId_destinatario());
+                ps.setString(5, value.getEstado().name());
                 if (value.getData_horaTratada() == null)
-                    ps.setNull(7, java.sql.Types.TIMESTAMP);
+                    ps.setNull(6, java.sql.Types.TIMESTAMP);
                 else
-                    ps.setTimestamp(7, Timestamp.valueOf(value.getData_horaTratada()));
+                    ps.setTimestamp(6, Timestamp.valueOf(value.getData_horaTratada()));
+                ps.setInt(7, key);
                 ps.executeUpdate();
             }
             if (value instanceof NotificacaoOS nos) {
-                String sqlChild = """
-                        INSERT INTO NotificacaoOS (id, id_os) VALUES (?, ?)
-                        ON DUPLICATE KEY UPDATE id_os = VALUES(id_os)
-                        """;
+                String sqlChild = "UPDATE NotificacaoOS SET id_os=? WHERE id=?";
                 try (PreparedStatement ps = c.prepareStatement(sqlChild)) {
-                    ps.setInt(1, key);
-                    ps.setInt(2, nos.getId_os());
+                    ps.setInt(1, nos.getId_os());
+                    ps.setInt(2, key);
                     ps.executeUpdate();
                 }
             } else if (value instanceof NotificacaoStock nst) {
-                String sqlChild = """
-                        INSERT INTO NotificacaoStock (id, id_peca) VALUES (?, ?)
-                        ON DUPLICATE KEY UPDATE id_peca = VALUES(id_peca)
-                        """;
+                String sqlChild = "UPDATE NotificacaoStock SET id_peca=? WHERE id=?";
                 try (PreparedStatement ps = c.prepareStatement(sqlChild)) {
-                    ps.setInt(1, key);
-                    ps.setInt(2, nst.getId_peca());
+                    ps.setInt(1, nst.getId_peca());
+                    ps.setInt(2, key);
                     ps.executeUpdate();
                 }
             }
@@ -169,6 +157,63 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
             throw new EcoRideException("Erro a gravar notificacao " + key, e);
         }
         return prev;
+    }
+
+    public int insert(Notificacao value) {
+        String sqlBase = """
+                INSERT INTO Notificacao (descricao, data_emissao, id_remetente,
+                                         id_destinatario, estado, data_horaTratada)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                int id = -1;
+                try (PreparedStatement ps = c.prepareStatement(sqlBase, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setString(1, value.getDescricao());
+                    ps.setTimestamp(2, Timestamp.valueOf(value.getData_emissao()));
+                    if (value.getId_remetente() == 0)
+                        ps.setNull(3, java.sql.Types.INTEGER);
+                    else
+                        ps.setInt(3, value.getId_remetente());
+                    ps.setInt(4, value.getId_destinatario());
+                    ps.setString(5, value.getEstado().name());
+                    if (value.getData_horaTratada() == null)
+                        ps.setNull(6, java.sql.Types.TIMESTAMP);
+                    else
+                        ps.setTimestamp(6, Timestamp.valueOf(value.getData_horaTratada()));
+                    ps.executeUpdate();
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (rs.next()) { id = rs.getInt(1); value.setId(id); }
+                        else throw new EcoRideException("Sem ID gerado para notificacao");
+                    }
+                }
+                if (value instanceof NotificacaoOS nos) {
+                    try (PreparedStatement ps = c.prepareStatement(
+                            "INSERT INTO NotificacaoOS (id, id_os) VALUES (?, ?)")) {
+                        ps.setInt(1, id);
+                        ps.setInt(2, nos.getId_os());
+                        ps.executeUpdate();
+                    }
+                } else if (value instanceof NotificacaoStock nst) {
+                    try (PreparedStatement ps = c.prepareStatement(
+                            "INSERT INTO NotificacaoStock (id, id_peca) VALUES (?, ?)")) {
+                        ps.setInt(1, id);
+                        ps.setInt(2, nst.getId_peca());
+                        ps.executeUpdate();
+                    }
+                }
+                c.commit();
+                return id;
+            } catch (SQLException e) {
+                c.rollback();
+                throw new EcoRideException("Erro a inserir notificacao", e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação ao inserir notificacao", e);
+        }
     }
 
     @Override
@@ -235,16 +280,6 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
     // --------- Aliases / domínio ---------
 
     public void add(Notificacao n) { put(n.getId(), n); }
-
-    public int generateNewId() {
-        try (Connection c = ConnectionFactory.get();
-             Statement s = c.createStatement();
-             ResultSet rs = s.executeQuery("SELECT COALESCE(MAX(id), 0) FROM Notificacao")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
-        } catch (SQLException e) {
-            throw new EcoRideException("Erro a gerar novo ID para notificacao", e);
-        }
-    }
 
     public List<Notificacao> getByDestinatario(int id_destinatario) {
         List<Notificacao> out = new ArrayList<>();

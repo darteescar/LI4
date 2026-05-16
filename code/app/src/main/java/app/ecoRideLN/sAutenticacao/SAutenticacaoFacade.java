@@ -18,9 +18,8 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         if (utilizadoresDAO.existeIdentificador(identificador)) {
             throw new EcoRideException("Identificador '" + identificador + "' já está em uso.");
         }
-        int newId = utilizadoresDAO.generateNewId();
-        Utilizador utilizador = new Utilizador(newId, password, idFuncionario, cargo, identificador);
-        utilizadoresDAO.put(newId, utilizador);
+        Utilizador utilizador = new Utilizador(0, password, idFuncionario, cargo, identificador);
+        utilizadoresDAO.insert(utilizador);
         return utilizador;
     }
 

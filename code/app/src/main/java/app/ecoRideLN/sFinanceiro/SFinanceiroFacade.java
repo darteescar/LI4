@@ -19,9 +19,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
           validaMovimentoFinanceiro(descricao, valor);
 
-          int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFinanceiro movimento = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), TipoMovimento.GastoPecas, codStock);
-          return movimentoFinanceiroDAO.put(id, movimento);
+          MovimentoFinanceiro movimento = new MovimentoPeca(0, descricao, valor, LocalDateTime.now(), TipoMovimento.GastoPecas, codStock);
+          movimentoFinanceiroDAO.insert(movimento);
+          return movimento;
      }
 
      @Override
@@ -29,9 +29,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
           validaMovimentoFinanceiro(descricao, valor);
 
-          int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFinanceiro movimento = new MovimentoPeca(id, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroVendaPecas, codStock);
-          return movimentoFinanceiroDAO.put(id, movimento);
+          MovimentoFinanceiro movimento = new MovimentoPeca(0, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroVendaPecas, codStock);
+          movimentoFinanceiroDAO.insert(movimento);
+          return movimento;
      }
 
      @Override
@@ -39,9 +39,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
           validaMovimentoFinanceiro(descricao, valor);
 
-          int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFinanceiro movimento = new MovimentoFuncionario(id, descricao, valor, LocalDateTime.now(), TipoMovimento.Salario, idFuncionario);
-          return movimentoFinanceiroDAO.put(id, movimento);
+          MovimentoFinanceiro movimento = new MovimentoFuncionario(0, descricao, valor, LocalDateTime.now(), TipoMovimento.Salario, idFuncionario);
+          movimentoFinanceiroDAO.insert(movimento);
+          return movimento;
      }
 
      @Override
@@ -49,9 +49,9 @@ public class SFinanceiroFacade implements ISFinanceiro {
 
           validaMovimentoFinanceiro(descricao, valor);
 
-          int id = movimentoFinanceiroDAO.generateNewId();
-          MovimentoFinanceiro movimento = new MovimentoReparacao(id, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroMaoObra, idReparacao);
-          return movimentoFinanceiroDAO.put(id, movimento);
+          MovimentoFinanceiro movimento = new MovimentoReparacao(0, descricao, valor, LocalDateTime.now(), TipoMovimento.LucroMaoObra, idReparacao);
+          movimentoFinanceiroDAO.insert(movimento);
+          return movimento;
      }
 
      // ------------------- Consulta -------------------
