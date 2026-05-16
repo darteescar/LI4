@@ -155,3 +155,103 @@ VALUES
 (8,  'Speedway Mini 4 Pro',       'Minimotors','MM2026H008','Brushless',     8),
 (9,  'Urban Glide Ride 80XL',     'UrbanGlide','UG2026I009','Direct Drive',  9),
 (10, 'Dualtron Mini',             'Dualtron', 'DT2026J010', 'Dual Motor',    10);
+
+-- =========================================================
+-- Stock
+-- =========================================================
+
+-- Stocks consumidos nos conseretos das OS Pagas (estado final correto após conserto)
+INSERT IGNORE INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, garantia, estado)
+VALUES
+    (1,  15.00, 6,  '2025-01-10', 1, '2025-07-10', 'StockUsadoConserto'),  -- Pneu 8.5 — usado na OS 1
+    (2,   5.00, 8,  '2025-01-10', 1,  NULL,         'StockUsadoConserto'),  -- Câmara 8.5 — usado na OS 1
+    (3,  99.00, 1,  '2025-02-01', 1, '2026-02-01',  'StockUsadoConserto'),  -- Bateria 36V — usado na OS 2
+    (4,  35.00, 15, '2025-03-01', 1, '2026-03-01',  'StockUsadoConserto'),  -- Controlador 36V — usado na OS 3
+    (5,  12.00, 28, '2025-03-01', 1,  NULL,         'StockUsadoConserto');  -- Kit Cablagem — usado na OS 3
+
+-- Stocks em armazém disponíveis para futuras reparações
+INSERT IGNORE INTO Stock (id, preco_compra, codPeca, data_chegada, quantidade, garantia, estado)
+VALUES
+    (6,  15.00, 6,  '2025-04-01', 5, '2025-10-01', 'StockEmArmazem'),  -- Pneu 8.5
+    (7,   5.00, 8,  '2025-04-01', 8,  NULL,         'StockEmArmazem'),  -- Câmara 8.5
+    (8,   8.00, 10, '2025-04-05', 6, '2025-10-05', 'StockEmArmazem'),  -- Pastilhas de Travão
+    (9,  99.00, 1,  '2025-04-10', 3, '2026-04-10', 'StockEmArmazem'),  -- Bateria 36V 10Ah
+    (10, 34.00, 13, '2025-04-15', 2, '2026-04-15', 'StockEmArmazem');  -- Display LCD M365
+
+-- =========================================================
+-- Ordens de Serviço — Pagas (3) e Eliminadas (2)
+-- =========================================================
+
+INSERT IGNORE INTO OrdemServico (id, descricao, data_criacao, codTrotinete, codCliente, codCriador, codMecanico, estado, metodo_pagamento)
+VALUES
+    (1, 'Pneu furado e câmara de ar danificada. Cliente refere impacto com passeio.',
+        '2025-01-15 09:00:00', 1, 1, 3, 4, 'Paga', 'MULTIBANCO'),
+    (2, 'Bateria não segura carga. Trotinete desliga-se após percurso mínimo.',
+        '2025-02-10 10:30:00', 3, 3, 3, 5, 'Paga', 'NUMERARIO'),
+    (3, 'Controlador com falhas intermitentes e cablagem de alimentação danificada.',
+        '2025-03-05 14:00:00', 5, 5, 3, 4, 'Paga', 'MBWAY'),
+    (4, 'Reclamação de ruído no motor. Cliente não compareceu para levantamento.',
+        '2025-02-20 11:00:00', 2, 2, 3, 4, 'Eliminada', NULL),
+    (5, 'Solicitação de revisão geral. Cliente cancelou o serviço.',
+        '2025-04-01 09:30:00', 7, 7, 1, NULL, 'Eliminada', NULL);
+
+-- Acessórios entregues com as trotinetes
+INSERT IGNORE INTO OrdemServico_Acessorio (idOS, ordem, valor)
+VALUES
+    (1, 1, 'Cadeado'),
+    (1, 2, 'Carregador original'),
+    (2, 1, 'Carregador original'),
+    (3, 1, 'Bolsa de transporte');
+
+-- =========================================================
+-- Diagnósticos (apenas OS Pagas — aprovado = TRUE)
+-- =========================================================
+
+INSERT IGNORE INTO Diagnostico (idOS, descricao, orcamento, aprovado)
+VALUES
+    (1, 'Pneu com corte irreparável. Câmara de ar furada. Necessária substituição de ambos.', 55.00, TRUE),
+    (2, 'Bateria com células degradadas. Capacidade real inferior a 20% do original.', 180.00, TRUE),
+    (3, 'Controlador com MOSFET danificado. Cablagem de alimentação com quebra interna.', 106.00, TRUE);
+
+INSERT IGNORE INTO Diagnostico_PecaOrcamento (idOS, codPeca, quantidade)
+VALUES
+    (1, 6,  1),  -- Pneu 8.5
+    (1, 8,  1),  -- Câmara 8.5
+    (2, 1,  1),  -- Bateria 36V 10Ah
+    (3, 15, 1),  -- Controlador 36V
+    (3, 28, 1);  -- Kit Cablagem
+
+INSERT IGNORE INTO Diagnostico_Reparacao (idOS, codReparacao)
+VALUES
+    (1, 2),   -- Troca de Pneu
+    (1, 3),   -- Reparação de Câmara de Ar
+    (2, 1),   -- Diagnóstico Geral
+    (2, 8),   -- Substituição de Bateria
+    (3, 9),   -- Reparação de Controlador
+    (3, 18);  -- Reparação de Cabelagem
+
+-- =========================================================
+-- Conseretos (apenas OS Pagas)
+-- =========================================================
+
+INSERT IGNORE INTO Conserto (idOS, preco_total, chk_luzes, chk_pneus, chk_aceleracao, chk_travagem, chk_visor, chk_teste_pratico)
+VALUES
+    (1,  52.00, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE),
+    (2, 175.00, TRUE, TRUE, TRUE, TRUE, TRUE,  TRUE),
+    (3, 103.00, TRUE, TRUE, TRUE, TRUE, TRUE,  TRUE);
+
+INSERT IGNORE INTO Conserto_PecaUsada (idOS, codStock, quantidade)
+VALUES
+    (1, 1, 1),  -- Pneu 8.5   (stock 1)
+    (1, 2, 1),  -- Câmara 8.5 (stock 2)
+    (2, 3, 1),  -- Bateria 36V (stock 3)
+    (3, 4, 1),  -- Controlador 36V (stock 4)
+    (3, 5, 1);  -- Kit Cablagem (stock 5)
+
+INSERT IGNORE INTO Conserto_Reparacao (idOS, codReparacao)
+VALUES
+    (1, 2),   -- Troca de Pneu
+    (1, 3),   -- Reparação de Câmara de Ar
+    (2, 8),   -- Substituição de Bateria
+    (3, 9),   -- Reparação de Controlador
+    (3, 18);  -- Reparação de Cabelagem
