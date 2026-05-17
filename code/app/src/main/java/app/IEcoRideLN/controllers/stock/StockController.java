@@ -157,6 +157,11 @@ public class StockController {
             ctx.json(historico ? facade.obterEncomendas() : facade.obterEncomendasAbertas());
         });
 
+        app.get("/api/encomendas/automatica", ctx -> {
+            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
+            ctx.status(200).json(facade.gerarListaAutomatica());
+        });
+
         app.get("/api/encomendas/{id}", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
             int id = Integer.parseInt(ctx.pathParam("id"));
@@ -187,11 +192,6 @@ public class StockController {
             Encomenda atualizado = facade.marcarEncomendaComoEnviada(id);
             if (atualizado == null) ctx.status(404);
             else ctx.status(200).json(atualizado);
-        });
-
-        app.get("/api/encomendas/automatica", ctx -> {
-            GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            ctx.status(200).json(facade.gerarListaAutomatica());
         });
 
         app.patch("/api/encomendas/{id}/recebida", ctx -> {

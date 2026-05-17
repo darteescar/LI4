@@ -149,6 +149,7 @@ export default function Trotinetes() {
         )}
       />
       <TrotineteForm
+        key={editing?.id ?? "new"}
         open={open}
         onOpenChange={setOpen}
         initial={editing}
