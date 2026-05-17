@@ -582,6 +582,9 @@ public class EcoRideController implements IEcoRideController {
     public List<Devolucao> obterDevolucoes() { return sStock.obterDevolucoes(); }
 
     @Override
+    public List<Devolucao> obterDevolucoesPendentes() { return sStock.obterDevolucoesPendentes(); }
+
+    @Override
     public boolean removerDevolucao(int id) { return sStock.removerDevolucao(id); }
 
     @Override
@@ -617,6 +620,9 @@ public class EcoRideController implements IEcoRideController {
 
     @Override
     public List<Encomenda> obterEncomendas() { return sStock.obterEncomendas(); }
+
+    @Override
+    public List<Encomenda> obterEncomendasAbertas() { return sStock.obterEncomendasAbertas(); }
 
     @Override
     public Encomenda marcarEncomendaComoEnviada(int id) { return sStock.marcarEncomendaComoEnviada(id); }

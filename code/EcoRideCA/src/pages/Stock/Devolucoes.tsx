@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2, CheckCircle2, Send, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +21,7 @@ interface Devolucao {
   id: number; data: string; motivo: string; estado: EstadoDevolucao; codStock: number;
 }
 
-interface StockEntry { id: number; codPeca: number; }
+interface StockEntry { id: number; codPeca: number; quantidade: number; data_chegada: string | null; }
 interface Peca { id: number; referencia: string; nome: string; }
 
 const ESTADO_LABELS: Record<EstadoDevolucao, string> = {
@@ -40,12 +41,13 @@ const ESTADO_VARIANT: Record<EstadoDevolucao, "secondary" | "outline" | "destruc
 export default function StockDevolucoes() {
   const { role } = useAuth();
   const qc = useQueryClient();
+  const [historico, setHistorico] = useState(false);
 
   const canEdit = role === "GERENTE" || role === "GESTOR_STOCK";
 
   const { data: devolucoes = [], isLoading } = useQuery<Devolucao[]>({
-    queryKey: ["devolucoes"],
-    queryFn: () => api.get<Devolucao[]>("/devolucoes"),
+    queryKey: ["devolucoes", historico],
+    queryFn: () => api.get<Devolucao[]>(`/devolucoes${historico ? "?historico=true" : ""}`),
   });
 
   const { data: stocks = [] } = useQuery<StockEntry[]>({
@@ -84,12 +86,12 @@ export default function StockDevolucoes() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const stockLabel = (codStock: number) => {
+  const stockInfo = (codStock: number) => {
     const s = stocks.find((x) => x.id === codStock);
-    if (!s) return `Stock #${codStock}`;
+    if (!s) return { label: `Stock #${codStock}`, quantidade: null, data_chegada: null };
     const p = pecas.find((x) => x.id === s.codPeca);
-    const pLabel = p ? `${p.referencia} · ${p.nome}` : `Peça #${s.codPeca}`;
-    return pLabel;
+    const label = p ? `${p.referencia} · ${p.nome}` : `Peça #${s.codPeca}`;
+    return { label, quantidade: s.quantidade, data_chegada: s.data_chegada };
   };
 
   return (
@@ -100,13 +102,25 @@ export default function StockDevolucoes() {
       />
       <StockTabs />
 
+      <div className="mb-3 flex justify-end">
+        <Button
+          variant={historico ? "default" : "outline"}
+          size="sm"
+          onClick={() => setHistorico((v) => !v)}
+        >
+          {historico ? "Ocultar histórico" : "Ver histórico completo"}
+        </Button>
+      </div>
+
       <div className="rounded-lg border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Nº</TableHead>
               <TableHead>Stock / Peça</TableHead>
-              <TableHead>Data</TableHead>
+              <TableHead>Qtd</TableHead>
+              <TableHead>Data chegada</TableHead>
+              <TableHead>Data devolução</TableHead>
               <TableHead>Motivo</TableHead>
               <TableHead>Estado</TableHead>
               {canEdit && <TableHead className="w-[1%] text-right">Ações</TableHead>}
@@ -114,13 +128,17 @@ export default function StockDevolucoes() {
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={canEdit ? 6 : 5} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="h-24 text-center text-sm text-muted-foreground">A carregar…</TableCell></TableRow>
             ) : devolucoes.length === 0 ? (
-              <TableRow><TableCell colSpan={canEdit ? 6 : 5} className="h-24 text-center text-sm text-muted-foreground">Sem devoluções registadas</TableCell></TableRow>
-            ) : devolucoes.map((d) => (
+              <TableRow><TableCell colSpan={canEdit ? 8 : 7} className="h-24 text-center text-sm text-muted-foreground">Sem devoluções registadas</TableCell></TableRow>
+            ) : devolucoes.map((d) => {
+              const { label, quantidade, data_chegada } = stockInfo(d.codStock);
+              return (
               <TableRow key={d.id}>
                 <TableCell className="font-mono text-xs">DEV-{d.id}</TableCell>
-                <TableCell className="font-medium">{stockLabel(d.codStock)}</TableCell>
+                <TableCell className="font-medium">{label}</TableCell>
+                <TableCell className="font-mono text-xs">{quantidade ?? "—"}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{data_chegada ?? "—"}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">{d.data}</TableCell>
                 <TableCell className="max-w-[200px] truncate text-sm" title={d.motivo}>{d.motivo}</TableCell>
                 <TableCell>
@@ -162,7 +180,8 @@ export default function StockDevolucoes() {
                   </TableCell>
                 )}
               </TableRow>
-            ))}
+              );
+            })}
           </TableBody>
         </Table>
       </div>

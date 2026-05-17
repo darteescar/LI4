@@ -7,9 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Date;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -178,6 +180,19 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
         Set<Entry<Integer, Devolucao>> out = new HashSet<>();
         for (Devolucao d : values())
             out.add(new AbstractMap.SimpleEntry<>(d.getId(), d));
+        return out;
+    }
+
+    public List<Devolucao> getPendentes() {
+        List<Devolucao> out = new ArrayList<>();
+        String sql = "SELECT id, data, motivo, estado, codStock FROM Devolucao WHERE estado IN ('StockPendenteDeDevolucao', 'Enviada')";
+        try (Connection c = ConnectionFactory.get();
+             Statement s = c.createStatement();
+             ResultSet rs = s.executeQuery(sql)) {
+            while (rs.next()) out.add(buildFromRow(rs));
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro a obter devolucoes pendentes", e);
+        }
         return out;
     }
 

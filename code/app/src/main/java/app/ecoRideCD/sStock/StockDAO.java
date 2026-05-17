@@ -7,10 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,9 @@ import java.util.Set;
 
 import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
+import app.ecoRideLN.sStock.Defeito;
+import app.ecoRideLN.sStock.Devolucao;
+import app.ecoRideLN.sStock.EstadoDevolucao;
 import app.ecoRideLN.sStock.EstadoStock;
 import app.ecoRideLN.sStock.Stock;
 
@@ -259,5 +264,331 @@ public class StockDAO implements Map<Integer, Stock> {
             throw new EcoRideException("Erro a obter stocks operacionais", e);
         }
         return out;
+    }
+
+    // --------- Helpers privados (usam Connection externa) ---------
+
+    private Stock getStockConn(Connection c, int id) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("SELECT * FROM Stock WHERE id = ?")) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? buildFromRow(rs) : null;
+            }
+        }
+    }
+
+    private void updateStockConn(Connection c, Stock s) throws SQLException {
+        String sql = "UPDATE Stock SET preco_compra=?, codPeca=?, data_chegada=?, quantidade=?, garantia=?, estado=? WHERE id=?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setFloat(1, s.getPreco_compra());
+            ps.setInt(2, s.getCodPeca());
+            if (s.getData_chegada() != null) ps.setDate(3, Date.valueOf(s.getData_chegada()));
+            else ps.setNull(3, Types.DATE);
+            ps.setInt(4, s.getQuantidade());
+            if (s.getGarantia() != null) ps.setDate(5, Date.valueOf(s.getGarantia()));
+            else ps.setNull(5, Types.DATE);
+            ps.setString(6, s.getEstado().name());
+            ps.setInt(7, s.getId());
+            ps.executeUpdate();
+        }
+    }
+
+    private int insertStockConn(Connection c, Stock s) throws SQLException {
+        String sql = "INSERT INTO Stock (preco_compra, codPeca, data_chegada, quantidade, garantia, estado) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setFloat(1, s.getPreco_compra());
+            ps.setInt(2, s.getCodPeca());
+            if (s.getData_chegada() != null) ps.setDate(3, Date.valueOf(s.getData_chegada()));
+            else ps.setNull(3, Types.DATE);
+            ps.setInt(4, s.getQuantidade());
+            if (s.getGarantia() != null) ps.setDate(5, Date.valueOf(s.getGarantia()));
+            else ps.setNull(5, Types.DATE);
+            ps.setString(6, s.getEstado().name());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) { int id = rs.getInt(1); s.setId(id); return id; }
+                throw new EcoRideException("Sem ID gerado para stock");
+            }
+        }
+    }
+
+    private Defeito getDefeitoConn(Connection c, int id) throws SQLException {
+        String sql = "SELECT id, codStock, motivo, idFuncionario, estado_anterior FROM Defeito WHERE id = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                return new Defeito(rs.getInt("id"), rs.getInt("codStock"), rs.getString("motivo"),
+                        rs.getInt("idFuncionario"), EstadoStock.valueOf(rs.getString("estado_anterior")));
+            }
+        }
+    }
+
+    private Defeito insertDefeitoConn(Connection c, int codStock, String motivo, int idFuncionario, EstadoStock estadoAnterior) throws SQLException {
+        String sql = "INSERT INTO Defeito (codStock, motivo, idFuncionario, estado_anterior) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, codStock);
+            ps.setString(2, motivo);
+            ps.setInt(3, idFuncionario);
+            ps.setString(4, estadoAnterior.name());
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (!rs.next()) throw new EcoRideException("Sem ID gerado para defeito");
+                return new Defeito(rs.getInt(1), codStock, motivo, idFuncionario, estadoAnterior);
+            }
+        }
+    }
+
+    private Devolucao insertDevolucaoConn(Connection c, int codStock, String motivo, LocalDate data) throws SQLException {
+        String sql = "INSERT INTO Devolucao (data, motivo, estado, codStock) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setDate(1, Date.valueOf(data));
+            ps.setString(2, motivo);
+            ps.setString(3, EstadoDevolucao.StockPendenteDeDevolucao.name());
+            ps.setInt(4, codStock);
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (!rs.next()) throw new EcoRideException("Sem ID gerado para devolucao");
+                return new Devolucao(rs.getInt(1), data, motivo, codStock);
+            }
+        }
+    }
+
+    // --------- Métodos transacionais públicos ---------
+
+    public Map<Integer, Integer> atribuirFIFO(int codPeca, int quantidade) {
+        Map<Integer, Integer> resultado = new LinkedHashMap<>();
+        String selectSql = "SELECT * FROM Stock WHERE codPeca = ? AND estado = ? AND quantidade > 0 ORDER BY data_chegada ASC, id ASC";
+        String updateSql = "UPDATE Stock SET quantidade=?, estado=? WHERE id=?";
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                List<Stock> candidatos = new ArrayList<>();
+                try (PreparedStatement ps = c.prepareStatement(selectSql)) {
+                    ps.setInt(1, codPeca);
+                    ps.setString(2, EstadoStock.StockEmArmazem.name());
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) candidatos.add(buildFromRow(rs));
+                    }
+                }
+                int restante = quantidade;
+                for (Stock s : candidatos) {
+                    if (restante <= 0) break;
+                    int consumir = Math.min(s.getQuantidade(), restante);
+                    resultado.put(s.getId(), consumir);
+                    int novaQtd = s.getQuantidade() - consumir;
+                    String novoEstado = (novaQtd == 0) ? EstadoStock.StockUsadoConserto.name() : EstadoStock.StockEmArmazem.name();
+                    try (PreparedStatement ps = c.prepareStatement(updateSql)) {
+                        ps.setInt(1, novaQtd);
+                        ps.setString(2, novoEstado);
+                        ps.setInt(3, s.getId());
+                        ps.executeUpdate();
+                    }
+                    restante -= consumir;
+                }
+                if (restante > 0) throw new EcoRideException("Stock insuficiente para a peça " + codPeca + ". Faltam " + restante + " unidades.");
+                c.commit();
+                return resultado;
+            } catch (Exception e) {
+                try { c.rollback(); } catch (SQLException ignored) {}
+                if (e instanceof EcoRideException er) throw er;
+                throw new EcoRideException("Erro em atribuirFIFO para peça " + codPeca, (SQLException) e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação em atribuirFIFO", e);
+        }
+    }
+
+    public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario) {
+        List<Defeito> resultado = new ArrayList<>();
+        String selectSql = "SELECT * FROM Stock WHERE codPeca = ? AND estado = ? AND quantidade > 0";
+        String updateSql = "UPDATE Stock SET estado=? WHERE id=?";
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                List<Stock> candidatos = new ArrayList<>();
+                try (PreparedStatement ps = c.prepareStatement(selectSql)) {
+                    ps.setInt(1, codPeca);
+                    ps.setString(2, EstadoStock.StockEmArmazem.name());
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) candidatos.add(buildFromRow(rs));
+                    }
+                }
+                if (candidatos.isEmpty())
+                    throw new EcoRideException("Não foram encontrados stocks disponíveis para a peça " + codPeca + ".");
+                for (Stock s : candidatos) {
+                    try (PreparedStatement ps = c.prepareStatement(updateSql)) {
+                        ps.setString(1, EstadoStock.StockComPossivelDefeito.name());
+                        ps.setInt(2, s.getId());
+                        ps.executeUpdate();
+                    }
+                    resultado.add(insertDefeitoConn(c, s.getId(), motivo, idFuncionario, EstadoStock.StockEmArmazem));
+                }
+                c.commit();
+                return resultado;
+            } catch (Exception e) {
+                try { c.rollback(); } catch (SQLException ignored) {}
+                if (e instanceof EcoRideException er) throw er;
+                throw new EcoRideException("Erro a registar defeito para peça " + codPeca, (SQLException) e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação em registarDefeito", e);
+        }
+    }
+
+    public Devolucao registarDevolucao(int codStock, String motivo, LocalDate data) {
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                Stock s = getStockConn(c, codStock);
+                if (s == null) throw new EcoRideException("Stock " + codStock + " não encontrado.");
+                if (s.getEstado() != EstadoStock.StockComPossivelDefeito && s.getEstado() != EstadoStock.StockEmArmazem)
+                    throw new EcoRideException("Stock " + codStock + " não está disponível (estado: " + s.getEstado() + ").");
+                try (PreparedStatement ps = c.prepareStatement("UPDATE Stock SET estado=? WHERE id=?")) {
+                    ps.setString(1, EstadoStock.StockPendenteDeDevolucao.name());
+                    ps.setInt(2, codStock);
+                    ps.executeUpdate();
+                }
+                Devolucao dev = insertDevolucaoConn(c, codStock, motivo, data);
+                c.commit();
+                return dev;
+            } catch (Exception e) {
+                try { c.rollback(); } catch (SQLException ignored) {}
+                if (e instanceof EcoRideException er) throw er;
+                throw new EcoRideException("Erro a registar devolução para stock " + codStock, (SQLException) e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação em registarDevolucao", e);
+        }
+    }
+
+    public Devolucao confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data) {
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                Defeito d = getDefeitoConn(c, idDefeito);
+                if (d == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
+                try (PreparedStatement ps = c.prepareStatement("DELETE FROM Defeito WHERE id = ?")) {
+                    ps.setInt(1, idDefeito);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = c.prepareStatement("UPDATE Stock SET estado=? WHERE id=?")) {
+                    ps.setString(1, EstadoStock.StockPendenteDeDevolucao.name());
+                    ps.setInt(2, d.getCodStock());
+                    ps.executeUpdate();
+                }
+                Devolucao dev = insertDevolucaoConn(c, d.getCodStock(), motivo, data);
+                c.commit();
+                return dev;
+            } catch (Exception e) {
+                try { c.rollback(); } catch (SQLException ignored) {}
+                if (e instanceof EcoRideException er) throw er;
+                throw new EcoRideException("Erro a confirmar defeito " + idDefeito + " com devolução", (SQLException) e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação em confirmarDefeitoComDevolucao", e);
+        }
+    }
+
+    public void resolverDefeitoComSplit(int idDefeito, int qtdDefeituosa, String motivo, LocalDate data) {
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                Defeito defeito = getDefeitoConn(c, idDefeito);
+                if (defeito == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
+                Stock original = getStockConn(c, defeito.getCodStock());
+                if (original == null) throw new EcoRideException("Stock associado ao defeito não encontrado.");
+                if (qtdDefeituosa <= 0 || qtdDefeituosa > original.getQuantidade())
+                    throw new EcoRideException("Quantidade inválida — tem de ser entre 1 e " + original.getQuantidade() + ".");
+
+                try (PreparedStatement ps = c.prepareStatement("DELETE FROM Defeito WHERE id = ?")) {
+                    ps.setInt(1, idDefeito);
+                    ps.executeUpdate();
+                }
+
+                if (qtdDefeituosa == original.getQuantidade()) {
+                    try (PreparedStatement ps = c.prepareStatement("UPDATE Stock SET estado=? WHERE id=?")) {
+                        ps.setString(1, EstadoStock.StockPendenteDeDevolucao.name());
+                        ps.setInt(2, original.getId());
+                        ps.executeUpdate();
+                    }
+                    insertDevolucaoConn(c, original.getId(), motivo, data);
+                } else {
+                    original.setQuantidade(original.getQuantidade() - qtdDefeituosa);
+                    original.setEstado(defeito.getEstadoAnterior());
+                    updateStockConn(c, original);
+
+                    Stock novoStock = new Stock(0, original.getPreco_compra(), original.getCodPeca(),
+                            original.getData_chegada(), qtdDefeituosa,
+                            EstadoStock.StockPendenteDeDevolucao, original.getGarantia());
+                    insertStockConn(c, novoStock);
+                    insertDevolucaoConn(c, novoStock.getId(), motivo, data);
+                }
+                c.commit();
+            } catch (Exception e) {
+                try { c.rollback(); } catch (SQLException ignored) {}
+                if (e instanceof EcoRideException er) throw er;
+                throw new EcoRideException("Erro a resolver defeito com split " + idDefeito, (SQLException) e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação em resolverDefeitoComSplit", e);
+        }
+    }
+
+    public void marcarDevolucaoComoEnviada(int idDevolucao) {
+        transicionarDevolucao(idDevolucao, EstadoStock.StockEnviadoParaFornecedor, EstadoDevolucao.Enviada);
+    }
+
+    public void marcarDevolucaoComoDevolvida(int idDevolucao) {
+        transicionarDevolucao(idDevolucao, EstadoStock.StockDevolvidoFornecedor, EstadoDevolucao.Devolvida);
+    }
+
+    public void marcarDevolucaoComoInvalida(int idDevolucao) {
+        transicionarDevolucao(idDevolucao, EstadoStock.StockinvalidoParaDevolucao, EstadoDevolucao.Invalida);
+    }
+
+    private void transicionarDevolucao(int idDevolucao, EstadoStock novoEstadoStock, EstadoDevolucao novoEstadoDevolucao) {
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                int codStock;
+                try (PreparedStatement ps = c.prepareStatement("SELECT codStock FROM Devolucao WHERE id = ?")) {
+                    ps.setInt(1, idDevolucao);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (!rs.next()) throw new EcoRideException("Devolução " + idDevolucao + " não encontrada.");
+                        codStock = rs.getInt(1);
+                    }
+                }
+                try (PreparedStatement ps = c.prepareStatement("UPDATE Stock SET estado=? WHERE id=?")) {
+                    ps.setString(1, novoEstadoStock.name());
+                    ps.setInt(2, codStock);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = c.prepareStatement("UPDATE Devolucao SET estado=? WHERE id=?")) {
+                    ps.setString(1, novoEstadoDevolucao.name());
+                    ps.setInt(2, idDevolucao);
+                    ps.executeUpdate();
+                }
+                c.commit();
+            } catch (Exception e) {
+                try { c.rollback(); } catch (SQLException ignored) {}
+                if (e instanceof EcoRideException er) throw er;
+                throw new EcoRideException("Erro a transicionar devolução " + idDevolucao, (SQLException) e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação em transicionarDevolucao", e);
+        }
     }
 }

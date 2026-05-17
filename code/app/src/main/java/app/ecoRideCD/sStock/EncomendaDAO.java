@@ -19,6 +19,8 @@ import app.common.EcoRideException;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
 import app.ecoRideLN.sStock.Encomenda;
 import app.ecoRideLN.sStock.EstadoEncomenda;
+import app.ecoRideLN.sStock.EstadoStock;
+import app.ecoRideLN.sStock.Stock;
 
 public class EncomendaDAO implements Map<Integer, Encomenda> {
 
@@ -277,5 +279,125 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
                throw new EcoRideException("Erro a obter encomendas por estado", e);
           }
           return out;
+     }
+
+     public Encomenda registarComStocks(int codFornecedor, List<Stock> stocks) {
+          String insertStockSql = """
+                    INSERT INTO Stock (preco_compra, codPeca, data_chegada, quantidade, garantia, estado)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """;
+          String insertEncSql = """
+                    INSERT INTO Encomenda (codFornecedor, data_criacao, data_rececao, data_envio, estado)
+                    VALUES (?, ?, ?, ?, ?)
+                    """;
+          try (Connection c = ConnectionFactory.get()) {
+               c.setAutoCommit(false);
+               try {
+                    List<Integer> stockIds = new ArrayList<>();
+                    for (Stock s : stocks) {
+                         try (PreparedStatement ps = c.prepareStatement(insertStockSql, Statement.RETURN_GENERATED_KEYS)) {
+                              ps.setFloat(1, s.getPreco_compra());
+                              ps.setInt(2, s.getCodPeca());
+                              if (s.getData_chegada() != null) ps.setDate(3, Date.valueOf(s.getData_chegada()));
+                              else ps.setNull(3, java.sql.Types.DATE);
+                              ps.setInt(4, s.getQuantidade());
+                              if (s.getGarantia() != null) ps.setDate(5, Date.valueOf(s.getGarantia()));
+                              else ps.setNull(5, java.sql.Types.DATE);
+                              ps.setString(6, s.getEstado().name());
+                              ps.executeUpdate();
+                              try (ResultSet rs = ps.getGeneratedKeys()) {
+                                   if (!rs.next()) throw new EcoRideException("Sem ID gerado para stock");
+                                   int id = rs.getInt(1);
+                                   s.setId(id);
+                                   stockIds.add(id);
+                              }
+                         }
+                    }
+                    java.time.LocalDate hoje = java.time.LocalDate.now();
+                    int idEncomenda;
+                    try (PreparedStatement ps = c.prepareStatement(insertEncSql, Statement.RETURN_GENERATED_KEYS)) {
+                         ps.setInt(1, codFornecedor);
+                         ps.setDate(2, Date.valueOf(hoje));
+                         ps.setNull(3, java.sql.Types.DATE);
+                         ps.setNull(4, java.sql.Types.DATE);
+                         ps.setString(5, EstadoEncomenda.RASCUNHO.name());
+                         ps.executeUpdate();
+                         try (ResultSet rs = ps.getGeneratedKeys()) {
+                              if (!rs.next()) throw new EcoRideException("Sem ID gerado para encomenda");
+                              idEncomenda = rs.getInt(1);
+                         }
+                    }
+                    insertStocks(c, idEncomenda, stockIds);
+                    c.commit();
+                    return new Encomenda(idEncomenda, codFornecedor, stockIds);
+               } catch (Exception e) {
+                    try { c.rollback(); } catch (SQLException ignored) {}
+                    if (e instanceof EcoRideException er) throw er;
+                    throw new EcoRideException("Erro a registar encomenda com stocks", (SQLException) e);
+               } finally {
+                    c.setAutoCommit(true);
+               }
+          } catch (SQLException e) {
+               throw new EcoRideException("Erro de ligação em registarComStocks", e);
+          }
+     }
+
+     public List<Encomenda> getAbertas() {
+          List<Encomenda> out = new ArrayList<>();
+          String sql = "SELECT * FROM Encomenda WHERE estado IN ('RASCUNHO', 'ENVIADA')";
+          try (Connection c = ConnectionFactory.get();
+               Statement s = c.createStatement();
+               ResultSet rs = s.executeQuery(sql)) {
+               while (rs.next()) out.add(buildFromRow(c, rs));
+          } catch (SQLException e) {
+               throw new EcoRideException("Erro a obter encomendas abertas", e);
+          }
+          return out;
+     }
+
+     public Encomenda marcarComoRecebida(int id) {
+          try (Connection c = ConnectionFactory.get()) {
+               c.setAutoCommit(false);
+               try {
+                    Encomenda e;
+                    try (PreparedStatement ps = c.prepareStatement("SELECT * FROM Encomenda WHERE id = ?")) {
+                         ps.setInt(1, id);
+                         try (ResultSet rs = ps.executeQuery()) {
+                              if (!rs.next()) throw new EcoRideException("Encomenda " + id + " não encontrada.");
+                              e = buildFromRow(c, rs);
+                         }
+                    }
+                    if (e.getEstado() != EstadoEncomenda.ENVIADA)
+                         throw new EcoRideException("Encomenda " + id + " não está no estado ENVIADA.");
+
+                    java.time.LocalDate hoje = java.time.LocalDate.now();
+                    for (int stockId : e.getCodStocks()) {
+                         try (PreparedStatement ps = c.prepareStatement("UPDATE Stock SET estado=?, data_chegada=? WHERE id=?")) {
+                              ps.setString(1, EstadoStock.StockEmArmazem.name());
+                              ps.setDate(2, Date.valueOf(hoje));
+                              ps.setInt(3, stockId);
+                              ps.executeUpdate();
+                         }
+                    }
+                    try (PreparedStatement ps = c.prepareStatement("UPDATE Encomenda SET estado=?, data_rececao=? WHERE id=?")) {
+                         ps.setString(1, EstadoEncomenda.RECEBIDA.name());
+                         ps.setDate(2, Date.valueOf(hoje));
+                         ps.setInt(3, id);
+                         ps.executeUpdate();
+                    }
+                    c.commit();
+                    e.setEstado(EstadoEncomenda.RECEBIDA);
+                    e.setData_rececao(hoje);
+                    return e;
+               } catch (Exception ex) {
+                    try { c.rollback(); } catch (SQLException ignored) {}
+                    if (ex instanceof EcoRideException er) throw er;
+                    throw new EcoRideException("Erro a marcar encomenda " + id + " como recebida", (SQLException) ex);
+               } finally {
+                    c.setAutoCommit(true);
+               }
+          } catch (SQLException e) {
+               throw new EcoRideException("Erro de ligação em marcarComoRecebida", e);
+          }
      }
 }

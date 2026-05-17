@@ -48,8 +48,8 @@ export default function StockDefeitos() {
   });
 
   const { data: stocks = [] } = useQuery<StockEntry[]>({
-    queryKey: ["stocks"],
-    queryFn: () => api.get<StockEntry[]>("/stocks"),
+    queryKey: ["stocks", "historico"],
+    queryFn: () => api.get<StockEntry[]>("/stocks?historico=true"),
   });
 
   const { data: pecas = [] } = useQuery<Peca[]>({

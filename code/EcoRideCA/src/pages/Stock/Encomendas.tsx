@@ -48,7 +48,6 @@ const ESTADO_VARIANT: Record<EstadoEncomenda, "outline" | "secondary"> = {
 };
 
 interface ItemEncomenda { codPeca: number; quantidade: number; preco_compra: number; }
-interface StockEntry { id: number; codPeca: number; quantidade: number; estado: string; }
 
 
 export default function StockEncomendas() {
@@ -59,10 +58,11 @@ export default function StockEncomendas() {
   const [openReceber, setOpenReceber] = useState<Encomenda | null>(null);
 
   const canEdit = userRole === "GERENTE" || userRole === "GESTOR_STOCK";
+  const [historico, setHistorico] = useState(false);
 
   const { data: encomendas = [], isLoading } = useQuery<Encomenda[]>({
-    queryKey: ["encomendas"],
-    queryFn: () => api.get<Encomenda[]>("/encomendas"),
+    queryKey: ["encomendas", historico],
+    queryFn: () => api.get<Encomenda[]>(`/encomendas${historico ? "?historico=true" : ""}`),
   });
 
   const { data: pecas = [] } = useQuery<Peca[]>({
@@ -110,6 +110,16 @@ export default function StockEncomendas() {
         }
       />
       <StockTabs />
+
+      <div className="mb-3 flex justify-end">
+        <Button
+          variant={historico ? "default" : "outline"}
+          size="sm"
+          onClick={() => setHistorico((v) => !v)}
+        >
+          {historico ? "Ocultar histórico" : "Ver histórico completo"}
+        </Button>
+      </div>
 
       <div className="rounded-lg border bg-card shadow-sm">
         <Table>
@@ -230,7 +240,7 @@ function ListaAutomaticaDialog({
   const generate = async () => {
     setGenerating(true);
     try {
-      const result = await api.post<Record<string, Record<string, number>>>("/encomendas/automatica", {});
+      const result = await api.get<Record<string, Record<string, number>>>("/encomendas/automatica");
       setAutoResult(result);
     } catch (e) {
       toast.error((e as Error).message);
@@ -425,9 +435,9 @@ function NovaEncomendaDialog({
 
   const addItem = () => {
     if (!pecaId) { toast.error("Escolhe uma peça"); return; }
-    if (qty < 1) { toast.error("Quantidade ≥ 1"); return; }
+    if (qty === "" || qty < 1) { toast.error("Quantidade ≥ 1"); return; }
     if (itens.some((i) => i.codPeca === Number(pecaId))) { toast.error("Peça já adicionada"); return; }
-    setItens((p) => [...p, { codPeca: Number(pecaId), quantidade: qty, preco_compra: preco }]);
+    setItens((p) => [...p, { codPeca: Number(pecaId), quantidade: qty, preco_compra: Number(preco) || 0 }]);
     setPecaId(""); setQty(""); setPreco("");
   };
 

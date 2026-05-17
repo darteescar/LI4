@@ -2,7 +2,6 @@ package app.ecoRideLN.sStock;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,7 +29,6 @@ public class SStockFacade implements ISStock {
     @Override
     public Fornecedor registarFornecedor(String nome, String telemovel, String email) {
         Validacoes.naoVazio(nome, "Nome do fornecedor");
-        // contacto pode ser telefone ou email — valida o que estiver preenchido
         if (telemovel != null && !telemovel.isBlank()) Validacoes.telefone(telemovel);
         if (email != null && !email.isBlank()) Validacoes.emailValido(email);
         if ((telemovel == null || telemovel.isBlank()) && (email == null || email.isBlank()))
@@ -180,34 +178,7 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Map<Integer, Integer> atribuirStocksFIFO(int codPeca, int quantidade) {
-        Map<Integer, Integer> resultado = new LinkedHashMap<>();
-        int restante = quantidade;
-
-        for (Stock s : stockDAO.getByPecaId(codPeca)) {
-            if (restante <= 0) break;
-            if (s.getEstado() != EstadoStock.StockEmArmazem || s.getQuantidade() <= 0) continue;
-            int consumir = Math.min(s.getQuantidade(), restante);
-            resultado.put(s.getId(), consumir);
-            s.setQuantidade(s.getQuantidade() - consumir);
-            if (s.getQuantidade() == 0) s.setEstado(EstadoStock.StockUsadoConserto);
-            stockDAO.put(s.getId(), s);
-            restante -= consumir;
-        }
-
-        if (restante > 0) {
-            // Reverter todos os stocks já modificados
-            for (Map.Entry<Integer, Integer> entry : resultado.entrySet()) {
-                Stock s = stockDAO.get(entry.getKey());
-                if (s != null) {
-                    s.setQuantidade(s.getQuantidade() + entry.getValue());
-                    s.setEstado(EstadoStock.StockEmArmazem);
-                    stockDAO.put(s.getId(), s);
-                }
-            }
-            throw new EcoRideException("Stock insuficiente para a peça " + pecaDAO.get(codPeca).getNome() + ". Faltam " + restante + " unidades.");
-        }
-
-        return resultado;
+        return stockDAO.atribuirFIFO(codPeca, quantidade);
     }
 
     @Override
@@ -223,18 +194,7 @@ public class SStockFacade implements ISStock {
     public List<Defeito> registarDefeito(int codPeca, String motivo, int idFuncionario) {
         if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
         if (idFuncionario < 0) throw new EcoRideException("ID do funcionário não pode ser negativo.");
-        List<Defeito> resultado = new ArrayList<>();
-        for (Stock s : stockDAO.getByPecaId(codPeca)) {
-            if (s.getEstado() != EstadoStock.StockEmArmazem || s.getQuantidade() <= 0) continue;
-            Defeito d = new Defeito(0, s.getId(), motivo, idFuncionario, s.getEstado());
-            defeitoDAO.insert(d);
-            s.setEstado(EstadoStock.StockComPossivelDefeito);
-            stockDAO.put(s.getId(), s);
-            resultado.add(d);
-        }
-        if (resultado.isEmpty())
-            throw new EcoRideException("Não foram encontrados stocks disponíveis para a peça " + pecaDAO.get(codPeca).getNome() + ".");
-        return resultado;
+        return stockDAO.registarDefeito(codPeca, motivo, idFuncionario);
     }
 
     @Override
@@ -245,47 +205,16 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Devolucao confirmarDefeitoComDevolucao(int idDefeito, String motivo, LocalDate data) {
-        Defeito d = defeitoDAO.get(idDefeito);
-        if (d == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
-        defeitoDAO.remove(idDefeito);
-        return registarDevolucao(d.getCodStock(), motivo, data);
+        if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
+        if (data == null) throw new EcoRideException("Data não pode ser nula.");
+        return stockDAO.confirmarDefeitoComDevolucao(idDefeito, motivo, data);
     }
 
     @Override
     public void resolverDefeitoComSplit(int idDefeito, int qtdDefeituosa, String motivo, LocalDate data) {
-        Defeito defeito = defeitoDAO.get(idDefeito);
-        if (defeito == null) throw new EcoRideException("Defeito " + idDefeito + " não encontrado.");
-        
-        Stock original = stockDAO.get(defeito.getCodStock());
-        if (original == null) throw new EcoRideException("Stock associado não encontrado.");
-        
-        if (qtdDefeituosa <= 0 || qtdDefeituosa > original.getQuantidade())
-            throw new EcoRideException("Quantidade inválida — tem de ser entre 1 e " + original.getQuantidade() + ".");
-
-        if (qtdDefeituosa == original.getQuantidade()) {
-            // Sem split — registarDevolucao trata de mudar o estado
-            defeitoDAO.remove(idDefeito);
-            registarDevolucao(original.getId(), motivo, data);
-            return;
-        }
-
-        // Split — algumas boas, algumas defeituosas
-        // 1. Original fica com as boas, repõe estado anterior
-        original.setQuantidade(original.getQuantidade() - qtdDefeituosa);
-        original.setEstado(defeito.getEstadoAnterior());
-        stockDAO.put(original.getId(), original);
-
-        // 2. Novo stock só com as defeituosas (StockComPossivelDefeito para registarDevolucao aceitar)
-        Stock novo = new Stock(0, original.getPreco_compra(), original.getCodPeca(),
-                original.getData_chegada(), qtdDefeituosa,
-                EstadoStock.StockComPossivelDefeito, original.getGarantia());
-        stockDAO.insert(novo);
-
-        // 3. Remove o defeito
-        defeitoDAO.remove(idDefeito);
-
-        // 4. Cria devolução para o novo stock
-        registarDevolucao(novo.getId(), motivo, data);
+        if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
+        if (data == null) throw new EcoRideException("Data não pode ser nula.");
+        stockDAO.resolverDefeitoComSplit(idDefeito, qtdDefeituosa, motivo, data);
     }
 
     @Override
@@ -300,20 +229,9 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Devolucao registarDevolucao(int stockId, String motivo, LocalDate data) {
-
         if (motivo == null || motivo.isBlank()) throw new EcoRideException("Motivo não pode ser vazio.");
         if (data == null) throw new EcoRideException("Data não pode ser nula.");
-
-        Stock s = stockDAO.get(stockId);
-        if (s == null)
-            throw new EcoRideException("Stock " + stockId + " não encontrado.");
-        if (s.getEstado() != EstadoStock.StockComPossivelDefeito && s.getEstado() != EstadoStock.StockEmArmazem)
-            throw new EcoRideException("Stock " + stockId + " não está disponível (estado: " + s.getEstado() + ").");
-        s.setEstado(EstadoStock.StockPendenteDeDevolucao);
-        stockDAO.put(stockId, s);
-        Devolucao nova = new Devolucao(0, data, motivo, stockId);
-        devolucaoDAO.insert(nova);
-        return nova;
+        return stockDAO.registarDevolucao(stockId, motivo, data);
     }
 
     @Override
@@ -329,54 +247,37 @@ public class SStockFacade implements ISStock {
     public List<Devolucao> obterDevolucoes() { return new ArrayList<>(devolucaoDAO.values()); }
 
     @Override
+    public List<Devolucao> obterDevolucoesPendentes() { return devolucaoDAO.getPendentes(); }
+
+    @Override
     public void marcarDevolucaoComoEnviada(int id) {
-        Devolucao d = devolucaoDAO.get(id);
-        if (d != null) {
-            atualizaEstadoStock(d.getCodStock(), EstadoStock.StockEnviadoParaFornecedor);
-            d.setEstado(EstadoDevolucao.Enviada);
-            devolucaoDAO.put(id, d);
-        }
+        stockDAO.marcarDevolucaoComoEnviada(id);
     }
 
     @Override
     public void marcarDevolucaoComoDevolvida(int id) {
-        Devolucao d = devolucaoDAO.get(id);
-        if (d != null) {
-            atualizaEstadoStock(d.getCodStock(), EstadoStock.StockDevolvidoFornecedor);
-            d.setEstado(EstadoDevolucao.Devolvida);
-            devolucaoDAO.put(id, d);
-        }
+        stockDAO.marcarDevolucaoComoDevolvida(id);
     }
 
     @Override
     public void marcarDevolucaoComoInvalida(int id) {
-        Devolucao d = devolucaoDAO.get(id);
-        if (d != null) {
-            // A entrada de stock volta a ficar disponível
-            atualizaEstadoStock(d.getCodStock(), EstadoStock.StockinvalidoParaDevolucao);
-            d.setEstado(EstadoDevolucao.Invalida);
-            devolucaoDAO.put(id, d);
-        }
+        stockDAO.marcarDevolucaoComoInvalida(id);
     }
 
     // ------------------- Encomenda -------------------
 
     @Override
     public Encomenda registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor) {
-        List<Integer> stockIds = new ArrayList<>();
         LocalDate dataPedido = LocalDate.now();
+        List<Stock> stocks = new ArrayList<>();
         for (int i = 0; i < id_peca.size(); i++) {
             Peca p = pecaDAO.get(id_peca.get(i));
             if (p == null) throw new EcoRideException("Peça " + id_peca.get(i) + " não encontrada.");
             int garantia = p.getGarantia();
             LocalDate dataGarantia = garantia > 0 ? dataPedido.plusMonths(garantia) : null;
-            Stock s = new Stock(0, preco_compra.get(i), id_peca.get(i), null, quantidade.get(i), EstadoStock.StockEncomendado, dataGarantia);
-            stockDAO.insert(s);
-            stockIds.add(s.getId());
+            stocks.add(new Stock(0, preco_compra.get(i), id_peca.get(i), null, quantidade.get(i), EstadoStock.StockEncomendado, dataGarantia));
         }
-        Encomenda e = new Encomenda(0, cod_fornecedor, stockIds);
-        encomendaDAO.insert(e);
-        return e;
+        return encomendaDAO.registarComStocks(cod_fornecedor, stocks);
     }
 
     @Override
@@ -384,6 +285,9 @@ public class SStockFacade implements ISStock {
 
     @Override
     public List<Encomenda> obterEncomendas() { return new ArrayList<>(encomendaDAO.values()); }
+
+    @Override
+    public List<Encomenda> obterEncomendasAbertas() { return encomendaDAO.getAbertas(); }
 
     @Override
     public Encomenda marcarEncomendaComoEnviada(int id) {
@@ -398,24 +302,7 @@ public class SStockFacade implements ISStock {
 
     @Override
     public Encomenda marcarEncomendaComoRecebida(int id) {
-        Encomenda e = encomendaDAO.get(id);
-        if (e == null) throw new EcoRideException("Encomenda " + id + " não encontrada.");
-        if (e.getEstado() == EstadoEncomenda.ENVIADA) {
-            for (int stockId : e.getCodStocks()) {
-                Stock s = stockDAO.get(stockId);
-                if (s != null) {
-                    s.setEstado(EstadoStock.StockEmArmazem);
-                    s.setData_chegada(LocalDate.now());
-                    stockDAO.put(stockId, s);
-                }
-            }
-            e.setEstado(EstadoEncomenda.RECEBIDA);
-            e.setData_rececao(LocalDate.now());
-            encomendaDAO.put(id, e);
-        } else {
-            throw new EcoRideException("Encomenda " + id + " não está no estado ENVIADA.");
-        }
-        return e;
+        return encomendaDAO.marcarComoRecebida(id);
     }
 
     @Override

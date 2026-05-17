@@ -129,6 +129,7 @@ public interface IEcoRideController {
      public boolean         existeDevolucao(int id);
      public Devolucao       registarDevolucao(int codStock, String motivo, LocalDate data);
      public List<Devolucao> obterDevolucoes();
+     public List<Devolucao> obterDevolucoesPendentes();
      public boolean         removerDevolucao(int id);
      public void            marcarDevolucaoComoEnviada(int id);
      public void            marcarDevolucaoComoDevolvida(int id);
@@ -140,6 +141,7 @@ public interface IEcoRideController {
      public Encomenda                   registarEncomenda(List<Integer> id_peca, List<Float> preco_compra, List<Integer> quantidade, int cod_fornecedor);
      public boolean                     removerEncomenda(int id);
      public List<Encomenda>             obterEncomendas();
+     public List<Encomenda>             obterEncomendasAbertas();
      public Encomenda                   marcarEncomendaComoEnviada(int id);
      public Encomenda                   marcarEncomendaComoRecebida(int id);
      public Map<Integer, Map<Integer, Integer>> gerarListaAutomatica();

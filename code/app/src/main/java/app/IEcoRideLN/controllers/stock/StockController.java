@@ -153,7 +153,8 @@ public class StockController {
 
         app.get("/api/encomendas", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            ctx.json(facade.obterEncomendas());
+            boolean historico = "true".equalsIgnoreCase(ctx.queryParam("historico"));
+            ctx.json(historico ? facade.obterEncomendas() : facade.obterEncomendasAbertas());
         });
 
         app.get("/api/encomendas/{id}", ctx -> {
@@ -188,9 +189,9 @@ public class StockController {
             else ctx.status(200).json(atualizado);
         });
 
-        app.post("/api/encomendas/automatica", ctx -> {
+        app.get("/api/encomendas/automatica", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            ctx.status(201).json(facade.gerarListaAutomatica());
+            ctx.status(200).json(facade.gerarListaAutomatica());
         });
 
         app.patch("/api/encomendas/{id}/recebida", ctx -> {
@@ -247,7 +248,8 @@ public class StockController {
 
         app.get("/api/devolucoes", ctx -> {
             GestorSessoes.verifica_cargo(ctx, Cargo.Gerente, Cargo.GestorStock);
-            ctx.json(facade.obterDevolucoes());
+            boolean historico = "true".equalsIgnoreCase(ctx.queryParam("historico"));
+            ctx.json(historico ? facade.obterDevolucoes() : facade.obterDevolucoesPendentes());
         });
 
         app.delete("/api/devolucoes/{id}", ctx -> {
