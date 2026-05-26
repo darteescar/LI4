@@ -33,4 +33,8 @@ public class SessaoUtilizador {
     public Cargo getCargo() {
         return cargo;
     }
+
+    public static SessaoUtilizador devSession() {
+        return new SessaoUtilizador(1, 1, Cargo.Gerente);
+    }
 }

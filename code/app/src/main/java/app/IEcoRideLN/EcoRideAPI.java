@@ -41,13 +41,22 @@ public class EcoRideAPI {
             );
         }).start(7000);
 
-        // Middleware — todas as rotas /api/* exigem sessão válida
-        app.before("/api/*", ctx -> {
-            String token = ctx.header("Authorization");
-            if (token == null) throw new UnauthorizedResponse("Token em falta");
-            SessaoUtilizador sessao = gestorSessoes.validar(token);
-            ctx.attribute("sessao", sessao);
-        });
+        // Middleware — todas as rotas /api/* exigem sessão válida (ignorado em DEV_MODE)
+        boolean devMode = "true".equalsIgnoreCase(System.getenv("DEV_MODE"));
+        if (devMode) {
+            System.out.println("[EcoRide] DEV_MODE activo — autenticação desligada");
+            app.before("/api/*", ctx -> {
+                // Injeta sessão de Gerente para que verifica_cargo não lance 403
+                ctx.attribute("sessao", SessaoUtilizador.devSession());
+            });
+        } else {
+            app.before("/api/*", ctx -> {
+                String token = ctx.header("Authorization");
+                if (token == null) throw new UnauthorizedResponse("Token em falta");
+                SessaoUtilizador sessao = gestorSessoes.validar(token);
+                ctx.attribute("sessao", sessao);
+            });
+        }
 
         GlobalExceptionHandler.register(app);
 
