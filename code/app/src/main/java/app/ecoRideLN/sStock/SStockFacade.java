@@ -158,7 +158,7 @@ public class SStockFacade implements ISStock {
     public Stock obterStock(int id) { return stockDAO.get(id); }
 
     @Override
-    public boolean removerStock(int id) { return stockDAO.remove(id) != null; }
+    public boolean removerStock(int id) { return stockDAO.removerComMovimentos(id) != null; }
 
     @Override
     public List<Stock> obterStocks() { return new ArrayList<>(stockDAO.values()); }

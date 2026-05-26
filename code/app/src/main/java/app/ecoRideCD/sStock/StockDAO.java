@@ -183,6 +183,37 @@ public class StockDAO implements Map<Integer, Stock> {
         return prev;
     }
 
+    public Stock removerComMovimentos(int id) {
+        Stock prev = get(id);
+        if (prev == null) return null;
+        try (Connection c = ConnectionFactory.get()) {
+            c.setAutoCommit(false);
+            try {
+                // Apaga MovimentoFinanceiro (cascata ON DELETE CASCADE → MovimentoPeca)
+                try (PreparedStatement ps = c.prepareStatement(
+                        "DELETE FROM MovimentoFinanceiro WHERE id IN (SELECT id FROM MovimentoPeca WHERE codStock = ?)")) {
+                    ps.setInt(1, id);
+                    ps.executeUpdate();
+                }
+                // Apaga o stock (cascata ON DELETE CASCADE → Defeito, Devolucao, MovimentoPeca residual)
+                try (PreparedStatement ps = c.prepareStatement("DELETE FROM Stock WHERE id = ?")) {
+                    ps.setInt(1, id);
+                    ps.executeUpdate();
+                }
+                c.commit();
+            } catch (Exception e) {
+                try { c.rollback(); } catch (SQLException ignored) {}
+                if (e instanceof EcoRideException er) throw er;
+                throw new EcoRideException("Erro a remover stock " + id, (SQLException) e);
+            } finally {
+                c.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new EcoRideException("Erro de ligação ao remover stock " + id, e);
+        }
+        return prev;
+    }
+
     @Override
     public void putAll(Map<? extends Integer, ? extends Stock> m) {
         m.forEach(this::put);

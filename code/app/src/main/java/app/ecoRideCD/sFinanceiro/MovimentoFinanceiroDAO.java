@@ -55,10 +55,16 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
         TipoMovimento tipo = TipoMovimento.valueOf(rs.getString("tipo"));
 
         return switch (tipo) {
-            case Salario      -> new MovimentoFuncionario(id, desc, valor, data, tipo, rs.getInt("codFuncionario"));
-            case LucroMaoObra -> new MovimentoReparacao(id, desc, valor, data, tipo, rs.getInt("codReparacao"));
-            case GastoPecas, LucroVendaPecas
-                              -> new MovimentoPeca(id, desc, valor, data, tipo, rs.getInt("codStock"));
+            case Salario -> {
+                int cod = rs.getInt("codFuncionario");
+                yield new MovimentoFuncionario(id, desc, valor, data, tipo, rs.wasNull() ? 0 : cod);
+            }
+            case LucroMaoObra -> {
+                int cod = rs.getInt("codReparacao");
+                yield new MovimentoReparacao(id, desc, valor, data, tipo, rs.wasNull() ? 0 : cod);
+            }
+            case GastoPecas, LucroVendaPecas ->
+                new MovimentoPeca(id, desc, valor, data, tipo, rs.getInt("codStock"));
         };
     }
 

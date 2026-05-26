@@ -204,19 +204,19 @@ CREATE TABLE IF NOT EXISTS MovimentoFinanceiro (
 );
 
 CREATE TABLE IF NOT EXISTS MovimentoFuncionario (
-    id             INT NOT NULL,
-    codFuncionario INT NOT NULL,
+    id             INT  NOT NULL,
+    codFuncionario INT  NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id)             REFERENCES MovimentoFinanceiro(id) ON DELETE CASCADE,
-    FOREIGN KEY (codFuncionario) REFERENCES Funcionario(id)
+    FOREIGN KEY (codFuncionario) REFERENCES Funcionario(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS MovimentoReparacao (
-    id           INT NOT NULL,
-    codReparacao INT NOT NULL,
+    id           INT  NOT NULL,
+    codReparacao INT  NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id)           REFERENCES MovimentoFinanceiro(id) ON DELETE CASCADE,
-    FOREIGN KEY (codReparacao) REFERENCES Reparacao(id)
+    FOREIGN KEY (codReparacao) REFERENCES Reparacao(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS MovimentoPeca (
@@ -342,7 +342,7 @@ CREATE TABLE IF NOT EXISTS NotificacaoOS (
     id_os INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id)    REFERENCES Notificacao(id)   ON DELETE CASCADE,
-    FOREIGN KEY (id_os) REFERENCES OrdemServico(id)
+    FOREIGN KEY (id_os) REFERENCES OrdemServico(id)  ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS NotificacaoStock (
@@ -350,6 +350,6 @@ CREATE TABLE IF NOT EXISTS NotificacaoStock (
     id_peca INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (id)      REFERENCES Notificacao(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_peca) REFERENCES Peca(id)
+    FOREIGN KEY (id_peca) REFERENCES Peca(id)        ON DELETE CASCADE
 );
 

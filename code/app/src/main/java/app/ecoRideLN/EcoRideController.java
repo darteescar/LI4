@@ -517,7 +517,6 @@ public class EcoRideController implements IEcoRideController {
 
     @Override
     public boolean removerStock(int id) {
-        sFinanceiro.removerMovimentosFinanceirosPorStock(id);
         return sStock.removerStock(id);
     }
 
