@@ -12,6 +12,10 @@ public class SAutenticacaoFacade implements ISAutenticacao {
         this.utilizadoresDAO = UtilizadorDAO.getInstance();
     }
 
+    public SAutenticacaoFacade(UtilizadorDAO dao) {
+        this.utilizadoresDAO = dao;
+    }
+
     @Override
     public Utilizador registarUtilizador(String password, int idFuncionario, Cargo cargo, String identificador) {
         validaDadosUtilizador(password, idFuncionario, cargo, identificador);

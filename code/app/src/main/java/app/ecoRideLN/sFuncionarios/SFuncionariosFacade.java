@@ -9,9 +9,13 @@ import app.ecoRideCD.sFuncionarios.FuncionarioDAO;
 
 public class SFuncionariosFacade implements ISFuncionarios {
      private final FuncionarioDAO funcionarioDAO;
-     
+
      public SFuncionariosFacade() {
           this.funcionarioDAO = FuncionarioDAO.getInstance();
+     }
+
+     public SFuncionariosFacade(FuncionarioDAO dao) {
+          this.funcionarioDAO = dao;
      }
 
      @Override

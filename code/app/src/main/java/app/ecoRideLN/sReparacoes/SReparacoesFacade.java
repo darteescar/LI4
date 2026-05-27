@@ -6,7 +6,15 @@ import app.common.EcoRideException;
 import app.ecoRideCD.sReparacoes.ReparacaoDAO;
 
 public class SReparacoesFacade implements ISReparacoes {
-     private final ReparacaoDAO reparacaoDAO = ReparacaoDAO.getInstance();
+     private final ReparacaoDAO reparacaoDAO;
+
+     public SReparacoesFacade() {
+          this.reparacaoDAO = ReparacaoDAO.getInstance();
+     }
+
+     public SReparacoesFacade(ReparacaoDAO dao) {
+          this.reparacaoDAO = dao;
+     }
 
      @Override
      public Reparacao registarReparacao(String nomenclatura, String descricao, float preco, boolean disponivel) {

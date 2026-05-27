@@ -20,7 +20,7 @@ import app.ecoRideLN.sAutenticacao.Utilizador;
 public class UtilizadorDAO implements Map<Integer, Utilizador> {
     private static UtilizadorDAO instance;
 
-    private UtilizadorDAO() {}
+    protected UtilizadorDAO() {}
 
     public static UtilizadorDAO getInstance() {
         if (instance == null) instance = new UtilizadorDAO();

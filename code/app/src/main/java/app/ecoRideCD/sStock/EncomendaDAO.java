@@ -26,7 +26,7 @@ public class EncomendaDAO implements Map<Integer, Encomenda> {
 
      private static EncomendaDAO instance;
 
-     private EncomendaDAO() {}
+     protected EncomendaDAO() {}
 
      public static EncomendaDAO getInstance() {
           if (instance == null) instance = new EncomendaDAO();

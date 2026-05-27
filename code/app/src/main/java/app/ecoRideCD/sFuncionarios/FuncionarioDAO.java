@@ -20,7 +20,7 @@ import app.ecoRideLN.sFuncionarios.Funcionario;
 public class FuncionarioDAO implements Map<Integer, Funcionario> {
      private static FuncionarioDAO instance;
 
-     private FuncionarioDAO() {}
+     protected FuncionarioDAO() {}
 
      public static FuncionarioDAO getInstance() {
           if (instance == null) instance = new FuncionarioDAO();

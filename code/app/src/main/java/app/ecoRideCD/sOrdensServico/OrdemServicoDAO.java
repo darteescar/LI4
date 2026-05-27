@@ -32,7 +32,7 @@ public class OrdemServicoDAO implements Map<Integer, OrdemServico> {
 
     private static OrdemServicoDAO instance;
 
-    private OrdemServicoDAO() {}
+    protected OrdemServicoDAO() {}
 
     public static OrdemServicoDAO getInstance() {
         if (instance == null) instance = new OrdemServicoDAO();

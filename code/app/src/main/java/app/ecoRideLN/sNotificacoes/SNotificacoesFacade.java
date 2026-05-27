@@ -5,7 +5,15 @@ import java.util.List;
 import app.ecoRideCD.sNotificacoes.NotificacoesDAO;
 
 public class SNotificacoesFacade implements ISNotificacoes {
-     private final NotificacoesDAO notificacaoDAO = NotificacoesDAO.getInstance();
+     private final NotificacoesDAO notificacaoDAO;
+
+     public SNotificacoesFacade() {
+          this.notificacaoDAO = NotificacoesDAO.getInstance();
+     }
+
+     public SNotificacoesFacade(NotificacoesDAO dao) {
+          this.notificacaoDAO = dao;
+     }
 
      @Override
      public void registarNotificacaoOS(String descricao, int id_remetente,List<Integer> ids_destinatarios, int id_os) {

@@ -24,7 +24,7 @@ public class DevolucaoDAO implements Map<Integer, Devolucao> {
 
     private static DevolucaoDAO instance;
 
-    private DevolucaoDAO() {}
+    protected DevolucaoDAO() {}
 
     public static DevolucaoDAO getInstance() {
         if (instance == null) instance = new DevolucaoDAO();

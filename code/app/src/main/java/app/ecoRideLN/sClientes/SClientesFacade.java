@@ -9,10 +9,18 @@ import app.ecoRideCD.sClientes.ClienteDAO;
 import app.ecoRideCD.sClientes.TrotineteDAO;
 
 public class SClientesFacade implements ISClientes {
-     private final ClienteDAO     clientesDAO     = ClienteDAO.getInstance();
-     private final TrotineteDAO   trotinetesDAO   = TrotineteDAO.getInstance();
+     private final ClienteDAO     clientesDAO;
+     private final TrotineteDAO   trotinetesDAO;
 
-     public SClientesFacade() {}
+     public SClientesFacade() {
+          this.clientesDAO   = ClienteDAO.getInstance();
+          this.trotinetesDAO = TrotineteDAO.getInstance();
+     }
+
+     public SClientesFacade(ClienteDAO clientesDAO, TrotineteDAO trotinetesDAO) {
+          this.clientesDAO   = clientesDAO;
+          this.trotinetesDAO = trotinetesDAO;
+     }
 
      // ------------------- Cliente -------------------
 

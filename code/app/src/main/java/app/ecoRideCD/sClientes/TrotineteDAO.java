@@ -21,7 +21,7 @@ import app.ecoRideLN.sClientes.Trotinete;
 public class TrotineteDAO implements Map<Integer, Trotinete> {
     private static TrotineteDAO instance;
 
-    private TrotineteDAO() {}
+    protected TrotineteDAO() {}
 
     public static TrotineteDAO getInstance() {
         if (instance == null) instance = new TrotineteDAO();

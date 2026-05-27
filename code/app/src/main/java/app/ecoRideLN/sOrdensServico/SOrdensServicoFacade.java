@@ -10,7 +10,15 @@ import app.ecoRideCD.sOrdensServico.OrdemServicoDAO;
 
 public class SOrdensServicoFacade implements ISOrdensServico {
 
-    private final OrdemServicoDAO ordemServicoDAO = OrdemServicoDAO.getInstance();
+    private final OrdemServicoDAO ordemServicoDAO;
+
+    public SOrdensServicoFacade() {
+        this.ordemServicoDAO = OrdemServicoDAO.getInstance();
+    }
+
+    public SOrdensServicoFacade(OrdemServicoDAO dao) {
+        this.ordemServicoDAO = dao;
+    }
 
     @Override
     public OrdemServico registarOS(Registo registo) {

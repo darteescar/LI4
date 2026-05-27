@@ -21,7 +21,7 @@ import app.ecoRideLN.sClientes.Cliente;
 public class ClienteDAO implements Map<Integer, Cliente> {
     private static ClienteDAO instance;
 
-    private ClienteDAO() {}
+    protected ClienteDAO() {}
 
     public static ClienteDAO getInstance() {
         if (instance == null) instance = new ClienteDAO();

@@ -21,7 +21,7 @@ import app.ecoRideLN.sStock.Peca;
 public class PecaDAO implements Map<Integer, Peca> {
     private static PecaDAO instance;
 
-    private PecaDAO() {}
+    protected PecaDAO() {}
 
     public static PecaDAO getInstance() {
         if (instance == null) instance = new PecaDAO();

@@ -19,7 +19,7 @@ import app.ecoRideLN.sReparacoes.Reparacao;
 public class ReparacaoDAO implements Map<Integer, Reparacao> {
     private static ReparacaoDAO instance;
 
-    private ReparacaoDAO() {}
+    protected ReparacaoDAO() {}
 
     public static ReparacaoDAO getInstance() {
         if (instance == null) instance = new ReparacaoDAO();

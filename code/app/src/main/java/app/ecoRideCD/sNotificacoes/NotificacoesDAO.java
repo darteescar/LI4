@@ -27,7 +27,7 @@ public class NotificacoesDAO implements Map<Integer, Notificacao> {
 
     private static NotificacoesDAO instance;
 
-    private NotificacoesDAO() {}
+    protected NotificacoesDAO() {}
 
     public static NotificacoesDAO getInstance() {
         if (instance == null) instance = new NotificacoesDAO();

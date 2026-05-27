@@ -21,7 +21,7 @@ public class DefeitoDAO implements Map<Integer, Defeito> {
 
     private static DefeitoDAO instance;
 
-    private DefeitoDAO() {}
+    protected DefeitoDAO() {}
 
     public static DefeitoDAO getInstance() {
         if (instance == null) instance = new DefeitoDAO();

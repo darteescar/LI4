@@ -10,7 +10,15 @@ import app.common.EcoRideException;
 import app.ecoRideCD.sFinanceiro.MovimentoFinanceiroDAO;
 
 public class SFinanceiroFacade implements ISFinanceiro {
-     private final MovimentoFinanceiroDAO movimentoFinanceiroDAO = MovimentoFinanceiroDAO.getInstance();
+     private final MovimentoFinanceiroDAO movimentoFinanceiroDAO;
+
+     public SFinanceiroFacade() {
+          this.movimentoFinanceiroDAO = MovimentoFinanceiroDAO.getInstance();
+     }
+
+     public SFinanceiroFacade(MovimentoFinanceiroDAO dao) {
+          this.movimentoFinanceiroDAO = dao;
+     }
 
      // ------------------- Registo -------------------
 

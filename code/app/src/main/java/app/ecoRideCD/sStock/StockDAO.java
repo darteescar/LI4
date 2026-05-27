@@ -30,7 +30,7 @@ public class StockDAO implements Map<Integer, Stock> {
 
     private static StockDAO instance;
 
-    private StockDAO() {
+    protected StockDAO() {
     }
 
     public static StockDAO getInstance() {

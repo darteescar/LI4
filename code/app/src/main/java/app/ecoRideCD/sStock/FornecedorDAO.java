@@ -19,7 +19,7 @@ import app.ecoRideLN.sStock.Fornecedor;
 public class FornecedorDAO implements Map<Integer, Fornecedor> {
     private static FornecedorDAO instance;
 
-    private FornecedorDAO() {}
+    protected FornecedorDAO() {}
 
     public static FornecedorDAO getInstance() {
         if (instance == null) instance = new FornecedorDAO();

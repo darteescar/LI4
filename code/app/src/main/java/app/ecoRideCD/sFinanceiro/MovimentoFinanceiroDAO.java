@@ -26,7 +26,7 @@ public class MovimentoFinanceiroDAO implements Map<Integer, MovimentoFinanceiro>
 
     private static MovimentoFinanceiroDAO instance;
 
-    private MovimentoFinanceiroDAO() {}
+    protected MovimentoFinanceiroDAO() {}
 
     public static MovimentoFinanceiroDAO getInstance() {
         if (instance == null) instance = new MovimentoFinanceiroDAO();

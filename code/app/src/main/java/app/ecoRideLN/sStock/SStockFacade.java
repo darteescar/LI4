@@ -17,12 +17,31 @@ import app.ecoRideCD.sStock.StockDAO;
 
 public class SStockFacade implements ISStock {
 
-    private final FornecedorDAO fornecedorDAO = FornecedorDAO.getInstance();
-    private final EncomendaDAO  encomendaDAO  = EncomendaDAO.getInstance();
-    private final PecaDAO       pecaDAO       = PecaDAO.getInstance();
-    private final DevolucaoDAO  devolucaoDAO  = DevolucaoDAO.getInstance();
-    private final StockDAO      stockDAO      = StockDAO.getInstance();
-    private final DefeitoDAO    defeitoDAO    = DefeitoDAO.getInstance();
+    private final FornecedorDAO fornecedorDAO;
+    private final EncomendaDAO  encomendaDAO;
+    private final PecaDAO       pecaDAO;
+    private final DevolucaoDAO  devolucaoDAO;
+    private final StockDAO      stockDAO;
+    private final DefeitoDAO    defeitoDAO;
+
+    public SStockFacade() {
+        this.fornecedorDAO = FornecedorDAO.getInstance();
+        this.encomendaDAO  = EncomendaDAO.getInstance();
+        this.pecaDAO       = PecaDAO.getInstance();
+        this.devolucaoDAO  = DevolucaoDAO.getInstance();
+        this.stockDAO      = StockDAO.getInstance();
+        this.defeitoDAO    = DefeitoDAO.getInstance();
+    }
+
+    public SStockFacade(FornecedorDAO fornecedorDAO, PecaDAO pecaDAO, StockDAO stockDAO,
+                 EncomendaDAO encomendaDAO, DefeitoDAO defeitoDAO, DevolucaoDAO devolucaoDAO) {
+        this.fornecedorDAO = fornecedorDAO;
+        this.encomendaDAO  = encomendaDAO;
+        this.pecaDAO       = pecaDAO;
+        this.devolucaoDAO  = devolucaoDAO;
+        this.stockDAO      = stockDAO;
+        this.defeitoDAO    = defeitoDAO;
+    }
 
     // ------------------- Fornecedor -------------------
 
