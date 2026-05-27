@@ -28,6 +28,7 @@ services:
       DB_USER: ecoride
       DB_PASS: EcoRide123!
       DEV_MODE: "true"   # remover em produção
+      ENCRYPTION_KEY: "gJ0uE98qhXW39ZLMVzrEM8/DlrZdGNKxnzRPvZk7nnE="  # AES-256 — não expor em produção
     ports:
       - "7000:7000"   # exposto para testes directos à API
     depends_on:

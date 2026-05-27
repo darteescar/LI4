@@ -21,22 +21,22 @@ CREATE TABLE IF NOT EXISTS Utilizador (
 
 CREATE TABLE IF NOT EXISTS Funcionario (
     id                  INT           NOT NULL AUTO_INCREMENT,
-    nome                VARCHAR(100)  NOT NULL,
-    telemovel           VARCHAR(20)   NOT NULL,
-    email               VARCHAR(150)  NOT NULL,
-    data_nascimento     DATE          NULL,
-    NISS                VARCHAR(20)   NOT NULL,
-    NIF                 VARCHAR(20)   NOT NULL,
-    NUS                 VARCHAR(20)   NOT NULL,
-    IBAN                VARCHAR(34)   NOT NULL,
-    salario_hora        FLOAT         NOT NULL,
-    salario_liquido     FLOAT         NOT NULL,
-    salario_bruto       FLOAT         NOT NULL,
+    nome                VARCHAR(200)  NOT NULL,  -- cifrado AES-256-GCM Base64
+    telemovel           VARCHAR(100)  NOT NULL,
+    email               VARCHAR(300)  NOT NULL,
+    data_nascimento     VARCHAR(100)  NULL,
+    NISS                VARCHAR(100)  NOT NULL,
+    NIF                 VARCHAR(100)  NOT NULL,
+    NUS                 VARCHAR(100)  NOT NULL,
+    IBAN                VARCHAR(100)  NOT NULL,
+    salario_hora        VARCHAR(100)  NOT NULL,  -- cifrado: float serializado como string
+    salario_liquido     VARCHAR(100)  NOT NULL,
+    salario_bruto       VARCHAR(100)  NOT NULL,
     horas_extra         INT           NOT NULL DEFAULT 0,
-    numero_porta        VARCHAR(20)   NOT NULL,
-    rua                 VARCHAR(255)  NOT NULL,
-    localidade          VARCHAR(100)  NOT NULL,
-    codigo_postal       VARCHAR(20)   NOT NULL,
+    numero_porta        VARCHAR(100)  NOT NULL,
+    rua                 VARCHAR(400)  NOT NULL,
+    localidade          VARCHAR(200)  NOT NULL,
+    codigo_postal       VARCHAR(100)  NOT NULL,
     PRIMARY KEY (id)
 );
 

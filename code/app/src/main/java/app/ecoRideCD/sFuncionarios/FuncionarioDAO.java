@@ -1,7 +1,6 @@
 package app.ecoRideCD.sFuncionarios;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import app.common.EcoRideException;
+import app.ecoRideCD.DAOconfig.CifraUtil;
 import app.ecoRideCD.DAOconfig.ConnectionFactory;
 import app.ecoRideLN.sFuncionarios.Funcionario;
 
@@ -28,25 +28,27 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
      }
 
      private Funcionario buildFromRow(ResultSet rs) throws SQLException {
-          Date dn = rs.getDate("data_nascimento");
+          String dnRaw = rs.getString("data_nascimento");
+          java.time.LocalDate dn = dnRaw == null ? null
+              : java.time.LocalDate.parse(CifraUtil.decifrar(dnRaw));
           return new Funcionario(
                     rs.getInt("id"),
-                    rs.getString("nome"),
-                    rs.getString("telemovel"),
-                    rs.getString("email"),
-                    dn == null ? null : dn.toLocalDate(),
-                    rs.getString("NISS"),
-                    rs.getString("NIF"),
-                    rs.getString("NUS"),
-                    rs.getString("IBAN"),
-                    rs.getFloat("salario_hora"),
-                    rs.getFloat("salario_liquido"),
-                    rs.getFloat("salario_bruto"),
+                    CifraUtil.decifrar(rs.getString("nome")),
+                    CifraUtil.decifrar(rs.getString("telemovel")),
+                    CifraUtil.decifrar(rs.getString("email")),
+                    dn,
+                    CifraUtil.decifrar(rs.getString("NISS")),
+                    CifraUtil.decifrar(rs.getString("NIF")),
+                    CifraUtil.decifrar(rs.getString("NUS")),
+                    CifraUtil.decifrar(rs.getString("IBAN")),
+                    (float) CifraUtil.decifrarFloat(rs.getString("salario_hora")),
+                    (float) CifraUtil.decifrarFloat(rs.getString("salario_liquido")),
+                    (float) CifraUtil.decifrarFloat(rs.getString("salario_bruto")),
                     rs.getInt("horas_extra"),
-                    rs.getString("numero_porta"),
-                    rs.getString("rua"),
-                    rs.getString("localidade"),
-                    rs.getString("codigo_postal"));
+                    CifraUtil.decifrar(rs.getString("numero_porta")),
+                    CifraUtil.decifrar(rs.getString("rua")),
+                    CifraUtil.decifrar(rs.getString("localidade")),
+                    CifraUtil.decifrar(rs.getString("codigo_postal")));
      }
 
      @Override
@@ -107,23 +109,24 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
                     """;
           try (Connection c = ConnectionFactory.get();
                PreparedStatement ps = c.prepareStatement(sql)) {
-               ps.setString(1, value.getNome());
-               ps.setString(2, value.getTelemovel());
-               ps.setString(3, value.getEmail());
-               ps.setDate(4, value.getData_nascimento() == null ? null : Date.valueOf(value.getData_nascimento()));
-               ps.setString(5, value.getNISS());
-               ps.setString(6, value.getNIF());
-               ps.setString(7, value.getNUS());
-               ps.setString(8, value.getIBAN());
-               ps.setDouble(9, value.getSalario_hora());
-               ps.setDouble(10, value.getSalario_liquido());
-               ps.setDouble(11, value.getSalario_bruto());
-               ps.setInt(12, value.getHoras_extra());
-               ps.setString(13, value.getNumero_porta());
-               ps.setString(14, value.getRua());
-               ps.setString(15, value.getLocalidade());
-               ps.setString(16, value.getCodigo_postal());
-               ps.setInt(17, key);
+               ps.setString(1,  CifraUtil.cifrar(value.getNome()));
+               ps.setString(2,  CifraUtil.cifrar(value.getTelemovel()));
+               ps.setString(3,  CifraUtil.cifrar(value.getEmail()));
+               ps.setString(4,  value.getData_nascimento() == null ? null
+                                    : CifraUtil.cifrar(value.getData_nascimento().toString()));
+               ps.setString(5,  CifraUtil.cifrar(value.getNISS()));
+               ps.setString(6,  CifraUtil.cifrar(value.getNIF()));
+               ps.setString(7,  CifraUtil.cifrar(value.getNUS()));
+               ps.setString(8,  CifraUtil.cifrar(value.getIBAN()));
+               ps.setString(9,  CifraUtil.cifrarFloat(value.getSalario_hora()));
+               ps.setString(10, CifraUtil.cifrarFloat(value.getSalario_liquido()));
+               ps.setString(11, CifraUtil.cifrarFloat(value.getSalario_bruto()));
+               ps.setInt(12,    value.getHoras_extra());
+               ps.setString(13, CifraUtil.cifrar(value.getNumero_porta()));
+               ps.setString(14, CifraUtil.cifrar(value.getRua()));
+               ps.setString(15, CifraUtil.cifrar(value.getLocalidade()));
+               ps.setString(16, CifraUtil.cifrar(value.getCodigo_postal()));
+               ps.setInt(17,    key);
                ps.executeUpdate();
           } catch (SQLException e) {
                throw new EcoRideException("Erro a gravar funcionario " + key, e);
@@ -139,22 +142,23 @@ public class FuncionarioDAO implements Map<Integer, Funcionario> {
                     """;
           try (Connection c = ConnectionFactory.get();
                PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-               ps.setString(1, value.getNome());
-               ps.setString(2, value.getTelemovel());
-               ps.setString(3, value.getEmail());
-               ps.setDate(4, value.getData_nascimento() == null ? null : Date.valueOf(value.getData_nascimento()));
-               ps.setString(5, value.getNISS());
-               ps.setString(6, value.getNIF());
-               ps.setString(7, value.getNUS());
-               ps.setString(8, value.getIBAN());
-               ps.setDouble(9, value.getSalario_hora());
-               ps.setDouble(10, value.getSalario_liquido());
-               ps.setDouble(11, value.getSalario_bruto());
-               ps.setInt(12, value.getHoras_extra());
-               ps.setString(13, value.getNumero_porta());
-               ps.setString(14, value.getRua());
-               ps.setString(15, value.getLocalidade());
-               ps.setString(16, value.getCodigo_postal());
+               ps.setString(1,  CifraUtil.cifrar(value.getNome()));
+               ps.setString(2,  CifraUtil.cifrar(value.getTelemovel()));
+               ps.setString(3,  CifraUtil.cifrar(value.getEmail()));
+               ps.setString(4,  value.getData_nascimento() == null ? null
+                                    : CifraUtil.cifrar(value.getData_nascimento().toString()));
+               ps.setString(5,  CifraUtil.cifrar(value.getNISS()));
+               ps.setString(6,  CifraUtil.cifrar(value.getNIF()));
+               ps.setString(7,  CifraUtil.cifrar(value.getNUS()));
+               ps.setString(8,  CifraUtil.cifrar(value.getIBAN()));
+               ps.setString(9,  CifraUtil.cifrarFloat(value.getSalario_hora()));
+               ps.setString(10, CifraUtil.cifrarFloat(value.getSalario_liquido()));
+               ps.setString(11, CifraUtil.cifrarFloat(value.getSalario_bruto()));
+               ps.setInt(12,    value.getHoras_extra());
+               ps.setString(13, CifraUtil.cifrar(value.getNumero_porta()));
+               ps.setString(14, CifraUtil.cifrar(value.getRua()));
+               ps.setString(15, CifraUtil.cifrar(value.getLocalidade()));
+               ps.setString(16, CifraUtil.cifrar(value.getCodigo_postal()));
                ps.executeUpdate();
                try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) { int id = rs.getInt(1); value.setId(id); return id; }
