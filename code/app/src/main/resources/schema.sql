@@ -21,22 +21,22 @@ CREATE TABLE IF NOT EXISTS Utilizador (
 
 CREATE TABLE IF NOT EXISTS Funcionario (
     id                  INT           NOT NULL AUTO_INCREMENT,
-    nome                VARCHAR(200)  NOT NULL,  -- cifrado AES-256-GCM Base64
-    telemovel           VARCHAR(100)  NOT NULL,
-    email               VARCHAR(300)  NOT NULL,
-    data_nascimento     VARCHAR(100)  NULL,
-    NISS                VARCHAR(100)  NOT NULL,
-    NIF                 VARCHAR(100)  NOT NULL,
-    NUS                 VARCHAR(100)  NOT NULL,
-    IBAN                VARCHAR(100)  NOT NULL,
-    salario_hora        VARCHAR(100)  NOT NULL,  -- cifrado: float serializado como string
-    salario_liquido     VARCHAR(100)  NOT NULL,
-    salario_bruto       VARCHAR(100)  NOT NULL,
+    nome                VARCHAR(200)  NOT NULL,  -- cifrado
+    telemovel           VARCHAR(100)  NOT NULL,  -- cifrado
+    email               VARCHAR(300)  NOT NULL,  -- cifrado
+    data_nascimento     VARCHAR(100)  NULL,       -- cifrado (formato ISO: yyyy-MM-dd)
+    NISS                VARCHAR(100)  NOT NULL,  -- cifrado
+    NIF                 VARCHAR(100)  NOT NULL,  -- cifrado
+    NUS                 VARCHAR(100)  NOT NULL,  -- cifrado
+    IBAN                VARCHAR(100)  NOT NULL,  -- cifrado
+    salario_hora        VARCHAR(100)  NOT NULL,  -- cifrado (float serializado)
+    salario_liquido     VARCHAR(100)  NOT NULL,  -- cifrado (float serializado)
+    salario_bruto       VARCHAR(100)  NOT NULL,  -- cifrado (float serializado)
     horas_extra         INT           NOT NULL DEFAULT 0,
-    numero_porta        VARCHAR(100)  NOT NULL,
-    rua                 VARCHAR(400)  NOT NULL,
-    localidade          VARCHAR(200)  NOT NULL,
-    codigo_postal       VARCHAR(100)  NOT NULL,
+    numero_porta        VARCHAR(100)  NOT NULL,  -- cifrado
+    rua                 VARCHAR(400)  NOT NULL,  -- cifrado
+    localidade          VARCHAR(200)  NOT NULL,  -- cifrado
+    codigo_postal       VARCHAR(100)  NOT NULL,  -- cifrado
     PRIMARY KEY (id)
 );
 
