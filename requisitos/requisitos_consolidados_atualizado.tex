@@ -46,10 +46,10 @@
 		\textbf{3} & Deverá haver um registo de qual mecânico realizou o diagnóstico e qual realizou a reparação da OS. \\ \hline
 		\textbf{4} & O sistema deve impedir que dois mecânicos iniciem a mesma OS simultaneamente, atribuindo-a a um mecânico de cada vez. Caso um mecânico selecione uma OS que já está a ser tratada, deverá ser impedido. \\ \hline
 		\textbf{5} & Sempre que uma peça for colocada no estado "Possível defeito" ou tiver a sua quantidade mínima atingida, deverá ser gerado automaticamente um alerta (que contém o motivo do alerta e a peça em questão) para o gestor de stock, que deverá ficar guardado na sua lista de alertas. Cada alerta deverá ter um campo que indique se já foi tratado ou não. \\ \hline
-	    \textbf{6} & Quando uma peça no estado "Possível Defeito" for colocada no estado "Pendente de Devolução", a quantidade em stock dessa peça deverá diminuir em 1 unidade. \\ \hline
- 	    \textbf{7} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Devolvida ao fornecedor", uma unidade dessa peça deverá ser adicionada ao stock sem qualquer custo adicional. \\ \hline
-  	    \textbf{8} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Inválida para Devolução", não deverá existir qualquer consequência no stock ou nos movimentos. \\ \hline
-  	    \textbf{9} & O sistema deverá separar os utilizadores definindo diferentes perfis, consoante o seu cargo, disponibilizando as respetivas capacidades. \\ \hline
+		\textbf{6} & Quando uma peça no estado "Possível Defeito" for colocada no estado "Pendente de Devolução", a quantidade em stock dessa peça deverá diminuir em 1 unidade. \\ \hline
+		\textbf{7} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Devolvida ao fornecedor", uma unidade dessa peça deverá ser adicionada ao stock sem qualquer custo adicional. \\ \hline
+		\textbf{8} & Quando uma peça no estado "Pendente de Devolução" for colocada no estado "Inválida para Devolução", não deverá existir qualquer consequência no stock ou nos movimentos. \\ \hline
+		\textbf{9} & O sistema deverá separar os utilizadores definindo diferentes perfis, consoante o seu cargo, disponibilizando as respetivas capacidades. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
@@ -81,10 +81,11 @@
 		\textbf{1} & O gestor de armazém poderá consultar as peças existentes no sistema, as peças em stock, as peças com possível defeito em stock, as peças pendentes de devolução e as peças devolvidas ao fornecedor. Para isto, poderá filtrar por estado (se existe no sistema, stock, com possível defeito, pendente de devolução, devolvida ao fornecedor ou inválida para devolução), fornecedor, referência, data de receção (para as que estejam em stock), tipo ou preço. \\ \hline
 		\textbf{2} & O gestor de armazém poderá adicionar, remover e editar o stock de peças existentes. Para além disso, também poderá adicionar, remover e editar fornecedores. \\ \hline
 		\textbf{3} & O sistema deve permitir registar fornecedores obrigatoriamente com: nome e contacto (email ou número de telefone). \\ \hline
-		\textbf{4} & O sistema deve permitir o registo de peças obrigatoriamente com: fornecedor, referência (do fornecedor), preço de compra, preço de venda, nível mínimo aceitável em stock, tempo de garantia e marca. \\ \hline
-		\textbf{5} & O sistema deve permitir registar entradas de peças obrigatoriamente com: referência, quantidade, fornecedor, preço de compra e venda e data de receção. \\ \hline
+		\textbf{4} & O sistema deve permitir o registo de peças obrigatoriamente com: fornecedor, referência (do fornecedor), nome, descrição, marca, preço de venda, nível mínimo aceitável em stock e tempo de garantia. O preço de venda deve ser único por peça, independentemente do lote de entrada em stock, para garantir consistência nos valores faturados ao cliente. Deve ainda ser possível marcar peças como inativas, impedindo a sua utilização em novas reparações ou encomendas sem as remover do sistema, preservando o histórico de utilização. \\ \hline
+		\textbf{5} & O sistema deve permitir registar entradas de peças obrigatoriamente com: referência, quantidade, fornecedor, preço de compra e data de receção. O preço de venda não é definido ao nível da entrada de stock, sendo herdado da peça à qual a entrada está associada. \\ \hline
 		\textbf{6} & O sistema deve gerar listas de peças a encomendar com base em níveis mínimos, consumo e stock atual. \\ \hline
 		\textbf{7} & O sistema deve permitir registar e editar peças devolvidas ao fornecedor, com data, motivo e estado da devolução ("Pendente de Devolução", "Devolvida ao Fornecedor" ou "Inválida para Devolução"). \\ \hline
+		\textbf{8} & Quando um mecânico reportar um defeito numa peça, o sistema deverá automaticamente bloquear todas as entradas de stock dessa peça, colocando-as no estado "Possível Defeito" e impedindo a sua utilização em novas reparações. Para cada entrada bloqueada, o sistema deverá preservar o estado em que se encontrava previamente, de modo a permitir a sua restauração caso a inspeção conclua que não apresenta defeito. O gestor de stock deverá poder, para cada entrada no estado "Possível Defeito", decidir entre destiná-la a devolução ao fornecedor ou repô-la no estado anterior. \\ \hline
 	\end{tabularx}
 	
 	\vspace{1cm}
@@ -123,7 +124,7 @@
 		\textbf{8} & Quando um mecânico desejar terminar uma reparação, deverá verificar uma checklist obrigatória de segurança (luzes, pneus, aceleração, travagem, visor, teste de condução). \\ \hline
 		\textbf{9} & O sistema deve permitir ao mecânico marcar a OS como concluída, ficando esta no estado "Pendente Pagamento". \\ \hline
 	\end{tabularx}
-
+	
 	\section*{Requisitos da Investigação Operacional}
 	
 	\begin{tabularx}{\textwidth}{@{}|l|X|@{}}
@@ -132,5 +133,5 @@
 		\textbf{1} & No sistema deverá ser possível nomear os itens que foram deixados na hora de entrega da trotinete, como por exemplo, carregador, cadeado e chave.  \\ \hline
 		\textbf{2} & O sistema deverá ter um "Quadro de Estado em Tempo Real" \space acessível na receção. O mecânico deverá identificar a ordem de serviço associada e atualizar o seu estado para que a assistente tenha sempre a resposta imediatamente. \\ \hline
 	\end{tabularx}
-
+	
 \end{document}
