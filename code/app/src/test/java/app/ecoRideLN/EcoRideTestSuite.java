@@ -16,6 +16,9 @@ import org.junit.platform.suite.api.SuiteDisplayName;
     TesteAutenticacao.class,
     TesteReparacoes.class,
     TesteNotificacoes.class,
-    TesteFinanceiro.class
+    TesteFinanceiro.class,
+    // Testes de integração
+    TesteIntegracaoOS.class,
+    TesteIntegracaoStock.class
 })
 public class EcoRideTestSuite {}
