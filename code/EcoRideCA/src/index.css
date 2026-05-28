@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design system — EcoRide: verde vibrante sobre tons escuros/neutros. All colors HSL. */
+/* Uso dos estilos. */
 
 @layer base {
   :root {
