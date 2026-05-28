@@ -12,10 +12,10 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uecoride", "-pEcoRide123!"]
+      test: ["CMD", "mysql", "-uecoride", "-pEcoRide123!", "-e", "USE EcoRide;"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 15
 
   # ── API de dados (Javalin) ──────────────────────────────────────────────────
   backend:
