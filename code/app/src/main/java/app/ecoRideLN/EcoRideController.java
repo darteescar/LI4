@@ -70,6 +70,20 @@ public class EcoRideController implements IEcoRideController {
         this.sReparacoes = new SReparacoesFacade();
     }
 
+    EcoRideController(ISNotificacoes sNotificacoes, ISAutenticacao sAutenticacao,
+                      ISClientes sClientes, ISFinanceiro sFinanceiro,
+                      ISFuncionarios sFuncionarios, ISOrdensServico sOrdensServico,
+                      ISStock sStock, ISReparacoes sReparacoes) {
+        this.sNotificacoes = sNotificacoes;
+        this.sAutenticacao = sAutenticacao;
+        this.sClientes = sClientes;
+        this.sFinanceiro = sFinanceiro;
+        this.sFuncionarios = sFuncionarios;
+        this.sOrdensServico = sOrdensServico;
+        this.sStock = sStock;
+        this.sReparacoes = sReparacoes;
+    }
+
     // ------------------- Autenticação -------------------
 
     @Override

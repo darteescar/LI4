@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+// Sistema de cores e estilos customizados para o projeto, baseado no tema do Shadcn UI.
+
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],

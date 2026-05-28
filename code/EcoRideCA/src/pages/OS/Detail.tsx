@@ -186,7 +186,7 @@ export default function OSDetail() {
 
   const isMecAtribuido = isMec && !!mecIdUtilizador && user?.idUtilizador === mecIdUtilizador.idUtilizador;
   const canMecOps = isMecAtribuido;
-  const canPegar = isMec && !os.codMecanico && os.estado === "PendenteDiagnostico";
+  const canPegar = (isMec || isGerente) && !os.codMecanico && os.estado === "PendenteDiagnostico";
   const bloqueadoOutroMec = isMec && !!os.codMecanico && !isMecAtribuido;
 
   const mecNome = funcionarios.find((f) => f.id === os.codMecanico)?.nome ?? (os.codMecanico ? `#${os.codMecanico}` : null);
@@ -276,7 +276,7 @@ export default function OSDetail() {
                           Esta OS está disponível.
                         </p>
                         <Button onClick={() => pegarMutation.mutate()} disabled={pegarMutation.isPending}>
-                          <ShieldCheck className="h-4 w-4" /> Pegar nesta OS
+                          <ShieldCheck className="h-4 w-4" /> Executar OS
                         </Button>
                       </div>
                     ) 
@@ -297,7 +297,7 @@ export default function OSDetail() {
             os={os}
             reparacoes={reparacoes}
             pecas={pecas}
-            canEdit={canMecOps && os.estado === "PendenteDiagnostico" && !!os.codMecanico}
+            canEdit={(canMecOps || isGerente) && os.estado === "PendenteDiagnostico" && !!os.codMecanico}
             canApprove={canSecOps && os.estado === "PendenteAprovacaoOrcamento"}
             onChanged={reload}
           />
@@ -308,7 +308,7 @@ export default function OSDetail() {
             os={os}
             reparacoes={reparacoes}
             pecas={pecas}
-            canEdit={canMecOps && (os.estado === "PendenteReparacao" || os.estado === "AguardarPecas")}
+            canEdit={(canMecOps || isGerente) && (os.estado === "PendenteReparacao" || os.estado === "AguardarPecas")}
             canReportDefeito={isGerente || isMecAtribuido}
             onChanged={reload}
           />
