@@ -1,150 +1,102 @@
 # LI4 (Laboratórios de Informática IV) (Português)
 
-Projeto de grupo desenvolvido no âmbito da UC de LI4. O projeto consiste na implementação de protocolos que correrm sobre UDP (MissionLink) e TCP (TelemetryStream) para a comunicação entre _Rovers_ e uma Nave Mãe, numa simulação de missões espaciais.
-Pode consultar o [enunciado](TP_CC_2526.pdf) do projeto e o respetivo [relatório](Relatorio_CC.pdf).
+Projeto de grupo desenvolvido no âmbito da UC de LI4. O projeto consiste no desenvolvimento do sistema de gestão para a empresa EcoRide Solutions — uma aplicação web de gestão de uma oficina de reparação de trotinetes elétricas, com suporte a ordens de serviço, stock, financeiro e notificações.
+Pode consultar o [enunciado](enunciado.pdf) do projeto e o respetivos relaótios: [relatório](relatorios/relatorio.pdf), [Guia de Manutenção](relatorios/Guião%20Manutenção%20EcoRide.pdf) e [Guia de Utilização](relatorios/Guião%20Utilização%20EcoRide.pdf).
 
 ## Membros do grupo:
 
 * [darteescar](https://github.com/darteescar)
 * [luis7788](https://github.com/luis7788)
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
+* [inesferribeiro](https://github.com/inesferribeiro)
 
-### Nota Final: 17.7 / 20 ⭐️
+### Nota Final: ?? / 20 ⭐️
 
 ![Interface](background.png)
 
-## Dependências 
+## Dependências
 
-Para poder correr as topologias criadas e testar os protocolos é necessário ter o [CORE](https://github.com/eivarin/Dockerized-Coreemu-Template) instalado.
-Para o **CORE** ter acesso ao código fonte, é necessário que o mesmo se encontre na diretoria *volume/*, que é partilhada pelo Docker e pela sua máquina.
+Para poder correr o sistema é necessário ter o [Docker](https://docs.docker.com/get-docker/) e o [Docker Compose](https://docs.docker.com/compose/install/) instalados.
 
-## Ambiente de testes
-Para testar os protocolos abra no CORE qualquer uma destas três topologias desenvolvidas:
+## Arranque
 
-- final-clean.xml
-- final-easy.xml
-- final-hard.xml
-
-Corra a topologia. Abra os terminais dos nós dos _Rovers_ que pretende testar, da _Nave Mãe_ e do _Ground Control_. Em cada um dos terminais abertos certifique-se que se encontra na diretoria *mission/* :
+Na diretoria `code/`, execute:
 
 ```bash
-$ cd mission/
+docker compose up --build
 ```
 
-### Compile
+Após o arranque, os seguintes serviços ficam disponíveis:
 
-Para compilar o projeto faça:
+- **Interface** → http://localhost:3000
+- **API directa** → http://localhost:7000
+- **Swagger UI** → http://localhost:8081
+
+### Credenciais de acesso
+
+| Identificador | Password   | Cargo        |
+|---------------|------------|--------------|
+| `admin`       | `admin123` | Gerente      |
+
+### Parar o sistema
 
 ```bash
-$ make compile
+docker compose down
 ```
 
-### Run
-
-Para correr a _Nave Mãe_ faça no seu terminal:
+Para parar e apagar todos os dados (reset completo):
 
 ```bash
-$ make navemae IP= ip_nave_mae
-```
-
-Onde o IP corresponde ao valor contido na topologia.
-
-Para correr os _Rovers_ faça nos seus terminais:
-
-```bash
-$ make rover ID=R-X IP_ROVER=X.X.X.X PORTA=7000 IP_NAVEMAE=ip_nave_mae
-```
-
-Onde o ID e o IP correspodem aos valores contidos na topologia.
-
-Para correr o _Ground Control_ faça no seu terminal:
-
-```bash
-$ make groundcontrol
-```
-### Rebuild
-
-Para reconstruir o projeto faça:
-
-```bash
-$ make rebuild
-```
-
-### Clean
-
-Para remover os ficheiros gerados pelo compile o projeto faça:
-
-```bash
-$ make clean
+docker compose down -v
 ```
 
 
-# CC (Computer Communications) (English)
-Group project developed within the scope of the CC course. The project consists of the implementation of protocols that run over UDP (MissionLink) and TCP (TelemetryStream) for communication between Rovers and a Mother Ship, in a simulation of space missions. You can consult the [statement](TP_CC_2526.pdf) of the project and the respective [report](Relatorio_CC.pdf).
+# LI4 (Laboratórios de Informática IV) (English)
+
+Group project developed within the scope of the LI4 course. The project consists of the development of a management system for the company EcoRide Solutions — a web application for managing an electric scooter repair workshop, with support for work orders, stock, financials and notifications.
+You can consult the [statement](enunciado.pdf) of the project and the respective reports: [report](relatorios/relatorio.pdf), [Maintenance Guide](relatorios/Guião%20Manutenção%20EcoRide.pdf) and [User Guide](relatorios/Guião%20Utilização%20EcoRide.pdf).
 
 ## Group members:
+
 * [darteescar](https://github.com/darteescar)
 * [luis7788](https://github.com/luis7788)
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
+* [inesferribeiro](https://github.com/inesferribeiro)
 
-### Final Grade: 17.7 / 20 ⭐️
+### Final Grade: ?? / 20 ⭐️
 
 ## Dependencies
-To run the created topologies and test the protocols, you need to have [CORE](https://github.com/eivarin/Dockerized-Coreemu-Template) installed. For **CORE** to have access to the source code, it is necessary that it is in the *volume/* directory, which is shared by Docker and your machine.
 
-## Testing environment
-To test the protocols, open any of these three developed topologies in CORE:
+To run the system you need to have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
-- final-clean.xml
-- final-easy.xml
-- final-hard.xml
+## Starting the system
 
-Start the topology. Open the terminals of the nodes of the _Rovers_ you want to test, of the _Mother Ship_ and of the _Ground Control_. In each of the opened terminals make sure you are in the *mission/* directory:
+In the `code/` directory, run:
 
 ```bash
-$ cd mission/
+docker compose up --build
 ```
 
-### Compilation
-To compile the project do:
+Once started, the following services are available:
+
+- **Interface** → http://localhost:3000
+- **Direct API** → http://localhost:7000
+- **Swagger UI** → http://localhost:8081
+
+### Login credentials
+
+| Identifier | Password   | Role    |
+|------------|------------|---------|
+| `admin`    | `admin123` | Manager |
+
+### Stopping the system
 
 ```bash
-$ make compile
+docker compose down
 ```
 
-### Run
-To run the _Mother Ship_ do in its terminal:
+To stop and delete all data (full reset):
 
 ```bash
-$ make navemae IP= mother_ship_ip
-```
-
-Where the IP corresponds to the value contained in the topology.
-
-To run the _Rovers_ do in their terminals:
-
-```bash
-$ make rover ID=R-X IP_ROVER=X.X.X.X PORTA=7000 IP_NAVEMAE=mother_ship_ip
-```
-
-Where the ID and IP correspond to the values contained in the topology.
-
-To run the _Ground Control_ do in its terminal:
-
-```bash
-$ make groundcontrol
-```
-
-### Rebuild
-To rebuild the project do:
-
-```bash
-$ make rebuild
-```
-
-### Clean
-To remove the files generated by compiling the project do:
-
-```bash
-$ make clean
+docker compose down -v
 ```
