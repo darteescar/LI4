@@ -12,7 +12,7 @@ Pode consultar o [enunciado](enunciado.pdf) do projeto e o respetivos relaótios
 
 ### Nota Final: ?? / 20 ⭐️
 
-![Interface](background.png)
+![alt text](dashboard.png)
 
 ## Dependências
 
