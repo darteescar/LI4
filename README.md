@@ -2,10 +2,11 @@
 
 Projeto de grupo desenvolvido no âmbito da Unidade Curricular de LI4. O projeto consiste no desenvolvimento de um sistema de gestão para a empresa EcoRide Solutions — uma aplicação web de gestão de uma oficina de reparação de trotinetes elétricas, com suporte a ordens de serviço, stock, financeiro e notificações.
 
-Pode consultar o [enunciado](enunciado.pdf) do projeto, o relatório e os guias de manutenção e utilização:
-- [Relatório](relatorios/relatorio.pdf)
-- [Guia de Manutenção](relatorios/Guião%20Manutenção%20EcoRide.pdf)
-- [Guia de Utilização](relatorios/Guião%20Utilização%20EcoRide.pdf)
+Pode consultar o enunciado do projeto, o relatório e os guias de manutenção e utilização:
+- [Enunciado](assets/enunciado.pdf)
+- [Relatório](reports/LI4-Relatorio-Grupo7.pdf)
+- [Guia de Manutenção](reports/LI4-GuiaoManutencao-Grupo7.pdf)
+- [Guia de Utilização](reports/LI4-GuiaoUtilizacao-Grupo7.pdf)
 
 ## Membros do grupo:
 
@@ -65,10 +66,11 @@ docker compose down -v
 
 Group project developed within the scope of the LI4 course. The project consists of the development of a management system for the company EcoRide Solutions — a web application for managing an electric scooter repair workshop, with support for work orders, stock, financials and notifications.
 
-You can consult the [assignment](enunciado.pdf) of the project, the report and the maintenance and user guides:
-- [Report](relatorios/relatorio.pdf) 
-- [Maintenance Guide](relatorios/Guião%20Manutenção%20EcoRide.pdf)
-- [User Guide](relatorios/Guião%20Utilização%20EcoRide.pdf)
+You can consult the assignment of the project, the report and the maintenance and user guides:
+- [Assignment](assets/enunciado.pdf)
+- [Report](reports/LI4-Relatorio-Grupo7.pdf) 
+- [Maintenance Guide](reports/LI4-GuiaoManutencao-Grupo7.pdf)
+- [User Guide](reports/LI4-GuiaoUtilizacao-Grupo7.pdf)
 
 ## Group members:
 
