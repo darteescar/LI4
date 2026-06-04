@@ -1,7 +1,11 @@
 # LI4 (Laboratórios de Informática IV) (Português)
 
-Projeto de grupo desenvolvido no âmbito da UC de LI4. O projeto consiste no desenvolvimento do sistema de gestão para a empresa EcoRide Solutions — uma aplicação web de gestão de uma oficina de reparação de trotinetes elétricas, com suporte a ordens de serviço, stock, financeiro e notificações.
-Pode consultar o [enunciado](enunciado.pdf) do projeto e o respetivos relaótios: [relatório](relatorios/relatorio.pdf), [Guia de Manutenção](relatorios/Guião%20Manutenção%20EcoRide.pdf) e [Guia de Utilização](relatorios/Guião%20Utilização%20EcoRide.pdf).
+Projeto de grupo desenvolvido no âmbito da Unidade Curricular de LI4. O projeto consiste no desenvolvimento de um sistema de gestão para a empresa EcoRide Solutions — uma aplicação web de gestão de uma oficina de reparação de trotinetes elétricas, com suporte a ordens de serviço, stock, financeiro e notificações.
+
+Pode consultar o [enunciado](enunciado.pdf) do projeto, o relatório e os guias de manutenção e utilização:
+- [relatório](relatorios/relatorio.pdf), 
+- [Guia de Manutenção](relatorios/Guião%20Manutenção%20EcoRide.pdf)
+- [Guia de Utilização](relatorios/Guião%20Utilização%20EcoRide.pdf).
 
 ## Membros do grupo:
 
@@ -10,9 +14,15 @@ Pode consultar o [enunciado](enunciado.pdf) do projeto e o respetivos relaótios
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
 * [inesferribeiro](https://github.com/inesferribeiro)
 
-### Nota Final: ?? / 20 ⭐️
+<p>
+    <img src="imgs/login.png", width="49%"/>
+    <img src="imgs/dashboard.png", width="49%"/>
+</p>
+<p>
+    <img src="imgs/os.png", width="49%" />
+    <img src="imgs/financeiro.png", width="49%" />
+</p>
 
-![alt text](dashboard.png)
 
 ## Dependências
 
@@ -54,7 +64,11 @@ docker compose down -v
 # LI4 (Laboratórios de Informática IV) (English)
 
 Group project developed within the scope of the LI4 course. The project consists of the development of a management system for the company EcoRide Solutions — a web application for managing an electric scooter repair workshop, with support for work orders, stock, financials and notifications.
-You can consult the [statement](enunciado.pdf) of the project and the respective reports: [report](relatorios/relatorio.pdf), [Maintenance Guide](relatorios/Guião%20Manutenção%20EcoRide.pdf) and [User Guide](relatorios/Guião%20Utilização%20EcoRide.pdf).
+
+You can consult the [assignment](enunciado.pdf) of the project, the report and the maintenance and user guides:
+- [report](relatorios/relatorio.pdf), 
+- [Maintenance Guide](relatorios/Guião%20Manutenção%20EcoRide.pdf)
+- [User Guide](relatorios/Guião%20Utilização%20EcoRide.pdf).
 
 ## Group members:
 
@@ -63,7 +77,15 @@ You can consult the [statement](enunciado.pdf) of the project and the respective
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
 * [inesferribeiro](https://github.com/inesferribeiro)
 
-### Final Grade: ?? / 20 ⭐️
+<p>
+    <img src="imgs/login.png", width="49%"/>
+    <img src="imgs/dashboard.png", width="49%"/>
+</p>
+<p>
+    <img src="imgs/os.png", width="49%" />
+    <img src="imgs/financeiro.png", width="49%" />
+</p>
+
 
 ## Dependencies
 
