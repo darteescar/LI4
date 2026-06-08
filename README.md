@@ -15,6 +15,10 @@ Pode consultar o enunciado do projeto, o relatório e os guias de manutenção e
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
 * [inesferribeiro](https://github.com/inesferribeiro)
 
+### Nota Final: 16 / 20 ⭐️
+
+<br>
+
 <p>
     <img src="imgs/login.png", width="49%"/>
     <img src="imgs/dashboard.png", width="49%"/>
@@ -78,6 +82,10 @@ You can consult the assignment of the project, the report and the maintenance an
 * [luis7788](https://github.com/luis7788)
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
 * [inesferribeiro](https://github.com/inesferribeiro)
+
+### Final Mark: 16 / 20 ⭐️
+
+<br>
 
 <p>
     <img src="imgs/login.png", width="49%"/>
